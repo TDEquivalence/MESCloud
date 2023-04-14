@@ -68,7 +68,7 @@ jobs:
 #Build the application using Maven
       - name: Upload JAR
         #This uploads artifacts from your workflow allowing you to share data between jobs and store data once a workflow is complete.
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3.1.2
         with:
           #Set artifact name
           name: artifact
