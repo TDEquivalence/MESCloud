@@ -22,7 +22,6 @@ public class DataController {
 
     @GetMapping("/string")
     public ResponseEntity<String> getRandomNations() {
-        String stringToReturn = "Hey world and scenes";
-        return new ResponseEntity<>(stringToReturn, HttpStatus.OK);
+        return new ResponseEntity<>("Hey world and scenes", HttpStatus.OK);
     }
 }
