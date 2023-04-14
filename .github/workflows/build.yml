@@ -88,6 +88,13 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: artifact
+      - name: Download artifact
+        uses: actions/download-artifact@v3
+        with: 
+          name: static-site
+      - name: Test artifact download
+        run: ls -R
+          
       #Deploy the artifact (JAR) into AWS Beanstalk
       - name: Deploy to EB
         uses: einaregilsson/beanstalk-deploy@v21
