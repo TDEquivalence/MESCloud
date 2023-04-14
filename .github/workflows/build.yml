@@ -74,7 +74,7 @@ jobs:
           #Set artifact name
           name: artifact
           #From this path
-          path: target/data-0.0.1-SNAPSHOT.jar
+          path: target/mescloud-0.0.1-SNAPSHOT.jar
           
 #Deploy's job
   deploy:
@@ -108,4 +108,4 @@ jobs:
           environment_name: MESCloud-env
           version_label: ${{github.SHA}}
           region: us-east-1
-          deployment_package: data-0.0.1-SNAPSHOT.jar
+          deployment_package: mescloud-0.0.1-SNAPSHOT.jar
