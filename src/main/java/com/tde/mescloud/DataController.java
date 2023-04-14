@@ -12,7 +12,7 @@ public class DataController {
 
     @GetMapping
     public ResponseEntity<String> healthCheck() {
-        return new ResponseEntity<>("200", HttpStatus.OK);
+        return new ResponseEntity<>("FONIXXXXXX estava a ver que não", HttpStatus.OK);
     }
 
     @GetMapping("/version")
