@@ -103,5 +103,5 @@ jobs:
           application_name: mescloud
           environment_name: Mescloud-env-1
           version_label: ${{github.SHA}}
-          region: us-east-1
+          region: eu-west-3
           deployment_package: mescloud-0.0.1-SNAPSHOT.jar
