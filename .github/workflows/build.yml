@@ -86,6 +86,7 @@ jobs:
     #Run on Ubuntu using the latest version
     runs-on: ubuntu-latest
     steps:
+      - run: echo ${{github.ref}}
       - name: Download JAR
         #Download the artifact which was uploaded in the build's job
         uses: actions/download-artifact@v2
