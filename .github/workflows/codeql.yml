@@ -38,7 +38,7 @@ jobs:
           languages: ${{ matrix.language }}
 
       - run: |
-         mvn clean instal -DskipTests
+         mvn clean install -DskipTests
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v1
