@@ -17,7 +17,7 @@ public class DataController {
 
     @GetMapping("/version")
     public String version() {
-        return "Version MES 0.0.1";
+        return "Version MES 0.0.0.1";
     }
 
     @GetMapping("/string")
