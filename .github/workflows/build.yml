@@ -9,9 +9,43 @@ on:
       - '*'
   pull_request:
     types: [opened, synchronize, reopened]
+    
 jobs:
+  analyze:
+    name: Analyze CodeQL
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ 'java']
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Set up JDK ${{ matrix.java }}
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'zulu'
+          java-version: 17
+         # architecture: x64
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: ${{ matrix.language }}
+
+      - run: |
+         mvn clean install -DskipTests
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+
   #Test's job
   tests:
+    needs: analyze
     name: Unit tests
     #Run on Ubuntu using the latest version
     runs-on: ubuntu-latest
@@ -38,6 +72,7 @@ jobs:
         run: mvn -B test
         
   build:
+    needs: tests
     name: Build and analyze
     runs-on: ubuntu-latest
     steps:
