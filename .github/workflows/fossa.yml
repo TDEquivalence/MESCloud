@@ -1,0 +1,31 @@
+          #Software Composition Analysis (SCA)
+
+#Workflow name
+name: Software Composition Analysis
+on:
+  #Manually trigger workflow runs
+  workflow_dispatch:
+  #Trigger the workflow on push from the main branch
+  push:
+    branches:
+      - '*'
+  pull_request:
+    types: [opened, synchronize, reopened]
+jobs:
+  fossa-scan:
+    name: Running Dependencies Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout Code"
+        uses: actions/checkout@v2
+
+      - name: "Run FOSSA Scan"
+        uses: fossas/fossa-action@v1
+        with:
+          api-key: ${{secrets.FOSSA_API_KEY}}
+
+      - name: "Run FOSSA Test"
+        uses: fossas/fossa-action@v1
+        with:
+          api-key: ${{secrets.FOSSA_API_KEY}}
+          run-tests: true
