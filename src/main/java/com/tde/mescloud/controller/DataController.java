@@ -1,4 +1,4 @@
-package com.tde.mescloud;
+package com.tde.mescloud.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,16 +12,16 @@ public class DataController {
 
     @GetMapping
     public ResponseEntity<String> healthCheck() {
-        return new ResponseEntity<>("CELEBRATION TIME", HttpStatus.OK);
+        return new ResponseEntity<>("YEAH", HttpStatus.OK);
     }
 
     @GetMapping("/version")
     public String version() {
-        return "The actual version is 1.0.0 MES";
+        return "Version MES 0.0.0.1";
     }
 
     @GetMapping("/string")
     public ResponseEntity<String> getRandomNations() {
-        return new ResponseEntity<>("Hey world and scenes", HttpStatus.OK);
+        return new ResponseEntity<>("Loving DevOps... Or not!", HttpStatus.OK);
     }
 }
