@@ -114,6 +114,7 @@ jobs:
           
 #Software Composition Analysis (SCA)
   fossa-scan:
+    name: Running Application Tests
     needs: build
     runs-on: ubuntu-latest
     steps:
@@ -134,7 +135,7 @@ jobs:
 #Deploy's job
   deploy:
     #Depends on build's job
-    needs: fossa-scan
+    needs: build
     if: github.ref == 'refs/heads/main'
     name: Deploy
     #Run on Ubuntu using the latest version
