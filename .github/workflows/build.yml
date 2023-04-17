@@ -114,6 +114,7 @@ jobs:
           
 #Software Composition Analysis (SCA)
   fossa-scan:
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - name: "Checkout Code"
@@ -122,7 +123,7 @@ jobs:
       - name: "Run FOSSA Scan"
         uses: fossas/fossa-action@v1
         with:
-          api-key: ${{secrets.fossaApiKey}}
+          api-key: ${{secrets.FOSSA_TOKEN}}
 
       - name: "Run FOSSA Test"
         uses: fossas/fossa-action@v1
@@ -133,7 +134,7 @@ jobs:
 #Deploy's job
   deploy:
     #Depends on build's job
-    needs: build
+    needs: fossa-scan
     if: github.ref == 'refs/heads/main'
     name: Deploy
     #Run on Ubuntu using the latest version
