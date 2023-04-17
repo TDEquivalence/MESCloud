@@ -45,6 +45,7 @@ jobs:
   
   #Synik SCA
   security:
+    name: Synik
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
