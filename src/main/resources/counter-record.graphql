@@ -1,0 +1,15 @@
+schema {
+    query: Query
+}
+
+type Query {
+    getCounterRecords : [CounterRecord]
+    findByAlias(alias : String) : CounterRecord
+}
+
+type CounterRecord {
+    id: ID!
+    alias: String
+    realValue: Float
+    computedValue: Float
+}
