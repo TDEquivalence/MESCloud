@@ -35,6 +35,11 @@ public class CounterRecordController {
         this.repository = repository;
     }
 
+    @GetMapping("/we-are-alive")
+    public ResponseEntity<String> weAreAlive() {
+        return new ResponseEntity<>("We are Alive!", HttpStatus.OK);
+    }
+
     @PostConstruct
     public void loadSchema() throws IOException {
         File schemaFile = schemaResource.getFile();
