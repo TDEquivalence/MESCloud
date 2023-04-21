@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/")
 public class CounterRecordController {
 
     private final CounterRecordRepository repository;
@@ -35,7 +35,7 @@ public class CounterRecordController {
         this.repository = repository;
     }
 
-    @GetMapping("/we-are-alive")
+    @GetMapping
     public ResponseEntity<String> weAreAlive() {
         return new ResponseEntity<>("We are Alive!", HttpStatus.OK);
     }
