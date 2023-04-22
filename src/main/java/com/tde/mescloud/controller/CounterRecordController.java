@@ -11,6 +11,7 @@ import graphql.schema.idl.SchemaGenerator;
 import graphql.schema.idl.SchemaParser;
 import graphql.schema.idl.TypeDefinitionRegistry;
 import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
@@ -31,6 +32,7 @@ public class CounterRecordController {
     @Value("classpath:counter-record.graphql")
     private Resource schemaResource;
 
+    @Autowired
     public CounterRecordController(CounterRecordRepository repository) {
         this.repository = repository;
     }
