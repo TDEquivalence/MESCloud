@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/")
+@RequestMapping("/counter")
 public class CounterRecordController {
 
     private final CounterRecordRepository repository;
@@ -35,11 +35,6 @@ public class CounterRecordController {
     @Autowired
     public CounterRecordController(CounterRecordRepository repository) {
         this.repository = repository;
-    }
-
-    @GetMapping
-    public ResponseEntity<String> healthCheck() {
-        return new ResponseEntity<>("We are Alive!", HttpStatus.OK);
     }
 
     @PostConstruct
