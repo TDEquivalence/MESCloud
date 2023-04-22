@@ -35,7 +35,7 @@ public class CounterRecordController {
         this.repository = repository;
     }
 
-    @GetMapping
+    @GetMapping("/health-check")
     public ResponseEntity<String> healthCheck() {
         return new ResponseEntity<>("We are Alive!", HttpStatus.OK);
     }
