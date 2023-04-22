@@ -36,7 +36,7 @@ public class CounterRecordController {
     }
 
     @GetMapping
-    public ResponseEntity<String> weAreAlive() {
+    public ResponseEntity<String> healthCheck() {
         return new ResponseEntity<>("We are Alive!", HttpStatus.OK);
     }
 
