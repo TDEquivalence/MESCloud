@@ -1,18 +1,18 @@
 #nginx
 server:
-  port: 5000
+  port: 80
 
 #server:
   #port: 8081
 
-spring:
-  datasource:
-    url: jdbc:h2:mem:mydb
-    username: sa
-    password: password
-    driverClassName: org.h2.Driver
-    jpa:
-      spring.jpa.database-platform: org.hibernate.dialect.H2Dialect
+#spring:
+#  datasource:
+#    url: jdbc:h2:mem:mydb
+#    username: sa
+#    password: password
+#    driverClassName: org.h2.Driver
+#    jpa:
+#      spring.jpa.database-platform: org.hibernate.dialect.H2Dialect
 
 #  datasource:
 #    url: jdbc:postgresql://localhost:5432/mesclouddb #change this to your database url
