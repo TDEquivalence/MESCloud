@@ -52,13 +52,11 @@ public class CounterRecordController {
     }
 
     private RuntimeWiring buildWiring() {
-        DataFetcher<List<CounterRecord>> countersFetcher=data -> {
-            return repository.findAll();
-        };
+        DataFetcher<List<CounterRecord>> countersFetcher=data -> repository.findAll();
 
-        DataFetcher<CounterRecord> aliasFetcher=data -> {
-            return repository.findByAlias(data.getArgument("alias"));
-        };
+
+        DataFetcher<CounterRecord> aliasFetcher=data -> repository.findByAlias(data.getArgument("alias"));
+
 
         return RuntimeWiring.newRuntimeWiring().type("Query", typeWriting ->
                 typeWriting.dataFetcher("getCounterRecords", countersFetcher).dataFetcher("findByAlias", aliasFetcher)).build();
@@ -75,14 +73,8 @@ public class CounterRecordController {
         return repository.findAll();
     }
 
-    @PostMapping("/get-all")
-    public ResponseEntity<Object> findAllCounterRecords(@RequestBody String query) {
-        ExecutionResult result = graphQL.execute(query);
-        return new ResponseEntity<>(result, HttpStatus.OK);
-    }
-
-    @PostMapping("/get-by-alias")
-    public ResponseEntity<Object> findByAlias(@RequestBody String query) {
+    @PostMapping("/get-by-query")
+    public ResponseEntity<Object> findByQuery(@RequestBody String query) {
         ExecutionResult result = graphQL.execute(query);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
