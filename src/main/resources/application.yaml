@@ -9,6 +9,9 @@ server:
     url: dbc:postgresql://${HOST}:${PORT}/${DATABASE_NAME} #change this to your database url
     username: ${USERNAME} #change this to your database username
     password: ${PASSWORD} #change this to your database password
+spring:
+  jpa:
+    open-in-view: false
 
 #spring:
 #  datasource:
