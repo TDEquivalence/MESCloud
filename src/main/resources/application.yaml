@@ -2,8 +2,13 @@
 server:
   port: 5000
 
-  #server:
-  #port: 8081
+#server:
+#  port: 8081
+
+  datasource:
+    url: dbc:postgresql://awseb-e-7v2bmnjmr3-stack-awsebrdsdatabase-rcghmsehdn0f.ccov8x8f1qrd.eu-west-3.rds.amazonaws.com:3306/awseb-e-7v2bmnjmr3-stack-awsebrdsdatabase-rcghmsehdn0f #change this to your database url
+    username: development #change this to your database username
+    password: Tde022022 #change this to your database password
 
 #spring:
 #  datasource:
