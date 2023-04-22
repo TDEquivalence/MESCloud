@@ -6,9 +6,9 @@ server:
 #  port: 8081
 
   datasource:
-    url: dbc:postgresql://${HOST}:${PORT}/${DATABASE_NAME} #change this to your database url
-    username: ${USERNAME} #change this to your database username
-    password: ${PASSWORD} #change this to your database password
+    url: dbc:postgresql://${DB_HOST}:${DB_PORT}/${DATABASE_NAME} #change this to your database url
+    username: ${DB_USERNAME} #change this to your database username
+    password: ${DB_PASSWORD} #change this to your database password
 spring:
   jpa:
     open-in-view: false

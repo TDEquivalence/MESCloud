@@ -14,4 +14,9 @@ public class DataController {
     public ResponseEntity<String> healthCheck() {
         return new ResponseEntity<>("We are Alive!", HttpStatus.OK);
     }
+
+    @GetMapping("/health")
+    public ResponseEntity<String> health() {
+        return new ResponseEntity<>("We are Alive!", HttpStatus.OK);
+    }
 }
