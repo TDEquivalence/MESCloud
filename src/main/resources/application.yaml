@@ -1,6 +1,6 @@
 #nginx
 server:
-  port: 80
+  port: 5000
 
   #server:
   #port: 8081
