@@ -1,0 +1,19 @@
+#Search for your_MES or your_TDE to find placeholders
+spring:
+  profiles:
+    active:
+      - development
+
+  datasource:
+    url: dbc:postgresql://${MES_DB_HOST:your_MES_db_host}:${MES_DB_PORT:your_MES_db_port}/${MES_DB_NAME:your_MES_db_name}
+    username: ${MES_DB_USERNAME:your_MES_db_username}
+    password: ${MES_DB_PASSWORD:your_MES_db_password}
+  jpa:
+    open-in-view: false
+
+aws:
+  mqtt:
+      clientId: ${MES_MQTT_CLIENT_ID:your_MES_mqtt_client_id}
+      clientEndpoint: ${MES_MQTT_CLIENT_ENDPOINT:your_MES_mqtt_client_endpoint}
+      awsAccessKeyId: ${TDE_AWS_ACCESS_KEY_ID:your_TDE_user_aws_access_key_id}
+      awsSecretAccessKey: ${TDE_AWS_SECRET_ACCESS_KEY:your_TDE_user_aws_secret_access_key}

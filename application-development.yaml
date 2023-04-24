@@ -1,0 +1,3 @@
+mes:
+  mqtt:
+    countProtocolTopic: "DEV/MASILVA/OBO/PROTOCOL_COUNT_V0"
