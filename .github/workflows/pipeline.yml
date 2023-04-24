@@ -8,8 +8,6 @@ on:
     branches:
       - '*'
       - 'feature/*' 
-  pull_request:
-    types: [created, edited, opened, synchronize, reopened]
     
 jobs:
   analyze:
@@ -152,7 +150,7 @@ jobs:
           aws_session_token: ${{ secrets.AWS_SESSION_TOKEN }}
           use_existing_version_if_available: true
           application_name: mescloud
-          environment_name: Mescloud-env
+          environment_name: Mescloud-env-1
           version_label: ${{github.SHA}}
           region: eu-west-3
           deployment_package: mescloud-0.0.1-SNAPSHOT.jar
