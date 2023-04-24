@@ -8,8 +8,10 @@ spring:
     url: jdbc:postgresql://${MES_DB_HOST:your_MES_db_host}:${MES_DB_PORT:your_MES_db_port}/${MES_DB_NAME:your_MES_db_name}
     username: ${MES_DB_USERNAME:your_MES_db_username}
     password: ${MES_DB_PASSWORD:your_MES_db_password}
+    driverClassName: "org.postgresql.Driver"
   jpa:
     open-in-view: false
+    databasePlatform: "org.hibernate.dialect.PostgreSQLDialect"
 
 aws:
   mqtt:
