@@ -30,6 +30,16 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: 17
+       
+       #DB CI/CD   
+      - name: Set CI/CD DB
+        uses: harmon758/postgresql-action@v1
+        with:
+          postgresql version: '11'
+          postgresql db: cicd_db
+          postgresql user: cicduser
+          postgresql password: tempdb  
+         
          # architecture: x64
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v2
@@ -103,13 +113,6 @@ jobs:
           path: ~/.sonar/cache
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
-      - name: Set CI/CD DB
-        uses: harmon758/postgresql-action@v1
-        with:
-          postgresql version: '11'
-          postgresql db: cicd_db
-          postgresql user: cicduser
-          postgresql password: tempdb
       - name: Cache Maven packages
         uses: actions/cache@v3
         with:
