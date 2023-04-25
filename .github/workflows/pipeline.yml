@@ -100,6 +100,7 @@ jobs:
           -Dspring.datasource.url=jdbc:postgresql://localhost:5432/cicd_db
           -Dspring.datasource.username=cicduser
           -Dspring.datasource.password=tempdb
+          -Dspring.datasource.driverClassName="org.postgresql.Driver"
 
   build:
     needs: tests
@@ -147,8 +148,9 @@ jobs:
           -Dspring.datasource.url=jdbc:postgresql://localhost:5432/cicd_db
           -Dspring.datasource.username=cicduser
           -Dspring.datasource.password=tempdb
+          -Dspring.datasource.driverClassName="org.postgresql.Driver"
 
-#Build the application using Maven
+      #Build the application using Maven
       - name: Upload JAR
         #This uploads artifacts from your workflow allowing you to share data between jobs and store data once a workflow is complete.
         uses: actions/upload-artifact@v3.1.2
