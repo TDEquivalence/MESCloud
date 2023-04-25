@@ -111,14 +111,26 @@ jobs:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
-            
+      - name: Set CI/CD DB
+        uses: harmon758/postgresql-action@v1
+        with:
+          postgresql-version: '12'
+          postgresql-db: cicd_db
+          postgresql-user: cicduser
+          postgresql-password: tempdb
+          postgresql-port: '5432'
+          postgresql-host: 'localhost'
       - name: Build and analyze
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
           mvn clean -B verify --file pom.xml org.sonarsource.scanner.maven:sonar-maven-plugin:sonar 
-          -Dsonar.projectKey=tdedevelopment_MESCloud 
+          -Dsonar.projectKey=tdedevelopment_MESCloud
+          -Dspring.profiles.active=production
+          -Dspring.datasource.url=jdbc:postgresql://localhost:5432/cicd_db
+          -Dspring.datasource.username=cicduser
+          -Dspring.datasource.password=tempdb
 
 #Build the application using Maven
       - name: Upload JAR
