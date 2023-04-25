@@ -35,10 +35,12 @@ jobs:
       - name: Set CI/CD DB
         uses: harmon758/postgresql-action@v1
         with:
-          postgresql version: '11'
-          postgresql db: cicd_db
-          postgresql user: cicduser
-          postgresql password: tempdb  
+          postgresql-version: '12'
+          postgresql-db: cicd_db
+          postgresql-user: cicduser
+          postgresql-password: tempdb
+          postgresql-port: '5432'
+          postgresql-host: 'localhost'
          
          # architecture: x64
       - name: Initialize CodeQL
