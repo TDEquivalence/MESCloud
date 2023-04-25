@@ -19,7 +19,7 @@ public class FactoryController {
         this.factoryRepository = factoryRepository;
     }
 
-    @PostMapping("/save")
+    @GetMapping("/save")
     public ResponseEntity<String> save() {
         FactoryEntity factoryEntity = new FactoryEntity();
         factoryEntity.setName("testFactory");
