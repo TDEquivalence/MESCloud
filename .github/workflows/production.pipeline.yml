@@ -1,5 +1,5 @@
 #Workflow name
-name: CI/CD Pipeline
+name: Main | Production CI/CD
 on:
   #Manually trigger workflow runs
   workflow_dispatch:
@@ -7,7 +7,15 @@ on:
   push:
     branches:
       - '*'
-      - 'feature/*' 
+      - 'feature/*'
+
+env:
+  DB_HOST: ${{ vars.DB_HOST }}
+  DB_PORT: ${{ vars.DB_PORT }}
+  DB_NAME: ${{ vars.DB_NAME }}
+  DB_USERNAME: ${{ vars.DB_USERNAME }}
+  DB_PASSWORD: ${{ vars.DB_PASSWORD }}
+  SPRING_PROFILES_ACTIVE: "production"
     
 jobs:
   analyze:
@@ -36,8 +44,7 @@ jobs:
         with:
           languages: ${{ matrix.language }}
 
-      - run: |
-         mvn clean install -DskipTests
+      - run: mvn clean install -DskipTests
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2
@@ -62,10 +69,34 @@ jobs:
     name: Unit tests
     #Run on Ubuntu using the latest version
     runs-on: ubuntu-latest
+
+    services:
+      # Label used to access the service container
+      postgres:
+        # Docker Hub image
+        image: postgres
+        # Provide the password for postgres
+        env:
+          POSTGRES_PORT: ${{ vars.DB_PORT }}
+          POSTGRES_HOST: ${{ vars.DB_HOST }}
+          POSTGRES_USER: ${{ vars.DB_USERNAME }}
+          POSTGRES_PASSWORD: ${{ vars.DB_PASSWORD }}
+          POSTGRES_DB: ${{ vars.DB_NAME }}
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          # Maps tcp port 5432 on service container to the host
+          - 5432:5432
+
     #Job's steps
     steps:
       #Check-out your repository under $GITHUB_WORKSPACE, so your workflow can access it
       - uses: actions/checkout@v3
+
       #Set up JDK 17
       - name: Set up JDK
         uses: actions/setup-java@v3.3.0
@@ -80,15 +111,32 @@ jobs:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
+
       #Run Tests
       - name: Run Tests
-        run: mvn -B test
-        
+        run: mvn -B test -Dsonar.projectKey=tdedevelopment_MESCloud
+
   build:
     needs: tests
     if: github.event_name != 'pull_request'
     name: Build and analyze
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_PORT: ${{ vars.DB_PORT }}
+          POSTGRES_HOST: ${{ vars.DB_HOST }}
+          POSTGRES_USER: ${{ vars.DB_USERNAME }}
+          POSTGRES_PASSWORD: ${{ vars.DB_PASSWORD }}
+          POSTGRES_DB: ${{ vars.DB_NAME }}
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
     steps:
       - uses: actions/checkout@v3
         with:
@@ -104,18 +152,21 @@ jobs:
           path: ~/.sonar/cache
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
+
       - name: Cache Maven packages
         uses: actions/cache@v3
         with:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
+
       - name: Build and analyze
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: mvn clean install -B verify --file pom.xml org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=tdedevelopment_MESCloud
-
+        run: |
+          mvn clean install -B verify --file pom.xml org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+          -Dsonar.projectKey=tdedevelopment_MESCloud
 #Build the application using Maven
       - name: Upload JAR
         #This uploads artifacts from your workflow allowing you to share data between jobs and store data once a workflow is complete.
@@ -140,7 +191,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: artifact
-          
+
       #Deploy the artifact (JAR) into AWS Beanstalk
       - name: Deploy to EB
         uses: einaregilsson/beanstalk-deploy@v13
