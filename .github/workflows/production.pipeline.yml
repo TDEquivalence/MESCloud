@@ -15,7 +15,13 @@ env:
   DB_NAME: ${{ vars.DB_NAME }}
   DB_USERNAME: ${{ vars.DB_USERNAME }}
   DB_PASSWORD: ${{ vars.DB_PASSWORD }}
+  MQTT_CLIENT_ID: ${{ secrets.MQTT_CLIENT_ID }}
+  MQTT_CLIENT_ENDPOINT: ${{ secrets.MQTT_CLIENT_ENDPOINT }}
+  MQTT_AWS_REGION: ${{ secrets.MQTT_AWS_REGION }}
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   SPRING_PROFILES_ACTIVE: "production"
+
     
 jobs:
   analyze:

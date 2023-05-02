@@ -17,5 +17,6 @@ aws:
   mqtt:
       clientId: ${MES_MQTT_CLIENT_ID:your_MES_mqtt_client_id}
       clientEndpoint: ${MES_MQTT_CLIENT_ENDPOINT:your_MES_mqtt_client_endpoint}
+      awsRegion: ${MES_MQTT_AWS_REGION:your_MES_mqtt_aws_region}
       awsAccessKeyId: ${TDE_AWS_ACCESS_KEY_ID:your_TDE_user_aws_access_key_id}
       awsSecretAccessKey: ${TDE_AWS_SECRET_ACCESS_KEY:your_TDE_user_aws_secret_access_key}
