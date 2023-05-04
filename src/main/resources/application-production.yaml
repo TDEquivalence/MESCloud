@@ -15,9 +15,11 @@ aws:
   mqtt:
     clientId: ${MQTT_CLIENT_ID}
     clientEndpoint: ${MQTT_CLIENT_ENDPOINT}
+    awsRegion: ${MQTT_AWS_REGION}
     awsAccessKeyId: ${AWS_ACCESS_KEY_ID}
     awsSecretAccessKey: ${AWS_SECRET_ACCESS_KEY}
 
 mes:
   mqtt:
-    countProtocolTopic: "MASILVA/OBO/PROTOCOL_COUNT_V0"
+    protCountBackendTopic: "MASILVA/OBO/PROTOCOL_COUNT_V0/BE"
+    protCountPlcTopic: "MASILVA/OBO/PROTOCOL_COUNT_V0/PLC"

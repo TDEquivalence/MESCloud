@@ -1,7 +1,7 @@
 :: Search for your_MES or your_TDE to find placeholders
 
 :: Spring
-:: setx SPRING_PROFILES_ACTIVE=production
+:: setx SPRING_PROFILES_ACTIVE development
 
 :: Database
 :: setx MES_DB_HOST your_MES_db_host
@@ -13,6 +13,7 @@
 :: AWS IoT
 :: setx MES_MQTT_CLIENT_ID your_MES_BE_thing
 :: setx MES_MQTT_CLIENT_ENDPOINT your_MES_BE_thing
+:: setx MES_MQTT_AWS_REGION eu-central-1
 :: setx TDE_AWS_ACCESS_KEY_ID your_TDE_user_aws_access_key_id
 :: setx TDE_AWS_SECRET_ACCESS_KEY your_TDE_user_aws_secret_access_key
 

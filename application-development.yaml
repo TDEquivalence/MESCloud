@@ -1,3 +1,4 @@
 mes:
   mqtt:
-    countProtocolTopic: "DEV/MASILVA/OBO/PROTOCOL_COUNT_V0"
+    protCountBackendTopic: "DEV/MASILVA/OBO/PROTOCOL_COUNT_V0/BE"
+    protCountPlcTopic: "DEV/MASILVA/OBO/PROTOCOL_COUNT_V0/PLC"
