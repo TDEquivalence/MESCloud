@@ -1,6 +1,7 @@
 package com.tde.mescloud.security.auth;
 
 import lombok.*;
+import org.springframework.http.HttpHeaders;
 
 @Getter
 @Setter
@@ -10,4 +11,5 @@ import lombok.*;
 public class AuthenticationResponse {
 
     private String token;
+    private HttpHeaders headers;
 }
