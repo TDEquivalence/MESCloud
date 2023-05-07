@@ -40,7 +40,6 @@ public class AuthenticationService {
                 .build();
 
         userRepository.save(user);
-        var jwtToken = jwtTokenService.generateToken(user);
         return request;
     }
 

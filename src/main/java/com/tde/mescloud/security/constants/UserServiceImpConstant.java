@@ -2,6 +2,8 @@ package com.tde.mescloud.security.constants;
 
 public class UserServiceImpConstant {
 
+    private UserServiceImpConstant() {
+    }
 
     public static final String USERNAME_ALREADY_EXISTS = "Username already exists";
     public static final String EMAIL_ALREADY_EXISTS = "Email already exists";
