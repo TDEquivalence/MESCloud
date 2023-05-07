@@ -4,8 +4,6 @@ import com.tde.mescloud.security.config.JwtTokenService;
 import com.tde.mescloud.security.exception.UsernameExistException;
 import com.tde.mescloud.security.model.User;
 import com.tde.mescloud.security.repository.UserRepository;
-import com.tde.mescloud.security.role.Role;
-import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
