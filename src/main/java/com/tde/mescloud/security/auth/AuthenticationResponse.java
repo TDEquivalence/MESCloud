@@ -1,7 +1,9 @@
 package com.tde.mescloud.security.auth;
 
+import com.tde.mescloud.security.role.Role;
 import lombok.*;
-import org.springframework.http.HttpHeaders;
+
+import java.util.Date;
 
 @Getter
 @Setter
@@ -10,6 +12,10 @@ import org.springframework.http.HttpHeaders;
 @NoArgsConstructor
 public class AuthenticationResponse {
 
-    private String token;
-    private HttpHeaders headers;
+    private Long id;
+    private String firstName;
+    private String lastName;
+    private String username;
+    private Date createdAt;
+    private Role role;
 }

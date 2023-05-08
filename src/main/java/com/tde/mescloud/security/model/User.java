@@ -4,12 +4,10 @@ import com.tde.mescloud.security.role.Role;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.Date;
-import java.util.List;
 
 @Getter
 @Setter
@@ -33,15 +31,13 @@ public class User implements UserDetails {
     private Role role;
     private String[] userAuthorities;
 
-    private Date lastLoginDate;
-    private Date lastLoginDateDisplay;
-    private Date joinDate;
+    private Date createdAt;
     private boolean isActive;
     private boolean isNotLocked;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return role.getAuthorities();
+        return role.getRoleAuthorities();
     }
 
     @Override
@@ -51,7 +47,7 @@ public class User implements UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
-        return isNotLocked;
+        return true;
     }
 
     @Override

@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.tde.mescloud.security.role.Authorization.*;
+import static com.tde.mescloud.security.role.Authority.*;
 
 @RequiredArgsConstructor
 public enum Role {
@@ -18,14 +18,14 @@ public enum Role {
     SUPER_ADMIN(Set.of(ADMIN_READ, ADMIN_UPDATE, ADMIN_DELETE,ADMIN_CREATE));
 
     @Getter
-    private final Set<Authorization> authorizations;
+    private final Set<Authority> authorities;
 
-    public List<SimpleGrantedAuthority> getAuthorities() {
-        var authorities = getAuthorizations()
+    public List<SimpleGrantedAuthority> getRoleAuthorities() {
+        var grantedAuthorities = getAuthorities()
                 .stream()
-                .map(authorization -> new SimpleGrantedAuthority(authorization.name()))
+                .map(authority -> new SimpleGrantedAuthority(authority.name()))
                 .collect(Collectors.toList());
-        authorities.add(new SimpleGrantedAuthority("ROLE_" + this.name()));
-        return authorities;
+        grantedAuthorities.add(new SimpleGrantedAuthority("ROLE_" + this.name()));
+        return grantedAuthorities;
     }
 }

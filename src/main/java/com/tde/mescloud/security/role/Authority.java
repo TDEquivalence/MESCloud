@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public enum Authorization {
+public enum Authority {
 
     ADMIN_READ("admin:read"),
     ADMIN_UPDATE("admin:update"),

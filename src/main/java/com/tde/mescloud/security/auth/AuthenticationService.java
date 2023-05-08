@@ -25,7 +25,7 @@ public class AuthenticationService {
     private final JwtTokenService jwtTokenService;
     private final AuthenticationManager authenticationManager;
 
-    public RegisterRequest register(RegisterRequest request) throws UsernameExistException {
+    public AuthenticationResponse register(RegisterRequest request) throws UsernameExistException {
         setUsernameByEmail(request);
         validateUsername(request);
         var user = User.builder()
@@ -37,11 +37,11 @@ public class AuthenticationService {
                 .role(request.getRole())
                 .isActive(true)
                 .isNotLocked(true)
-                .joinDate(new Date())
+                .createdAt(new Date())
                 .build();
 
         userRepository.save(user);
-        return request;
+        return userToAuthenticationResponse(user);
     }
 
     public AuthenticationResponse authenticate(AuthenticateRequest request) {
@@ -51,28 +51,41 @@ public class AuthenticationService {
                         request.getPassword()
                 )
         );
-        //TODO: exception handling
-        User user = userRepository.findByUsername(request.getUsername()).orElseThrow();
-        var jwtToken = jwtTokenService.generateToken(user);
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(JWT_TOKEN_HEADER, jwtToken);
 
-        return AuthenticationResponse.builder().token(jwtToken).headers(headers).build();
+        User user = userRepository.findUserByUsername(request.getUsername());
+        return userToAuthenticationResponse(user);
     }
 
-    private RegisterRequest setUsernameByEmail(RegisterRequest request) {
+    private void setUsernameByEmail(RegisterRequest request) {
         if (request.getUsername().isBlank()) {
             request.setUsername(request.getEmail());
         }
-        return request;
     }
 
-    private RegisterRequest validateUsername(RegisterRequest request) throws UsernameExistException {
+    private void validateUsername(RegisterRequest request) throws UsernameExistException {
         User user = userRepository.findUserByUsername(request.getUsername());
         if(user != null) {
             throw new UsernameExistException(USERNAME_ALREADY_EXISTS);
         }
-        return request;
     }
 
+    public HttpHeaders getJwtHeader(AuthenticationResponse authenticationResponse) {
+        User user = userRepository.findUserByUsername(authenticationResponse.getUsername());
+        var jwtToken = jwtTokenService.generateToken(user);
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(JWT_TOKEN_HEADER, jwtToken);
+
+        return headers;
+    }
+
+    private AuthenticationResponse userToAuthenticationResponse(User user) {
+        return new AuthenticationResponse(
+                user.getId(),
+                user.getFirstName(),
+                user.getLastName(),
+                user.getUsername(),
+                user.getCreatedAt(),
+                user.getRole()
+        );
+    }
 }

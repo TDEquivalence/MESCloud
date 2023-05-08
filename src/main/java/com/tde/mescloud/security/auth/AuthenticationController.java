@@ -18,15 +18,15 @@ public class AuthenticationController {
     private final AuthenticationService authenticationService;
 
     @PostMapping("/register")
-    public ResponseEntity<RegisterRequest> register(@RequestBody RegisterRequest request) throws UsernameExistException {
-        RegisterRequest registerRequest = authenticationService.register(request);
-        return new ResponseEntity<>(registerRequest, HttpStatus.CREATED);
+    public ResponseEntity<AuthenticationResponse> register(@RequestBody RegisterRequest request) throws UsernameExistException {
+        AuthenticationResponse userRegisteredResponse = authenticationService.register(request);
+        return new ResponseEntity<>(userRegisteredResponse, HttpStatus.CREATED);
     }
 
-    @PostMapping("/authenticate")
-    public ResponseEntity<AuthenticationResponse> register(@RequestBody AuthenticateRequest request) {
+    @PostMapping("/login")
+    public ResponseEntity<AuthenticationResponse> login(@RequestBody AuthenticateRequest request) {
         AuthenticationResponse authenticationResponse = authenticationService.authenticate(request);
-        HttpHeaders headers = authenticationResponse.getHeaders();
+        HttpHeaders headers = authenticationService.getJwtHeader(authenticationResponse);
         return new ResponseEntity<>(authenticationResponse, headers, HttpStatus.OK);
     }
 }
