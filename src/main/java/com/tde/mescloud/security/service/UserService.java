@@ -7,6 +7,8 @@ import com.tde.mescloud.security.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -17,6 +19,11 @@ public class UserService {
     public UserDto getUserById(Long id) {
         User user = userRepository.findUserById(id);
         return mapper.convertToDto(user);
+    }
+
+    public List<UserDto> getAllUsers() {
+        List<User> userList = userRepository.findAll();
+        return mapper.convertToDto(userList);
     }
 
 
