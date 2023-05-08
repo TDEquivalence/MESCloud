@@ -16,7 +16,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-import static com.tde.mescloud.security.constants.SecurityConstant.TOKEN_PREFIX;
+import static com.tde.mescloud.security.constant.SecurityConstant.TOKEN_PREFIX;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 @Component

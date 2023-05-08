@@ -1,6 +1,6 @@
 package com.tde.mescloud.security.config;
 
-import com.tde.mescloud.security.constants.SecurityConstant;
+import com.tde.mescloud.security.constant.SecurityConstant;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;

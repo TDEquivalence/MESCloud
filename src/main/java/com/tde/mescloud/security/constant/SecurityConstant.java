@@ -1,4 +1,4 @@
-package com.tde.mescloud.security.constants;
+package com.tde.mescloud.security.constant;
 
 public class SecurityConstant {
 

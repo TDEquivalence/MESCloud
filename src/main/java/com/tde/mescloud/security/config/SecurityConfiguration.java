@@ -12,7 +12,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import static com.tde.mescloud.security.constants.SecurityConstant.PUBLIC_URLS;
+import static com.tde.mescloud.security.constant.SecurityConstant.PUBLIC_URLS;
 
 @Configuration
 @EnableWebSecurity

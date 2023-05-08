@@ -13,8 +13,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 
-import static com.tde.mescloud.security.constants.SecurityConstant.JWT_TOKEN_HEADER;
-import static com.tde.mescloud.security.constants.UserServiceImpConstant.USERNAME_ALREADY_EXISTS;
+import static com.tde.mescloud.security.constant.SecurityConstant.JWT_TOKEN_HEADER;
+import static com.tde.mescloud.security.constant.UserServiceImpConstant.USERNAME_ALREADY_EXISTS;
 
 @Service
 @RequiredArgsConstructor
@@ -36,6 +36,7 @@ public class AuthenticationService {
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(request.getRole())
                 .isActive(true)
+                .isNotLocked(true)
                 .joinDate(new Date())
                 .build();
 

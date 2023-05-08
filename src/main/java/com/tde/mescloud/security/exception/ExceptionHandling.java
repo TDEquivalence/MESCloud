@@ -14,7 +14,6 @@ import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.LockedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.io.IOException;
@@ -22,7 +21,7 @@ import java.nio.file.AccessDeniedException;
 import java.util.Arrays;
 import java.util.Objects;
 
-import static com.tde.mescloud.security.constants.HttpResponseConstant.*;
+import static com.tde.mescloud.security.constant.HttpResponseConstant.*;
 import static org.springframework.http.HttpStatus.*;
 
 @RestControllerAdvice
