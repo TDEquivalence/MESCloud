@@ -1,4 +1,4 @@
-package com.tde.mescloud.security.model;
+package com.tde.mescloud.security.model.entity;
 
 import com.tde.mescloud.security.role.Role;
 import jakarta.persistence.*;

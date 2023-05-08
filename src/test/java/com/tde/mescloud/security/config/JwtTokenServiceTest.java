@@ -1,6 +1,6 @@
 package com.tde.mescloud.security.config;
 
-import com.tde.mescloud.security.model.User;
+import com.tde.mescloud.security.model.entity.User;
 import com.tde.mescloud.security.role.Role;
 import org.junit.Assert;
 import org.junit.Test;

@@ -2,7 +2,9 @@ package com.tde.mescloud.security.auth;
 
 import com.tde.mescloud.security.config.JwtTokenService;
 import com.tde.mescloud.security.exception.UsernameExistException;
-import com.tde.mescloud.security.model.User;
+import com.tde.mescloud.security.mapper.EntityDtoMapper;
+import com.tde.mescloud.security.model.dto.UserDto;
+import com.tde.mescloud.security.model.entity.User;
 import com.tde.mescloud.security.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -24,6 +26,7 @@ public class AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenService jwtTokenService;
     private final AuthenticationManager authenticationManager;
+    private final EntityDtoMapper mapper;
 
     public AuthenticationResponse register(RegisterRequest request) throws UsernameExistException {
         setUsernameByEmail(request);
@@ -81,9 +84,9 @@ public class AuthenticationService {
     private AuthenticationResponse userToAuthenticationResponse(User user) {
         return new AuthenticationResponse(
                 user.getId(),
+                user.getUsername(),
                 user.getFirstName(),
                 user.getLastName(),
-                user.getUsername(),
                 user.getCreatedAt(),
                 user.getRole()
         );
