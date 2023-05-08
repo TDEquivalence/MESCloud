@@ -1,4 +1,4 @@
-package com.tde.mescloud.security.auth;
+package com.tde.mescloud.security.model.auth;
 
 import com.tde.mescloud.security.role.Role;
 import lombok.*;

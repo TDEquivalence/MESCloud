@@ -1,6 +1,5 @@
-package com.tde.mescloud.security.auth;
+package com.tde.mescloud.security.model.auth;
 
-import com.tde.mescloud.security.role.Role;
 import lombok.*;
 
 @Getter
@@ -15,5 +14,5 @@ public class RegisterRequest {
     private String username;
     private String email;
     private String password;
-    private Role role;
+    private String role;
 }

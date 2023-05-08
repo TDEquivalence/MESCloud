@@ -1,11 +1,14 @@
-package com.tde.mescloud.security.auth;
+package com.tde.mescloud.security.service;
 
 import com.tde.mescloud.security.config.JwtTokenService;
 import com.tde.mescloud.security.exception.UsernameExistException;
 import com.tde.mescloud.security.mapper.EntityDtoMapper;
-import com.tde.mescloud.security.model.dto.UserDto;
+import com.tde.mescloud.security.model.auth.AuthenticateRequest;
+import com.tde.mescloud.security.model.auth.AuthenticationResponse;
+import com.tde.mescloud.security.model.auth.RegisterRequest;
 import com.tde.mescloud.security.model.entity.User;
 import com.tde.mescloud.security.repository.UserRepository;
+import com.tde.mescloud.security.role.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -37,7 +40,7 @@ public class AuthenticationService {
                 .username(request.getUsername())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .role(request.getRole())
+                .role(getRoleEnumName(request.getRole()))
                 .isActive(true)
                 .isNotLocked(true)
                 .createdAt(new Date())
@@ -90,5 +93,9 @@ public class AuthenticationService {
                 user.getCreatedAt(),
                 user.getRole()
         );
+    }
+
+    private Role getRoleEnumName(String role) {
+        return Role.valueOf(role.toUpperCase());
     }
 }
