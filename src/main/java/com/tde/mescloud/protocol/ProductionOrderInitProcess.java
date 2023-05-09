@@ -34,7 +34,6 @@ public class ProductionOrderInitProcess extends AbstractMesProtocolProcess<Equip
         for (CounterMqttDTO counterDTO : equipmentCountsDTO.getCounters()) {
             CounterRecord counterRecord = counterRecordConverter.convertToDO(equipmentCountsDTO, counterDTO);
             counterRecord.setComputedValue(INITIAL_COMPUTED_VALUE);
-            //TODO: Properly handle Date, including Timezone
             counterRecord.setRegisteredAt(new Date());
             counterRecords.add(counterRecord);
         }
