@@ -17,9 +17,7 @@ import static org.mockito.Mockito.verify;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class JwtTokenServiceTest {
-
-    private String secretKey = "jwt.secretKey=[a-zA-Z0-9._]^+$Guidelines89797987forAlphabeticalArraNumeralsandOtherSymbo$";
-
+    
     @Autowired
     private JwtTokenService jwtTokenService;
 
