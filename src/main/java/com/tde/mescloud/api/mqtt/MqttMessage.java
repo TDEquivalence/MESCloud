@@ -1,4 +1,4 @@
-package com.tde.mescloud.model;
+package com.tde.mescloud.api.mqtt;
 
 import com.amazonaws.services.iot.client.AWSIotMessage;
 import com.amazonaws.services.iot.client.AWSIotQos;
@@ -6,7 +6,6 @@ import lombok.extern.java.Log;
 
 @Log
 public class MqttMessage extends AWSIotMessage {
-
 
     public MqttMessage(String topic, AWSIotQos qos, String payload) {
         super(topic, qos, payload);
