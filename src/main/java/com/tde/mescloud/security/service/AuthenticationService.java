@@ -77,7 +77,7 @@ public class AuthenticationService {
 
     public HttpHeaders getJwtHeader(AuthenticationResponse authenticationResponse) {
         User user = userRepository.findUserByUsername(authenticationResponse.getUsername());
-        var jwtToken = jwtTokenService.generateToken(user);
+        String jwtToken = jwtTokenService.generateToken(user);
         HttpHeaders headers = new HttpHeaders();
         headers.add(JWT_TOKEN_HEADER, jwtToken);
 

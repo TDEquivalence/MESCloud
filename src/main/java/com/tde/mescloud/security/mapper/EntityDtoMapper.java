@@ -24,10 +24,10 @@ public class EntityDtoMapper {
     }
 
     public List<UserDto> convertToDto(List<User> userList) {
-        return userList.stream().map(this::convertToDto).collect(Collectors.toList());
+        return userList.stream().map(this::convertToDto).toList();
     }
 
     public List<User> convertToEntity(List<UserDto> userDtoList) {
-        return userDtoList.stream().map(this::convertToEntity).collect(Collectors.toList());
+        return userDtoList.stream().map(this::convertToEntity).toList();
     }
 }
