@@ -1,8 +1,7 @@
-package com.tde.mescloud.controller;
+package com.tde.mescloud.api.rest;
 
-import com.tde.mescloud.model.FactoryEntity;
+import com.tde.mescloud.model.entity.FactoryEntity;
 import com.tde.mescloud.repository.FactoryRepository;
-import org.aspectj.runtime.reflect.Factory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

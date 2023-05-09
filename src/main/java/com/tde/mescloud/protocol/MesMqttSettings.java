@@ -1,4 +1,4 @@
-package com.tde.mescloud.service;
+package com.tde.mescloud.protocol;
 
 import lombok.Getter;
 import lombok.Setter;
