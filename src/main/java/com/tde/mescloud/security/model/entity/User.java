@@ -32,6 +32,7 @@ public class User implements UserDetails {
     private String[] userAuthorities;
 
     private Date createdAt;
+    private Date updatedAt;
     private boolean isActive;
     private boolean isNotLocked;
 

@@ -1,14 +1,12 @@
 package com.tde.mescloud.security.controller;
 
+import com.tde.mescloud.security.exception.UserNotFoundException;
 import com.tde.mescloud.security.model.dto.UserDto;
 import com.tde.mescloud.security.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -29,5 +27,11 @@ public class UserController {
     public ResponseEntity<List<UserDto>> getAllUsers() {
         List<UserDto> users = userService.getAllUsers();
         return new ResponseEntity<>(users, HttpStatus.OK);
+    }
+
+    @PostMapping("/update")
+    public ResponseEntity<UserDto> updateUser(@RequestBody UserDto user) throws UserNotFoundException {
+        UserDto userDto = userService.updateUser(user);
+        return new ResponseEntity<>(userDto, HttpStatus.ACCEPTED);
     }
 }
