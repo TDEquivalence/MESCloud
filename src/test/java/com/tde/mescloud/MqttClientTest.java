@@ -1,7 +1,7 @@
 package com.tde.mescloud;
 
 import com.tde.mescloud.exception.MesMqttException;
-import com.tde.mescloud.service.MqttClient;
+import com.tde.mescloud.api.mqtt.MqttClient;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

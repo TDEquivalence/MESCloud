@@ -1,6 +1,6 @@
 package com.tde.mescloud.repository;
 
-import com.tde.mescloud.model.FactoryEntity;
+import com.tde.mescloud.model.entity.FactoryEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

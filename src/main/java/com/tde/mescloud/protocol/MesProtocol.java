@@ -1,4 +1,4 @@
-package com.tde.mescloud.service;
+package com.tde.mescloud.protocol;
 
 import com.amazonaws.services.iot.client.AWSIotMessage;
 

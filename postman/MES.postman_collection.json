@@ -68,7 +68,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"equipmentCode\": \"OBO001\",\r\n  \"pTimerCommunicationCycle\": 60,\r\n  \"totalOutput\": 4,\r\n  \"outputCodes\": [\"OBO1\", \"OBO2\", \"OBO3\", \"OBO4\"]\r\n}",
+					"raw": "{\r\n  \"jsonType\": \"Configuration\",\r\n  \"equipmentCode\": \"OBO001\",\r\n  \"pTimerCommunicationCycle\": 60,\r\n  \"totalOutput\": 4,\r\n  \"outputCodes\": [\"OBO1\", \"OBO2\", \"OBO3\", \"OBO4\"]\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -102,7 +102,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"equipmentCode\": \"OBO001\",\r\n  \"productionOrderCode\": \"PO2301\",\r\n  \"targetAmount\": 3000,\r\n  \"isEquipmentEnabled\": true\r\n}",
+					"raw": "{\r\n  \"jsonType\": \"ProductionOrder\",\r\n  \"equipmentCode\": \"OBO001\",\r\n  \"productionOrderCode\": \"PO2301\",\r\n  \"targetAmount\": 3000,\r\n  \"isEquipmentEnabled\": true\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -136,7 +136,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n   \"messageType\": \"productionOrder\",\r\n   \"equipmentCode\":\"OBO001\",\r\n   \"equipmentStatus\":1,\r\n   \"counters\":[\r\n      {\r\n         \"outputCode\":\"OBO1\",\r\n         \"value\":30\r\n      },\r\n      {\r\n         \"outputCode\":\"OBO2\",\r\n         \"value\":0\r\n      },\r\n      {\r\n         \"outputCode\":3,\r\n         \"value\":40\r\n      },\r\n      {\r\n         \"outputCode\":\"OBO4\",\r\n         \"value\":10\r\n      }\r\n   ]\r\n}",
+					"raw": "{\r\n   \"jsonType\": \"ProductionOrder\",\r\n   \"equipmentCode\":\"OBO001\",\r\n   \"equipmentStatus\":1,\r\n   \"counters\":[\r\n      {\r\n         \"outputCode\":\"OBO1\",\r\n         \"value\":30\r\n      },\r\n      {\r\n         \"outputCode\":\"OBO2\",\r\n         \"value\":0\r\n      },\r\n      {\r\n         \"outputCode\":3,\r\n         \"value\":40\r\n      },\r\n      {\r\n         \"outputCode\":\"OBO4\",\r\n         \"value\":10\r\n      }\r\n   ]\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -144,7 +144,7 @@
 					}
 				},
 				"url": {
-					"raw": "localhost:8080/mqtt/publish?topic=DEV/MASILVA/OBO/PROTOCOL_COUNT_V0/PLC",
+					"raw": "localhost:8080/mqtt/publish?topic=DEV/MASILVA/OBO/PROTOCOL_COUNT_V0/BE",
 					"host": [
 						"localhost"
 					],
@@ -156,7 +156,7 @@
 					"query": [
 						{
 							"key": "topic",
-							"value": "DEV/MASILVA/OBO/PROTOCOL_COUNT_V0/PLC"
+							"value": "DEV/MASILVA/OBO/PROTOCOL_COUNT_V0/BE"
 						}
 					]
 				}
@@ -170,7 +170,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n   \"messageType\": \"count\",\r\n   \"equipmentCode\":\"OBO001\",\r\n   \"equipmentStatus\":1,\r\n   \"counters\":[\r\n      {\r\n         \"outputCode\":\"OBO1\",\r\n         \"value\":30\r\n      },\r\n      {\r\n         \"outputCode\":\"OBO2\",\r\n         \"value\":0\r\n      },\r\n      {\r\n         \"outputCode\":3,\r\n         \"value\":40\r\n      },\r\n      {\r\n         \"outputCode\":\"OBO4\",\r\n         \"value\":10\r\n      }\r\n   ]\r\n}",
+					"raw": "{\r\n   \"jsonType\": \"ProductionCount\",\r\n   \"equipmentCode\":\"OBO001\",\r\n   \"equipmentStatus\":1,\r\n   \"counters\":[\r\n      {\r\n         \"outputCode\":\"OBO1\",\r\n         \"value\":30\r\n      },\r\n      {\r\n         \"outputCode\":\"OBO2\",\r\n         \"value\":0\r\n      },\r\n      {\r\n         \"outputCode\":3,\r\n         \"value\":40\r\n      },\r\n      {\r\n         \"outputCode\":\"OBO4\",\r\n         \"value\":10\r\n      }\r\n   ]\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -204,7 +204,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"equipmentCode\": \"OBO001\",\r\n  \"hasReceived\": true\r\n}",
+					"raw": "{\r\n  \"jsonType\": \"Received\",\r\n  \"equipmentCode\": \"OBO001\",\r\n  \"hasReceived\": true\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"

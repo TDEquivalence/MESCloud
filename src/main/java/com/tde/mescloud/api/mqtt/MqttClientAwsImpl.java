@@ -1,4 +1,4 @@
-package com.tde.mescloud.service;
+package com.tde.mescloud.api.mqtt;
 
 import com.amazonaws.services.iot.client.AWSIotConnectionStatus;
 import com.amazonaws.services.iot.client.AWSIotException;
@@ -7,20 +7,18 @@ import com.amazonaws.services.iot.client.AWSIotQos;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tde.mescloud.exception.MesMqttException;
-import com.tde.mescloud.model.MqttMessage;
-import com.tde.mescloud.model.MqttTopic;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Component;
 
 @Component
 @Log
-public class AwsMqttClient implements MqttClient {
+public class MqttClientAwsImpl implements MqttClient {
 
     private final AWSIotMqttClient mqttClient;
-    private final AwsMqttClientSettings awsMqttSettings;
+    private final MqttClientAwsSettings awsMqttSettings;
     private final ObjectMapper objectMapper;
 
-    public AwsMqttClient(AWSIotMqttClient mqttClient, AwsMqttClientSettings awsSettings, ObjectMapper objectMapper) {
+    public MqttClientAwsImpl(AWSIotMqttClient mqttClient, MqttClientAwsSettings awsSettings, ObjectMapper objectMapper) {
         this.mqttClient = mqttClient;
         this.awsMqttSettings = awsSettings;
         this.objectMapper = objectMapper;

@@ -1,4 +1,4 @@
-package com.tde.mescloud.service;
+package com.tde.mescloud.api.mqtt;
 
 import com.amazonaws.services.iot.client.AWSIotException;
 import com.amazonaws.services.iot.client.AWSIotMqttClient;
@@ -17,7 +17,7 @@ import org.springframework.context.annotation.Configuration;
 @Getter
 @Setter
 @Log
-public class AwsMqttClientSettings {
+public class MqttClientAwsSettings {
 
     private AWSIotMqttClient mqttClient;
     private final long connectionTimeout = 3000;

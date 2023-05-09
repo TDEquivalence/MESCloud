@@ -1,4 +1,4 @@
-package com.tde.mescloud.controller;
+package com.tde.mescloud.api.rest;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
