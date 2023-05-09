@@ -85,14 +85,12 @@ public class AuthenticationService {
     }
 
     private AuthenticationResponse userToAuthenticationResponse(User user) {
-        return new AuthenticationResponse(
-                user.getId(),
-                user.getUsername(),
-                user.getFirstName(),
-                user.getLastName(),
-                user.getCreatedAt(),
-                user.getRole()
-        );
+        return AuthenticationResponse.builder()
+                .id(user.getId())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .username(user.getUsername())
+                .build();
     }
 
     private Role getRoleEnumName(String role) {
