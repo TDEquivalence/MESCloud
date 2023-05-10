@@ -40,7 +40,6 @@ public class UserService {
                 .firstName(userDto.getFirstName())
                 .lastName(userDto.getLastName())
                 .username(userDto.getUsername())
-                .email(userDto.getEmail())
                 .updatedAt(new Date())
                 .build();
 

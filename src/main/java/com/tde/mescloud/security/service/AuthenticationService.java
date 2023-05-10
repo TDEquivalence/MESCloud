@@ -99,7 +99,6 @@ public class AuthenticationService {
                 .firstName(userEntity.getFirstName())
                 .lastName(userEntity.getLastName())
                 .username(userEntity.getUsername())
-                .createdAt(userEntity.getCreatedAt())
                 .role(userEntity.getRole())
                 .build();
     }
