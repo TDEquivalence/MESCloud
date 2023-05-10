@@ -6,8 +6,7 @@ import lombok.Setter;
 
 import java.util.Date;
 
-@Entity
-@Table(name = "counter_record")
+@Entity(name = "counter_record")
 @Getter
 @Setter
 public class CounterRecordEntity {
