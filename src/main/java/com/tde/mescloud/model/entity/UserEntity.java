@@ -1,4 +1,4 @@
-package com.tde.mescloud.security.model.entity;
+package com.tde.mescloud.model.entity;
 
 import com.tde.mescloud.security.role.Role;
 import jakarta.persistence.*;
@@ -14,9 +14,8 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Entity
-@Table(name = "users")
-public class User implements UserDetails {
+@Entity(name = "users")
+public class UserEntity implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

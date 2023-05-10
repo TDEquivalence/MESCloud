@@ -17,7 +17,7 @@ import static com.tde.mescloud.security.constant.SecurityConstant.PUBLIC_URLS;
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
-public class SecurityConfiguration {
+public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final AuthenticationProvider authenticationProvider;

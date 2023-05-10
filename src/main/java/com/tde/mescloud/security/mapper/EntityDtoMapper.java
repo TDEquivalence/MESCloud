@@ -1,13 +1,12 @@
 package com.tde.mescloud.security.mapper;
 
-import com.tde.mescloud.security.model.dto.UserDto;
-import com.tde.mescloud.security.model.entity.User;
+import com.tde.mescloud.model.dto.UserDto;
+import com.tde.mescloud.model.entity.UserEntity;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 public class EntityDtoMapper {
@@ -15,19 +14,19 @@ public class EntityDtoMapper {
     @Autowired
     private ModelMapper mapper;
 
-    public UserDto convertToDto(User user) {
-        return mapper.map(user, UserDto.class);
+    public UserDto convertToDto(UserEntity userEntity) {
+        return mapper.map(userEntity, UserDto.class);
     }
 
-    public User convertToEntity(UserDto userDto) {
-        return (userDto == null) ? null : mapper.map(userDto, User.class);
+    public UserEntity convertToEntity(UserDto userDto) {
+        return (userDto == null) ? null : mapper.map(userDto, UserEntity.class);
     }
 
-    public List<UserDto> convertToDto(List<User> userList) {
-        return userList.stream().map(this::convertToDto).toList();
+    public List<UserDto> convertToDto(List<UserEntity> userEntityList) {
+        return userEntityList.stream().map(this::convertToDto).toList();
     }
 
-    public List<User> convertToEntity(List<UserDto> userDtoList) {
+    public List<UserEntity> convertToEntity(List<UserDto> userDtoList) {
         return userDtoList.stream().map(this::convertToEntity).toList();
     }
 }

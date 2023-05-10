@@ -1,4 +1,4 @@
-package com.tde.mescloud.security.model.dto;
+package com.tde.mescloud.model.dto;
 
 import com.tde.mescloud.security.role.Role;
 import lombok.AllArgsConstructor;
@@ -18,6 +18,4 @@ public class UserDto {
     private String firstName;
     private String lastName;
     private Role role;
-
-
 }

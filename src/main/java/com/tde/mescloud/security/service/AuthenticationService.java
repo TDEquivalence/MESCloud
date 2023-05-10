@@ -1,12 +1,12 @@
 package com.tde.mescloud.security.service;
 
+import com.tde.mescloud.model.entity.UserEntity;
 import com.tde.mescloud.security.config.JwtTokenService;
 import com.tde.mescloud.security.exception.UsernameExistException;
 import com.tde.mescloud.security.mapper.EntityDtoMapper;
 import com.tde.mescloud.security.model.auth.AuthenticateRequest;
 import com.tde.mescloud.security.model.auth.AuthenticationResponse;
 import com.tde.mescloud.security.model.auth.RegisterRequest;
-import com.tde.mescloud.security.model.entity.User;
 import com.tde.mescloud.security.repository.UserRepository;
 import com.tde.mescloud.security.role.Role;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +34,7 @@ public class AuthenticationService {
     public AuthenticationResponse register(RegisterRequest request) throws UsernameExistException {
         setUsernameByEmail(request);
         validateUsername(request);
-        var user = User.builder()
+        var user = UserEntity.builder()
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
                 .username(request.getUsername())
@@ -58,8 +58,8 @@ public class AuthenticationService {
                 )
         );
 
-        User user = userRepository.findUserByUsername(request.getUsername());
-        return userToAuthenticationResponse(user);
+        UserEntity userEntity = userRepository.findUserByUsername(request.getUsername());
+        return userToAuthenticationResponse(userEntity);
     }
 
     private void setUsernameByEmail(RegisterRequest request) {
@@ -69,27 +69,27 @@ public class AuthenticationService {
     }
 
     private void validateUsername(RegisterRequest request) throws UsernameExistException {
-        User user = userRepository.findUserByUsername(request.getUsername());
-        if(user != null) {
+        UserEntity userEntity = userRepository.findUserByUsername(request.getUsername());
+        if(userEntity != null) {
             throw new UsernameExistException(USERNAME_ALREADY_EXISTS);
         }
     }
 
     public HttpHeaders getJwtHeader(AuthenticationResponse authenticationResponse) {
-        User user = userRepository.findUserByUsername(authenticationResponse.getUsername());
-        String jwtToken = jwtTokenService.generateToken(user);
+        UserEntity userEntity = userRepository.findUserByUsername(authenticationResponse.getUsername());
+        String jwtToken = jwtTokenService.generateToken(userEntity);
         HttpHeaders headers = new HttpHeaders();
         headers.add(JWT_TOKEN_HEADER, jwtToken);
 
         return headers;
     }
 
-    private AuthenticationResponse userToAuthenticationResponse(User user) {
+    private AuthenticationResponse userToAuthenticationResponse(UserEntity userEntity) {
         return AuthenticationResponse.builder()
-                .id(user.getId())
-                .firstName(user.getFirstName())
-                .lastName(user.getLastName())
-                .username(user.getUsername())
+                .id(userEntity.getId())
+                .firstName(userEntity.getFirstName())
+                .lastName(userEntity.getLastName())
+                .username(userEntity.getUsername())
                 .build();
     }
 

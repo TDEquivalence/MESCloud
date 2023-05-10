@@ -1,8 +1,8 @@
-package com.tde.mescloud.security.controller;
+package com.tde.mescloud.api.rest;
 
 import com.tde.mescloud.security.exception.UserNotFoundException;
-import com.tde.mescloud.security.model.dto.UserDto;
-import com.tde.mescloud.security.service.UserService;
+import com.tde.mescloud.model.dto.UserDto;
+import com.tde.mescloud.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

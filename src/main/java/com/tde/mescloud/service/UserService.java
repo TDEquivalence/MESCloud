@@ -1,9 +1,9 @@
-package com.tde.mescloud.security.service;
+package com.tde.mescloud.service;
 
+import com.tde.mescloud.model.entity.UserEntity;
 import com.tde.mescloud.security.exception.UserNotFoundException;
 import com.tde.mescloud.security.mapper.EntityDtoMapper;
-import com.tde.mescloud.security.model.dto.UserDto;
-import com.tde.mescloud.security.model.entity.User;
+import com.tde.mescloud.model.dto.UserDto;
 import com.tde.mescloud.security.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,22 +21,22 @@ public class UserService {
     private final EntityDtoMapper mapper;
 
     public UserDto getUserById(Long id) {
-        User user = userRepository.findUserById(id);
-        return mapper.convertToDto(user);
+        UserEntity userEntity = userRepository.findUserById(id);
+        return mapper.convertToDto(userEntity);
     }
 
     public List<UserDto> getAllUsers() {
-        List<User> userList = userRepository.findAll();
-        return mapper.convertToDto(userList);
+        List<UserEntity> userEntityList = userRepository.findAll();
+        return mapper.convertToDto(userEntityList);
     }
 
     public UserDto updateUser(UserDto userDto) throws UserNotFoundException {
-        User dbUser = userRepository.findUserByUsername(userDto.getUsername());
+        UserEntity dbUserEntity = userRepository.findUserByUsername(userDto.getUsername());
 
-        if(dbUser == null) {
+        if(dbUserEntity == null) {
             throw new UserNotFoundException(USER_NOT_FOUND_BY_USERNAME);
         }
-        dbUser = User.builder()
+        dbUserEntity = UserEntity.builder()
                 .firstName(userDto.getFirstName())
                 .lastName(userDto.getLastName())
                 .username(userDto.getUsername())
@@ -44,8 +44,8 @@ public class UserService {
                 .updatedAt(new Date())
                 .build();
 
-        userRepository.save(dbUser);
-        return mapper.convertToDto(dbUser);
+        userRepository.save(dbUserEntity);
+        return mapper.convertToDto(dbUserEntity);
     }
 }
 

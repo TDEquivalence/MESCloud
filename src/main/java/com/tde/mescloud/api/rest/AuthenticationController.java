@@ -1,4 +1,4 @@
-package com.tde.mescloud.security.controller;
+package com.tde.mescloud.api.rest;
 
 import com.tde.mescloud.security.model.auth.AuthenticateRequest;
 import com.tde.mescloud.security.model.auth.AuthenticationResponse;
