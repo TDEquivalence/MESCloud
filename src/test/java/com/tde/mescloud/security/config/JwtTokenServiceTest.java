@@ -1,6 +1,6 @@
 package com.tde.mescloud.security.config;
 
-import com.tde.mescloud.security.model.entity.User;
+import com.tde.mescloud.model.entity.UserEntity;
 import com.tde.mescloud.security.role.Role;
 import org.junit.Assert;
 import org.junit.Test;
@@ -22,12 +22,12 @@ public class JwtTokenServiceTest {
     private JwtTokenService jwtTokenService;
 
     @Mock
-    private User user;
+    private UserEntity user;
 
     @Test
     public void testGenerateToken() {
         //User
-        User.builder()
+        UserEntity.builder()
                 .firstName("John")
                 .lastName("Doe")
                 .password("1234")

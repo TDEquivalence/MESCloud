@@ -11,8 +11,12 @@ import java.util.List;
 @Component
 public class EntityDtoMapper {
 
+    private final ModelMapper mapper;
+
     @Autowired
-    private ModelMapper mapper;
+    public EntityDtoMapper(ModelMapper mapper) {
+        this.mapper = mapper;
+    }
 
     public UserDto convertToDto(UserEntity userEntity) {
         return mapper.map(userEntity, UserDto.class);
