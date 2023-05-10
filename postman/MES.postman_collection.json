@@ -1,235 +1,427 @@
 {
 	"info": {
-		"_postman_id": "dfd804cd-6448-4228-b70c-6af1b5e5cd80",
+		"_postman_id": "a37eaa54-b599-4b98-bf75-ef6bd95903a2",
 		"name": "MES",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
-			"name": "BE - Subscribe",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "DEV/MASILVA/OBO/PROTOCOL_COUNT_V0/BE",
-					"options": {
-						"raw": {
-							"language": "text"
+			"name": "User",
+			"item": [
+				{
+					"name": "New Request",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"firstName\": \"alcina\",\r\n    \"lastName\": \"toto\",\r\n    \"username\": \"xauxau\",\r\n    \"email\": \"pepe@email.com\",\r\n    \"role\": \"admin\",\r\n    \"password\": \"12345\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}:{{port}}/api/auth/register",
+							"host": [
+								"{{url}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"auth",
+								"register"
+							]
 						}
-					}
+					},
+					"response": []
 				},
-				"url": {
-					"raw": "localhost:8080/mqtt/subscribe",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"mqtt",
-						"subscribe"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "BE - Unsubscribe",
-			"request": {
-				"method": "DELETE",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "DEV/MASILVA/OBO/PROTOCOL_COUNT_V0/BE",
-					"options": {
-						"raw": {
-							"language": "text"
-						}
-					}
-				},
-				"url": {
-					"raw": "localhost:8080/mqtt/unsubscribe",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"mqtt",
-						"unsubscribe"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "BE->PLC - Equipment Config",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n  \"equipmentCode\": \"OBO001\",\r\n  \"pTimerCommunicationCycle\": 60,\r\n  \"totalOutput\": 4,\r\n  \"outputCodes\": [\"OBO1\", \"OBO2\", \"OBO3\", \"OBO4\"]\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "localhost:8080/mqtt/publish?topic=DEV/MASILVA/OBO/PROTOCOL_COUNT_V0/PLC",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"mqtt",
-						"publish"
-					],
-					"query": [
+				{
+					"name": "New Request",
+					"event": [
 						{
-							"key": "topic",
-							"value": "DEV/MASILVA/OBO/PROTOCOL_COUNT_V0/PLC"
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"jwtoken\", pm.response.headers.get('Jwt-Token'));"
+								],
+								"type": "text/javascript"
+							}
 						}
-					]
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\": \"xauxau\",\r\n    \"password\": \"12345\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}:{{port}}/api/auth/login",
+							"host": [
+								"{{url}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "New Request",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwtoken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbGNpbmEiLCJpYXQiOjE2ODM1ODI0MzAsImV4cCI6MTY4NDAxNDQzMH0.nDKQwxzFrn2UklnQ0OD7h_4gl0Pe1AzEkLgIBod-Ng8",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}:{{port}}/api/user/all",
+							"host": [
+								"{{url}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"user",
+								"all"
+							]
+						}
+					},
+					"response": []
 				}
-			},
-			"response": []
+			]
 		},
 		{
-			"name": "BE->PLC - Production Order",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n  \"equipmentCode\": \"OBO001\",\r\n  \"productionOrderCode\": \"PO2301\",\r\n  \"targetAmount\": 3000,\r\n  \"isEquipmentEnabled\": true\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
+			"name": "MQTT",
+			"item": [
+				{
+					"name": "BE - Subscribe",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwtoken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "DEV/MASILVA/OBO/PROTOCOL_COUNT_V0/BE",
+							"options": {
+								"raw": {
+									"language": "text"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}:{{port}}/api/mqtt/subscribe",
+							"host": [
+								"{{url}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"mqtt",
+								"subscribe"
+							]
 						}
-					}
+					},
+					"response": []
 				},
-				"url": {
-					"raw": "localhost:8080/mqtt/publish?topic=DEV/MASILVA/OBO/PROTOCOL_COUNT_V0/PLC",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"mqtt",
-						"publish"
-					],
-					"query": [
-						{
-							"key": "topic",
-							"value": "DEV/MASILVA/OBO/PROTOCOL_COUNT_V0/PLC"
+				{
+					"name": "BE - Unsubscribe",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwtoken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "DEV/MASILVA/OBO/PROTOCOL_COUNT_V0/BE",
+							"options": {
+								"raw": {
+									"language": "text"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}:{{port}}/api/mqtt/unsubscribe",
+							"host": [
+								"{{url}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"mqtt",
+								"unsubscribe"
+							]
 						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "PLC->BE - Production Order",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n   \"messageType\": \"productionOrder\",\r\n   \"equipmentCode\":\"OBO001\",\r\n   \"equipmentStatus\":1,\r\n   \"counters\":[\r\n      {\r\n         \"outputCode\":\"OBO1\",\r\n         \"value\":30\r\n      },\r\n      {\r\n         \"outputCode\":\"OBO2\",\r\n         \"value\":0\r\n      },\r\n      {\r\n         \"outputCode\":3,\r\n         \"value\":40\r\n      },\r\n      {\r\n         \"outputCode\":\"OBO4\",\r\n         \"value\":10\r\n      }\r\n   ]\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
+					},
+					"response": []
 				},
-				"url": {
-					"raw": "localhost:8080/mqtt/publish?topic=DEV/MASILVA/OBO/PROTOCOL_COUNT_V0/PLC",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"mqtt",
-						"publish"
-					],
-					"query": [
-						{
-							"key": "topic",
-							"value": "DEV/MASILVA/OBO/PROTOCOL_COUNT_V0/PLC"
+				{
+					"name": "BE->PLC - Equipment Config",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwtoken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"jsonType\": \"Configuration\",\r\n  \"equipmentCode\": \"OBO001\",\r\n  \"pTimerCommunicationCycle\": 60,\r\n  \"totalOutput\": 4,\r\n  \"outputCodes\": [\"OBO1\", \"OBO2\", \"OBO3\", \"OBO4\"]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}:{{port}}/api/mqtt/publish?topic=DEV/MASILVA/OBO/PROTOCOL_COUNT_V0/PLC",
+							"host": [
+								"{{url}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"mqtt",
+								"publish"
+							],
+							"query": [
+								{
+									"key": "topic",
+									"value": "DEV/MASILVA/OBO/PROTOCOL_COUNT_V0/PLC"
+								}
+							]
 						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "PLC->BE - Count",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n   \"messageType\": \"count\",\r\n   \"equipmentCode\":\"OBO001\",\r\n   \"equipmentStatus\":1,\r\n   \"counters\":[\r\n      {\r\n         \"outputCode\":\"OBO1\",\r\n         \"value\":30\r\n      },\r\n      {\r\n         \"outputCode\":\"OBO2\",\r\n         \"value\":0\r\n      },\r\n      {\r\n         \"outputCode\":3,\r\n         \"value\":40\r\n      },\r\n      {\r\n         \"outputCode\":\"OBO4\",\r\n         \"value\":10\r\n      }\r\n   ]\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
+					},
+					"response": []
 				},
-				"url": {
-					"raw": "localhost:8080/mqtt/publish?topic=DEV/MASILVA/OBO/PROTOCOL_COUNT_V0/BE",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"mqtt",
-						"publish"
-					],
-					"query": [
-						{
-							"key": "topic",
-							"value": "DEV/MASILVA/OBO/PROTOCOL_COUNT_V0/BE"
+				{
+					"name": "BE->PLC - Production Order",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwtoken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"jsonType\": \"ProductionOrder\",\r\n  \"equipmentCode\": \"OBO001\",\r\n  \"productionOrderCode\": \"PO2301\",\r\n  \"targetAmount\": 3000,\r\n  \"isEquipmentEnabled\": true\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}:{{port}}/api/mqtt/publish?topic=DEV/MASILVA/OBO/PROTOCOL_COUNT_V0/PLC",
+							"host": [
+								"{{url}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"mqtt",
+								"publish"
+							],
+							"query": [
+								{
+									"key": "topic",
+									"value": "DEV/MASILVA/OBO/PROTOCOL_COUNT_V0/PLC"
+								}
+							]
 						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "BE->PLC - Has received",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n  \"equipmentCode\": \"OBO001\",\r\n  \"hasReceived\": true\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
+					},
+					"response": []
 				},
-				"url": {
-					"raw": "localhost:8080/mqtt/publish?topic=DEV/MASILVA/OBO/PROTOCOL_COUNT_V0/PLC",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"mqtt",
-						"publish"
-					],
-					"query": [
-						{
-							"key": "topic",
-							"value": "DEV/MASILVA/OBO/PROTOCOL_COUNT_V0/PLC"
+				{
+					"name": "PLC->BE - Production Order",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwtoken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n   \"jsonType\": \"ProductionOrderInit\",\r\n   \"equipmentCode\":\"OBO001\",\r\n   \"equipmentStatus\":1,\r\n   \"counters\":[\r\n      {\r\n         \"outputCode\":\"OBO1\",\r\n         \"value\":30\r\n      },\r\n      {\r\n         \"outputCode\":\"OBO2\",\r\n         \"value\":0\r\n      },\r\n      {\r\n         \"outputCode\":3,\r\n         \"value\":40\r\n      },\r\n      {\r\n         \"outputCode\":\"OBO4\",\r\n         \"value\":10\r\n      }\r\n   ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}:{{port}}/api/mqtt/publish?topic=DEV/MASILVA/OBO/PROTOCOL_COUNT_V0/BE",
+							"host": [
+								"{{url}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"mqtt",
+								"publish"
+							],
+							"query": [
+								{
+									"key": "topic",
+									"value": "DEV/MASILVA/OBO/PROTOCOL_COUNT_V0/BE"
+								}
+							]
 						}
-					]
+					},
+					"response": []
+				},
+				{
+					"name": "PLC->BE - Count",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwtoken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n   \"jsonType\": \"ProductionCount\",\r\n   \"equipmentCode\":\"OBO001\",\r\n   \"equipmentStatus\":1,\r\n   \"counters\":[\r\n      {\r\n         \"outputCode\":\"OBO1\",\r\n         \"value\":30\r\n      },\r\n      {\r\n         \"outputCode\":\"OBO2\",\r\n         \"value\":0\r\n      },\r\n      {\r\n         \"outputCode\":3,\r\n         \"value\":40\r\n      },\r\n      {\r\n         \"outputCode\":\"OBO4\",\r\n         \"value\":10\r\n      }\r\n   ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}:{{port}}/api/mqtt/publish?topic=DEV/MASILVA/OBO/PROTOCOL_COUNT_V0/BE",
+							"host": [
+								"{{url}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"mqtt",
+								"publish"
+							],
+							"query": [
+								{
+									"key": "topic",
+									"value": "DEV/MASILVA/OBO/PROTOCOL_COUNT_V0/BE"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "BE->PLC - Has received",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwtoken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"jsonType\": \"Received\",\r\n  \"equipmentCode\": \"OBO001\",\r\n  \"hasReceived\": true\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}:{{port}}/api/mqtt/publish?topic=DEV/MASILVA/OBO/PROTOCOL_COUNT_V0/PLC",
+							"host": [
+								"{{url}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"mqtt",
+								"publish"
+							],
+							"query": [
+								{
+									"key": "topic",
+									"value": "DEV/MASILVA/OBO/PROTOCOL_COUNT_V0/PLC"
+								}
+							]
+						}
+					},
+					"response": []
 				}
-			},
-			"response": []
+			]
 		}
 	]
 }
