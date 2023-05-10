@@ -52,8 +52,6 @@ public class AuthenticationService {
                 .build();
 
         userRepository.save(user);
-        String jwtToken = jwtTokenService.generateToken(user);
-        saveUserToken(jwtToken, user);
         return userToAuthenticationResponse(user);
     }
 
@@ -127,7 +125,14 @@ public class AuthenticationService {
             token.setExpired(true);
             token.setRevoked(true);
         });
+        removeAllInvalidUserTokens(user);
         tokenRepository.saveAll(validUserTokens);
     }
 
+    private void removeAllInvalidUserTokens(UserEntity user) {
+        List<TokenEntity> invalidUserTokens = tokenRepository.findAllInvalidTokenByUser(user.getId());
+        if(!invalidUserTokens.isEmpty()) {
+            invalidUserTokens.forEach(tokenRepository::delete);
+        }
+    }
 }

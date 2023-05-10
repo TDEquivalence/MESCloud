@@ -14,9 +14,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import static com.tde.mescloud.security.constant.SecurityConstant.LOGOUT;
-import static com.tde.mescloud.security.constant.SecurityConstant.PUBLIC_URLS;
-
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -37,7 +34,7 @@ public class SecurityConfig {
                 .csrf()
                 .disable()
                 .authorizeHttpRequests()
-                .requestMatchers(PUBLIC_URLS)
+                .requestMatchers("/api/auth/register", "/api/auth/login")
                 .permitAll()
                 .anyRequest()
                 .authenticated()
