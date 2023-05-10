@@ -19,7 +19,6 @@ public class CounterRecordConverterImpl implements CounterRecordConverter {
         CounterRecord counterRecord = new CounterRecord();
         counterRecord.setProductionOrderCode(equipmentCountsDTO.getProductionOrderCode());
         counterRecord.setEquipmentCode(equipmentCountsDTO.getEquipmentCode());
-        counterRecord.setEquipmentStatus(equipmentCountsDTO.getEquipmentStatus());
         counterRecord.setEquipmentOutputCode(counterDTO.getOutputCode());
         counterRecord.setRealValue(counterDTO.getValue());
         return counterRecord;

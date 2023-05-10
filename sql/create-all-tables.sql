@@ -1,5 +1,4 @@
 DROP TABLE IF EXISTS factory_user;
-DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS production_instruction;
 DROP TABLE IF EXISTS production_order;
 DROP TABLE IF EXISTS equipment_status_record;
@@ -9,6 +8,7 @@ DROP TABLE IF EXISTS equipment_output;
 DROP TABLE IF EXISTS equipment_output_alias;
 DROP TABLE IF EXISTS section;
 DROP TABLE IF EXISTS factory;
+DROP TABLE IF EXISTS users;
 
 
 CREATE TABLE users (

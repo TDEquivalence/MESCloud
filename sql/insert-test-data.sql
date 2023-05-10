@@ -89,3 +89,19 @@ INSERT INTO equipment_output (
 	'OBO001-004',
 	4
 );
+
+INSERT INTO production_order (
+	equipment_id,
+	code,
+	target_amount,
+	is_equipment_enabled,
+	is_completed,
+	created_at
+) VALUES (
+	1,
+	'PO001/23',
+	1000,
+	true,
+	false,
+	'2023-05-09'
+);

@@ -13,7 +13,6 @@ public class CounterRecord {
     private String equipmentCode;
     private String equipmentOutputCode;
     private String equipmentOutputAlias;
-    private int equipmentStatus;
     private int realValue;
     private int computedValue;
     private Date registeredAt;
