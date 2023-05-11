@@ -99,7 +99,7 @@ INSERT INTO production_order (
 	created_at
 ) VALUES (
 	1,
-	'PO001/23',
+	'PO2301',
 	1000,
 	true,
 	false,

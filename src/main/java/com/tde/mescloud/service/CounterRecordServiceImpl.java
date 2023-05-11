@@ -39,7 +39,6 @@ public class CounterRecordServiceImpl implements CounterRecordService {
         List<CounterRecord> counterRecords = new ArrayList<>(equipmentCountsDTO.getCounters().length);
         for (CounterMqttDTO counterDTO : equipmentCountsDTO.getCounters()) {
             CounterRecord counterRecord = converter.convertToDO(equipmentCountsDTO, counterDTO);
-            counterRecord.setComputedValue(INITIAL_COMPUTED_VALUE);
             counterRecord.setRegisteredAt(new Date());
 
             EquipmentOutput equipmentOutput = equipmentOutputService.findByCode(counterDTO.getOutputCode());
@@ -47,11 +46,28 @@ public class CounterRecordServiceImpl implements CounterRecordService {
             //TODO: Discuss replacing the PO code with the IDs, considering it would save a read operation on the DB
             ProductionOrder productionOrder = productionOrderService.findByCode(equipmentCountsDTO.getProductionOrderCode());
             counterRecord.setProductionOrder(productionOrder);
-            //TODO: get productionOrder (id) from productionOrderCode (productionOrderService)
+
+            //TODO: This could be set dynamically, allowing the use of this method for all counts
+            counterRecord.setComputedValue(getComputedValue(counterRecord));
 
             counterRecords.add(counterRecord);
         }
         return save(counterRecords);
+    }
+
+    private int getComputedValue(CounterRecord counterRecord) {
+        //TODO: Add fail fast
+        long productionOrderId = counterRecord.getProductionOrder().getId();
+        long equipmentOutputId = counterRecord.getEquipmentOutput().getId();
+        CounterRecordEntity counterRecordEntity = repository.findLast(productionOrderId, equipmentOutputId);
+
+        if (counterRecordEntity == null) {
+            return INITIAL_COMPUTED_VALUE;
+        } else {
+            int previous = counterRecordEntity.getComputedValue();
+            int difference = counterRecord.getRealValue() - counterRecordEntity.getRealValue();
+            return previous + difference;
+        }
     }
 
     @Override
