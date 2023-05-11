@@ -1,10 +1,5 @@
 package com.tde.mescloud.model.dto;
 
-<<<<<<< HEAD
-=======
-
-import com.fasterxml.jackson.annotation.JsonFormat;
->>>>>>> development
 import com.tde.mescloud.security.role.Role;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
