@@ -5,6 +5,7 @@ import com.tde.mescloud.security.model.auth.AuthenticationResponse;
 import com.tde.mescloud.security.service.AuthenticationService;
 import com.tde.mescloud.security.model.auth.RegisterRequest;
 import com.tde.mescloud.security.exception.UsernameExistException;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -28,7 +29,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthenticationResponse> login(@RequestBody AuthenticateRequest request) {
+    public ResponseEntity<AuthenticationResponse> login(@RequestBody AuthenticateRequest request, HttpServletResponse response) {
         AuthenticationResponse authenticationResponse = authenticationService.authenticate(request);
         HttpHeaders headers = authenticationService.getJwtHeader(authenticationResponse);
         return new ResponseEntity<>(authenticationResponse, headers, HttpStatus.OK);

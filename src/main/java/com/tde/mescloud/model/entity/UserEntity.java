@@ -1,5 +1,6 @@
 package com.tde.mescloud.model.entity;
 
+import com.tde.mescloud.security.model.token.TokenEntity;
 import com.tde.mescloud.security.role.Role;
 import jakarta.persistence.*;
 import lombok.*;
@@ -8,6 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
@@ -29,6 +31,9 @@ public class UserEntity implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Role role;
     private String[] userAuthorities;
+
+    @OneToMany(mappedBy = "user")
+    private transient  List<TokenEntity> tokens;
 
     private Date createdAt;
     private Date updatedAt;
