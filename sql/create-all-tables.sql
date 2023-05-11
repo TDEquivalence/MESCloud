@@ -1,5 +1,4 @@
 DROP TABLE IF EXISTS factory_user;
-DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS production_instruction;
 DROP TABLE IF EXISTS production_order;
 DROP TABLE IF EXISTS equipment_status_record;
@@ -9,16 +8,23 @@ DROP TABLE IF EXISTS equipment_output;
 DROP TABLE IF EXISTS equipment_output_alias;
 DROP TABLE IF EXISTS section;
 DROP TABLE IF EXISTS factory;
-
+DROP TABLE IF EXISTS users;
 
 CREATE TABLE users (
- id int GENERATED ALWAYS AS IDENTITY,
- first_name varchar(20),
- last_name varchar(20),
- email varchar(50),
- password varchar(255),
+  id int GENERATED ALWAYS AS IDENTITY,
+  first_name VARCHAR(50),
+  last_name VARCHAR(50),
+  username VARCHAR(50) NOT NULL,
+  email VARCHAR(50),
+  password VARCHAR(255) NOT NULL,
+  role VARCHAR(50),
+  user_authorities TEXT[],
+  created_at TIMESTAMP,
+  updated_at TIMESTAMP,
+  is_active BOOLEAN,
+  is_not_locked BOOLEAN,
 
- PRIMARY KEY(id)
+  PRIMARY KEY(id)
 );
 
 CREATE TABLE factory (

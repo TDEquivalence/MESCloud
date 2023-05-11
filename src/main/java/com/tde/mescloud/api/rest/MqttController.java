@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
  * REST controller for MQTT testing purposes
  */
 @RestController
-@RequestMapping("/mqtt")
+@RequestMapping("api/mqtt")
 public class MqttController {
 
     private final MqttClient mqttClient;
