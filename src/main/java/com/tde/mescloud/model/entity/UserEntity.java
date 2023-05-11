@@ -33,7 +33,7 @@ public class UserEntity implements UserDetails {
     private String[] userAuthorities;
 
     @OneToMany(mappedBy = "user")
-    private List<TokenEntity> tokens;
+    private transient  List<TokenEntity> tokens;
 
     private Date createdAt;
     private Date updatedAt;
