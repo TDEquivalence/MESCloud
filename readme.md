@@ -26,7 +26,7 @@ behavior, simply remove the environment variable from any given property (ex.: c
 file, renaming it **set-sys-env-vars.bat**
 - Replace the desired placeholders (search for **your_MES** or **your_TDE**) by their actual value
 - Run the script on the command line (press Windows+R and insert cmd on the prompt window) 
-- Optionally, you can remove sensitive data from the script, such as your TDE AWS user secret access keys, after setting
+- Optionally, you can remove sensitive data from the script, such as your TDE AWS userEntity secret access keys, after setting
 the required environment variables
 
 ```

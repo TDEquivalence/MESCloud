@@ -1,4 +1,4 @@
-package com.tde.mescloud;
+package com.tde.mescloud.service;
 
 import com.tde.mescloud.exception.MesMqttException;
 import com.tde.mescloud.api.mqtt.MqttClient;
