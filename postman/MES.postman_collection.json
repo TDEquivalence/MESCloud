@@ -214,7 +214,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"jsonType\": \"Configuration\",\r\n  \"equipmentCode\": \"OBO001\",\r\n  \"pTimerCommunicationCycle\": 60,\r\n  \"totalOutput\": 4,\r\n  \"outputCodes\": [\"OBO1\", \"OBO2\", \"OBO3\", \"OBO4\"]\r\n}",
+							"raw": "{\r\n  \"jsonType\": \"Configuration\",\r\n  \"equipmentCode\": \"OBO001\",\r\n  \"pTimerCommunicationCycle\": 180,\r\n  \"totalOutput\": 4,\r\n  \"outputCodes\": [\"OBO001-001\", \"OBO001-002\", \"OBO001-003\", \"OBO001-004\"]\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -304,7 +304,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n   \"jsonType\": \"ProductionOrderInit\",\r\n   \"equipmentCode\":\"OBO001\",\r\n   \"equipmentStatus\":1,\r\n   \"counters\":[\r\n      {\r\n         \"outputCode\":\"OBO001-001\",\r\n         \"value\":30\r\n      },\r\n      {\r\n         \"outputCode\":\"OBO001-002\",\r\n         \"value\":0\r\n      },\r\n      {\r\n         \"outputCode\":\"OBO001-003\",\r\n         \"value\":40\r\n      },\r\n      {\r\n         \"outputCode\":\"OBO001-004\",\r\n         \"value\":10\r\n      }\r\n   ]\r\n}",
+							"raw": "{\r\n   \"jsonType\": \"ProductionOrderInit\",\r\n   \"productionOrderCode\": \"PO001/23\",\r\n   \"equipmentCode\":\"OBO001\",\r\n   \"equipmentStatus\":1,\r\n   \"counters\":[\r\n      {\r\n         \"outputCode\":\"OBO001-001\",\r\n         \"value\":30\r\n      },\r\n      {\r\n         \"outputCode\":\"OBO001-002\",\r\n         \"value\":0\r\n      },\r\n      {\r\n         \"outputCode\":\"OBO001-003\",\r\n         \"value\":40\r\n      },\r\n      {\r\n         \"outputCode\":\"OBO001-004\",\r\n         \"value\":10\r\n      }\r\n   ]\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
