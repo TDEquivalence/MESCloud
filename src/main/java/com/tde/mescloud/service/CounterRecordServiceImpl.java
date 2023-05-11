@@ -2,6 +2,7 @@ package com.tde.mescloud.service;
 
 import com.tde.mescloud.model.CounterRecord;
 import com.tde.mescloud.model.EquipmentOutput;
+import com.tde.mescloud.model.ProductionOrder;
 import com.tde.mescloud.model.converter.CounterRecordConverter;
 import com.tde.mescloud.model.dto.CounterMqttDTO;
 import com.tde.mescloud.model.dto.EquipmentCountsMqttDTO;
@@ -21,13 +22,16 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     private final CounterRecordConverter converter;
     private final CounterRecordRepository repository;
     private final EquipmentOutputService equipmentOutputService;
+    private final ProductionOrderService productionOrderService;
 
     public CounterRecordServiceImpl(CounterRecordConverter converter,
                                     CounterRecordRepository repository,
-                                    EquipmentOutputService equipmentOutputService) {
+                                    EquipmentOutputService equipmentOutputService,
+                                    ProductionOrderService productionOrderService) {
         this.converter = converter;
         this.repository = repository;
         this.equipmentOutputService = equipmentOutputService;
+        this.productionOrderService = productionOrderService;
     }
 
     //TODO: Improve efficiency to avoid the loop in this method and save(List<CounterRecord>)
@@ -40,8 +44,10 @@ public class CounterRecordServiceImpl implements CounterRecordService {
 
             EquipmentOutput equipmentOutput = equipmentOutputService.findByCode(counterDTO.getOutputCode());
             counterRecord.setEquipmentOutput(equipmentOutput);
-            //TODO: get productionOrder (id) from productionOrderCode (productionOrderService)
             //TODO: Discuss replacing the PO code with the IDs, considering it would save a read operation on the DB
+            ProductionOrder productionOrder = productionOrderService.findByCode(equipmentCountsDTO.getProductionOrderCode());
+            counterRecord.setProductionOrder(productionOrder);
+            //TODO: get productionOrder (id) from productionOrderCode (productionOrderService)
 
             counterRecords.add(counterRecord);
         }

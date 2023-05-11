@@ -17,7 +17,11 @@ public class MqttTopic extends AWSIotTopic {
 
     @Override
     public void onMessage(AWSIotMessage message) {
-        log.info(() -> String.format("Message received on topic [%s]", message.getTopic()));
-        SpringContext.getBean(CountProtocol.class, CountProtocol.BEAN_NAME).react(message);
+        try {
+            log.info(() -> String.format("Message received on topic [%s]", message.getTopic()));
+            SpringContext.getBean(CountProtocol.class, CountProtocol.BEAN_NAME).react(message);
+        } catch (Exception e) {
+            log.severe(e.getMessage());
+        }
     }
 }

@@ -2,10 +2,12 @@ package com.tde.mescloud.model.converter;
 
 import com.tde.mescloud.model.CounterRecord;
 import com.tde.mescloud.model.EquipmentOutput;
+import com.tde.mescloud.model.ProductionOrder;
 import com.tde.mescloud.model.dto.CounterMqttDTO;
 import com.tde.mescloud.model.dto.EquipmentCountsMqttDTO;
 import com.tde.mescloud.model.entity.CounterRecordEntity;
 import com.tde.mescloud.model.entity.EquipmentOutputEntity;
+import com.tde.mescloud.model.entity.ProductionOrderEntity;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Component;
 
@@ -17,14 +19,17 @@ public class CounterRecordConverterImpl implements CounterRecordConverter {
     @Override
     public CounterRecord convertToDO(EquipmentCountsMqttDTO equipmentCountsDTO, CounterMqttDTO counterDTO) {
         CounterRecord counterRecord = new CounterRecord();
-        counterRecord.setProductionOrderCode(equipmentCountsDTO.getProductionOrderCode());
         counterRecord.setEquipmentCode(equipmentCountsDTO.getEquipmentCode());
+        counterRecord.setRealValue(counterDTO.getValue());
 
         EquipmentOutput equipmentOutput = new EquipmentOutput();
         equipmentOutput.setCode(counterDTO.getOutputCode());
         counterRecord.setEquipmentOutput(equipmentOutput);
 
-        counterRecord.setRealValue(counterDTO.getValue());
+        ProductionOrder productionOrder = new ProductionOrder();
+        productionOrder.setCode(equipmentCountsDTO.getProductionOrderCode());
+        counterRecord.setProductionOrder(productionOrder);
+
         return counterRecord;
     }
 
@@ -46,6 +51,12 @@ public class CounterRecordConverterImpl implements CounterRecordConverter {
             equipmentOutputEntity.setId(counterRecord.getEquipmentOutput().getId());
         }
         counterRecordEntity.setEquipmentOutput(equipmentOutputEntity);
+
+        ProductionOrderEntity productionOrderEntity = new ProductionOrderEntity();
+        if (counterRecord.getProductionOrder() != null) {
+            productionOrderEntity.setId(counterRecord.getProductionOrder().getId());
+        }
+        counterRecordEntity.setProductionOrder(productionOrderEntity);
 
         return counterRecordEntity;
     }
