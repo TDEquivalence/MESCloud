@@ -11,9 +11,8 @@ public class CounterRecord {
 
     private String productionOrderCode;
     private String equipmentCode;
-    private String equipmentOutputCode;
-    private String equipmentOutputAlias;
     private int realValue;
     private int computedValue;
     private Date registeredAt;
+    private EquipmentOutput equipmentOutput;
 }

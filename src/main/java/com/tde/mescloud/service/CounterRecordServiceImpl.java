@@ -16,7 +16,6 @@ import java.util.List;
 @Service
 public class CounterRecordServiceImpl implements CounterRecordService {
 
-    private static final int ALIAS_MIN_LENGTH = 1;
     private final int INITIAL_COMPUTED_VALUE = 0;
 
     private final CounterRecordConverter converter;
@@ -31,7 +30,7 @@ public class CounterRecordServiceImpl implements CounterRecordService {
         this.equipmentOutputService = equipmentOutputService;
     }
 
-
+    //TODO: Improve efficiency to avoid the loop in this method and save(List<CounterRecord>)
     public List<CounterRecord> saveProductionOrderInitialCounts(EquipmentCountsMqttDTO equipmentCountsDTO) {
         List<CounterRecord> counterRecords = new ArrayList<>(equipmentCountsDTO.getCounters().length);
         for (CounterMqttDTO counterDTO : equipmentCountsDTO.getCounters()) {
@@ -40,9 +39,7 @@ public class CounterRecordServiceImpl implements CounterRecordService {
             counterRecord.setRegisteredAt(new Date());
 
             EquipmentOutput equipmentOutput = equipmentOutputService.findByCode(counterDTO.getOutputCode());
-            counterRecord.setEquipmentOutputCode(equipmentOutput.getCode());
-            counterRecord.setEquipmentOutputAlias(equipmentOutput.getAlias());
-            //TODO: get equipmentOutput (id) & its alias from equipmentOutputCode (equipmentOutputService)
+            counterRecord.setEquipmentOutput(equipmentOutput);
             //TODO: get productionOrder (id) from productionOrderCode (productionOrderService)
             //TODO: Discuss replacing the PO code with the IDs, considering it would save a read operation on the DB
 
@@ -55,20 +52,10 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     public List<CounterRecord> save(List<CounterRecord> counterRecords) {
         List<CounterRecordEntity> counterRecordEntities = new ArrayList<>(counterRecords.size());
         for (CounterRecord counterRecord : counterRecords) {
-            if (!hasOutputAlias(counterRecord)) {
-                String equipmentOutputAlias = equipmentOutputService.getOutputAlias(counterRecord.getEquipmentOutputCode());
-                counterRecord.setEquipmentOutputAlias(equipmentOutputAlias);
-            }
-            //TODO: Implement convertToEntity
             CounterRecordEntity counterRecordEntity = converter.convertToEntity(counterRecord);
             counterRecordEntities.add(counterRecordEntity);
         }
         List<CounterRecordEntity> persistedCounterRecords = (List<CounterRecordEntity>) repository.saveAll(counterRecordEntities);
         return converter.convertToDO(persistedCounterRecords);
-    }
-
-    private boolean hasOutputAlias(CounterRecord counterRecord) {
-        return counterRecord.getEquipmentOutputAlias() != null &&
-                counterRecord.getEquipmentOutputAlias().length() > ALIAS_MIN_LENGTH;
     }
 }

@@ -8,6 +8,7 @@ import lombok.Setter;
 @Setter
 public class EquipmentOutput {
 
+    private long id;
     private CountingEquipment countingEquipment;
     private String code;
     private String alias;

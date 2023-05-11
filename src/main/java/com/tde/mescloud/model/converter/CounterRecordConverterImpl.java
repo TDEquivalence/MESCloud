@@ -1,11 +1,11 @@
 package com.tde.mescloud.model.converter;
 
 import com.tde.mescloud.model.CounterRecord;
+import com.tde.mescloud.model.EquipmentOutput;
 import com.tde.mescloud.model.dto.CounterMqttDTO;
 import com.tde.mescloud.model.dto.EquipmentCountsMqttDTO;
 import com.tde.mescloud.model.entity.CounterRecordEntity;
 import com.tde.mescloud.model.entity.EquipmentOutputEntity;
-import com.tde.mescloud.model.entity.ProductionOrderEntity;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Component;
 
@@ -19,7 +19,11 @@ public class CounterRecordConverterImpl implements CounterRecordConverter {
         CounterRecord counterRecord = new CounterRecord();
         counterRecord.setProductionOrderCode(equipmentCountsDTO.getProductionOrderCode());
         counterRecord.setEquipmentCode(equipmentCountsDTO.getEquipmentCode());
-        counterRecord.setEquipmentOutputCode(counterDTO.getOutputCode());
+
+        EquipmentOutput equipmentOutput = new EquipmentOutput();
+        equipmentOutput.setCode(counterDTO.getOutputCode());
+        counterRecord.setEquipmentOutput(equipmentOutput);
+
         counterRecord.setRealValue(counterDTO.getValue());
         return counterRecord;
     }
@@ -32,17 +36,17 @@ public class CounterRecordConverterImpl implements CounterRecordConverter {
     @Override
     public CounterRecordEntity convertToEntity(CounterRecord counterRecord) {
         CounterRecordEntity counterRecordEntity = new CounterRecordEntity();
-        ProductionOrderEntity productionOrderEntity = new ProductionOrderEntity();
-        productionOrderEntity.setCode(counterRecord.getProductionOrderCode());
-        counterRecordEntity.setProductionOrder(productionOrderEntity);
-        counterRecordEntity.setEquipmentOutputAlias(counterRecord.getEquipmentOutputAlias());
-
-        EquipmentOutputEntity equipmentOutput = new EquipmentOutputEntity();
-        equipmentOutput.setCode(counterRecord.getEquipmentOutputCode());
-//        counterRecordEntity.setEquipmentOutput(equipmentOutput);
         counterRecordEntity.setRealValue(counterRecord.getRealValue());
         counterRecordEntity.setComputedValue(counterRecord.getComputedValue());
         counterRecordEntity.setRegisteredAt(counterRecord.getRegisteredAt());
+
+        EquipmentOutputEntity equipmentOutputEntity = new EquipmentOutputEntity();
+        if (counterRecord.getEquipmentOutput() != null) {
+            counterRecordEntity.setEquipmentOutputAlias(counterRecord.getEquipmentOutput().getAlias());
+            equipmentOutputEntity.setId(counterRecord.getEquipmentOutput().getId());
+        }
+        counterRecordEntity.setEquipmentOutput(equipmentOutputEntity);
+
         return counterRecordEntity;
     }
 }

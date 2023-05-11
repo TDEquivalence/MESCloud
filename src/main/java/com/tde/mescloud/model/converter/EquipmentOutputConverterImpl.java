@@ -10,7 +10,15 @@ import org.springframework.stereotype.Component;
 public class EquipmentOutputConverterImpl implements EquipmentOutputConverter{
 
     public EquipmentOutput convertToDO(EquipmentOutputEntity entity) {
+
+        if (entity == null) {
+            String msg = "Null EquipmentOutputEntity provided for Domain Object conversion";
+            log.warning(msg);
+            throw new IllegalArgumentException(msg);
+        }
+
         EquipmentOutput equipmentOutput = new EquipmentOutput();
+        equipmentOutput.setId(entity.getId().intValue());
         //TODO: set counting equipment
         //TODO: Alias within alias is a poor naming choice
         if (entity.getAlias() != null) {

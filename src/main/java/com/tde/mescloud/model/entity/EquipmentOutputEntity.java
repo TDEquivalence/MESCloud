@@ -16,5 +16,6 @@ public class EquipmentOutputEntity {
     private CountingEquipmentEntity countingEquipment;
     private String code;
     @ManyToOne
+    @JoinColumn(name = "equipment_output_alias_id")
     private EquipmentOutputAliasEntity alias;
 }
