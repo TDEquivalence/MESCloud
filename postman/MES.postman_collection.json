@@ -259,7 +259,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"jsonType\": \"ProductionOrder\",\r\n  \"equipmentCode\": \"OBO001\",\r\n  \"productionOrderCode\": \"PO2301\",\r\n  \"targetAmount\": 3000,\r\n  \"isEquipmentEnabled\": true\r\n}",
+							"raw": "{\r\n  \"jsonType\": \"ProductionOrder\",\r\n  \"equipmentCode\": \"OBO001\",\r\n  \"productionOrderCode\": \"PO001/23\",\r\n  \"targetAmount\": 3000,\r\n  \"isEquipmentEnabled\": true\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
