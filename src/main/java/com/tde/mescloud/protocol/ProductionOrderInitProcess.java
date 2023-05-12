@@ -1,7 +1,6 @@
 package com.tde.mescloud.protocol;
 
 import com.tde.mescloud.constant.MqttDTOConstants;
-import com.tde.mescloud.model.converter.CounterRecordConverter;
 import com.tde.mescloud.model.dto.EquipmentCountsMqttDTO;
 import com.tde.mescloud.service.CounterRecordService;
 import lombok.extern.java.Log;
@@ -20,7 +19,8 @@ public class ProductionOrderInitProcess extends AbstractMesProtocolProcess<Equip
     @Override
     public void execute(EquipmentCountsMqttDTO equipmentCountsDTO) {
         log.info("Executing Production Order init process");
-        counterRecordService.saveProductionOrderInitialCounts(equipmentCountsDTO);
+        //TODO: Check if it is a valid init process. Is there any CounterRecord for this PO
+        counterRecordService.save(equipmentCountsDTO);
         //TODO: equipmentStatus -> equipmentService.updateStatus();
     }
 

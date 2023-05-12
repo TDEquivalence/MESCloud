@@ -8,6 +8,7 @@ import com.tde.mescloud.model.dto.CounterMqttDTO;
 import com.tde.mescloud.model.dto.EquipmentCountsMqttDTO;
 import com.tde.mescloud.model.entity.CounterRecordEntity;
 import com.tde.mescloud.repository.CounterRecordRepository;
+import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -15,9 +16,11 @@ import java.util.Date;
 import java.util.List;
 
 @Service
+@Log
 public class CounterRecordServiceImpl implements CounterRecordService {
 
     private final int INITIAL_COMPUTED_VALUE = 0;
+    private final int PLC_UINT_OVERFLOW = 65535;
 
     private final CounterRecordConverter converter;
     private final CounterRecordRepository repository;
@@ -35,7 +38,7 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     }
 
     //TODO: Improve efficiency to avoid the loop in this method and save(List<CounterRecord>)
-    public List<CounterRecord> saveProductionOrderInitialCounts(EquipmentCountsMqttDTO equipmentCountsDTO) {
+    public List<CounterRecord> save(EquipmentCountsMqttDTO equipmentCountsDTO) {
         List<CounterRecord> counterRecords = new ArrayList<>(equipmentCountsDTO.getCounters().length);
         for (CounterMqttDTO counterDTO : equipmentCountsDTO.getCounters()) {
             CounterRecord counterRecord = converter.convertToDO(equipmentCountsDTO, counterDTO);
@@ -46,28 +49,46 @@ public class CounterRecordServiceImpl implements CounterRecordService {
             //TODO: Discuss replacing the PO code with the IDs, considering it would save a read operation on the DB
             ProductionOrder productionOrder = productionOrderService.findByCode(equipmentCountsDTO.getProductionOrderCode());
             counterRecord.setProductionOrder(productionOrder);
-
-            //TODO: This could be set dynamically, allowing the use of this method for all counts
+            //TODO: Refactor
             counterRecord.setComputedValue(getComputedValue(counterRecord));
-
             counterRecords.add(counterRecord);
         }
         return save(counterRecords);
     }
 
     private int getComputedValue(CounterRecord counterRecord) {
-        //TODO: Add fail fast
+
+        if (counterRecord == null) {
+            String msg = "Unable to compute Counter Record value: null counter record";
+            log.severe(msg);
+            throw new IllegalArgumentException(msg);
+        }
+
+        CounterRecordEntity counterRecordEntity = findLastCounterRecord(counterRecord);
+        return counterRecordEntity == null ? INITIAL_COMPUTED_VALUE : getComputedValue(counterRecordEntity, counterRecord);
+    }
+
+    private CounterRecordEntity findLastCounterRecord(CounterRecord counterRecord) {
+
         long productionOrderId = counterRecord.getProductionOrder().getId();
         long equipmentOutputId = counterRecord.getEquipmentOutput().getId();
-        CounterRecordEntity counterRecordEntity = repository.findLast(productionOrderId, equipmentOutputId);
+        return repository.findLast(productionOrderId, equipmentOutputId);
+    }
 
-        if (counterRecordEntity == null) {
-            return INITIAL_COMPUTED_VALUE;
+    private int getComputedValue(CounterRecordEntity counterRecordEntity, CounterRecord counterRecord) {
+
+        int computedValue;
+        if (counterRecord.getRealValue() < counterRecordEntity.getRealValue()) {
+
+            int incrementBeforeOverflow = PLC_UINT_OVERFLOW - counterRecordEntity.getRealValue();
+            computedValue = incrementBeforeOverflow + counterRecord.getRealValue();
         } else {
             int previous = counterRecordEntity.getComputedValue();
             int difference = counterRecord.getRealValue() - counterRecordEntity.getRealValue();
-            return previous + difference;
+            computedValue = previous + difference;
         }
+
+        return computedValue;
     }
 
     @Override

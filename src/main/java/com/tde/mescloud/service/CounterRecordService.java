@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface CounterRecordService {
 
-    List<CounterRecord> saveProductionOrderInitialCounts(EquipmentCountsMqttDTO equipmentCountsMqttDTO);
+    List<CounterRecord> save(EquipmentCountsMqttDTO equipmentCountsMqttDTO);
 
     List<CounterRecord> save(List<CounterRecord> counterRecords);
 }
