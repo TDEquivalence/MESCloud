@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin(origins = {"http://staging.mescloud.pt", "http://staging.mescloud.pt"})
 @RestController
 @RequestMapping("api/user")
 @RequiredArgsConstructor
