@@ -17,10 +17,10 @@ public class ProductionOrderInitProcess extends AbstractMesProtocolProcess<Equip
     }
 
     @Override
-    public void execute(EquipmentCountsMqttDTO equipmentCountsDTO) {
+    public void execute(EquipmentCountsMqttDTO equipmentCountsMqttDTO) {
         log.info("Executing Production Order init process");
-        //TODO: Check if it is a valid init process. Is there any CounterRecord for this PO
-        counterRecordService.save(equipmentCountsDTO);
+        //TODO: Check if it is a valid init process. Is there any CounterRecord for this PO? If so, problem
+        counterRecordService.save(equipmentCountsMqttDTO);
         //TODO: equipmentStatus -> equipmentService.updateStatus();
     }
 
