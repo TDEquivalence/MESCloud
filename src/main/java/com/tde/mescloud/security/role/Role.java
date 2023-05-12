@@ -13,7 +13,7 @@ import static com.tde.mescloud.security.role.Authority.*;
 @RequiredArgsConstructor
 public enum Role {
 
-    USER(Set.of(USER_READ, USER_UPDATE, USER_DELETE, USER_CREATE)),
+    OPERATOR(Set.of(USER_READ, USER_UPDATE, USER_DELETE, USER_CREATE)),
     ADMIN(Set.of(ADMIN_READ, ADMIN_UPDATE, ADMIN_DELETE,ADMIN_CREATE)),
     SUPER_ADMIN(Set.of(ADMIN_READ, ADMIN_UPDATE, ADMIN_DELETE,ADMIN_CREATE));
 

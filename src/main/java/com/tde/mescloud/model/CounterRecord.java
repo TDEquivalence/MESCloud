@@ -9,12 +9,10 @@ import java.util.Date;
 @Setter
 public class CounterRecord {
 
-    private String productionOrderCode;
+    private ProductionOrder productionOrder;
     private String equipmentCode;
-    private String equipmentOutputCode;
-    private String equipmentOutputAlias;
-    private int equipmentStatus;
     private int realValue;
     private int computedValue;
     private Date registeredAt;
+    private EquipmentOutput equipmentOutput;
 }

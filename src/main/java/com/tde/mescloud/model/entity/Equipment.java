@@ -1,14 +1,13 @@
-package com.tde.mescloud.model;
+package com.tde.mescloud.model.entity;
 
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class EquipmentOutput {
+public class Equipment {
 
     private long id;
-    private CountingEquipment countingEquipment;
     private String code;
     private String alias;
 }

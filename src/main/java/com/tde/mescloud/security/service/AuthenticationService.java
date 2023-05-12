@@ -7,6 +7,9 @@ import com.tde.mescloud.security.mapper.EntityDtoMapper;
 import com.tde.mescloud.security.model.auth.AuthenticateRequest;
 import com.tde.mescloud.security.model.auth.AuthenticationResponse;
 import com.tde.mescloud.security.model.auth.RegisterRequest;
+import com.tde.mescloud.security.model.token.TokenEntity;
+import com.tde.mescloud.security.model.token.TokenType;
+import com.tde.mescloud.security.repository.TokenRepository;
 import com.tde.mescloud.security.repository.UserRepository;
 import com.tde.mescloud.security.role.Role;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +20,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 
 import static com.tde.mescloud.security.constant.SecurityConstant.JWT_TOKEN_HEADER;
 import static com.tde.mescloud.security.constant.UserServiceImpConstant.USERNAME_ALREADY_EXISTS;
@@ -26,6 +30,7 @@ import static com.tde.mescloud.security.constant.UserServiceImpConstant.USERNAME
 public class AuthenticationService {
 
     private final UserRepository userRepository;
+    private final TokenRepository tokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenService jwtTokenService;
     private final AuthenticationManager authenticationManager;
@@ -34,7 +39,7 @@ public class AuthenticationService {
     public AuthenticationResponse register(RegisterRequest request) throws UsernameExistException {
         setUsernameByEmail(request);
         validateUsername(request);
-        var user = UserEntity.builder()
+        UserEntity user = UserEntity.builder()
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
                 .username(request.getUsername())
@@ -58,8 +63,12 @@ public class AuthenticationService {
                 )
         );
 
-        UserEntity userEntity = userRepository.findUserByUsername(request.getUsername());
-        return userToAuthenticationResponse(userEntity);
+        UserEntity user = userRepository.findUserByUsername(request.getUsername());
+        String jwtToken = jwtTokenService.generateToken(user);
+        revokeAllUserTokens(user);
+        saveUserToken(jwtToken, user);
+        removeLastInvalidUserTokens(user);
+        return userToAuthenticationResponse(user);
     }
 
     private void setUsernameByEmail(RegisterRequest request) {
@@ -76,11 +85,10 @@ public class AuthenticationService {
     }
 
     public HttpHeaders getJwtHeader(AuthenticationResponse authenticationResponse) {
-        UserEntity userEntity = userRepository.findUserByUsername(authenticationResponse.getUsername());
-        String jwtToken = jwtTokenService.generateToken(userEntity);
+        UserEntity user = userRepository.findUserByUsername(authenticationResponse.getUsername());
+        String jwtToken = jwtTokenService.generateToken(user);
         HttpHeaders headers = new HttpHeaders();
         headers.add(JWT_TOKEN_HEADER, jwtToken);
-
         return headers;
     }
 
@@ -90,12 +98,41 @@ public class AuthenticationService {
                 .firstName(userEntity.getFirstName())
                 .lastName(userEntity.getLastName())
                 .username(userEntity.getUsername())
-                .createdAt(userEntity.getCreatedAt())
                 .role(userEntity.getRole())
                 .build();
     }
 
     private Role getRoleEnumName(String role) {
         return Role.valueOf(role.toUpperCase());
+    }
+
+    private void saveUserToken(String jwtToken, UserEntity user) {
+        TokenEntity token = TokenEntity.builder()
+                .user(user)
+                .token(jwtToken)
+                .tokenType(TokenType.BEARER)
+                .expired(false)
+                .revoked(false)
+                .build();
+        tokenRepository.save(token);
+    }
+
+    private void revokeAllUserTokens(UserEntity user) {
+        List<TokenEntity> validUserTokens = tokenRepository.findAllValidTokenByUser(user.getId());
+        if(validUserTokens.isEmpty()) {
+            return;
+        }
+        validUserTokens.forEach(token -> {
+            token.setExpired(true);
+            token.setRevoked(true);
+        });
+        tokenRepository.saveAll(validUserTokens);
+    }
+
+    private void removeLastInvalidUserTokens(UserEntity user) {
+        List<TokenEntity> invalidUserTokens = tokenRepository.findAllInvalidTokenByUser(user.getId());
+        if(!invalidUserTokens.isEmpty()) {
+            invalidUserTokens.forEach(tokenRepository::delete);
+        }
     }
 }

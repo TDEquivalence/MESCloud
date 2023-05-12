@@ -19,7 +19,7 @@ public class CounterRecordEntity {
     private String equipmentOutputAlias;
     private int realValue;
     private int computedValue;
-    @Transient
+    @ManyToOne
     private ProductionOrderEntity productionOrder;
     private Date registeredAt;
 }

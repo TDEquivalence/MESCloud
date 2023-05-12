@@ -3,8 +3,6 @@ package com.tde.mescloud.security.model.auth;
 import com.tde.mescloud.security.role.Role;
 import lombok.*;
 
-import java.util.Date;
-
 @Getter
 @Setter
 @Builder
@@ -16,6 +14,5 @@ public class AuthenticationResponse {
     private String username;
     private String firstName;
     private String lastName;
-    private Date createdAt;
     private Role role;
 }
