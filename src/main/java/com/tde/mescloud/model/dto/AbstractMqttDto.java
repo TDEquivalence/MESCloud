@@ -5,8 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class CounterMqttDTO {
+public abstract class AbstractMqttDto implements MqttDto {
 
-    private String outputCode;
-    private int value;
+    private String jsonType;
 }

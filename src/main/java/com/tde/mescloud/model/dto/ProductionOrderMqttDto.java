@@ -5,10 +5,10 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class EquipmentCountsMqttDTO extends AbstractMqttDTO {
+public class ProductionOrderMqttDto extends AbstractMqttDto {
 
     private String productionOrderCode;
     private String equipmentCode;
-    private int equipmentStatus;
-    private CounterMqttDTO[] counters;
+    private int targetAmount;
+    private boolean isEquipmentEnabled;
 }

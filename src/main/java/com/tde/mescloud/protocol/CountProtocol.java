@@ -6,8 +6,8 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tde.mescloud.api.mqtt.MqttClient;
 import com.tde.mescloud.exception.MesMqttException;
-import com.tde.mescloud.model.dto.HasReceivedMqttDTO;
-import com.tde.mescloud.model.dto.MqttDTO;
+import com.tde.mescloud.model.dto.HasReceivedMqttDto;
+import com.tde.mescloud.model.dto.MqttDto;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Component;
@@ -49,20 +49,20 @@ public class CountProtocol extends AbstractMesProtocol {
         log.info(() -> String.format("Message delegated to [%s] on topic [%s] with payload: [%s]",
                 this.getClass().toString(), message.getTopic(), message.getStringPayload()));
 
-        Optional<MqttDTO> optMqttDTO = parseMqttDTO(message);
+        Optional<MqttDto> optMqttDTO = parseMqttDTO(message);
         if(optMqttDTO.isEmpty()) {
             publishNotReceived();
             return;
         }
 
-        MqttDTO mqttDTO = optMqttDTO.get();
+        MqttDto mqttDTO = optMqttDTO.get();
         publishHasReceived(mqttDTO);
         executeMesProcess(mqttDTO);
     }
 
-    private Optional<MqttDTO> parseMqttDTO(AWSIotMessage message) {
+    private Optional<MqttDto> parseMqttDTO(AWSIotMessage message) {
         try {
-            MqttDTO mqttDTO = objectMapper.readValue(message.getStringPayload(), MqttDTO.class);
+            MqttDto mqttDTO = objectMapper.readValue(message.getStringPayload(), MqttDto.class);
             return Optional.of(mqttDTO);
         } catch (JsonMappingException e) {
             log.log(Level.SEVERE, e, () -> String.format("Unable to map JSON [%s]", message.getStringPayload()));
@@ -76,16 +76,16 @@ public class CountProtocol extends AbstractMesProtocol {
     private void publishNotReceived() {
         try {
             log.severe("Unable to parse a valid MqttDTO from payload.");
-            mqttClient.publish(mesMqttSettings.getProtCountPlcTopic(), new HasReceivedMqttDTO(false));
+            mqttClient.publish(mesMqttSettings.getProtCountPlcTopic(), new HasReceivedMqttDto(false));
         } catch (MesMqttException e) {
             log.log(Level.SEVERE,"Failed to publish Not Received message", e);
             throw new RuntimeException(e);
         }
     }
 
-    private void publishHasReceived(MqttDTO mqttDTO) {
+    private void publishHasReceived(MqttDto mqttDTO) {
         try {
-            HasReceivedMqttDTO hasReceivedMqttDTO = new HasReceivedMqttDTO(mqttDTO.getEquipmentCode(), true);
+            HasReceivedMqttDto hasReceivedMqttDTO = new HasReceivedMqttDto(mqttDTO.getEquipmentCode(), true);
             mqttClient.publish(mesMqttSettings.getProtCountPlcTopic(), hasReceivedMqttDTO);
         } catch (MesMqttException e) {
             log.log(Level.SEVERE, e, () -> String.format("Failed to publish Has Received message as a response to [%s] for equipment [%s]",

@@ -1,12 +1,11 @@
 package com.tde.mescloud.model.dto;
 
-import com.tde.mescloud.constant.MqttDTOConstants;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class EquipmentConfigMqttDTO extends AbstractMqttDTO {
+public class EquipmentConfigMqttDto extends AbstractMqttDto {
 
     private String equipmentCode;
     private int pTimerCommunicationCycle;

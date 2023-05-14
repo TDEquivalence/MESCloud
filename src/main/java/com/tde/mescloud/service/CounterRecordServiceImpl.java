@@ -4,8 +4,8 @@ import com.tde.mescloud.model.CounterRecord;
 import com.tde.mescloud.model.EquipmentOutput;
 import com.tde.mescloud.model.ProductionOrder;
 import com.tde.mescloud.model.converter.CounterRecordConverter;
-import com.tde.mescloud.model.dto.CounterMqttDTO;
-import com.tde.mescloud.model.dto.EquipmentCountsMqttDTO;
+import com.tde.mescloud.model.dto.CounterMqttDto;
+import com.tde.mescloud.model.dto.EquipmentCountsMqttDto;
 import com.tde.mescloud.model.entity.CounterRecordEntity;
 import com.tde.mescloud.model.entity.ProductionOrderEntity;
 import com.tde.mescloud.repository.CounterRecordRepository;
@@ -43,10 +43,10 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     }
 
     //TODO: Improve efficiency to avoid the loop in this method and save(List<CounterRecord>)
-    public List<CounterRecord> save(EquipmentCountsMqttDTO equipmentCountsDTO) {
+    public List<CounterRecord> save(EquipmentCountsMqttDto equipmentCountsDTO) {
 
         List<CounterRecord> counterRecords = new ArrayList<>(equipmentCountsDTO.getCounters().length);
-        for (CounterMqttDTO counterDTO : equipmentCountsDTO.getCounters()) {
+        for (CounterMqttDto counterDTO : equipmentCountsDTO.getCounters()) {
             CounterRecord counterRecord = converter.convertToDO(equipmentCountsDTO, counterDTO);
             setEquipmentOutput(counterRecord, counterDTO.getOutputCode());
             setProductionOrder(counterRecord, equipmentCountsDTO.getProductionOrderCode());

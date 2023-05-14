@@ -1,14 +1,14 @@
 package com.tde.mescloud.protocol;
 
 import com.tde.mescloud.constant.MqttDTOConstants;
-import com.tde.mescloud.model.dto.EquipmentCountsMqttDTO;
+import com.tde.mescloud.model.dto.EquipmentCountsMqttDto;
 import com.tde.mescloud.service.CounterRecordService;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 
 @Service
 @Log
-public class CounterRecordProcess extends AbstractMesProtocolProcess<EquipmentCountsMqttDTO> {
+public class CounterRecordProcess extends AbstractMesProtocolProcess<EquipmentCountsMqttDto> {
 
     private final CounterRecordService counterRecordService;
 
@@ -17,7 +17,7 @@ public class CounterRecordProcess extends AbstractMesProtocolProcess<EquipmentCo
     }
 
     @Override
-    public void execute(EquipmentCountsMqttDTO equipmentCountsMqttDTO) {
+    public void execute(EquipmentCountsMqttDto equipmentCountsMqttDTO) {
         log.info("Executing Counter Record process");
         if (areInvalidContinuationCounts(equipmentCountsMqttDTO)) {
             log.warning(() -> String.format("Invalid continuation Counter Record - Production Order [%s] has records no or does not exist",
@@ -32,7 +32,7 @@ public class CounterRecordProcess extends AbstractMesProtocolProcess<EquipmentCo
            //3 pTimerCommunicationCycles without receiving counts
     }
 
-    private boolean areInvalidContinuationCounts(EquipmentCountsMqttDTO equipmentCountsMqttDTO) {
+    private boolean areInvalidContinuationCounts(EquipmentCountsMqttDto equipmentCountsMqttDTO) {
         return !counterRecordService.areValidContinuationCounts(equipmentCountsMqttDTO.getProductionOrderCode());
     }
 

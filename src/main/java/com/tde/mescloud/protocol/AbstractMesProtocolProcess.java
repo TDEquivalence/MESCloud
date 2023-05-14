@@ -1,9 +1,9 @@
 package com.tde.mescloud.protocol;
 
-import com.tde.mescloud.model.dto.MqttDTO;
+import com.tde.mescloud.model.dto.MqttDto;
 import jakarta.annotation.PostConstruct;
 
-public abstract class AbstractMesProtocolProcess<T extends MqttDTO> implements MesProtocolProcess<T>{
+public abstract class AbstractMesProtocolProcess<T extends MqttDto> implements MesProtocolProcess<T>{
 
     @PostConstruct
     private void registerMesProtocolProcess() {

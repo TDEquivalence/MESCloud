@@ -3,8 +3,8 @@ package com.tde.mescloud.model.converter;
 import com.tde.mescloud.model.CounterRecord;
 import com.tde.mescloud.model.EquipmentOutput;
 import com.tde.mescloud.model.ProductionOrder;
-import com.tde.mescloud.model.dto.CounterMqttDTO;
-import com.tde.mescloud.model.dto.EquipmentCountsMqttDTO;
+import com.tde.mescloud.model.dto.CounterMqttDto;
+import com.tde.mescloud.model.dto.EquipmentCountsMqttDto;
 import com.tde.mescloud.model.entity.CounterRecordEntity;
 import com.tde.mescloud.model.entity.EquipmentOutputEntity;
 import com.tde.mescloud.model.entity.ProductionOrderEntity;
@@ -17,7 +17,7 @@ public class CounterRecordConverterImpl implements CounterRecordConverter {
 
 
     @Override
-    public CounterRecord convertToDO(EquipmentCountsMqttDTO equipmentCountsDTO, CounterMqttDTO counterDTO) {
+    public CounterRecord convertToDO(EquipmentCountsMqttDto equipmentCountsDTO, CounterMqttDto counterDTO) {
         CounterRecord counterRecord = new CounterRecord();
         counterRecord.setEquipmentCode(equipmentCountsDTO.getEquipmentCode());
         counterRecord.setRealValue(counterDTO.getValue());
