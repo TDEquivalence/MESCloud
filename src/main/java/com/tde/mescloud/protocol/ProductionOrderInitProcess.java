@@ -19,9 +19,18 @@ public class ProductionOrderInitProcess extends AbstractMesProtocolProcess<Equip
     @Override
     public void execute(EquipmentCountsMqttDTO equipmentCountsMqttDTO) {
         log.info("Executing Production Order init process");
-        //TODO: Check if it is a valid init process. Is there any CounterRecord for this PO? If so, problem
+        if (areInvalidInitialCounts(equipmentCountsMqttDTO)) {
+            log.warning(() -> String.format("Invalid initial Counter Record - Production Order [%s] already has records or does not exist",
+                    equipmentCountsMqttDTO.getProductionOrderCode()));
+            return;
+        }
+
         counterRecordService.save(equipmentCountsMqttDTO);
         //TODO: equipmentStatus -> equipmentService.updateStatus();
+    }
+
+    private boolean areInvalidInitialCounts(EquipmentCountsMqttDTO equipmentCountsMqttDTO) {
+        return !counterRecordService.areValidInitialCounts(equipmentCountsMqttDTO.getProductionOrderCode());
     }
 
     @Override

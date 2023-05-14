@@ -12,4 +12,7 @@ public interface CounterRecordRepository extends CrudRepository<CounterRecordEnt
 
     @Query(value = "SELECT * FROM counter_record cr WHERE (cr.production_order_id = :productionOrderId AND cr.equipment_output_id = :equipmentOutputId) ORDER BY id DESC LIMIT 1", nativeQuery = true)
     CounterRecordEntity findLast(Long productionOrderId, Long equipmentOutputId);
+
+    @Query(value = "SELECT * FROM counter_record cr WHERE (cr.production_order_id = :productionOrderId) LIMIT 1", nativeQuery = true)
+    CounterRecordEntity findLast(Long productionOrderId);
 }

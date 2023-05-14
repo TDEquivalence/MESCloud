@@ -18,13 +18,22 @@ public class CounterRecordProcess extends AbstractMesProtocolProcess<EquipmentCo
 
     @Override
     public void execute(EquipmentCountsMqttDTO equipmentCountsMqttDTO) {
-        //TODO: Check if it is a valid counter record process. Is there any CounterRecord for this PO? If not, problem!
         log.info("Executing Counter Record process");
+        if (areInvalidContinuationCounts(equipmentCountsMqttDTO)) {
+            log.warning(() -> String.format("Invalid continuation Counter Record - Production Order [%s] has records no or does not exist",
+                    equipmentCountsMqttDTO.getProductionOrderCode()));
+            return;
+        }
         counterRecordService.save(equipmentCountsMqttDTO);
+
         //TODO: Check for alert needs
            //Counter values are the same for 3 consecutive counts
            //Equipment status is not 1
            //3 pTimerCommunicationCycles without receiving counts
+    }
+
+    private boolean areInvalidContinuationCounts(EquipmentCountsMqttDTO equipmentCountsMqttDTO) {
+        return !counterRecordService.areValidContinuationCounts(equipmentCountsMqttDTO.getProductionOrderCode());
     }
 
     @Override

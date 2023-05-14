@@ -7,7 +7,9 @@ import com.tde.mescloud.model.converter.CounterRecordConverter;
 import com.tde.mescloud.model.dto.CounterMqttDTO;
 import com.tde.mescloud.model.dto.EquipmentCountsMqttDTO;
 import com.tde.mescloud.model.entity.CounterRecordEntity;
+import com.tde.mescloud.model.entity.ProductionOrderEntity;
 import com.tde.mescloud.repository.CounterRecordRepository;
+import com.tde.mescloud.repository.ProductionOrderRepository;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +20,7 @@ import java.util.List;
 @Service
 @Log
 public class CounterRecordServiceImpl implements CounterRecordService {
+    private final ProductionOrderRepository productionOrderRepository;
 
     private final int INITIAL_COMPUTED_VALUE = 0;
     private final int PLC_UINT_OVERFLOW = 65535;
@@ -30,11 +33,13 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     public CounterRecordServiceImpl(CounterRecordConverter converter,
                                     CounterRecordRepository repository,
                                     EquipmentOutputService equipmentOutputService,
-                                    ProductionOrderService productionOrderService) {
+                                    ProductionOrderService productionOrderService,
+                                    ProductionOrderRepository productionOrderRepository) {
         this.converter = converter;
         this.repository = repository;
         this.equipmentOutputService = equipmentOutputService;
         this.productionOrderService = productionOrderService;
+        this.productionOrderRepository = productionOrderRepository;
     }
 
     //TODO: Improve efficiency to avoid the loop in this method and save(List<CounterRecord>)
@@ -60,6 +65,8 @@ public class CounterRecordServiceImpl implements CounterRecordService {
 
     private void setProductionOrder(CounterRecord counterRecord, String productionOrderCode) {
         //Sending the ProductionOrder ID instead of its code, on the MqttDTO, would save a DB read operation
+        //Alternatively, isValidInitialCounterRecord() could be replaced by findByCode @ ProductionOrderInitProcess
+        //which would check against nullity and, if not null, pass the reference to save, jointly w/ the EquipmentCountsMqttDTO
         ProductionOrder productionOrder = productionOrderService.findByCode(productionOrderCode);
         counterRecord.setProductionOrder(productionOrder);
     }
@@ -110,4 +117,17 @@ public class CounterRecordServiceImpl implements CounterRecordService {
         List<CounterRecordEntity> persistedCounterRecords = (List<CounterRecordEntity>) repository.saveAll(counterRecordEntities);
         return converter.convertToDO(persistedCounterRecords);
     }
+
+    public boolean areValidInitialCounts(String productionOrderCode) {
+        ProductionOrderEntity productionOrderEntity = productionOrderRepository.findByCode(productionOrderCode);
+        return productionOrderEntity != null &&
+                repository.findLast(productionOrderEntity.getId()) == null;
+    }
+
+    public boolean areValidContinuationCounts(String productionOrderCode) {
+        ProductionOrderEntity productionOrderEntity = productionOrderRepository.findByCode(productionOrderCode);
+        return productionOrderEntity != null &&
+                repository.findLast(productionOrderEntity.getId()) != null;
+    }
+
 }

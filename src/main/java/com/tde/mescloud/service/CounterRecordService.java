@@ -10,4 +10,8 @@ public interface CounterRecordService {
     List<CounterRecord> save(EquipmentCountsMqttDTO equipmentCountsMqttDTO);
 
     List<CounterRecord> save(List<CounterRecord> counterRecords);
+
+    boolean areValidInitialCounts(String productionOrderCode);
+
+    boolean areValidContinuationCounts(String productionOrderCode);
 }
