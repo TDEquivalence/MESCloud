@@ -9,5 +9,4 @@ public class MescloudApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(MescloudApplication.class, args);
 	}
-
 }
