@@ -7,6 +7,9 @@ import com.tde.mescloud.protocol.CountProtocol;
 import com.tde.mescloud.utility.SpringContext;
 import lombok.extern.java.Log;
 
+import java.util.Arrays;
+import java.util.logging.Level;
+
 @Log
 public class MqttTopic extends AWSIotTopic {
 
@@ -21,7 +24,8 @@ public class MqttTopic extends AWSIotTopic {
             log.info(() -> String.format("Message received on topic [%s]", message.getTopic()));
             SpringContext.getBean(CountProtocol.class, CountProtocol.BEAN_NAME).react(message);
         } catch (Exception e) {
-            log.severe(e.getMessage());
+            log.log(Level.SEVERE, e, () -> e.getMessage());
+            log.severe(Arrays.toString(e.getStackTrace()));
         }
     }
 }

@@ -9,6 +9,7 @@ import java.util.Date;
 @Setter
 public class CounterRecord {
 
+    private long id;
     private ProductionOrder productionOrder;
     private String equipmentCode;
     private int realValue;
