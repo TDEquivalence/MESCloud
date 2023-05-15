@@ -1,10 +1,10 @@
 package com.tde.mescloud.api.rest;
 
+import com.tde.mescloud.security.exception.UsernameExistException;
 import com.tde.mescloud.security.model.auth.AuthenticateRequest;
 import com.tde.mescloud.security.model.auth.AuthenticationResponse;
-import com.tde.mescloud.security.service.AuthenticationService;
 import com.tde.mescloud.security.model.auth.RegisterRequest;
-import com.tde.mescloud.security.exception.UsernameExistException;
+import com.tde.mescloud.security.service.AuthenticationService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
