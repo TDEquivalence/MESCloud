@@ -42,6 +42,17 @@ public class CounterRecordServiceImpl implements CounterRecordService {
         this.productionOrderRepository = productionOrderRepository;
     }
 
+    @Override
+    public List<CounterRecord> findAll() {
+        Iterable<CounterRecordEntity> counterRecordEntities = repository.findAll();
+        List<CounterRecord> counterRecords = new ArrayList<>();
+        for (CounterRecordEntity counterRecordEntity : counterRecordEntities) {
+            CounterRecord counterRecord = converter.convertToDO(counterRecordEntity);
+            counterRecords.add(counterRecord);
+        }
+        return counterRecords;
+    }
+
     //TODO: Improve efficiency to avoid the loop in this method and save(List<CounterRecord>)
     public List<CounterRecord> save(EquipmentCountsMqttDto equipmentCountsDTO) {
 

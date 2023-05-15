@@ -2,6 +2,7 @@ package com.tde.mescloud.model.converter;
 
 import com.tde.mescloud.model.CounterRecord;
 import com.tde.mescloud.model.dto.CounterMqttDto;
+import com.tde.mescloud.model.dto.CounterRecordDto;
 import com.tde.mescloud.model.dto.EquipmentCountsMqttDto;
 import com.tde.mescloud.model.entity.CounterRecordEntity;
 
@@ -13,6 +14,8 @@ public interface CounterRecordConverter {
     CounterRecord convertToDO(EquipmentCountsMqttDto equipmentCountsDTO, CounterMqttDto counterDTO);
 
     CounterRecord convertToDO(CounterRecordEntity entity);
+
+    List<CounterRecordDto> convertToDTO(List<CounterRecord> counterRecords);
 
     default List<CounterRecord> convertToDO(List<CounterRecordEntity> counterRecordEntities) {
         List<CounterRecord> counterRecords = new ArrayList<>(counterRecordEntities.size());

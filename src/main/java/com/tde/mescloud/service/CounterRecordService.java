@@ -7,6 +7,8 @@ import java.util.List;
 
 public interface CounterRecordService {
 
+    List<CounterRecord> findAll();
+
     List<CounterRecord> save(EquipmentCountsMqttDto equipmentCountsMqttDTO);
 
     List<CounterRecord> save(List<CounterRecord> counterRecords);

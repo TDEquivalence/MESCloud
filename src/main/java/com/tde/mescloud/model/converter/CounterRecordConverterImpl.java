@@ -4,17 +4,35 @@ import com.tde.mescloud.model.CounterRecord;
 import com.tde.mescloud.model.EquipmentOutput;
 import com.tde.mescloud.model.ProductionOrder;
 import com.tde.mescloud.model.dto.CounterMqttDto;
+import com.tde.mescloud.model.dto.CounterRecordDto;
 import com.tde.mescloud.model.dto.EquipmentCountsMqttDto;
 import com.tde.mescloud.model.entity.CounterRecordEntity;
 import com.tde.mescloud.model.entity.EquipmentOutputEntity;
 import com.tde.mescloud.model.entity.ProductionOrderEntity;
 import lombok.extern.java.Log;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Component
 @Log
 public class CounterRecordConverterImpl implements CounterRecordConverter {
 
+    private final ModelMapper modelMapper;
+
+    public CounterRecordConverterImpl(ModelMapper modelMapper) {
+        this.modelMapper = modelMapper;
+    }
+
+    public CounterRecordDto convertToDTO(CounterRecord counterRecord) {
+        return modelMapper.map(counterRecord, CounterRecordDto.class);
+    }
+
+    @Override
+    public List<CounterRecordDto> convertToDTO(List<CounterRecord> counterRecords) {
+        return counterRecords.stream().map(this::convertToDTO).toList();
+    }
 
     @Override
     public CounterRecord convertToDO(EquipmentCountsMqttDto equipmentCountsDTO, CounterMqttDto counterDTO) {
@@ -35,7 +53,7 @@ public class CounterRecordConverterImpl implements CounterRecordConverter {
 
     @Override
     public CounterRecord convertToDO(CounterRecordEntity entity) {
-        return null;
+        return modelMapper.map(entity, CounterRecord.class);
     }
 
     @Override
