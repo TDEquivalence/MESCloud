@@ -26,3 +26,5 @@ mes:
   mqtt:
     protCountBackendTopic: "MASILVA/OBO/PROTOCOL_COUNT_V0/BE"
     protCountPlcTopic: "MASILVA/OBO/PROTOCOL_COUNT_V0/PLC"
+  security:
+    allowedOrigin: "https://www.mescloud.pt"

@@ -47,7 +47,7 @@ public class CounterRecordServiceImpl implements CounterRecordService {
         Iterable<CounterRecordEntity> counterRecordEntities = repository.findAll();
         List<CounterRecord> counterRecords = new ArrayList<>();
         for (CounterRecordEntity counterRecordEntity : counterRecordEntities) {
-            CounterRecord counterRecord = converter.convertToDO(counterRecordEntity);
+            CounterRecord counterRecord = converter.convertToDomainObj(counterRecordEntity);
             counterRecords.add(counterRecord);
         }
         return counterRecords;
@@ -58,7 +58,7 @@ public class CounterRecordServiceImpl implements CounterRecordService {
 
         List<CounterRecord> counterRecords = new ArrayList<>(equipmentCountsDTO.getCounters().length);
         for (CounterMqttDto counterDTO : equipmentCountsDTO.getCounters()) {
-            CounterRecord counterRecord = converter.convertToDO(equipmentCountsDTO, counterDTO);
+            CounterRecord counterRecord = converter.convertToDomainObj(equipmentCountsDTO, counterDTO);
             setEquipmentOutput(counterRecord, counterDTO.getOutputCode());
             setProductionOrder(counterRecord, equipmentCountsDTO.getProductionOrderCode());
             setComputedValue(counterRecord);
@@ -126,7 +126,7 @@ public class CounterRecordServiceImpl implements CounterRecordService {
             counterRecordEntities.add(counterRecordEntity);
         }
         List<CounterRecordEntity> persistedCounterRecords = (List<CounterRecordEntity>) repository.saveAll(counterRecordEntities);
-        return converter.convertToDO(persistedCounterRecords);
+        return converter.convertToDomainObj(persistedCounterRecords);
     }
 
     public boolean areValidInitialCounts(String productionOrderCode) {

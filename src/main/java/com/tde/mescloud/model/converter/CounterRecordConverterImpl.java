@@ -10,7 +10,6 @@ import com.tde.mescloud.model.entity.CounterRecordEntity;
 import com.tde.mescloud.model.entity.EquipmentOutputEntity;
 import com.tde.mescloud.model.entity.ProductionOrderEntity;
 import lombok.extern.java.Log;
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -19,23 +18,24 @@ import java.util.List;
 @Log
 public class CounterRecordConverterImpl implements CounterRecordConverter {
 
-    private final ModelMapper modelMapper;
-
-    public CounterRecordConverterImpl(ModelMapper modelMapper) {
-        this.modelMapper = modelMapper;
-    }
-
-    public CounterRecordDto convertToDTO(CounterRecord counterRecord) {
-        return modelMapper.map(counterRecord, CounterRecordDto.class);
-    }
-
-    @Override
-    public List<CounterRecordDto> convertToDTO(List<CounterRecord> counterRecords) {
-        return counterRecords.stream().map(this::convertToDTO).toList();
+    public CounterRecordDto convertToDto(CounterRecord counterRecord) {
+        CounterRecordDto counterRecordDto = new CounterRecordDto();
+        counterRecordDto.setId(counterRecord.getId());
+        counterRecordDto.setRegisteredAt(counterRecord.getRegisteredAt());
+        counterRecordDto.setComputedValue(counterRecord.getComputedValue());
+        counterRecordDto.setEquipmentAlias(counterRecord.getEquipmentOutput().getCountingEquipment().getAlias());
+        counterRecordDto.setEquipmentOutputAlias(counterRecord.getEquipmentOutput().getAlias());
+        counterRecordDto.setProductionOrderCode(counterRecord.getProductionOrder().getCode());
+        return counterRecordDto;
     }
 
     @Override
-    public CounterRecord convertToDO(EquipmentCountsMqttDto equipmentCountsDTO, CounterMqttDto counterDTO) {
+    public List<CounterRecordDto> convertToDto(List<CounterRecord> counterRecords) {
+        return counterRecords.stream().map(this::convertToDto).toList();
+    }
+
+    @Override
+    public CounterRecord convertToDomainObj(EquipmentCountsMqttDto equipmentCountsDTO, CounterMqttDto counterDTO) {
         CounterRecord counterRecord = new CounterRecord();
         counterRecord.setEquipmentCode(equipmentCountsDTO.getEquipmentCode());
         counterRecord.setRealValue(counterDTO.getValue());
@@ -52,8 +52,23 @@ public class CounterRecordConverterImpl implements CounterRecordConverter {
     }
 
     @Override
-    public CounterRecord convertToDO(CounterRecordEntity entity) {
-        return modelMapper.map(entity, CounterRecord.class);
+    public CounterRecord convertToDomainObj(CounterRecordEntity entity) {
+        CounterRecord counterRecord = new CounterRecord();
+        counterRecord.setId(entity.getId());
+        counterRecord.setEquipmentCode(entity.getEquipmentOutput().getCode());
+        counterRecord.setRealValue(entity.getRealValue());
+        counterRecord.setComputedValue(entity.getComputedValue());
+        counterRecord.setRegisteredAt(entity.getRegisteredAt());
+
+        EquipmentOutput equipmentOutput = new EquipmentOutput(entity.getEquipmentOutput());
+        counterRecord.setEquipmentOutput(equipmentOutput);
+
+        ProductionOrder productionOrder = new ProductionOrder(entity.getProductionOrder());
+        productionOrder.setId(entity.getProductionOrder().getId());
+        productionOrder.setCode(entity.getProductionOrder().getCode());
+        counterRecord.setProductionOrder(productionOrder);
+
+        return counterRecord;
     }
 
     @Override

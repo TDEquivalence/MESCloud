@@ -4,6 +4,8 @@ import com.tde.mescloud.security.config.httphandler.JwtAccessDeniedHandler;
 import com.tde.mescloud.security.config.httphandler.JwtAuthenticationEntryPoint;
 import com.tde.mescloud.security.service.LogoutService;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -26,6 +28,7 @@ import java.util.Collections;
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
+@ConfigurationProperties(prefix = "mes.security")
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthFilter;
@@ -33,6 +36,8 @@ public class SecurityConfig {
     private final LogoutService logoutService;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    @Setter
+    private String allowedOrigin;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -70,7 +75,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(Collections.singletonList("https://www.mescloud.pt")); // Set the specific origin
+        config.setAllowedOrigins(Collections.singletonList(allowedOrigin));
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
         config.setAllowedHeaders(Collections.singletonList("*"));
         config.addExposedHeader("Access-Control-Allow-Origin");

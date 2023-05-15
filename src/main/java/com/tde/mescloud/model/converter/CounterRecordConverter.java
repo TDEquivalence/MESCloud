@@ -11,16 +11,16 @@ import java.util.List;
 
 public interface CounterRecordConverter {
 
-    CounterRecord convertToDO(EquipmentCountsMqttDto equipmentCountsDTO, CounterMqttDto counterDTO);
+    CounterRecord convertToDomainObj(EquipmentCountsMqttDto equipmentCountsDTO, CounterMqttDto counterDTO);
 
-    CounterRecord convertToDO(CounterRecordEntity entity);
+    CounterRecord convertToDomainObj(CounterRecordEntity entity);
 
-    List<CounterRecordDto> convertToDTO(List<CounterRecord> counterRecords);
+    List<CounterRecordDto> convertToDto(List<CounterRecord> counterRecords);
 
-    default List<CounterRecord> convertToDO(List<CounterRecordEntity> counterRecordEntities) {
+    default List<CounterRecord> convertToDomainObj(List<CounterRecordEntity> counterRecordEntities) {
         List<CounterRecord> counterRecords = new ArrayList<>(counterRecordEntities.size());
         for (CounterRecordEntity entity : counterRecordEntities) {
-            counterRecords.add(convertToDO(entity));
+            counterRecords.add(convertToDomainObj(entity));
         }
         return counterRecords;
     }

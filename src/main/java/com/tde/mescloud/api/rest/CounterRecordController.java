@@ -27,7 +27,7 @@ public class CounterRecordController {
     @GetMapping
     public ResponseEntity<List<CounterRecordDto>> getCounterRecords() {
         List<CounterRecord> counterRecords = service.findAll();
-        List<CounterRecordDto> counterRecordDtos = converter.convertToDTO(counterRecords);
+        List<CounterRecordDto> counterRecordDtos = converter.convertToDto(counterRecords);
         return new ResponseEntity<>(counterRecordDtos, HttpStatus.OK);
     }
 }

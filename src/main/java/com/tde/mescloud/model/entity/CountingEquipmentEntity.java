@@ -20,7 +20,7 @@ public class CountingEquipmentEntity {
     private SectionEntity section;
     private int equipmentStatus;
     private int pTimerCommunicationCycle;
-    @OneToMany(mappedBy = "countingEquipment")
+    @OneToMany(mappedBy = "countingEquipment", fetch = FetchType.EAGER)
     List<EquipmentOutputEntity> outputs;
 
 }

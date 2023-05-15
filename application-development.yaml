@@ -2,3 +2,7 @@ mes:
   mqtt:
     protCountBackendTopic: "DEV/MASILVA/OBO/PROTOCOL_COUNT_V0/BE"
     protCountPlcTopic: "DEV/MASILVA/OBO/PROTOCOL_COUNT_V0/PLC"
+  security:
+    allowedOrigin: "http://127.0.0.1:5173"
+
+
