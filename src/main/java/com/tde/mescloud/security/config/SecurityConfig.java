@@ -2,6 +2,7 @@ package com.tde.mescloud.security.config;
 
 import com.tde.mescloud.security.config.httphandler.JwtAccessDeniedHandler;
 import com.tde.mescloud.security.config.httphandler.JwtAuthenticationEntryPoint;
+import com.tde.mescloud.security.constant.SecurityConstant;
 import com.tde.mescloud.security.service.LogoutService;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -80,7 +81,7 @@ public class SecurityConfig {
         config.setAllowedHeaders(Collections.singletonList("*"));
         config.addExposedHeader("Access-Control-Allow-Origin");
         config.addExposedHeader("Access-Control-Allow-Headers");
-        config.addExposedHeader("Jwt-Token");
+        config.addExposedHeader(SecurityConstant.JWT_TOKEN_HEADER);
         config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
