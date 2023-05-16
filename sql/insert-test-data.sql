@@ -20,7 +20,7 @@ INSERT INTO counting_equipment (
 	p_timer_communication_cycle
 ) VALUES (
 	'OBO001',
-	'OBO',
+	'Máquina 1',
 	1,
 	2,
 	60

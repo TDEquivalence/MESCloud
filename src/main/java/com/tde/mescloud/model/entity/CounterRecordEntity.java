@@ -21,5 +21,6 @@ public class CounterRecordEntity {
     private int computedValue;
     @ManyToOne
     private ProductionOrderEntity productionOrder;
+    @Temporal(TemporalType.TIMESTAMP)
     private Date registeredAt;
 }

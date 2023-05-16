@@ -125,7 +125,7 @@ CREATE TABLE counter_record (
 	real_value int,
 	computed_value int,
 	production_order_id int,
-	registered_at date,
+	registered_at timestamp,
 
 	PRIMARY KEY(id),
 	FOREIGN KEY(equipment_output_id) REFERENCES equipment_output(id)
