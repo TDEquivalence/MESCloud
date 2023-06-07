@@ -15,14 +15,19 @@ public interface CounterRecordConverter {
 
     CounterRecord convertToDomainObj(CounterRecordEntity entity);
 
-    List<CounterRecordDto> convertToDto(List<CounterRecord> counterRecords);
-
-    default List<CounterRecord> convertToDomainObj(List<CounterRecordEntity> counterRecordEntities) {
-        List<CounterRecord> counterRecords = new ArrayList<>(counterRecordEntities.size());
+    default List<CounterRecord> convertToDomainObj(Iterable<CounterRecordEntity> counterRecordEntities) {
+        List<CounterRecord> counterRecords = new ArrayList<>();
         for (CounterRecordEntity entity : counterRecordEntities) {
-            counterRecords.add(convertToDomainObj(entity));
+            CounterRecord counterRecord = convertToDomainObj(entity);
+            counterRecords.add(counterRecord);
         }
         return counterRecords;
+    }
+
+    CounterRecordDto convertToDto(CounterRecord counterRecord);
+
+    default List<CounterRecordDto> convertToDto(List<CounterRecord> counterRecords) {
+        return counterRecords.stream().map(this::convertToDto).toList();
     }
 
     CounterRecordEntity convertToEntity(CounterRecord counterRecord);

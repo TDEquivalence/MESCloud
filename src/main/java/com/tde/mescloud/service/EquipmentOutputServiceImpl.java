@@ -22,7 +22,7 @@ public class EquipmentOutputServiceImpl implements EquipmentOutputService {
     @Override
     public EquipmentOutput findByCode(String equipmentOutputCode) {
         EquipmentOutputEntity entity = repository.findByCode(equipmentOutputCode);
-        return converter.convertToDO(entity);
+        return converter.convertToDomainObject(entity);
     }
 
     public String getOutputAlias(String equipmentOutputCode) {

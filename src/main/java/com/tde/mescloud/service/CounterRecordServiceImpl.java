@@ -10,17 +10,19 @@ import com.tde.mescloud.model.entity.CounterRecordEntity;
 import com.tde.mescloud.model.entity.ProductionOrderEntity;
 import com.tde.mescloud.repository.CounterRecordRepository;
 import com.tde.mescloud.repository.ProductionOrderRepository;
+import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Service
+@AllArgsConstructor
 @Log
 public class CounterRecordServiceImpl implements CounterRecordService {
-    private final ProductionOrderRepository productionOrderRepository;
 
     private final int INITIAL_COMPUTED_VALUE = 0;
     private final int PLC_UINT_OVERFLOW = 65535;
@@ -29,44 +31,38 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     private final CounterRecordRepository repository;
     private final EquipmentOutputService equipmentOutputService;
     private final ProductionOrderService productionOrderService;
+    private final ProductionOrderRepository productionOrderRepository;
 
-    public CounterRecordServiceImpl(CounterRecordConverter converter,
-                                    CounterRecordRepository repository,
-                                    EquipmentOutputService equipmentOutputService,
-                                    ProductionOrderService productionOrderService,
-                                    ProductionOrderRepository productionOrderRepository) {
-        this.converter = converter;
-        this.repository = repository;
-        this.equipmentOutputService = equipmentOutputService;
-        this.productionOrderService = productionOrderService;
-        this.productionOrderRepository = productionOrderRepository;
-    }
 
     @Override
     public List<CounterRecord> findAll() {
         Iterable<CounterRecordEntity> counterRecordEntities = repository.findAll();
-        List<CounterRecord> counterRecords = new ArrayList<>();
-        for (CounterRecordEntity counterRecordEntity : counterRecordEntities) {
-            CounterRecord counterRecord = converter.convertToDomainObj(counterRecordEntity);
-            counterRecords.add(counterRecord);
-        }
-        return counterRecords;
+        return converter.convertToDomainObj(counterRecordEntities);
     }
 
-    //TODO: Improve efficiency to avoid the loop in this method and save(List<CounterRecord>)
-    public List<CounterRecord> save(EquipmentCountsMqttDto equipmentCountsDTO) {
+    @Override
+    public List<CounterRecord> save(EquipmentCountsMqttDto equipmentCountsDto) {
 
-        List<CounterRecord> counterRecords = new ArrayList<>(equipmentCountsDTO.getCounters().length);
-        for (CounterMqttDto counterDTO : equipmentCountsDTO.getCounters()) {
-            CounterRecord counterRecord = converter.convertToDomainObj(equipmentCountsDTO, counterDTO);
-            setEquipmentOutput(counterRecord, counterDTO.getOutputCode());
-            setProductionOrder(counterRecord, equipmentCountsDTO.getProductionOrderCode());
-            setComputedValue(counterRecord);
-            counterRecord.setRegisteredAt(new Date());
-            counterRecords.add(counterRecord);
+        List<CounterRecordEntity> counterRecordEntities = new ArrayList<>(equipmentCountsDto.getCounters().length);
+        for (CounterMqttDto counterDto : equipmentCountsDto.getCounters()) {
+            CounterRecord counterRecord = extractCounterRecord(counterDto, equipmentCountsDto);
+            CounterRecordEntity counterRecordEntity = converter.convertToEntity(counterRecord);
+            counterRecordEntities.add(counterRecordEntity);
         }
 
-        return save(counterRecords);
+        List<CounterRecordEntity> persistedCounterRecords = (List<CounterRecordEntity>) repository.saveAll(counterRecordEntities);
+        return converter.convertToDomainObj(persistedCounterRecords);
+    }
+
+    private CounterRecord extractCounterRecord(CounterMqttDto counterDto, EquipmentCountsMqttDto equipmentCountsDto) {
+
+        CounterRecord counterRecord = converter.convertToDomainObj(equipmentCountsDto, counterDto);
+        setEquipmentOutput(counterRecord, counterDto.getOutputCode());
+        setProductionOrder(counterRecord, equipmentCountsDto.getProductionOrderCode());
+        setComputedValue(counterRecord);
+        counterRecord.setRegisteredAt(new Date());
+
+        return counterRecord;
     }
 
     private void setEquipmentOutput(CounterRecord counterRecord, String equipmentOutputCode) {
@@ -75,6 +71,7 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     }
 
     private void setProductionOrder(CounterRecord counterRecord, String productionOrderCode) {
+        //TODO: Discuss MQTT Protocol
         //Sending the ProductionOrder ID instead of its code, on the MqttDTO, would save a DB read operation
         //Alternatively, isValidInitialCounterRecord() could be replaced by findByCode @ ProductionOrderInitProcess
         //which would check against nullity and, if not null, pass the reference to save, jointly w/ the EquipmentCountsMqttDTO
@@ -82,63 +79,56 @@ public class CounterRecordServiceImpl implements CounterRecordService {
         counterRecord.setProductionOrder(productionOrder);
     }
 
-    private void setComputedValue(CounterRecord receivedCounterRecord) {
+    private void setComputedValue(CounterRecord receivedCount) {
 
-        if (receivedCounterRecord == null) {
-            String msg = "Unable to compute Counter Record value: null counter record";
-            log.severe(msg);
-            throw new IllegalArgumentException(msg);
+        Optional<CounterRecordEntity> lastPersistedCountOpt = findLastPersistedCount(receivedCount);
+        if (lastPersistedCountOpt.isEmpty()) {
+            receivedCount.setComputedValue(INITIAL_COMPUTED_VALUE);
+            return;
         }
 
-        CounterRecordEntity lastPersistedCounterRecord = findLastCounterRecord(receivedCounterRecord);
-        int computedValue = lastPersistedCounterRecord == null ?
-                INITIAL_COMPUTED_VALUE : calculateComputedValue(lastPersistedCounterRecord, receivedCounterRecord);
-        receivedCounterRecord.setComputedValue(computedValue);
+        int computedValue = calculateComputedValue(lastPersistedCountOpt.get(), receivedCount);
+        receivedCount.setComputedValue(computedValue);
     }
 
-    private CounterRecordEntity findLastCounterRecord(CounterRecord counterRecord) {
+    private Optional<CounterRecordEntity> findLastPersistedCount(CounterRecord counterRecord) {
         long productionOrderId = counterRecord.getProductionOrder().getId();
         long equipmentOutputId = counterRecord.getEquipmentOutput().getId();
         return repository.findLast(productionOrderId, equipmentOutputId);
     }
 
-    private int calculateComputedValue(CounterRecordEntity lastPersistedCounterRecord,
-                                       CounterRecord receivedCounterRecord) {
+    private int calculateComputedValue(CounterRecordEntity lastPersistedCount, CounterRecord receivedCount) {
 
-        int computedValue;
-        if (receivedCounterRecord.getRealValue() < lastPersistedCounterRecord.getRealValue()) {
-            int incrementBeforeOverflow = PLC_UINT_OVERFLOW - lastPersistedCounterRecord.getRealValue();
-            computedValue = incrementBeforeOverflow + receivedCounterRecord.getRealValue();
-        } else {
-            int lastComputedValue = lastPersistedCounterRecord.getComputedValue();
-            int computedValueIncrement = receivedCounterRecord.getRealValue() - lastPersistedCounterRecord.getRealValue();
-            computedValue = lastComputedValue + computedValueIncrement;
+        if (isRollover(lastPersistedCount, receivedCount)) {
+            return rolloverCalculateComputedValue(lastPersistedCount, receivedCount);
         }
 
-        return computedValue;
+        return defaultCalculateComputedValue(lastPersistedCount, receivedCount);
     }
 
-    @Override
-    public List<CounterRecord> save(List<CounterRecord> counterRecords) {
-        List<CounterRecordEntity> counterRecordEntities = new ArrayList<>(counterRecords.size());
-        for (CounterRecord counterRecord : counterRecords) {
-            CounterRecordEntity counterRecordEntity = converter.convertToEntity(counterRecord);
-            counterRecordEntities.add(counterRecordEntity);
-        }
-        List<CounterRecordEntity> persistedCounterRecords = (List<CounterRecordEntity>) repository.saveAll(counterRecordEntities);
-        return converter.convertToDomainObj(persistedCounterRecords);
+    private boolean isRollover(CounterRecordEntity lastPersistedCount, CounterRecord receivedCount) {
+        return receivedCount.getRealValue() < lastPersistedCount.getRealValue();
+    }
+
+    private int rolloverCalculateComputedValue(CounterRecordEntity lastPersistedCount, CounterRecord receivedCount) {
+        int incrementBeforeOverflow = PLC_UINT_OVERFLOW - lastPersistedCount.getRealValue();
+        return incrementBeforeOverflow + receivedCount.getRealValue();
+    }
+
+    private int defaultCalculateComputedValue(CounterRecordEntity lastPersistedCount, CounterRecord receivedCount) {
+        int computedValueIncrement = receivedCount.getRealValue() - lastPersistedCount.getRealValue();
+        return lastPersistedCount.getComputedValue() + computedValueIncrement;
     }
 
     public boolean areValidInitialCounts(String productionOrderCode) {
         ProductionOrderEntity productionOrderEntity = productionOrderRepository.findByCode(productionOrderCode);
         return productionOrderEntity != null &&
-                repository.findLast(productionOrderEntity.getId()) == null;
+                repository.findLast(productionOrderEntity.getId()).isEmpty();
     }
 
     public boolean areValidContinuationCounts(String productionOrderCode) {
         ProductionOrderEntity productionOrderEntity = productionOrderRepository.findByCode(productionOrderCode);
         return productionOrderEntity != null &&
-                repository.findLast(productionOrderEntity.getId()) != null;
+                repository.findLast(productionOrderEntity.getId()).isPresent();
     }
-
 }

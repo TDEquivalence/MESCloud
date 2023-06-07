@@ -23,6 +23,11 @@ public class CountingEquipment extends Equipment {
     List<EquipmentOutput> outputs;
 
     public CountingEquipment(CountingEquipmentEntity entity) {
+
+        if (entity == null) {
+            return;
+        }
+
         this.id = entity.getId();
         this.equipmentStatus = entity.getEquipmentStatus();
         this.code = entity.getCode();

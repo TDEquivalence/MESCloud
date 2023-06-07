@@ -9,14 +9,16 @@ import com.tde.mescloud.model.dto.EquipmentCountsMqttDto;
 import com.tde.mescloud.model.entity.CounterRecordEntity;
 import com.tde.mescloud.model.entity.EquipmentOutputEntity;
 import com.tde.mescloud.model.entity.ProductionOrderEntity;
+import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-
 @Component
+@AllArgsConstructor
 @Log
 public class CounterRecordConverterImpl implements CounterRecordConverter {
+
+    private EquipmentOutputConverter equipmentOutputConverter;
 
     public CounterRecordDto convertToDto(CounterRecord counterRecord) {
         CounterRecordDto counterRecordDto = new CounterRecordDto();
@@ -27,11 +29,6 @@ public class CounterRecordConverterImpl implements CounterRecordConverter {
         counterRecordDto.setEquipmentOutputAlias(counterRecord.getEquipmentOutput().getAlias());
         counterRecordDto.setProductionOrderCode(counterRecord.getProductionOrder().getCode());
         return counterRecordDto;
-    }
-
-    @Override
-    public List<CounterRecordDto> convertToDto(List<CounterRecord> counterRecords) {
-        return counterRecords.stream().map(this::convertToDto).toList();
     }
 
     @Override
@@ -60,9 +57,12 @@ public class CounterRecordConverterImpl implements CounterRecordConverter {
         counterRecord.setComputedValue(entity.getComputedValue());
         counterRecord.setRegisteredAt(entity.getRegisteredAt());
 
-        EquipmentOutput equipmentOutput = new EquipmentOutput(entity.getEquipmentOutput());
+        //TODO: Replace with converter
+//        EquipmentOutput equipmentOutput = new EquipmentOutput(entity.getEquipmentOutput());
+        EquipmentOutput equipmentOutput = equipmentOutputConverter.convertToDomainObject(entity.getEquipmentOutput());
         counterRecord.setEquipmentOutput(equipmentOutput);
 
+        //TODO: Replace with converter
         ProductionOrder productionOrder = new ProductionOrder(entity.getProductionOrder());
         productionOrder.setId(entity.getProductionOrder().getId());
         productionOrder.setCode(entity.getProductionOrder().getCode());

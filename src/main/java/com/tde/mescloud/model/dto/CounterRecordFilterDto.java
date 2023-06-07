@@ -1,7 +1,12 @@
 package com.tde.mescloud.model.dto;
 
+import lombok.Data;
+
+@Data
 public class CounterRecordFilterDto {
-    //TODO: Convert to ENUM
-    private String id;
-    private String value;
+
+    private int take;
+    private int skip;
+    private CounterRecordSearchDto[] search;
+    private CounterRecordOrderDto[] order;
 }
