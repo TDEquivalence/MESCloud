@@ -24,7 +24,6 @@ public class MqttController {
         return new ResponseEntity<>("REST controller on.", HttpStatus.OK);
     }
 
-    //TODO: Create a DTO that holds both the topic & payload
     @PostMapping("/publish")
     public ResponseEntity<String> publish(@RequestParam(name = "topic") String topic,
                                           @RequestBody Object payload) {

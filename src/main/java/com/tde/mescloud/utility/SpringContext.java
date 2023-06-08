@@ -1,5 +1,7 @@
 package com.tde.mescloud.utility;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -24,5 +26,9 @@ public class SpringContext implements ApplicationContextAware {
 
     private static synchronized void setContext(ApplicationContext context) {
         SpringContext.context = context;
+    }
+
+    public static EntityManager getEntityManager() {
+        return getBean(EntityManager.class);
     }
 }

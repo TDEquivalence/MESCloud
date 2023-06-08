@@ -5,6 +5,7 @@ import com.tde.mescloud.model.EquipmentOutput;
 import com.tde.mescloud.model.ProductionOrder;
 import com.tde.mescloud.model.converter.CounterRecordConverter;
 import com.tde.mescloud.model.dto.CounterMqttDto;
+import com.tde.mescloud.model.dto.CounterRecordFilterDto;
 import com.tde.mescloud.model.dto.EquipmentCountsMqttDto;
 import com.tde.mescloud.model.entity.CounterRecordEntity;
 import com.tde.mescloud.model.entity.ProductionOrderEntity;
@@ -40,6 +41,11 @@ public class CounterRecordServiceImpl implements CounterRecordService {
         return converter.convertToDomainObj(counterRecordEntities);
     }
 
+    public List<CounterRecord> findAllByCriteria(CounterRecordFilterDto filterDto) {
+        List<CounterRecordEntity> counterRecordEntities = repository.findAllByCriteria(filterDto);
+        return converter.convertToDomainObj(counterRecordEntities);
+    }
+
     @Override
     public List<CounterRecord> save(EquipmentCountsMqttDto equipmentCountsDto) {
 
@@ -71,10 +77,7 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     }
 
     private void setProductionOrder(CounterRecord counterRecord, String productionOrderCode) {
-        //TODO: Discuss MQTT Protocol
-        //Sending the ProductionOrder ID instead of its code, on the MqttDTO, would save a DB read operation
-        //Alternatively, isValidInitialCounterRecord() could be replaced by findByCode @ ProductionOrderInitProcess
-        //which would check against nullity and, if not null, pass the reference to save, jointly w/ the EquipmentCountsMqttDTO
+        //TODO: Discuss MQTT Protocol -> MC-80 .2
         ProductionOrder productionOrder = productionOrderService.findByCode(productionOrderCode);
         counterRecord.setProductionOrder(productionOrder);
     }

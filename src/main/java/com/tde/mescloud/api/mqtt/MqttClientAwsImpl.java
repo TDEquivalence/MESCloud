@@ -55,7 +55,7 @@ public class MqttClientAwsImpl implements MqttClient {
             log.info(() -> String.format("Publishing message on topic [%s]", topic));
             String payloadAsJSON = objectMapper.writeValueAsString(payload);
             MqttMessage mqttMessage = new MqttMessage(topic, AWSIotQos.QOS0, payloadAsJSON);
-            mqttClient.publish(mqttMessage, awsMqttSettings.getConnectionTimeout());
+            mqttClient.publish(mqttMessage, awsMqttSettings.getAwsIotMqttCLient().getConnectionTimeout());
         } catch (AWSIotException e) {
             log.severe(() -> String.format("Exception caught while publishing to [%s] with QOS [%s]",
                     topic, AWSIotQos.QOS0));

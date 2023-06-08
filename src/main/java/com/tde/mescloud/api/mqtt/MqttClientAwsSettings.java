@@ -20,7 +20,7 @@ import org.springframework.context.annotation.Configuration;
 public class MqttClientAwsSettings {
 
     private AWSIotMqttClient mqttClient;
-    private final long connectionTimeout = 3000;
+    private static final long connectionTimeout = 3000;
     private String clientEndpoint;
     private String clientId;
     private String awsAccessKeyId;

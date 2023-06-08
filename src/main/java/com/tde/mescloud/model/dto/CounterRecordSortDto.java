@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class CounterRecordOrderDto {
+public class CounterRecordSortDto {
     private String id;
     private boolean desc;
 }
