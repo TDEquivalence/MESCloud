@@ -2,6 +2,7 @@ package com.tde.mescloud.api.rest;
 
 import com.tde.mescloud.api.mqtt.MqttClient;
 import com.tde.mescloud.exception.MesMqttException;
+import lombok.extern.java.Log;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @RestController
 @RequestMapping("api/mqtt")
+@Log
 public class MqttController {
 
     private final MqttClient mqttClient;
@@ -31,7 +33,9 @@ public class MqttController {
             mqttClient.publish(topic, payload);
             return new ResponseEntity<>("Message published successfully", HttpStatus.OK);
         } catch (MesMqttException e) {
-            throw new RuntimeException(e);
+            String msg = String.format("Unable to publish on topic [%s] with the payload: [%s]", topic, payload.toString());
+            log.severe(msg);
+            return new ResponseEntity<>(msg, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -41,7 +45,9 @@ public class MqttController {
             mqttClient.subscribe(topic);
             return new ResponseEntity<>("Subscribed topic: " + topic, HttpStatus.OK);
         } catch (MesMqttException e) {
-            throw new RuntimeException(e);
+            String msg = String.format("Unable to subscribe topic [%s]", topic);
+            log.severe(msg);
+            return new ResponseEntity<>(msg, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -51,7 +57,9 @@ public class MqttController {
             mqttClient.unsubscribe(topic);
             return new ResponseEntity<>("Topic unsubscribed successfully", HttpStatus.OK);
         } catch (MesMqttException e) {
-            throw new RuntimeException(e);
+            String msg = String.format("Unable to unsubscribe topic [%s]", topic);
+            log.severe(msg);
+            return new ResponseEntity<>(msg, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

@@ -42,7 +42,7 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     }
 
     public List<CounterRecord> findAllByCriteria(CounterRecordFilterDto filterDto) {
-        List<CounterRecordEntity> counterRecordEntities = repository.findAllByCriteria(filterDto);
+        List<CounterRecordEntity> counterRecordEntities = repository.findByCriteria(filterDto);
         return converter.convertToDomainObj(counterRecordEntities);
     }
 

@@ -27,8 +27,8 @@ public interface CounterRecordRepository extends CrudRepository<CounterRecordEnt
     @Query(value = "SELECT * FROM counter_record cr WHERE (cr.production_order_id = :productionOrderId) LIMIT 1", nativeQuery = true)
     Optional<CounterRecordEntity> findLast(Long productionOrderId);
 
-    //TODO: rename to findByCriteria and consider removing to either a different interface || repositoryImpl
-    default List<CounterRecordEntity> findAllByCriteria(CounterRecordFilterDto filterDto) {
+    //TODO: Consider removing to either a different interface || repositoryImpl
+    default List<CounterRecordEntity> findByCriteria(CounterRecordFilterDto filterDto) {
         EntityManager entityManager = SpringContext.getEntityManager();
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<CounterRecordEntity> counterRecordCriteriaQuery = criteriaBuilder.createQuery(CounterRecordEntity.class);
