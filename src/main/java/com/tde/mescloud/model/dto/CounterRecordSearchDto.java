@@ -6,11 +6,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class CounterRecordSearchDto {
-    private String equipmentAlias;
-    private String productionOrderCode;
-    private String equipmentOutputAlias;
-    private Integer computedValue;
-    private String dateStart;
-    private String dateEnd;
-    private String registeredAt;
+    private String id;//dateStart & dateEnd
+    private String value;
 }

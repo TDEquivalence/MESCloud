@@ -7,6 +7,6 @@ public class CounterRecordFilterDto {
 
     private int take;
     private int skip;
-    private CounterRecordSearchDto search;
+    private CounterRecordSearchDto[] search;
     private CounterRecordSortDto[] sort;
 }

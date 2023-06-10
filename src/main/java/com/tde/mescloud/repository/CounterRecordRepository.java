@@ -1,6 +1,7 @@
 package com.tde.mescloud.repository;
 
 import com.tde.mescloud.model.dto.CounterRecordFilterDto;
+import com.tde.mescloud.model.dto.CounterRecordSearchDto;
 import com.tde.mescloud.model.dto.CounterRecordSortDto;
 import com.tde.mescloud.model.entity.CounterRecordEntity;
 import com.tde.mescloud.model.entity.CountingEquipmentEntity;
@@ -13,7 +14,14 @@ import jakarta.persistence.criteria.*;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,34 +45,28 @@ public interface CounterRecordRepository extends CrudRepository<CounterRecordEnt
 
         Root<CounterRecordEntity> counterRecordRoot = counterRecordCriteriaQuery.from(CounterRecordEntity.class);
 
-        if (filterDto.getSearch().getComputedValue() != null) {
-            Predicate computedValuePredicate = criteriaBuilder.equal(counterRecordRoot.get("computedValue"),
-                    filterDto.getSearch().getComputedValue());
-            predicates.add(computedValuePredicate);
-        }
-
-        if (filterDto.getSearch().getEquipmentOutputAlias() != null) {
-            Predicate equipmentOutputAlias = criteriaBuilder.like(criteriaBuilder.upper(counterRecordRoot.get("equipmentOutputAlias")),
-                    "%" + filterDto.getSearch().getEquipmentOutputAlias().toUpperCase() + "%");
-            predicates.add(equipmentOutputAlias);
-        }
-
-        if (filterDto.getSearch().getEquipmentAlias() != null) {
-            Join<CounterRecordEntity, EquipmentOutputEntity> equipementOutputJoin =
-                    counterRecordRoot.join("equipmentOutput");
-            Join<EquipmentOutputEntity, CountingEquipmentEntity> countingEquipmentJoin =
-                    equipementOutputJoin.join("countingEquipment");
-            Predicate equipmentAlias = criteriaBuilder.like(countingEquipmentJoin.get("alias"),
-                    "%" + filterDto.getSearch().getEquipmentAlias() + "%" );
-            predicates.add(equipmentAlias);
-        }
-
-        if (filterDto.getSearch().getProductionOrderCode() != null) {
-            Join<CounterRecordEntity, ProductionOrderEntity> productionOrderJoin =
-                    counterRecordRoot.join("productionOrder");
-            Predicate productionOrderPredicate = criteriaBuilder.like(criteriaBuilder.upper(productionOrderJoin.get("code")),
-                    "%" + filterDto.getSearch().getProductionOrderCode().toUpperCase() + "%");
-            predicates.add(productionOrderPredicate);
+        for (CounterRecordSearchDto search : filterDto.getSearch()) {
+            Predicate predicate;
+            switch (search.getId()) {
+                case "computedValue" -> {
+                    predicate = criteriaBuilder.equal(counterRecordRoot.get("computedValue"),
+                            search.getValue());
+                }
+                case "dateStart" -> {
+                    ZonedDateTime date = ZonedDateTime.parse(search.getValue());
+                    predicate = criteriaBuilder.greaterThanOrEqualTo(counterRecordRoot.get("registeredAt"), date);
+                }
+                case "dateEnd" -> {
+                    ZonedDateTime date = ZonedDateTime.parse(search.getValue());
+                    predicate = criteriaBuilder.lessThanOrEqualTo(counterRecordRoot.get("registeredAt"), date);
+                }
+                default -> {
+                    Path path = getPath(counterRecordRoot, search.getId());
+                    predicate = criteriaBuilder.like(criteriaBuilder.upper(path),
+                            "%" + search.getValue().toUpperCase() + "%");
+                }
+            }
+            predicates.add(predicate);
         }
 
         for (CounterRecordSortDto sort : filterDto.getSort()) {
@@ -82,7 +84,10 @@ public interface CounterRecordRepository extends CrudRepository<CounterRecordEnt
                 .where(criteriaBuilder.and(predicates.toArray(new Predicate[0])))
                 .orderBy(orders);
 
-        TypedQuery<CounterRecordEntity> query = entityManager.createQuery(counterRecordCriteriaQuery);
+        TypedQuery<CounterRecordEntity> query = entityManager
+                .createQuery(counterRecordCriteriaQuery)
+                .setFirstResult(filterDto.getSkip())
+                .setMaxResults(filterDto.getTake());
         return query.getResultList();
     }
 

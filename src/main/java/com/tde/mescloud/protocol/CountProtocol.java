@@ -33,13 +33,14 @@ public class CountProtocol extends AbstractMesProtocol {
 
 
     @PostConstruct
-    private void subscribeProtocolTopic() {
+    private void subscribeProtocolTopic() throws MesMqttException {
         try {
             mqttClient.subscribe(mesMqttSettings.getProtCountBackendTopic());
         } catch (MesMqttException e) {
-            log.log(Level.SEVERE, e, () -> String.format("Unable to subscribe to [%s] protocol topic [%s]",
-                    this.getClass().getName(), mesMqttSettings.getProtCountBackendTopic()));
-            throw new RuntimeException(e);
+            log.log(Level.SEVERE, e, () -> String.format("Unable to subscribe topic [%s] on [%s]", mesMqttSettings.getProtCountBackendTopic(),
+                    this.getClass().getName()));
+            throw new MesMqttException(String.format("Unable to subscribe topic [%s] on [%s]",
+                    mesMqttSettings.getProtCountBackendTopic(), this.getClass().getName()));
         }
     }
 

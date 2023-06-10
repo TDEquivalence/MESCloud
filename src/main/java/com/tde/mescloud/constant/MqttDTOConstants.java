@@ -2,6 +2,11 @@ package com.tde.mescloud.constant;
 
 public class MqttDTOConstants {
 
+    private MqttDTOConstants() throws IllegalAccessException {
+        String msg = String.format("[%s] is an utility class, thus should not be instantiated", this.getClass().getName());
+        throw new IllegalAccessException(msg);
+    }
+
     public static final String JSON_TYPE_PROPERTY_NAME = "jsonType";
     public static final String PRODUCTION_ORDER_DTO_NAME = "ProductionOrder";
     public static final String PRODUCTION_ORDER_INIT_DTO_NAME = "ProductionOrderInit";
