@@ -35,4 +35,15 @@ public class CountingEquipmentConverterImpl implements CountingEquipmentConverte
 //        countingEquipmentDto.setOutputs(countingEquipment.getOutputs());
         return countingEquipmentDto;
     }
+
+    @Override
+    public CountingEquipmentEntity convertToEntity(CountingEquipmentDto countingEquipmentDto) {
+        CountingEquipmentEntity countingEquipmentEntity = new CountingEquipmentEntity();
+        countingEquipmentEntity.setId(countingEquipmentDto.getId());
+        countingEquipmentEntity.setEquipmentStatus(countingEquipmentDto.getEquipmentStatus());
+        countingEquipmentEntity.setCode(countingEquipmentDto.getCode());
+        countingEquipmentEntity.setAlias(countingEquipmentDto.getAlias());
+        countingEquipmentEntity.setPTimerCommunicationCycle(countingEquipmentDto.getPTimerCommunicationCycle());
+        return countingEquipmentEntity;
+    }
 }

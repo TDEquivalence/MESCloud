@@ -16,7 +16,7 @@ public class ProductionOrderEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String code;
-    @OneToOne
+    @OneToOne(fetch = FetchType.EAGER)
     private CountingEquipmentEntity equipment;
     private int targetAmount;
     private boolean isCompleted;

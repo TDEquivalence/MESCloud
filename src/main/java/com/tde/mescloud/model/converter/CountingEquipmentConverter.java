@@ -34,4 +34,6 @@ public interface CountingEquipmentConverter {
 
         return countingEquipmentDtos;
     }
+
+    CountingEquipmentEntity convertToEntity(CountingEquipmentDto countingEquipmentDto);
 }

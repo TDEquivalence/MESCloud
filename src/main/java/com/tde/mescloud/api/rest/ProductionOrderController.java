@@ -1,5 +1,6 @@
 package com.tde.mescloud.api.rest;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tde.mescloud.model.ProductionOrder;
 import com.tde.mescloud.model.converter.ProductionOrderConverter;
 import com.tde.mescloud.model.dto.ProductionOrderDto;
@@ -17,6 +18,7 @@ public class ProductionOrderController {
     private ProductionOrderService productionOrderService;
     private ProductionOrderConverter productionOrderConverter;
 
+
     @GetMapping("/generate-code")
     public ResponseEntity<String> generateCode() {
         String newCode = productionOrderService.generateCode();
@@ -27,6 +29,8 @@ public class ProductionOrderController {
     public ResponseEntity<ProductionOrderDto> save(@RequestBody ProductionOrderDto requestProductionOrder) {
         ProductionOrder productionOrder = productionOrderService.save(requestProductionOrder);
         ProductionOrderDto responseProductionOrder = productionOrderConverter.convertToDto(productionOrder);
-        return new ResponseEntity<>(responseProductionOrder, HttpStatus.OK);
+        return responseProductionOrder != null ?
+                new ResponseEntity<>(responseProductionOrder, HttpStatus.OK) :
+                new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

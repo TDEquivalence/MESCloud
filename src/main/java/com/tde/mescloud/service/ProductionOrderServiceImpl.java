@@ -1,16 +1,23 @@
 package com.tde.mescloud.service;
 
+import com.tde.mescloud.api.mqtt.MqttClient;
+import com.tde.mescloud.exception.MesMqttException;
 import com.tde.mescloud.model.ProductionOrder;
 import com.tde.mescloud.model.converter.ProductionOrderConverter;
 import com.tde.mescloud.model.dto.ProductionOrderDto;
+import com.tde.mescloud.model.dto.ProductionOrderMqttDto;
 import com.tde.mescloud.model.entity.ProductionOrderEntity;
 import com.tde.mescloud.repository.ProductionOrderRepository;
+import lombok.AllArgsConstructor;
+import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 
 import java.util.Calendar;
 import java.util.Date;
 
 @Service
+@AllArgsConstructor
+@Log
 public class ProductionOrderServiceImpl implements ProductionOrderService {
 
     private static final String CODE_PREFIX = "PO";
@@ -19,11 +26,8 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
 
     private final ProductionOrderRepository repository;
     private final ProductionOrderConverter converter;
+    private final MqttClient mqttClient;
 
-    public ProductionOrderServiceImpl(ProductionOrderRepository repository, ProductionOrderConverter converter) {
-        this.repository = repository;
-        this.converter = converter;
-    }
 
     @Override
     public ProductionOrder findByCode(String code) {
@@ -40,8 +44,22 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     public ProductionOrder save(ProductionOrderDto productionOrderDto) {
         ProductionOrderEntity productionOrderEntity = converter.convertToEntity(productionOrderDto);
         productionOrderEntity.setCreatedAt(new Date());
+        productionOrderEntity.setCompleted(false);
         ProductionOrderEntity persistedProductionOrder = repository.save(productionOrderEntity);
+
+        try {
+            publishToPlc(persistedProductionOrder);
+        } catch (MesMqttException e) {
+            log.severe("Unable to publish Production Order over MQTT.");
+            return null;
+        }
+
         return converter.convertToDomainObject(persistedProductionOrder);
+    }
+
+    private void publishToPlc(ProductionOrderEntity productionOrderEntity) throws MesMqttException {
+        ProductionOrderMqttDto productionOrderMqttDto = converter.convertToMqttDto(productionOrderEntity);
+        mqttClient.publish("DEV/MASILVA/OBO/PROTOCOL_COUNT_V0/PLC", productionOrderMqttDto);
     }
 
     private int getYearForCode() {
