@@ -31,7 +31,7 @@ public class CountingEquipmentController {
     public ResponseEntity<CountingEquipmentDto> findById(@PathVariable long id) {
         Optional<CountingEquipment> countingEquipmentOpt = countingEquipmentService.findById(id);
         if (countingEquipmentOpt.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
         CountingEquipmentDto countingEquipmentDto = countingEquipmentConverter.convertToDto(countingEquipmentOpt.get());
