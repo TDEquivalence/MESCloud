@@ -12,6 +12,7 @@ import java.util.Calendar;
 public class ProductionOrderServiceImpl implements ProductionOrderService{
 
     private static final String CODE_PREFIX = "PO";
+    private static final String NEW_CODE_FORMAT = "%02d";
     private static final int CODE_VALUE_INDEX = 4;
 
     private final ProductionOrderRepository repository;
@@ -30,17 +31,22 @@ public class ProductionOrderServiceImpl implements ProductionOrderService{
 
     @Override
     public String generateCode() {
-        return CODE_PREFIX + getYearForCode() + getNewCodeValue();
+        return CODE_PREFIX + getYearForCode() + getNewCodeValueFormatted();
     }
 
     private int getYearForCode() {
         return Calendar.getInstance().get(Calendar.YEAR) % 100;
     }
 
-    private int getNewCodeValue() {
+    private int calculateNewCodeValue() {
         ProductionOrderEntity productionOrderEntity = repository.findTopByOrderByIdDesc();
-        String lastValueAsString = productionOrderEntity.getCode().substring(4);
+        String lastValueAsString = productionOrderEntity.getCode().substring(CODE_VALUE_INDEX);
         int lastCodeValue = Integer.parseInt(lastValueAsString);
         return ++lastCodeValue;
+    }
+
+    private String getNewCodeValueFormatted() {
+        int newCode = calculateNewCodeValue();
+        return String.format(NEW_CODE_FORMAT, newCode);
     }
 }
