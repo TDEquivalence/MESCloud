@@ -8,4 +8,6 @@ import org.springframework.stereotype.Repository;
 public interface ProductionOrderRepository extends JpaRepository<ProductionOrderEntity, Long> {
 
     ProductionOrderEntity findByCode(String equipmentOutputCode);
+
+    ProductionOrderEntity findTopByOrderByIdDesc();
 }

@@ -9,9 +9,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/counting-equipments")
@@ -26,5 +28,16 @@ public class CountingEquipmentController {
         List<CountingEquipment> countingEquipments = countingEquipmentService.findAll();
         List<CountingEquipmentDto> countingEquipmentDtos = countingEquipmentConverter.convertToDto(countingEquipments);
         return new ResponseEntity<>(countingEquipmentDtos, HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<CountingEquipmentDto> findById(@RequestParam long id) {
+        Optional<CountingEquipment> countingEquipmentOpt = countingEquipmentService.findById(id);
+        if (countingEquipmentOpt.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        CountingEquipmentDto countingEquipmentDto = countingEquipmentConverter.convertToDto(countingEquipmentOpt.get());
+        return new ResponseEntity<>(countingEquipmentDto, HttpStatus.OK);
     }
 }
