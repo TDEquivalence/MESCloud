@@ -1,6 +1,5 @@
 package com.tde.mescloud.model;
 
-import com.tde.mescloud.model.entity.Equipment;
 import com.tde.mescloud.model.entity.ProductionOrderEntity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,7 +13,7 @@ import java.util.Date;
 public class ProductionOrder {
 
     private long id;
-    private Equipment equipment;
+    private CountingEquipment equipment;
     private String code;
     private int targetAmount;
     //TODO: Implement productionInstruction

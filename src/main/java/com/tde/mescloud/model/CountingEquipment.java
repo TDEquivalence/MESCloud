@@ -1,7 +1,6 @@
 package com.tde.mescloud.model;
 
 import com.tde.mescloud.model.entity.CountingEquipmentEntity;
-import com.tde.mescloud.model.entity.Equipment;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,7 +11,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-public class CountingEquipment extends Equipment {
+public class CountingEquipment {
 
     private long id;
     private String code;

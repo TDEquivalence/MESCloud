@@ -76,9 +76,19 @@ public interface CounterRecordRepository extends CrudRepository<CounterRecordEnt
             orders.add(order);
         }
 
-        if(predicates.isEmpty() && orders.isEmpty()) {
-            return (List<CounterRecordEntity>) findAll();
-        }
+//        if(predicates.isEmpty() && orders.isEmpty()) {
+////            return (List<CounterRecordEntity>) findAll();
+//            CounterRecordFilterDto counterRecordFilterDto = new CounterRecordFilterDto();
+//            CounterRecordSortDto counterRecordSortDto = new CounterRecordSortDto();
+//            counterRecordSortDto.setId("registeredAt");
+//            counterRecordSortDto.setDesc(true);
+//            CounterRecordSortDto[] counterRecordSortDtos = new CounterRecordSortDto[]{counterRecordSortDto};
+//            counterRecordFilterDto.setSort(counterRecordSortDtos);
+//            return findByCriteria(counterRecordFilterDto);
+//        }
+
+        Order defaultOrder = criteriaBuilder.desc(getPath(counterRecordRoot, "registeredAt"));
+        orders.add(defaultOrder);
 
         counterRecordCriteriaQuery
                 .where(criteriaBuilder.and(predicates.toArray(new Predicate[0])))
