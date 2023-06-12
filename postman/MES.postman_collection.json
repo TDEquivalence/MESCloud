@@ -15,7 +15,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"firstName\": \"alcina\",\r\n    \"lastName\": \"toto\",\r\n    \"username\": \"xauxau\",\r\n    \"email\": \"pepe@email.com\",\r\n    \"role\": \"admin\",\r\n    \"password\": \"12345\"\r\n}",
+							"raw": "{\r\n    \"firstName\": \"alcina\",\r\n    \"lastName\": \"toto\",\r\n    \"username\": \"admin\",\r\n    \"email\": \"pepe@email.com\",\r\n    \"role\": \"admin\",\r\n    \"password\": \"admin\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -55,7 +55,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"username\": \"xauxau\",\r\n    \"password\": \"12345\"\r\n}",
+							"raw": "{\r\n    \"username\": \"admin\",\r\n    \"password\": \"admin\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -214,7 +214,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"jsonType\": \"Configuration\",\r\n  \"equipmentCode\": \"OBO001\",\r\n  \"pTimerCommunicationCycle\": 180,\r\n  \"totalOutput\": 4,\r\n  \"outputCodes\": [\"OBO001-001\", \"OBO001-002\", \"OBO001-003\", \"OBO001-004\"]\r\n}",
+							"raw": "{\r\n  \"jsonType\": \"Configuration\",\r\n  \"equipmentCode\": \"OBO001\",\r\n  \"pTimerCommunicationCycle\": 300,\r\n  \"totalOutput\": 4,\r\n  \"outputCodes\": [\"OBO001-001\", \"OBO001-002\", \"OBO001-003\", \"OBO001-004\"]\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -259,7 +259,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"jsonType\": \"ProductionOrder\",\r\n  \"equipmentCode\": \"OBO001\",\r\n  \"productionOrderCode\": \"PO001/23\",\r\n  \"targetAmount\": 3000,\r\n  \"isEquipmentEnabled\": true\r\n}",
+							"raw": "{\r\n  \"jsonType\": \"ProductionOrder\",\r\n  \"equipmentCode\": \"OBO001\",\r\n  \"productionOrderCode\": \"PO2301\",\r\n  \"targetAmount\": 30000,\r\n  \"isEquipmentEnabled\": true\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -304,7 +304,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n   \"jsonType\": \"ProductionOrderInit\",\r\n   \"productionOrderCode\": \"PO001/23\",\r\n   \"equipmentCode\":\"OBO001\",\r\n   \"equipmentStatus\":1,\r\n   \"counters\":[\r\n      {\r\n         \"outputCode\":\"OBO001-001\",\r\n         \"value\":30\r\n      },\r\n      {\r\n         \"outputCode\":\"OBO001-002\",\r\n         \"value\":0\r\n      },\r\n      {\r\n         \"outputCode\":\"OBO001-003\",\r\n         \"value\":40\r\n      },\r\n      {\r\n         \"outputCode\":\"OBO001-004\",\r\n         \"value\":10\r\n      }\r\n   ]\r\n}",
+							"raw": "{\r\n   \"jsonType\": \"ProductionOrderInit\",\r\n   \"productionOrderCode\": \"PO2301\",\r\n   \"equipmentCode\":\"OBO001\",\r\n   \"equipmentStatus\":1,\r\n   \"counters\":[\r\n      {\r\n         \"outputCode\":\"OBO001-001\",\r\n         \"value\":250\r\n      },\r\n      {\r\n         \"outputCode\":\"OBO001-002\",\r\n         \"value\":220\r\n      },\r\n      {\r\n         \"outputCode\":\"OBO001-003\",\r\n         \"value\":65435\r\n      },\r\n      {\r\n         \"outputCode\":\"OBO001-004\",\r\n         \"value\":430\r\n      }\r\n   ]\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -349,7 +349,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n   \"jsonType\": \"ProductionCount\",\r\n   \"equipmentCode\":\"OBO001\",\r\n   \"equipmentStatus\":1,\r\n   \"counters\":[\r\n      {\r\n         \"outputCode\":\"OBO1\",\r\n         \"value\":30\r\n      },\r\n      {\r\n         \"outputCode\":\"OBO2\",\r\n         \"value\":0\r\n      },\r\n      {\r\n         \"outputCode\":3,\r\n         \"value\":40\r\n      },\r\n      {\r\n         \"outputCode\":\"OBO4\",\r\n         \"value\":10\r\n      }\r\n   ]\r\n}",
+							"raw": "{\r\n   \"jsonType\": \"ProductionCount\",\r\n   \"productionOrderCode\": \"PO2301\",\r\n   \"equipmentCode\":\"OBO001\",\r\n   \"equipmentStatus\":1,\r\n   \"counters\":[\r\n      {\r\n         \"outputCode\":\"OBO001-001\",\r\n         \"value\":350\r\n      },\r\n      {\r\n         \"outputCode\":\"OBO001-002\",\r\n         \"value\":320\r\n      },\r\n      {\r\n         \"outputCode\":\"OBO001-003\",\r\n         \"value\":100\r\n      },\r\n      {\r\n         \"outputCode\":\"OBO001-004\",\r\n         \"value\":600\r\n      }\r\n   ]\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -417,6 +417,244 @@
 									"key": "topic",
 									"value": "DEV/MASILVA/OBO/PROTOCOL_COUNT_V0/PLC"
 								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "REST",
+			"item": [
+				{
+					"name": "CounterRecord -> Find All",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwtoken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}:{{port}}/api/counter-records",
+							"host": [
+								"{{url}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"counter-records"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CounterRecord -> Find All Completion",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwtoken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}:{{port}}/api/counter-records/completion",
+							"host": [
+								"{{url}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"counter-records",
+								"completion"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CounterRecord -> Find w/ filter",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwtoken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/counter-records?skip=10&take=20&search%5B0%5D.id=1&search%5B0%5D.value=test",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"counter-records"
+							],
+							"query": [
+								{
+									"key": "skip",
+									"value": "10"
+								},
+								{
+									"key": "take",
+									"value": "20"
+								},
+								{
+									"key": "search%5B0%5D.id",
+									"value": "1"
+								},
+								{
+									"key": "search%5B0%5D.value",
+									"value": "test"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ProductionOrder -> Generate Code",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwtoken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/production-orders/generate-code",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"production-orders",
+								"generate-code"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ProductionOrder -> Save",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwtoken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"equipment\": {\r\n        \"id\": 1\r\n    },\r\n    \"targetAmount\": 1000,\r\n    \"inputBatch\": \"PLA8231\",\r\n    \"source\": \"32\",\r\n    \"gauge\": \"47 x 50\",\r\n    \"category\": \"Rosa\",\r\n    \"washingProcess\": \"IMS32\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}:{{port}}/api/production-orders",
+							"host": [
+								"{{url}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"production-orders"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CountingEquipment -> Find All",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwtoken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/counting-equipments",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"counting-equipments"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CountingEquipment -> Find 1",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwtoken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/counting-equipments/1",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"counting-equipments",
+								"1"
 							]
 						}
 					},
