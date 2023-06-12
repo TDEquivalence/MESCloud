@@ -1,6 +1,7 @@
 package com.tde.mescloud.model.converter;
 
 import com.tde.mescloud.constant.MqttDTOConstants;
+import com.tde.mescloud.model.CountingEquipment;
 import com.tde.mescloud.model.ProductionOrder;
 import com.tde.mescloud.model.dto.ProductionOrderDto;
 import com.tde.mescloud.model.dto.ProductionOrderMqttDto;
@@ -22,6 +23,13 @@ public class ProductionOrderConverterImpl implements ProductionOrderConverter {
     public ProductionOrder convertToDomainObject(ProductionOrderEntity entity) {
         ProductionOrder productionOrder = new ProductionOrder();
         productionOrder.setId(entity.getId());
+        productionOrder.setCode(entity.getCode());
+        productionOrder.setCreatedAt(entity.getCreatedAt());
+        productionOrder.setTargetAmount(entity.getTargetAmount());
+
+        CountingEquipment countingEquipment = countingEquipmentConverter.convertToDomainObject(entity.getEquipment());
+        productionOrder.setEquipment(countingEquipment);
+        
         return productionOrder;
     }
 
