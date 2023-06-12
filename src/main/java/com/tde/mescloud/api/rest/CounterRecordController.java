@@ -30,6 +30,12 @@ public class CounterRecordController {
         return new ResponseEntity<>(counterRecordDto, HttpStatus.OK);
     }
 
+    @GetMapping("/completion")
+    public ResponseEntity<List<CounterRecordDto>> getLastPerProductionOrder() {
+        List<CounterRecord> counterRecords = service.findLastPerProductionOrder();
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
     @PostMapping("/filter")
     public ResponseEntity<List<CounterRecordDto>> filterCounterRecords(@RequestBody CounterRecordFilterDto filter) {
         List<CounterRecord> counterRecords = service.findAllByCriteria(filter);

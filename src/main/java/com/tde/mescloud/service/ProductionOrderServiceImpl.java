@@ -45,6 +45,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         ProductionOrderEntity productionOrderEntity = converter.convertToEntity(productionOrderDto);
         productionOrderEntity.setCreatedAt(new Date());
         productionOrderEntity.setCompleted(false);
+        productionOrderEntity.setCode(generateCode());
         ProductionOrderEntity persistedProductionOrder = repository.save(productionOrderEntity);
 
         try {

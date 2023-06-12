@@ -41,6 +41,12 @@ public class CounterRecordServiceImpl implements CounterRecordService {
         return converter.convertToDomainObj(counterRecordEntities);
     }
 
+    @Override
+    public List<CounterRecord> findLastPerProductionOrder() {
+        Iterable<CounterRecordEntity> counterRecordEntities = repository.findLastPerProductionOrder();
+        return converter.convertToDomainObj(counterRecordEntities);
+    }
+
     public List<CounterRecord> findAllByCriteria(CounterRecordFilterDto filterDto) {
         List<CounterRecordEntity> counterRecordEntities = repository.findByCriteria(filterDto);
         return converter.convertToDomainObj(counterRecordEntities);

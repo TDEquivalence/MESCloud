@@ -50,8 +50,7 @@ public class ProductionOrderConverterImpl implements ProductionOrderConverter {
 
         CountingEquipmentEntity countingEquipmentEntity =
                 countingEquipmentConverter.convertToEntity(productionOrderDto.getEquipment());
-        //TODO: Implement
-//        productionOrderEntity.setEquipment();
+        productionOrderEntity.setEquipment(countingEquipmentEntity);
 
         return productionOrderEntity;
     }
