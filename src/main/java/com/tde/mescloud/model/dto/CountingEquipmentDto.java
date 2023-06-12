@@ -13,6 +13,7 @@ public class CountingEquipmentDto {
     //private Section section;
     private int equipmentStatus;
     private int pTimerCommunicationCycle;
+    private boolean hasActiveProductionOrder;
     //TODO: Implement
     //List<EquipmentOutputDto> outputs;
 }

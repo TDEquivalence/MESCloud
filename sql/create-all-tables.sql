@@ -101,6 +101,11 @@ CREATE TABLE production_order (
 	is_equipment_enabled boolean,
 	is_completed boolean,
 	created_at date,
+	input_batch varchar(100),
+	source varchar(100),
+	gauge varchar(100),
+	category varchar(100),
+	washing_process varchar(100),
 
 	PRIMARY KEY(id),
 	FOREIGN KEY(equipment_id) REFERENCES counting_equipment(id)

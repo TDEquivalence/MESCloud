@@ -96,12 +96,22 @@ INSERT INTO production_order (
 	target_amount,
 	is_equipment_enabled,
 	is_completed,
-	created_at
+	created_at,
+	input_batch,
+	source,
+	gauge,
+	category,
+	washing_process
 ) VALUES (
 	1,
 	'PO2301',
 	1000,
 	true,
 	false,
-	'2023-05-09'
+	'2023-05-09',
+	'POIN29Z12',
+	'2123185BP',
+	'45 x 24',
+	'Flor/Ext/Sup',
+	'MSN140X'
 );

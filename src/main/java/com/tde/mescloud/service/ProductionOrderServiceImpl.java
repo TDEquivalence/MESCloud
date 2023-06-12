@@ -11,9 +11,11 @@ import com.tde.mescloud.repository.ProductionOrderRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -36,12 +38,14 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     }
 
     @Override
-    public String generateCode() {
-        return CODE_PREFIX + getYearForCode() + getNewCodeValueFormatted();
+    public boolean hasActiveProductionOrder(long countingEquipmentId) {
+        Optional<ProductionOrderEntity> productionOrderEntityOpt = repository.findActive(countingEquipmentId);
+        return productionOrderEntityOpt.isPresent();
     }
 
     @Override
     public ProductionOrder save(ProductionOrderDto productionOrderDto) {
+
         ProductionOrderEntity productionOrderEntity = converter.convertToEntity(productionOrderDto);
         productionOrderEntity.setCreatedAt(new Date());
         productionOrderEntity.setCompleted(false);
@@ -58,9 +62,9 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         return converter.convertToDomainObject(persistedProductionOrder);
     }
 
-    private void publishToPlc(ProductionOrderEntity productionOrderEntity) throws MesMqttException {
-        ProductionOrderMqttDto productionOrderMqttDto = converter.convertToMqttDto(productionOrderEntity);
-        mqttClient.publish("DEV/MASILVA/OBO/PROTOCOL_COUNT_V0/PLC", productionOrderMqttDto);
+    @Override
+    public String generateCode() {
+        return CODE_PREFIX + getYearForCode() + getNewCodeValueFormatted();
     }
 
     private int getYearForCode() {
@@ -77,5 +81,10 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     private String getNewCodeValueFormatted() {
         int newCode = calculateNewCodeValue();
         return String.format(NEW_CODE_FORMAT, newCode);
+    }
+
+    private void publishToPlc(ProductionOrderEntity productionOrderEntity) throws MesMqttException {
+        ProductionOrderMqttDto productionOrderMqttDto = converter.convertToMqttDto(productionOrderEntity);
+        mqttClient.publish("DEV/MASILVA/OBO/PROTOCOL_COUNT_V0/PLC", productionOrderMqttDto);
     }
 }

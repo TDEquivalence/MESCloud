@@ -19,6 +19,7 @@ import org.springframework.stereotype.Component;
 public class CounterRecordConverterImpl implements CounterRecordConverter {
 
     private EquipmentOutputConverter equipmentOutputConverter;
+    private ProductionOrderConverter productionOrderConverter;
 
     public CounterRecordDto convertToDto(CounterRecord counterRecord) {
         CounterRecordDto counterRecordDto = new CounterRecordDto();
@@ -57,13 +58,10 @@ public class CounterRecordConverterImpl implements CounterRecordConverter {
         counterRecord.setComputedValue(entity.getComputedValue());
         counterRecord.setRegisteredAt(entity.getRegisteredAt());
 
-        //TODO: Replace with converter
-//        EquipmentOutput equipmentOutput = new EquipmentOutput(entity.getEquipmentOutput());
         EquipmentOutput equipmentOutput = equipmentOutputConverter.convertToDomainObject(entity.getEquipmentOutput());
         counterRecord.setEquipmentOutput(equipmentOutput);
 
-        //TODO: Replace with converter
-        ProductionOrder productionOrder = new ProductionOrder(entity.getProductionOrder());
+        ProductionOrder productionOrder = productionOrderConverter.convertToDomainObject(entity.getProductionOrder());
         productionOrder.setId(entity.getProductionOrder().getId());
         productionOrder.setCode(entity.getProductionOrder().getCode());
         counterRecord.setProductionOrder(productionOrder);

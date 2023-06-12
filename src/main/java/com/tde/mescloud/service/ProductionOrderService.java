@@ -10,4 +10,6 @@ public interface ProductionOrderService {
     String generateCode();
 
     ProductionOrder save(ProductionOrderDto productionOrderDto);
+
+    boolean hasActiveProductionOrder(long countingEquipmentId);
 }
