@@ -14,6 +14,7 @@ import com.tde.mescloud.repository.ProductionOrderRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -42,6 +43,7 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<CounterRecord> findLastPerProductionOrder() {
         Iterable<CounterRecordEntity> counterRecordEntities = repository.findLastPerProductionOrder();
         return converter.convertToDomainObj(counterRecordEntities);
