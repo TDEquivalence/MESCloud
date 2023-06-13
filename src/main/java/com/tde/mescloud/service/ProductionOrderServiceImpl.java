@@ -44,6 +44,20 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     }
 
     @Override
+    public Optional<ProductionOrder> complete(long countingEquipmentId) {
+        Optional<ProductionOrderEntity> productionOrderEntityOpt = repository.findActive(countingEquipmentId);
+        if (productionOrderEntityOpt.isEmpty()) {
+            return Optional.empty();
+        }
+
+        ProductionOrderEntity productionOrderEntity = productionOrderEntityOpt.get();
+        productionOrderEntity.setCompleted(true);
+        ProductionOrderEntity persistedProductionOrderEntity = repository.save(productionOrderEntity);
+        ProductionOrder productionOrder = converter.convertToDomainObject(persistedProductionOrderEntity);
+        return Optional.of(productionOrder);
+    }
+
+    @Override
     public ProductionOrder save(ProductionOrderDto productionOrderDto) {
 
         ProductionOrderEntity productionOrderEntity = converter.convertToEntity(productionOrderDto);

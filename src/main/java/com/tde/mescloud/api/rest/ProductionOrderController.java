@@ -1,6 +1,5 @@
 package com.tde.mescloud.api.rest;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tde.mescloud.model.ProductionOrder;
 import com.tde.mescloud.model.converter.ProductionOrderConverter;
 import com.tde.mescloud.model.dto.ProductionOrderDto;
@@ -9,6 +8,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/production-orders")
@@ -32,5 +33,16 @@ public class ProductionOrderController {
         return responseProductionOrder != null ?
                 new ResponseEntity<>(responseProductionOrder, HttpStatus.OK) :
                 new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @PostMapping("{countingEquipmentId}/complete")
+    public ResponseEntity<ProductionOrderDto> complete(@PathVariable long countingEquipmentId) {
+        Optional<ProductionOrder> productionOrderOpt = productionOrderService.complete(countingEquipmentId);
+        if (productionOrderOpt.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        ProductionOrderDto productionOrderDto = productionOrderConverter.convertToDto(productionOrderOpt.get());
+        return new ResponseEntity<>(productionOrderDto, HttpStatus.OK);
     }
 }

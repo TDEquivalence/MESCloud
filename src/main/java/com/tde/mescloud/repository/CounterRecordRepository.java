@@ -35,7 +35,13 @@ public interface CounterRecordRepository extends CrudRepository<CounterRecordEnt
     @Query(value = "SELECT * FROM counter_record cr WHERE (cr.production_order_id = :productionOrderId) LIMIT 1", nativeQuery = true)
     Optional<CounterRecordEntity> findLast(Long productionOrderId);
 
-    @Query(value = "SELECT * FROM counter_record cr ORDER BY id DESC LIMIT 4", nativeQuery = true)
+    //SELECT DISTINCT ON (production_order_id) * FROM (SELECT * FROM counter_record ORDER BY production_order_id, id DESC) sub;
+    //SELECT DISTINCT ON (production_order_id, equipment_output_alias) * FROM (SELECT * FROM counter_record ORDER BY production_order_id, equipment_output_alias, id DESC) sub;
+//    SELECT * FROM (
+//            SELECT DISTINCT ON (production_order_id, equipment_output_alias) * FROM (
+//            SELECT * FROM counter_record ORDER BY production_order_id, equipment_output_alias, id DESC) sub) suub ORDER BY id ASC;
+
+    @Query(value = "SELECT * FROM counter_record cr ORDER BY id DESC", nativeQuery = true)
     List<CounterRecordEntity> findLastPerProductionOrder();
 
     //TODO: Consider removing to either a different interface || repositoryImpl
