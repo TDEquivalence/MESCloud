@@ -3,6 +3,7 @@ package com.tde.mescloud.model.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Fetch;
 
 import java.util.Date;
 
@@ -19,7 +20,7 @@ public class CounterRecordEntity {
     private String equipmentOutputAlias;
     private int realValue;
     private int computedValue;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     private ProductionOrderEntity productionOrder;
     @Temporal(TemporalType.TIMESTAMP)
     private Date registeredAt;

@@ -30,8 +30,8 @@ public class CounterRecordController {
         return new ResponseEntity<>(counterRecordDto, HttpStatus.OK);
     }
 
-    @GetMapping("/completion")
-    public ResponseEntity<List<CounterRecordDto>> getLastPerProductionOrder() {
+    @PostMapping("/completion")
+    public ResponseEntity<List<CounterRecordDto>> getLastPerProductionOrder(@RequestBody CounterRecordFilterDto filter) {
         List<CounterRecord> counterRecords = service.findLastPerProductionOrder();
         List<CounterRecordDto> counterRecordDtos = converter.convertToDto(counterRecords);
         return new ResponseEntity<>(counterRecordDtos, HttpStatus.OK);

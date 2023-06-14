@@ -133,7 +133,8 @@ CREATE TABLE counter_record (
 	registered_at timestamp,
 
 	PRIMARY KEY(id),
-	FOREIGN KEY(equipment_output_id) REFERENCES equipment_output(id)
+	FOREIGN KEY(equipment_output_id) REFERENCES equipment_output(id),
+	FOREIGN KEY(production_order_id) REFERENCES production_order(id)
 );
 
 CREATE TABLE equipment_status_record (

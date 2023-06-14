@@ -28,7 +28,11 @@ public class CounterRecordConverterImpl implements CounterRecordConverter {
         counterRecordDto.setComputedValue(counterRecord.getComputedValue());
         counterRecordDto.setEquipmentAlias(counterRecord.getEquipmentOutput().getCountingEquipment().getAlias());
         counterRecordDto.setEquipmentOutputAlias(counterRecord.getEquipmentOutput().getAlias());
-        counterRecordDto.setProductionOrderCode(counterRecord.getProductionOrder().getCode());
+
+        if (counterRecord.getProductionOrder() != null) {
+            counterRecordDto.setProductionOrderCode(counterRecord.getProductionOrder().getCode());
+        }
+
         return counterRecordDto;
     }
 
@@ -61,10 +65,12 @@ public class CounterRecordConverterImpl implements CounterRecordConverter {
         EquipmentOutput equipmentOutput = equipmentOutputConverter.convertToDomainObject(entity.getEquipmentOutput());
         counterRecord.setEquipmentOutput(equipmentOutput);
 
-        ProductionOrder productionOrder = productionOrderConverter.convertToDomainObject(entity.getProductionOrder());
-        productionOrder.setId(entity.getProductionOrder().getId());
-        productionOrder.setCode(entity.getProductionOrder().getCode());
-        counterRecord.setProductionOrder(productionOrder);
+        if (entity.getProductionOrder() != null) {
+            ProductionOrder productionOrder = productionOrderConverter.convertToDomainObject(entity.getProductionOrder());
+            productionOrder.setId(entity.getProductionOrder().getId());
+            productionOrder.setCode(entity.getProductionOrder().getCode());
+            counterRecord.setProductionOrder(productionOrder);
+        }
 
         return counterRecord;
     }

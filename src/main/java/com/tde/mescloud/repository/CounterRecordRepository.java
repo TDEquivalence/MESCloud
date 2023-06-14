@@ -40,7 +40,7 @@ public interface CounterRecordRepository extends CrudRepository<CounterRecordEnt
 //    SELECT * FROM (
 //            SELECT DISTINCT ON (production_order_id, equipment_output_alias) * FROM (
 //            SELECT * FROM counter_record ORDER BY production_order_id, equipment_output_alias, id DESC) sub) suub ORDER BY id ASC;
-
+//    @Query(value = "SELECT * FROM (SELECT DISTINCT ON (cr.production_order_id, cr.equipment_output_alias) * FROM (SELECT * FROM counter_record cr ORDER BY cr.production_order_id, cr.equipment_output_alias, cr.id DESC)) ORDER BY cr.id ASC", nativeQuery = true)
     @Query(value = "SELECT * FROM counter_record cr ORDER BY id DESC", nativeQuery = true)
     List<CounterRecordEntity> findLastPerProductionOrder();
 
@@ -95,7 +95,7 @@ public interface CounterRecordRepository extends CrudRepository<CounterRecordEnt
         TypedQuery<CounterRecordEntity> query = entityManager
                 .createQuery(counterRecordCriteriaQuery)
                 .setFirstResult(filterDto.getSkip())
-                .setMaxResults(filterDto.getTake());
+                .setMaxResults(filterDto.getTake() + 1);
         return query.getResultList();
     }
 
