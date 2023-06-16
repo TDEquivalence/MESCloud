@@ -20,7 +20,7 @@ public class CounterRecordProcess extends AbstractMesProtocolProcess<EquipmentCo
     public void execute(EquipmentCountsMqttDto equipmentCountsMqttDTO) {
         log.info("Executing Counter Record process");
         if (areInvalidContinuationCounts(equipmentCountsMqttDTO)) {
-            log.warning(() -> String.format("Invalid continuation Counter Record - Production Order [%s] has records no or does not exist",
+            log.warning(() -> String.format("Invalid continuation count - Production Order [%s] has no initial records or does not exist",
                     equipmentCountsMqttDTO.getProductionOrderCode()));
             return;
         }

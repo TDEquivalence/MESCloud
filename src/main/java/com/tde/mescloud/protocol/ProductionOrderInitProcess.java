@@ -20,7 +20,7 @@ public class ProductionOrderInitProcess extends AbstractMesProtocolProcess<Equip
     public void execute(EquipmentCountsMqttDto equipmentCountsMqttDTO) {
         log.info("Executing Production Order init process");
         if (areInvalidInitialCounts(equipmentCountsMqttDTO)) {
-            log.warning(() -> String.format("Invalid initial Counter Record - Production Order [%s] already has records or does not exist",
+            log.warning(() -> String.format("Invalid initial count - Production Order [%s] already has records or does not exist",
                     equipmentCountsMqttDTO.getProductionOrderCode()));
             return;
         }

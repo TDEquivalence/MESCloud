@@ -27,6 +27,7 @@ import java.util.Optional;
 public class CounterRecordServiceImpl implements CounterRecordService {
 
     private final int INITIAL_COMPUTED_VALUE = 0;
+    private final int ZERO_AS_VALUE = 1;
     private final int PLC_UINT_OVERFLOW = 65535;
 
     private final CounterRecordConverter converter;
@@ -123,7 +124,8 @@ public class CounterRecordServiceImpl implements CounterRecordService {
 
     private int rolloverCalculateComputedValue(CounterRecordEntity lastPersistedCount, CounterRecord receivedCount) {
         int incrementBeforeOverflow = PLC_UINT_OVERFLOW - lastPersistedCount.getRealValue();
-        return incrementBeforeOverflow + receivedCount.getRealValue();
+        int totalIncrement = incrementBeforeOverflow + ZERO_AS_VALUE + receivedCount.getRealValue();
+        return lastPersistedCount.getComputedValue() + totalIncrement;
     }
 
     private int defaultCalculateComputedValue(CounterRecordEntity lastPersistedCount, CounterRecord receivedCount) {
