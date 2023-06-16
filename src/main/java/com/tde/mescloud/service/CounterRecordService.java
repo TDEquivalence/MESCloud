@@ -10,9 +10,9 @@ public interface CounterRecordService {
 
     List<CounterRecord> findAll();
 
-    List<CounterRecord> findLastPerProductionOrder();
+    List<CounterRecord> findLastPerProductionOrder(CounterRecordFilterDto filterDto);
 
-    List<CounterRecord> findAllByCriteria(CounterRecordFilterDto request);
+    List<CounterRecord> findAllByCriteria(CounterRecordFilterDto filterDto);
 
     List<CounterRecord> save(EquipmentCountsMqttDto equipmentCountsMqttDTO);
 

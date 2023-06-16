@@ -7,7 +7,8 @@ import org.hibernate.annotations.Fetch;
 
 import java.util.Date;
 
-@Entity(name = "counter_record")
+@Entity
+@Table(name = "counter_record")
 @Getter
 @Setter
 public class CounterRecordEntity {
@@ -16,11 +17,13 @@ public class CounterRecordEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @ManyToOne
+    @JoinColumn(name = "equipment_output_id")
     private EquipmentOutputEntity equipmentOutput;
     private String equipmentOutputAlias;
     private int realValue;
     private int computedValue;
     @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "production_order_id")
     private ProductionOrderEntity productionOrder;
     @Temporal(TemporalType.TIMESTAMP)
     private Date registeredAt;

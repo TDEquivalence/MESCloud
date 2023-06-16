@@ -44,8 +44,8 @@ public class CounterRecordServiceImpl implements CounterRecordService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<CounterRecord> findLastPerProductionOrder() {
-        Iterable<CounterRecordEntity> counterRecordEntities = repository.findLastPerProductionOrder();
+    public List<CounterRecord> findLastPerProductionOrder(CounterRecordFilterDto filterDto) {
+        Iterable<CounterRecordEntity> counterRecordEntities = repository.findLastPerProductionOrder(filterDto);
         return converter.convertToDomainObj(counterRecordEntities);
     }
 
