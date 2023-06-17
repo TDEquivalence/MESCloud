@@ -55,13 +55,17 @@ public class CounterRecordRepositoryImpl {
         maxIdPerOutputSubquery.select(criteriaBuilder.max(maxIdPerOutputRoot.get(ID_FIELD)))
                 .where(criteriaBuilder.equal(maxIdPerOutputRoot.get(EQUIPMENT_OUTPUT_FIELD), equipmentOutputJoin));
 
+        List<Predicate> predicates = new ArrayList<>();
+        predicates.add(criteriaBuilder.equal(root.get(ID_FIELD), maxIdSubquery.getSelection()));
+        predicates.add(criteriaBuilder.equal(root.get(ID_FIELD), maxIdPerOutputSubquery.getSelection()));
+        addPredicates(filterDto, predicates, criteriaBuilder, root);
+
+        List<Order> orders = new ArrayList<>();
+        addSortOrders(filterDto.getSort(), orders, criteriaBuilder, root);
+
         criteriaQuery.select(root)
-                .where(
-                        criteriaBuilder.and(
-                                criteriaBuilder.equal(root.get(ID_FIELD), maxIdSubquery.getSelection()),
-                                criteriaBuilder.equal(root.get(ID_FIELD), maxIdPerOutputSubquery.getSelection())
-                        )
-                );
+                .where(criteriaBuilder.and(predicates.toArray(new Predicate[0])))
+                .orderBy(orders);
 
         return entityManager.createQuery(criteriaQuery).getResultList();
     }
