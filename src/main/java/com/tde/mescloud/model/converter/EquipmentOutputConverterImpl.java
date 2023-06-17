@@ -2,6 +2,8 @@ package com.tde.mescloud.model.converter;
 
 import com.tde.mescloud.model.CountingEquipment;
 import com.tde.mescloud.model.EquipmentOutput;
+import com.tde.mescloud.model.dto.CountingEquipmentDto;
+import com.tde.mescloud.model.dto.EquipmentOutputDto;
 import com.tde.mescloud.model.entity.EquipmentOutputEntity;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Component;
@@ -26,5 +28,20 @@ public class EquipmentOutputConverterImpl implements EquipmentOutputConverter{
         }
 
         return equipmentOutput;
+    }
+
+    @Override
+    public EquipmentOutputDto convertToDto(EquipmentOutput equipmentOutput) {
+
+        EquipmentOutputDto equipmentOutputDto = new EquipmentOutputDto();
+        equipmentOutputDto.setId(equipmentOutput.getId());
+        equipmentOutputDto.setCode(equipmentOutput.getCode());
+        equipmentOutputDto.setAlias(equipmentOutput.getAlias());
+
+        //TODO: Implement
+        CountingEquipmentDto countingEquipmentDto = null;
+        equipmentOutputDto.setCountingEquipment(countingEquipmentDto);
+
+        return equipmentOutputDto;
     }
 }

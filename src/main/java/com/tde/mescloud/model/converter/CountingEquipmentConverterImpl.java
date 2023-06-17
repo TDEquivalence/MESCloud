@@ -1,14 +1,23 @@
 package com.tde.mescloud.model.converter;
 
 import com.tde.mescloud.model.CountingEquipment;
+import com.tde.mescloud.model.EquipmentOutput;
 import com.tde.mescloud.model.dto.CountingEquipmentDto;
+import com.tde.mescloud.model.dto.EquipmentOutputDto;
 import com.tde.mescloud.model.entity.CountingEquipmentEntity;
+import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Component
 @Log
+@AllArgsConstructor
 public class CountingEquipmentConverterImpl implements CountingEquipmentConverter {
+
+    private final EquipmentOutputConverter equipmentOutputConverter;
 
     public CountingEquipment convertToDomainObject(CountingEquipmentEntity countingEquipmentEntity) {
         CountingEquipment countingEquipment = new CountingEquipment();
@@ -18,8 +27,8 @@ public class CountingEquipmentConverterImpl implements CountingEquipmentConverte
         countingEquipment.setPTimerCommunicationCycle(countingEquipmentEntity.getPTimerCommunicationCycle());
         countingEquipment.setEquipmentStatus(countingEquipmentEntity.getEquipmentStatus());
 
-        //TODO: Implement converter
-//        countingEquipment.setOutputs(countingEquipmentEntity.getOutputs());
+        List<EquipmentOutput> equipmentOutputs = equipmentOutputConverter.convertToDomainObject(countingEquipmentEntity.getOutputs());
+        countingEquipment.setOutputs(equipmentOutputs);
         return countingEquipment;
     }
 
@@ -31,8 +40,10 @@ public class CountingEquipmentConverterImpl implements CountingEquipmentConverte
         countingEquipmentDto.setPTimerCommunicationCycle(countingEquipment.getPTimerCommunicationCycle());
         countingEquipmentDto.setEquipmentStatus(countingEquipment.getEquipmentStatus());
 
-        //TODO: Implement converter
-//        countingEquipmentDto.setOutputs(countingEquipment.getOutputs());
+        List<EquipmentOutputDto> equipmentOutputDtos = equipmentOutputConverter.convertToDto(countingEquipment.getOutputs());
+        countingEquipmentDto.setEquipmentOutputDtos(equipmentOutputDtos);
+        countingEquipmentDto.setTotalEquipmentOutput(equipmentOutputDtos.size());
+
         return countingEquipmentDto;
     }
 

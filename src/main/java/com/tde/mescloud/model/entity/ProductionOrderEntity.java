@@ -25,7 +25,6 @@ public class ProductionOrderEntity {
     private Date createdAt;
     @OneToMany(mappedBy = "productionOrder")
     private List<ProductionInstructionEntity> productionInstructions;
-
     private String inputBatch;
     private String source;
     private String gauge;

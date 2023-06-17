@@ -3,6 +3,8 @@ package com.tde.mescloud.model.dto;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 public class CountingEquipmentDto {
@@ -14,6 +16,8 @@ public class CountingEquipmentDto {
     private int equipmentStatus;
     private int pTimerCommunicationCycle;
     private boolean hasActiveProductionOrder;
+    private int totalEquipmentOutput;
+    private List<EquipmentOutputDto> equipmentOutputDtos;
     //TODO: Implement
     //List<EquipmentOutputDto> outputs;
 }
