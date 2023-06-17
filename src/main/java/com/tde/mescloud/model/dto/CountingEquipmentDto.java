@@ -16,8 +16,5 @@ public class CountingEquipmentDto {
     private int equipmentStatus;
     private int pTimerCommunicationCycle;
     private boolean hasActiveProductionOrder;
-    private int totalEquipmentOutput;
-    private List<EquipmentOutputDto> equipmentOutputDtos;
-    //TODO: Implement
-    //List<EquipmentOutputDto> outputs;
+    private List<EquipmentOutputDto> outputs;
 }

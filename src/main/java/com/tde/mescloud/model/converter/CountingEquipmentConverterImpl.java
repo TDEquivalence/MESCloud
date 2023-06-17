@@ -9,7 +9,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -41,8 +40,7 @@ public class CountingEquipmentConverterImpl implements CountingEquipmentConverte
         countingEquipmentDto.setEquipmentStatus(countingEquipment.getEquipmentStatus());
 
         List<EquipmentOutputDto> equipmentOutputDtos = equipmentOutputConverter.convertToDto(countingEquipment.getOutputs());
-        countingEquipmentDto.setEquipmentOutputDtos(equipmentOutputDtos);
-        countingEquipmentDto.setTotalEquipmentOutput(equipmentOutputDtos.size());
+        countingEquipmentDto.setOutputs(equipmentOutputDtos);
 
         return countingEquipmentDto;
     }
