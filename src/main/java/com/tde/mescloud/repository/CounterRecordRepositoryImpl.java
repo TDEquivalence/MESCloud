@@ -78,7 +78,6 @@ public class CounterRecordRepositoryImpl {
     }
 
     public List<CounterRecordEntity> findByCriteria(CounterRecordFilterDto filterDto) {
-        EntityManager entityManager = SpringContext.getEntityManager();
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<CounterRecordEntity> counterRecordCriteriaQuery = criteriaBuilder.createQuery(CounterRecordEntity.class);
 

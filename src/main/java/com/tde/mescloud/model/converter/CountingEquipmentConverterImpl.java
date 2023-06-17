@@ -38,6 +38,7 @@ public class CountingEquipmentConverterImpl implements CountingEquipmentConverte
         countingEquipmentDto.setCode(countingEquipment.getCode());
         countingEquipmentDto.setPTimerCommunicationCycle(countingEquipment.getPTimerCommunicationCycle());
         countingEquipmentDto.setEquipmentStatus(countingEquipment.getEquipmentStatus());
+        countingEquipmentDto.setHasActiveProductionOrder(countingEquipment.isHasActiveProductionOrder());
 
         List<EquipmentOutputDto> equipmentOutputDtos = equipmentOutputConverter.convertToDto(countingEquipment.getOutputs());
         countingEquipmentDto.setOutputs(equipmentOutputDtos);

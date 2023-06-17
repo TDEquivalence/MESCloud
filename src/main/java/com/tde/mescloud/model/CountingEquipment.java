@@ -20,6 +20,7 @@ public class CountingEquipment {
     private int equipmentStatus;
     private int pTimerCommunicationCycle;
     List<EquipmentOutput> outputs;
+    private boolean hasActiveProductionOrder;
 
     public CountingEquipment(CountingEquipmentEntity entity) {
 
