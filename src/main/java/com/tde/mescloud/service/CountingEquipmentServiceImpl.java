@@ -15,44 +15,42 @@ import java.util.Optional;
 @AllArgsConstructor
 public class CountingEquipmentServiceImpl implements CountingEquipmentService {
 
-    private CountingEquipmentRepository countingEquipmentRepository;
-    private CountingEquipmentConverter countingEquipmentConverter;
+    private CountingEquipmentRepository repository;
+    private CountingEquipmentConverter converter;
 
     public List<CountingEquipment> findAll() {
 
-        List<CountingEquipmentEntity> activeEquipments =
-                countingEquipmentRepository.findByProductionOrderStatus(true);
-        List<CountingEquipmentEntity> pausedEquipments =
-                countingEquipmentRepository.findByProductionOrderStatus(false);
+        List<CountingEquipmentEntity> activeEquipments = repository.findByProductionOrderStatus(true);
+        List<CountingEquipmentEntity> pausedEquipments = repository.findByProductionOrderStatus(false);
 
-        List<CountingEquipment> countingEquipments = new ArrayList<>(activeEquipments.size() + pausedEquipments.size());
-        for (CountingEquipmentEntity entity : activeEquipments) {
-            CountingEquipment countingEquipment = convertWithProductionOrderStatus(entity, true);
-            countingEquipments.add(countingEquipment);
-        }
+        List<CountingEquipment> equipments = new ArrayList<>(activeEquipments.size() + pausedEquipments.size());
+        equipments.addAll(convertWithActivityStatus(activeEquipments, true));
+        equipments.addAll(convertWithActivityStatus(pausedEquipments, false));
 
-        for (CountingEquipmentEntity entity : pausedEquipments) {
-            CountingEquipment countingEquipment = convertWithProductionOrderStatus(entity, false);
+        return equipments;
+    }
+
+    private List<CountingEquipment> convertWithActivityStatus(List<CountingEquipmentEntity> entities, boolean areActive) {
+
+        List<CountingEquipment> countingEquipments = new ArrayList<>(entities.size());
+        for (CountingEquipmentEntity entity : entities) {
+            CountingEquipment countingEquipment = converter.convertToDomainObject(entity);
+            countingEquipment.setHasActiveProductionOrder(areActive);
             countingEquipments.add(countingEquipment);
         }
 
         return countingEquipments;
     }
 
-    private CountingEquipment convertWithProductionOrderStatus(CountingEquipmentEntity entity, boolean isActive) {
-        CountingEquipment countingEquipment = countingEquipmentConverter.convertToDomainObject(entity);
-        countingEquipment.setHasActiveProductionOrder(isActive);
-        return countingEquipment;
-    }
-
     @Override
     public Optional<CountingEquipment> findById(long id) {
-        Optional<CountingEquipmentEntity> entityOpt = countingEquipmentRepository.findById(id);
+
+        Optional<CountingEquipmentEntity> entityOpt = repository.findById(id);
         if(entityOpt.isEmpty()) {
             return Optional.empty();
         }
 
-        CountingEquipment countingEquipment = countingEquipmentConverter.convertToDomainObject(entityOpt.get());
+        CountingEquipment countingEquipment = converter.convertToDomainObject(entityOpt.get());
         return Optional.of(countingEquipment);
     }
 }

@@ -7,9 +7,7 @@ import com.tde.mescloud.model.entity.CounterRecordEntity;
 import com.tde.mescloud.model.entity.CountingEquipmentEntity;
 import com.tde.mescloud.model.entity.EquipmentOutputEntity;
 import com.tde.mescloud.model.entity.ProductionOrderEntity;
-import com.tde.mescloud.utility.SpringContext;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -32,75 +30,86 @@ public class CounterRecordRepositoryImpl {
     private static final String PRODUCTION_ORDER_CODE_PROP = "code";
     private static final String COUNTING_EQUIPMENT_ALIAS_PROP = "alias";
 
-    private static final String DATE_END_FIELTER_FIELD = "dateEnd";
-    private static final String DATE_START_FIELTER_FIELD = "dateStart";
+    private static final String DATE_END_FILTER_FIELD = "dateEnd";
+    private static final String DATE_START_FILTER_FIELD = "dateStart";
     private static final String EQUIPMENT_ALIAS_FILTER_FIELD = "equipmentAlias";
     private static final String PRODUCTION_ORDER_CODE_FILTER_FIELD = "productionOrderCode";
 
     private static final String SQL_WILDCARD = "%";
 
-    public List<CounterRecordEntity> findLastPerProductionOrder(CounterRecordFilterDto filterDto) {
-        EntityManager entityManager = SpringContext.getEntityManager();
-
+    public List<CounterRecordEntity> findByCriteria(CounterRecordFilterDto filterDto) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<CounterRecordEntity> criteriaQuery = criteriaBuilder.createQuery(CounterRecordEntity.class);
-
         Root<CounterRecordEntity> root = criteriaQuery.from(CounterRecordEntity.class);
-        Join<CounterRecordEntity, EquipmentOutputEntity> equipmentOutputJoin = root.join(EQUIPMENT_OUTPUT_PROP);
-        Join<CounterRecordEntity, ProductionOrderEntity> productionOrderJoin = root.join(PRODUCTION_ORDER_PROP);
 
-        Subquery<Long> maxIdSubquery = criteriaQuery.subquery(Long.class);
-        Root<CounterRecordEntity> maxIdRoot = maxIdSubquery.from(CounterRecordEntity.class);
-        maxIdSubquery.select(criteriaBuilder.max(maxIdRoot.get(ID_PROP)))
-                .where(
-                        criteriaBuilder.equal(maxIdRoot.get(EQUIPMENT_OUTPUT_PROP), equipmentOutputJoin),
-                        criteriaBuilder.equal(maxIdRoot.get(PRODUCTION_ORDER_PROP), productionOrderJoin)
-                );
-
-        Subquery<Long> maxIdPerOutputSubquery = criteriaQuery.subquery(Long.class);
-        Root<CounterRecordEntity> maxIdPerOutputRoot = maxIdPerOutputSubquery.from(CounterRecordEntity.class);
-        maxIdPerOutputSubquery.select(criteriaBuilder.max(maxIdPerOutputRoot.get(ID_PROP)))
-                .where(criteriaBuilder.equal(maxIdPerOutputRoot.get(EQUIPMENT_OUTPUT_PROP), equipmentOutputJoin));
+        Subquery<Long> subquery = criteriaQuery.subquery(Long.class);
+        Root<CounterRecordEntity> subqueryRoot = subquery.from(CounterRecordEntity.class);
+        subquery.select(criteriaBuilder.count(subqueryRoot.get(ID_PROP)));
+        subquery.where(
+                criteriaBuilder.and(
+                        criteriaBuilder.equal(root.get(EQUIPMENT_OUTPUT_PROP), subqueryRoot.get(EQUIPMENT_OUTPUT_PROP)),
+                        criteriaBuilder.greaterThan(subqueryRoot.get(REGISTERED_AT_PROP), root.get(REGISTERED_AT_PROP))
+                )
+        );
 
         List<Predicate> predicates = new ArrayList<>();
-        predicates.add(criteriaBuilder.equal(root.get(ID_PROP), maxIdSubquery.getSelection()));
-        predicates.add(criteriaBuilder.equal(root.get(ID_PROP), maxIdPerOutputSubquery.getSelection()));
         addPredicates(filterDto, predicates, criteriaBuilder, root);
 
         List<Order> orders = new ArrayList<>();
         addSortOrders(filterDto.getSort(), orders, criteriaBuilder, root);
+        orders.add(criteriaBuilder.asc(subquery));
+        orders.add(criteriaBuilder.asc(root.get(EQUIPMENT_OUTPUT_PROP).get(ID_PROP)));
 
         criteriaQuery.select(root)
                 .where(criteriaBuilder.and(predicates.toArray(new Predicate[0])))
                 .orderBy(orders);
 
-        return entityManager.createQuery(criteriaQuery).getResultList();
+        return entityManager.createQuery(criteriaQuery)
+                .setFirstResult(filterDto.getSkip())
+                .setMaxResults(filterDto.getTake() + 1)
+                .getResultList();
     }
 
-    public List<CounterRecordEntity> findByCriteria(CounterRecordFilterDto filterDto) {
+
+    public List<CounterRecordEntity> findLastPerProductionOrder(CounterRecordFilterDto filterDto) {
+
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<CounterRecordEntity> counterRecordCriteriaQuery = criteriaBuilder.createQuery(CounterRecordEntity.class);
+        CriteriaQuery<CounterRecordEntity> criteriaQuery = criteriaBuilder.createQuery(CounterRecordEntity.class);
+
+        Root<CounterRecordEntity> root = criteriaQuery.from(CounterRecordEntity.class);
+        Join<CounterRecordEntity, EquipmentOutputEntity> equipmentOutputJoin = root.join("equipmentOutput");
+        Join<CounterRecordEntity, ProductionOrderEntity> productionOrderJoin = root.join("productionOrder");
+
+        Subquery<Long> maxIdSubquery = criteriaQuery.subquery(Long.class);
+        Root<CounterRecordEntity> maxIdRoot = maxIdSubquery.from(CounterRecordEntity.class);
+        maxIdSubquery.select(criteriaBuilder.max(maxIdRoot.get("id")))
+                .where(criteriaBuilder.equal(maxIdRoot.get("equipmentOutput"), equipmentOutputJoin),
+                        criteriaBuilder.equal(maxIdRoot.get("productionOrder"), productionOrderJoin));
+
+        Subquery<Long> maxIdPerOutputSubquery = criteriaQuery.subquery(Long.class);
+        Root<CounterRecordEntity> maxIdPerOutputRoot = maxIdPerOutputSubquery.from(CounterRecordEntity.class);
+        maxIdPerOutputSubquery.select(criteriaBuilder.max(maxIdPerOutputRoot.get("id")))
+                .where(criteriaBuilder.equal(maxIdPerOutputRoot.get("equipmentOutput"), equipmentOutputJoin),
+                        criteriaBuilder.equal(maxIdPerOutputRoot.get("productionOrder"), productionOrderJoin));
 
         List<Predicate> predicates = new ArrayList<>();
+        predicates.add(criteriaBuilder.equal(root.get("id"), maxIdSubquery.getSelection()));
+        predicates.add(criteriaBuilder.equal(root.get("id"), maxIdPerOutputSubquery.getSelection()));
+        addPredicates(filterDto, predicates, criteriaBuilder, root);
+
         List<Order> orders = new ArrayList<>();
-        Root<CounterRecordEntity> counterRecordRoot = counterRecordCriteriaQuery.from(CounterRecordEntity.class);
+        addSortOrders(filterDto.getSort(), orders, criteriaBuilder, root);
+        orders.add(criteriaBuilder.desc(productionOrderJoin.get("id")));
+        orders.add(criteriaBuilder.asc(equipmentOutputJoin.get("id")));
 
-        addPredicates(filterDto, predicates, criteriaBuilder, counterRecordRoot);
-        addSortOrders(filterDto.getSort(), orders, criteriaBuilder, counterRecordRoot);
-
-        Order orderByDate = criteriaBuilder.desc(getPath(counterRecordRoot, REGISTERED_AT_PROP));
-        orders.add(orderByDate);
-
-        counterRecordCriteriaQuery
+        criteriaQuery.select(root)
                 .where(criteriaBuilder.and(predicates.toArray(new Predicate[0])))
                 .orderBy(orders);
 
-        TypedQuery<CounterRecordEntity> query = entityManager
-                .createQuery(counterRecordCriteriaQuery)
+        return entityManager.createQuery(criteriaQuery)
                 .setFirstResult(filterDto.getSkip())
-                .setMaxResults(filterDto.getTake() + 1);
-
-        return query.getResultList();
+                .setMaxResults(filterDto.getTake() + 1)
+                .getResultList();
     }
 
     private void addPredicates(CounterRecordFilterDto filterDto, List<Predicate> predicates, CriteriaBuilder criteriaBuilder, Root<CounterRecordEntity> counterRecordRoot) {
@@ -109,11 +118,11 @@ public class CounterRecordRepositoryImpl {
             switch (search.getId()) {
                 case COMPUTED_VALUE_PROP ->
                         predicate = criteriaBuilder.equal(counterRecordRoot.get(COMPUTED_VALUE_PROP), search.getValue());
-                case DATE_START_FIELTER_FIELD -> {
+                case DATE_START_FILTER_FIELD -> {
                     ZonedDateTime dateStart = ZonedDateTime.parse(search.getValue());
                     predicate = criteriaBuilder.greaterThanOrEqualTo(counterRecordRoot.get(REGISTERED_AT_PROP), dateStart);
                 }
-                case DATE_END_FIELTER_FIELD -> {
+                case DATE_END_FILTER_FIELD -> {
                     ZonedDateTime dateEnd = ZonedDateTime.parse(search.getValue());
                     predicate = criteriaBuilder.lessThanOrEqualTo(counterRecordRoot.get(REGISTERED_AT_PROP), dateEnd);
                 }

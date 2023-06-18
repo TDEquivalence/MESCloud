@@ -14,22 +14,24 @@ public interface CountingEquipmentRepository extends CrudRepository<CountingEqui
     default List<CountingEquipmentEntity> findByProductionOrderStatus(boolean forActiveProductionOrder) {
 
         EntityManager entityManager = SpringContext.getEntityManager();
-        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<CountingEquipmentEntity> criteriaQuery = criteriaBuilder.createQuery(CountingEquipmentEntity.class);
-        Root<CountingEquipmentEntity> root = criteriaQuery.from(CountingEquipmentEntity.class);
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<CountingEquipmentEntity> query = cb.createQuery(CountingEquipmentEntity.class);
 
-        Subquery<Long> subquery = criteriaQuery.subquery(Long.class);
-        Root<ProductionOrderEntity> productionOrderRoot = subquery.from(ProductionOrderEntity.class);
-        subquery.select(productionOrderRoot.get("equipment").get("id"));
+        Root<CountingEquipmentEntity> countingEquipmentRoot = query.from(CountingEquipmentEntity.class);
+        Join<CountingEquipmentEntity, ProductionOrderEntity> productionOrderJoin = countingEquipmentRoot.join("productionOrders");
 
-        Predicate statusPredicate = forActiveProductionOrder ?
-                criteriaBuilder.isFalse(productionOrderRoot.get("isCompleted")) :
-                criteriaBuilder.isTrue(productionOrderRoot.get("isCompleted"));
+        Subquery<Long> subquery = query.subquery(Long.class);
+        Root<ProductionOrderEntity> subqueryRoot = subquery.from(ProductionOrderEntity.class);
+        subquery.select(cb.max(subqueryRoot.get("id")))
+                .where(cb.equal(subqueryRoot.get("equipment").get("id"), countingEquipmentRoot.get("id")));
 
-        subquery.where(statusPredicate);
-        Predicate isActivePredicate = criteriaBuilder.in(root.get("id")).value(subquery);
-        criteriaQuery.where(isActivePredicate);
+        query.select(countingEquipmentRoot)
+                .where(cb.and(
+                        cb.equal(productionOrderJoin.get("id"), subquery)),
+                        cb.equal(productionOrderJoin.get("isCompleted"), !forActiveProductionOrder)
+                );
 
-        return entityManager.createQuery(criteriaQuery).getResultList();
+        List<CountingEquipmentEntity> results = entityManager.createQuery(query).getResultList();
+        return results;
     }
 }

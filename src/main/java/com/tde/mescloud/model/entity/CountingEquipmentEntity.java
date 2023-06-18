@@ -22,5 +22,6 @@ public class CountingEquipmentEntity {
     private int pTimerCommunicationCycle;
     @OneToMany(mappedBy = "countingEquipment", fetch = FetchType.EAGER)
     List<EquipmentOutputEntity> outputs;
-
+    @OneToMany(mappedBy = "equipment", fetch = FetchType.LAZY)
+    List<ProductionOrderEntity> productionOrders;
 }
