@@ -6,6 +6,7 @@ import com.tde.mescloud.model.entity.CountingEquipmentEntity;
 import com.tde.mescloud.repository.CountingEquipmentRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,16 +19,11 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
     private CountingEquipmentRepository repository;
     private CountingEquipmentConverter converter;
 
+    @Transactional(readOnly = true)
+    @Override
     public List<CountingEquipment> findAll() {
-
-        List<CountingEquipmentEntity> activeEquipments = repository.findByProductionOrderStatus(true);
-        List<CountingEquipmentEntity> pausedEquipments = repository.findByProductionOrderStatus(false);
-
-        List<CountingEquipment> equipments = new ArrayList<>(activeEquipments.size() + pausedEquipments.size());
-        equipments.addAll(convertWithActivityStatus(activeEquipments, true));
-        equipments.addAll(convertWithActivityStatus(pausedEquipments, false));
-
-        return equipments;
+        Iterable<CountingEquipmentEntity> equipmentEntities = repository.findAll();
+        return converter.convertToDomainObject(equipmentEntities);
     }
 
     private List<CountingEquipment> convertWithActivityStatus(List<CountingEquipmentEntity> entities, boolean areActive) {
@@ -43,6 +39,7 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<CountingEquipment> findById(long id) {
 
         Optional<CountingEquipmentEntity> entityOpt = repository.findById(id);

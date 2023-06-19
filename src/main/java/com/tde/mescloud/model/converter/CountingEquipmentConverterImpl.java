@@ -5,6 +5,7 @@ import com.tde.mescloud.model.EquipmentOutput;
 import com.tde.mescloud.model.dto.CountingEquipmentDto;
 import com.tde.mescloud.model.dto.EquipmentOutputDto;
 import com.tde.mescloud.model.entity.CountingEquipmentEntity;
+import com.tde.mescloud.model.entity.ProductionOrderEntity;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Component;
@@ -18,16 +19,23 @@ public class CountingEquipmentConverterImpl implements CountingEquipmentConverte
 
     private final EquipmentOutputConverter equipmentOutputConverter;
 
-    public CountingEquipment convertToDomainObject(CountingEquipmentEntity countingEquipmentEntity) {
+    public CountingEquipment convertToDomainObject(CountingEquipmentEntity entity) {
         CountingEquipment countingEquipment = new CountingEquipment();
-        countingEquipment.setId(countingEquipmentEntity.getId());
-        countingEquipment.setAlias(countingEquipmentEntity.getAlias());
-        countingEquipment.setCode(countingEquipmentEntity.getCode());
-        countingEquipment.setPTimerCommunicationCycle(countingEquipmentEntity.getPTimerCommunicationCycle());
-        countingEquipment.setEquipmentStatus(countingEquipmentEntity.getEquipmentStatus());
+        countingEquipment.setId(entity.getId());
+        countingEquipment.setAlias(entity.getAlias());
+        countingEquipment.setCode(entity.getCode());
+        countingEquipment.setPTimerCommunicationCycle(entity.getPTimerCommunicationCycle());
+        countingEquipment.setEquipmentStatus(entity.getEquipmentStatus());
 
-        List<EquipmentOutput> equipmentOutputs = equipmentOutputConverter.convertToDomainObject(countingEquipmentEntity.getOutputs());
+        List<EquipmentOutput> equipmentOutputs = equipmentOutputConverter.convertToDomainObject(entity.getOutputs());
         countingEquipment.setOutputs(equipmentOutputs);
+
+        List<ProductionOrderEntity> productionOrders = entity.getProductionOrders();
+        if (productionOrders != null && productionOrders.size() > 0) {
+            ProductionOrderEntity lastProductionOrder = productionOrders.get(productionOrders.size() - 1);
+            countingEquipment.setHasActiveProductionOrder(!lastProductionOrder.isCompleted());
+        }
+
         return countingEquipment;
     }
 

@@ -77,30 +77,30 @@ public class CounterRecordRepositoryImpl {
         CriteriaQuery<CounterRecordEntity> criteriaQuery = criteriaBuilder.createQuery(CounterRecordEntity.class);
 
         Root<CounterRecordEntity> root = criteriaQuery.from(CounterRecordEntity.class);
-        Join<CounterRecordEntity, EquipmentOutputEntity> equipmentOutputJoin = root.join("equipmentOutput");
-        Join<CounterRecordEntity, ProductionOrderEntity> productionOrderJoin = root.join("productionOrder");
+        Join<CounterRecordEntity, EquipmentOutputEntity> equipmentOutputJoin = root.join(EQUIPMENT_OUTPUT_PROP);
+        Join<CounterRecordEntity, ProductionOrderEntity> productionOrderJoin = root.join(PRODUCTION_ORDER_PROP);
 
         Subquery<Long> maxIdSubquery = criteriaQuery.subquery(Long.class);
         Root<CounterRecordEntity> maxIdRoot = maxIdSubquery.from(CounterRecordEntity.class);
-        maxIdSubquery.select(criteriaBuilder.max(maxIdRoot.get("id")))
-                .where(criteriaBuilder.equal(maxIdRoot.get("equipmentOutput"), equipmentOutputJoin),
-                        criteriaBuilder.equal(maxIdRoot.get("productionOrder"), productionOrderJoin));
+        maxIdSubquery.select(criteriaBuilder.max(maxIdRoot.get(ID_PROP)))
+                .where(criteriaBuilder.equal(maxIdRoot.get(EQUIPMENT_OUTPUT_PROP), equipmentOutputJoin),
+                        criteriaBuilder.equal(maxIdRoot.get(PRODUCTION_ORDER_PROP), productionOrderJoin));
 
         Subquery<Long> maxIdPerOutputSubquery = criteriaQuery.subquery(Long.class);
         Root<CounterRecordEntity> maxIdPerOutputRoot = maxIdPerOutputSubquery.from(CounterRecordEntity.class);
-        maxIdPerOutputSubquery.select(criteriaBuilder.max(maxIdPerOutputRoot.get("id")))
-                .where(criteriaBuilder.equal(maxIdPerOutputRoot.get("equipmentOutput"), equipmentOutputJoin),
-                        criteriaBuilder.equal(maxIdPerOutputRoot.get("productionOrder"), productionOrderJoin));
+        maxIdPerOutputSubquery.select(criteriaBuilder.max(maxIdPerOutputRoot.get(ID_PROP)))
+                .where(criteriaBuilder.equal(maxIdPerOutputRoot.get(EQUIPMENT_OUTPUT_PROP), equipmentOutputJoin),
+                        criteriaBuilder.equal(maxIdPerOutputRoot.get(PRODUCTION_ORDER_PROP), productionOrderJoin));
 
         List<Predicate> predicates = new ArrayList<>();
-        predicates.add(criteriaBuilder.equal(root.get("id"), maxIdSubquery.getSelection()));
-        predicates.add(criteriaBuilder.equal(root.get("id"), maxIdPerOutputSubquery.getSelection()));
+        predicates.add(criteriaBuilder.equal(root.get(ID_PROP), maxIdSubquery.getSelection()));
+        predicates.add(criteriaBuilder.equal(root.get(ID_PROP), maxIdPerOutputSubquery.getSelection()));
         addPredicates(filterDto, predicates, criteriaBuilder, root);
 
         List<Order> orders = new ArrayList<>();
         addSortOrders(filterDto.getSort(), orders, criteriaBuilder, root);
-        orders.add(criteriaBuilder.desc(productionOrderJoin.get("id")));
-        orders.add(criteriaBuilder.asc(equipmentOutputJoin.get("id")));
+        orders.add(criteriaBuilder.desc(productionOrderJoin.get(ID_PROP)));
+        orders.add(criteriaBuilder.asc(equipmentOutputJoin.get(ID_PROP)));
 
         criteriaQuery.select(root)
                 .where(criteriaBuilder.and(predicates.toArray(new Predicate[0])))

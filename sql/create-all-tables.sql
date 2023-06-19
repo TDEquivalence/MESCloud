@@ -82,7 +82,6 @@ CREATE TABLE equipment_output_alias (
 	PRIMARY KEY(id)
 );
 
-
 CREATE TABLE equipment_output (
 	id int GENERATED ALWAYS AS IDENTITY,
 	counting_equipment_id int,
