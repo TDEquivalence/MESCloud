@@ -44,6 +44,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     }
 
     @Override
+    @Transactional
     public Optional<ProductionOrder> complete(long countingEquipmentId) {
         Optional<ProductionOrderEntity> productionOrderEntityOpt = repository.findActive(countingEquipmentId);
         if (productionOrderEntityOpt.isEmpty()) {
@@ -58,6 +59,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     }
 
     @Override
+    @Transactional
     public ProductionOrder save(ProductionOrderDto productionOrderDto) {
 
         ProductionOrderEntity productionOrderEntity = converter.convertToEntity(productionOrderDto);
