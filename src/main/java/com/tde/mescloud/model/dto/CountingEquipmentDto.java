@@ -12,7 +12,6 @@ public class CountingEquipmentDto {
     private long id;
     private String code;
     private String alias;
-    //private Section section;
     private int equipmentStatus;
     private int pTimerCommunicationCycle;
     private boolean hasActiveProductionOrder;

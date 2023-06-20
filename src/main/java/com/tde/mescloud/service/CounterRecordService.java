@@ -1,6 +1,7 @@
 package com.tde.mescloud.service;
 
 import com.tde.mescloud.model.CounterRecord;
+import com.tde.mescloud.model.dto.CounterRecordDto;
 import com.tde.mescloud.model.dto.CounterRecordFilterDto;
 import com.tde.mescloud.model.dto.EquipmentCountsMqttDto;
 
@@ -10,9 +11,9 @@ public interface CounterRecordService {
 
     List<CounterRecord> findAll();
 
-    List<CounterRecord> findLastPerProductionOrder(CounterRecordFilterDto filterDto);
+    List<CounterRecordDto> findLastPerProductionOrder(CounterRecordFilterDto filterDto);
 
-    List<CounterRecord> findAllByCriteria(CounterRecordFilterDto filterDto);
+    List<CounterRecordDto> findAllByCriteria(CounterRecordFilterDto filterDto);
 
     List<CounterRecord> save(EquipmentCountsMqttDto equipmentCountsMqttDTO);
 

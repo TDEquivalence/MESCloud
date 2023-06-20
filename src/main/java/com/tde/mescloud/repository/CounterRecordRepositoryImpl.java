@@ -7,6 +7,7 @@ import com.tde.mescloud.model.entity.CounterRecordEntity;
 import com.tde.mescloud.model.entity.CountingEquipmentEntity;
 import com.tde.mescloud.model.entity.EquipmentOutputEntity;
 import com.tde.mescloud.model.entity.ProductionOrderEntity;
+import jakarta.persistence.EntityGraph;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.*;
 import lombok.AllArgsConstructor;
@@ -35,6 +36,7 @@ public class CounterRecordRepositoryImpl {
     private static final String EQUIPMENT_ALIAS_FILTER_FIELD = "equipmentAlias";
     private static final String PRODUCTION_ORDER_CODE_FILTER_FIELD = "productionOrderCode";
 
+    private static final String JAKARTA_FETCHGRAPH = "jakarta.persistence.fetchgraph";
     private static final String SQL_WILDCARD = "%";
 
     public List<CounterRecordEntity> findByCriteria(CounterRecordFilterDto filterDto) {
@@ -42,13 +44,13 @@ public class CounterRecordRepositoryImpl {
         CriteriaQuery<CounterRecordEntity> criteriaQuery = criteriaBuilder.createQuery(CounterRecordEntity.class);
         Root<CounterRecordEntity> root = criteriaQuery.from(CounterRecordEntity.class);
 
-        Subquery<Long> subquery = criteriaQuery.subquery(Long.class);
-        Root<CounterRecordEntity> subqueryRoot = subquery.from(CounterRecordEntity.class);
-        subquery.select(criteriaBuilder.count(subqueryRoot.get(ID_PROP)));
-        subquery.where(
+        Subquery<Long> countSubquery = criteriaQuery.subquery(Long.class);
+        Root<CounterRecordEntity> countSubqueryRoot = countSubquery.from(CounterRecordEntity.class);
+        countSubquery.select(criteriaBuilder.count(countSubqueryRoot.get(ID_PROP)));
+        countSubquery.where(
                 criteriaBuilder.and(
-                        criteriaBuilder.equal(root.get(EQUIPMENT_OUTPUT_PROP), subqueryRoot.get(EQUIPMENT_OUTPUT_PROP)),
-                        criteriaBuilder.greaterThan(subqueryRoot.get(REGISTERED_AT_PROP), root.get(REGISTERED_AT_PROP))
+                        criteriaBuilder.equal(root.get(EQUIPMENT_OUTPUT_PROP), countSubqueryRoot.get(EQUIPMENT_OUTPUT_PROP)),
+                        criteriaBuilder.greaterThan(countSubqueryRoot.get(REGISTERED_AT_PROP), root.get(REGISTERED_AT_PROP))
                 )
         );
 
@@ -57,19 +59,23 @@ public class CounterRecordRepositoryImpl {
 
         List<Order> orders = new ArrayList<>();
         addSortOrders(filterDto.getSort(), orders, criteriaBuilder, root);
-        orders.add(criteriaBuilder.asc(subquery));
+        orders.add(criteriaBuilder.asc(countSubquery));
         orders.add(criteriaBuilder.asc(root.get(EQUIPMENT_OUTPUT_PROP).get(ID_PROP)));
+
+        EntityGraph<CounterRecordEntity> entityGraph = entityManager.createEntityGraph(CounterRecordEntity.class);
+        entityGraph.addSubgraph(PRODUCTION_ORDER_PROP);
+        entityGraph.addSubgraph(EQUIPMENT_OUTPUT_PROP).addSubgraph(COUNTING_EQUIPMENT_PROP);
 
         criteriaQuery.select(root)
                 .where(criteriaBuilder.and(predicates.toArray(new Predicate[0])))
                 .orderBy(orders);
 
         return entityManager.createQuery(criteriaQuery)
+                .setHint(JAKARTA_FETCHGRAPH, entityGraph)
                 .setFirstResult(filterDto.getSkip())
                 .setMaxResults(filterDto.getTake() + 1)
                 .getResultList();
     }
-
 
     public List<CounterRecordEntity> findLastPerProductionOrder(CounterRecordFilterDto filterDto) {
 
@@ -102,11 +108,16 @@ public class CounterRecordRepositoryImpl {
         orders.add(criteriaBuilder.desc(productionOrderJoin.get(ID_PROP)));
         orders.add(criteriaBuilder.asc(equipmentOutputJoin.get(ID_PROP)));
 
+        EntityGraph<CounterRecordEntity> entityGraph = entityManager.createEntityGraph(CounterRecordEntity.class);
+        entityGraph.addSubgraph(PRODUCTION_ORDER_PROP);
+        entityGraph.addSubgraph(EQUIPMENT_OUTPUT_PROP).addSubgraph(COUNTING_EQUIPMENT_PROP);
+
         criteriaQuery.select(root)
                 .where(criteriaBuilder.and(predicates.toArray(new Predicate[0])))
                 .orderBy(orders);
 
         return entityManager.createQuery(criteriaQuery)
+                .setHint(JAKARTA_FETCHGRAPH, entityGraph)
                 .setFirstResult(filterDto.getSkip())
                 .setMaxResults(filterDto.getTake() + 1)
                 .getResultList();

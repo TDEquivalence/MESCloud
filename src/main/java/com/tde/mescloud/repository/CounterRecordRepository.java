@@ -2,6 +2,7 @@ package com.tde.mescloud.repository;
 
 import com.tde.mescloud.model.dto.CounterRecordFilterDto;
 import com.tde.mescloud.model.entity.CounterRecordEntity;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
@@ -20,5 +21,7 @@ public interface CounterRecordRepository extends CrudRepository<CounterRecordEnt
 
     List<CounterRecordEntity> findLastPerProductionOrder(CounterRecordFilterDto filterDto);
 
+    //TODO: Check projections too, for example to get the isOrderCompleted when fetching COuntingEquipments...
+    @EntityGraph(attributePaths = { "equipmentOutput", "equipmentOutput.countingEquipment", "productionOrder" })
     List<CounterRecordEntity> findByCriteria(CounterRecordFilterDto filterDto);
 }

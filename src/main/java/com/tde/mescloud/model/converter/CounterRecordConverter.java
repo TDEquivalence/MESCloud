@@ -31,4 +31,12 @@ public interface CounterRecordConverter {
     }
 
     CounterRecordEntity convertToEntity(CounterRecord counterRecord);
+
+    CounterRecordDto toDto(CounterRecordEntity entity);
+
+    default List<CounterRecordDto> toDto(Iterable<CounterRecordEntity> entities) {
+        List<CounterRecordDto> dtos = new ArrayList<>();
+        entities.forEach(entity -> dtos.add(toDto(entity)));
+        return dtos;
+    }
 }

@@ -1,6 +1,5 @@
 package com.tde.mescloud.model.dto;
 
-import com.tde.mescloud.model.CountingEquipment;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,7 +7,6 @@ import lombok.Setter;
 @Setter
 public class EquipmentOutputDto {
     private long id;
-    private CountingEquipmentDto countingEquipment;
     private String code;
     private String alias;
 }

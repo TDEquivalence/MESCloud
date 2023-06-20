@@ -97,4 +97,18 @@ public class CounterRecordConverterImpl implements CounterRecordConverter {
 
         return counterRecordEntity;
     }
+
+    @Override
+    public CounterRecordDto toDto(CounterRecordEntity entity) {
+
+        CounterRecordDto dto = new CounterRecordDto();
+        dto.setId(entity.getId());
+        dto.setRegisteredAt(entity.getRegisteredAt());
+        dto.setComputedValue(entity.getComputedValue());
+        dto.setEquipmentOutputAlias(entity.getEquipmentOutputAlias());
+
+        dto.setProductionOrderCode(entity.getProductionOrder().getCode());
+        dto.setEquipmentAlias(entity.getEquipmentOutput().getCountingEquipment().getAlias());
+        return dto;
+    }
 }

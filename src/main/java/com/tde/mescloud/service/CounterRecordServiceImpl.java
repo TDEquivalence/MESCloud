@@ -5,6 +5,7 @@ import com.tde.mescloud.model.EquipmentOutput;
 import com.tde.mescloud.model.ProductionOrder;
 import com.tde.mescloud.model.converter.CounterRecordConverter;
 import com.tde.mescloud.model.dto.CounterMqttDto;
+import com.tde.mescloud.model.dto.CounterRecordDto;
 import com.tde.mescloud.model.dto.CounterRecordFilterDto;
 import com.tde.mescloud.model.dto.EquipmentCountsMqttDto;
 import com.tde.mescloud.model.entity.CounterRecordEntity;
@@ -14,7 +15,6 @@ import com.tde.mescloud.repository.ProductionOrderRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -44,19 +44,18 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public List<CounterRecord> findLastPerProductionOrder(CounterRecordFilterDto filterDto) {
-        Iterable<CounterRecordEntity> counterRecordEntities = repository.findLastPerProductionOrder(filterDto);
-        return converter.convertToDomainObj(counterRecordEntities);
+    public List<CounterRecordDto> findLastPerProductionOrder(CounterRecordFilterDto filter) {
+        Iterable<CounterRecordEntity> counterRecordEntities = repository.findLastPerProductionOrder(filter);
+        return converter.toDto(counterRecordEntities);
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public List<CounterRecord> findAllByCriteria(CounterRecordFilterDto filterDto) {
+    public List<CounterRecordDto> findAllByCriteria(CounterRecordFilterDto filterDto) {
         List<CounterRecordEntity> counterRecordEntities = repository.findByCriteria(filterDto);
-        return converter.convertToDomainObj(counterRecordEntities);
+        return converter.toDto(counterRecordEntities);
     }
 
+    //TODO: URGENTE -> extractCounterRecord should transform to entity directly instead.
     @Override
     public List<CounterRecord> save(EquipmentCountsMqttDto equipmentCountsDto) {
 
