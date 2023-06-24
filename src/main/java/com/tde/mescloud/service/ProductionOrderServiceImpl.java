@@ -71,6 +71,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         ProductionOrderEntity persistedProductionOrder = repository.save(productionOrderEntity);
 
         CountingEquipmentEntity countingEquipmentEntity = countingEquipmentOpt.get();
+        //TODO: Check who controls equipment status
         countingEquipmentEntity.setEquipmentStatus(EQUIPMENT_PAUSED_STATUS);
         countingEquipmentRepository.save(countingEquipmentEntity);
 
@@ -80,18 +81,16 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     }
 
     @Override
-    //TODO: Remove transacional
-    @Transactional
-    public ProductionOrderDto save(ProductionOrderDto productionOrderDto) {
+    public Optional<ProductionOrderDto> save(ProductionOrderDto productionOrder) {
 
         Optional<CountingEquipmentEntity> countingEquipmentEntityOpt =
-                countingEquipmentRepository.findById(productionOrderDto.getEquipmentId());
+                countingEquipmentRepository.findById(productionOrder.getEquipmentId());
         if (countingEquipmentEntityOpt.isEmpty()) {
-            //TODO: Handle & log error
-            return null;
+            //TODO: Log error
+            return Optional.empty();
         }
 
-        ProductionOrderEntity productionOrderEntity = converter.toEntity(productionOrderDto);
+        ProductionOrderEntity productionOrderEntity = converter.toEntity(productionOrder);
         productionOrderEntity.setCreatedAt(new Date());
         productionOrderEntity.setCompleted(false);
         productionOrderEntity.setCode(generateCode());
@@ -99,7 +98,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         CountingEquipmentEntity countingEquipmentEntity = countingEquipmentEntityOpt.get();
         //TODO: Check who controls equipment status
         countingEquipmentEntity.setEquipmentStatus(EQUIPMENT_ACTIVE_STATUS);
-        countingEquipmentEntity.setId(productionOrderDto.getEquipmentId());
+        countingEquipmentEntity.setId(productionOrder.getEquipmentId());
         productionOrderEntity.setEquipment(countingEquipmentEntity);
 
         ProductionOrderEntity persistedProductionOrder = repository.save(productionOrderEntity);
@@ -108,10 +107,11 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
             publishToPlc(persistedProductionOrder);
         } catch (MesMqttException e) {
             log.severe("Unable to publish Production Order over MQTT.");
-            return null;
+            return Optional.empty();
         }
 
-        return converter.toDto(persistedProductionOrder);
+        ProductionOrderDto persistedProductionOrderDto = converter.toDto(persistedProductionOrder);
+        return Optional.of(persistedProductionOrderDto);
     }
 
     @Override

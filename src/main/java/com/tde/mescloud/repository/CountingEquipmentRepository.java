@@ -13,7 +13,7 @@ public interface CountingEquipmentRepository extends CrudRepository<CountingEqui
     @EntityGraph(attributePaths = "outputs")
     List<CountingEquipmentEntity> findAll();
 
-    @Query(value = "SELECT DISTINCT " +
+    @Query(value = "SELECT DISTINCT ON (ce.id) " +
             "ce.id AS id, " +
             "ce.code AS code, " +
             "ce.alias AS alias, " +

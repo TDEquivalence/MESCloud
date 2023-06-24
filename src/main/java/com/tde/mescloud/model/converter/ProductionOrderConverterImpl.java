@@ -3,7 +3,6 @@ package com.tde.mescloud.model.converter;
 import com.tde.mescloud.constant.MqttDTOConstants;
 import com.tde.mescloud.model.dto.ProductionOrderDto;
 import com.tde.mescloud.model.dto.ProductionOrderMqttDto;
-import com.tde.mescloud.model.entity.CountingEquipmentEntity;
 import com.tde.mescloud.model.entity.ProductionOrderEntity;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Component;
