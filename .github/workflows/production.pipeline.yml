@@ -8,6 +8,7 @@ on:
     branches:
       - '*'
       - 'feature/*'
+      - 'bug/*'
 
 env:
   DB_HOST: ${{ vars.DB_HOST }}
