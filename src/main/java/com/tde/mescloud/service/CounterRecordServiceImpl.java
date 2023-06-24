@@ -1,12 +1,7 @@
 package com.tde.mescloud.service;
 
-import com.tde.mescloud.model.EquipmentOutput;
-import com.tde.mescloud.model.ProductionOrder;
 import com.tde.mescloud.model.converter.CounterRecordConverter;
-import com.tde.mescloud.model.dto.CounterMqttDto;
-import com.tde.mescloud.model.dto.CounterRecordDto;
-import com.tde.mescloud.model.dto.CounterRecordFilterDto;
-import com.tde.mescloud.model.dto.EquipmentCountsMqttDto;
+import com.tde.mescloud.model.dto.*;
 import com.tde.mescloud.model.entity.CounterRecordEntity;
 import com.tde.mescloud.model.entity.EquipmentOutputEntity;
 import com.tde.mescloud.model.entity.ProductionOrderEntity;
@@ -82,7 +77,7 @@ public class CounterRecordServiceImpl implements CounterRecordService {
 
     //TODO: Discuss MQTT Protocol -> MC-80 .2
     private void setEquipmentOutput(CounterRecordEntity counterRecord, String equipmentOutputCode) {
-        EquipmentOutput equipmentOutput = equipmentOutputService.findByCode(equipmentOutputCode);
+        EquipmentOutputDto equipmentOutput = equipmentOutputService.findByCode(equipmentOutputCode);
         EquipmentOutputEntity equipmentOutputEntity = new EquipmentOutputEntity();
         equipmentOutputEntity.setId(equipmentOutput.getId());
 
@@ -92,7 +87,7 @@ public class CounterRecordServiceImpl implements CounterRecordService {
 
     //TODO: Discuss MQTT Protocol -> MC-80 .2
     private void setProductionOrder(CounterRecordEntity counterRecord, String productionOrderCode) {
-        ProductionOrder productionOrder = productionOrderService.findByCode(productionOrderCode);
+        ProductionOrderDto productionOrder = productionOrderService.findByCode(productionOrderCode);
         ProductionOrderEntity productionOrderEntity = new ProductionOrderEntity();
         productionOrderEntity.setId(productionOrder.getId());
 

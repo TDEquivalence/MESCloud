@@ -1,8 +1,8 @@
 package com.tde.mescloud.service;
 
-import com.tde.mescloud.model.EquipmentOutput;
+import com.tde.mescloud.model.dto.EquipmentOutputDto;
 
 public interface EquipmentOutputService {
 
-    EquipmentOutput findByCode(String equipmentOutputCode);
+    EquipmentOutputDto findByCode(String equipmentOutputCode);
 }

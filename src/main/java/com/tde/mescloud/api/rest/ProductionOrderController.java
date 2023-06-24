@@ -1,6 +1,5 @@
 package com.tde.mescloud.api.rest;
 
-import com.tde.mescloud.model.ProductionOrder;
 import com.tde.mescloud.model.converter.ProductionOrderConverter;
 import com.tde.mescloud.model.dto.ProductionOrderDto;
 import com.tde.mescloud.service.ProductionOrderService;
@@ -28,21 +27,21 @@ public class ProductionOrderController {
 
     @PostMapping
     public ResponseEntity<ProductionOrderDto> save(@RequestBody ProductionOrderDto requestProductionOrder) {
-        ProductionOrder productionOrder = productionOrderService.save(requestProductionOrder);
-        ProductionOrderDto responseProductionOrder = productionOrderConverter.convertToDto(productionOrder);
-        return responseProductionOrder != null ?
-                new ResponseEntity<>(responseProductionOrder, HttpStatus.OK) :
+        //TODO: Change to Optional
+        ProductionOrderDto productionOrder = productionOrderService.save(requestProductionOrder);
+        return productionOrder != null ?
+                new ResponseEntity<>(productionOrder, HttpStatus.OK) :
                 new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @PostMapping("{countingEquipmentId}/complete")
     public ResponseEntity<ProductionOrderDto> complete(@PathVariable long countingEquipmentId) {
-        Optional<ProductionOrder> productionOrderOpt = productionOrderService.complete(countingEquipmentId);
+
+        Optional<ProductionOrderDto> productionOrderOpt = productionOrderService.complete(countingEquipmentId);
         if (productionOrderOpt.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        ProductionOrderDto productionOrderDto = productionOrderConverter.convertToDto(productionOrderOpt.get());
-        return new ResponseEntity<>(productionOrderDto, HttpStatus.OK);
+        return new ResponseEntity<>(productionOrderOpt.get(), HttpStatus.OK);
     }
 }

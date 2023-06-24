@@ -2,12 +2,12 @@ package com.tde.mescloud.service;
 
 import com.tde.mescloud.api.mqtt.MqttClient;
 import com.tde.mescloud.exception.MesMqttException;
-import com.tde.mescloud.model.ProductionOrder;
 import com.tde.mescloud.model.converter.ProductionOrderConverter;
 import com.tde.mescloud.model.dto.ProductionOrderDto;
 import com.tde.mescloud.model.dto.ProductionOrderMqttDto;
 import com.tde.mescloud.model.entity.CountingEquipmentEntity;
 import com.tde.mescloud.model.entity.ProductionOrderEntity;
+import com.tde.mescloud.protocol.MesMqttSettings;
 import com.tde.mescloud.repository.CountingEquipmentRepository;
 import com.tde.mescloud.repository.ProductionOrderRepository;
 import lombok.AllArgsConstructor;
@@ -35,13 +35,14 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     private final ProductionOrderConverter converter;
     private final CountingEquipmentRepository countingEquipmentRepository;
     private final MqttClient mqttClient;
+    private final MesMqttSettings mqttSettings;
 
 
     @Override
-    public ProductionOrder findByCode(String code) {
+    public ProductionOrderDto findByCode(String code) {
         //TODO: use projection
         ProductionOrderEntity entity = repository.findByCode(code);
-        return converter.convertToDomainObject(entity);
+        return converter.toDto(entity);
     }
 
     @Override
@@ -51,7 +52,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     }
 
     @Override
-    public Optional<ProductionOrder> complete(long equipmentId) {
+    public Optional<ProductionOrderDto> complete(long equipmentId) {
 
         Optional<ProductionOrderEntity> productionOrderEntityOpt = repository.findActive(equipmentId);
         if (productionOrderEntityOpt.isEmpty()) {
@@ -73,14 +74,15 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         countingEquipmentEntity.setEquipmentStatus(EQUIPMENT_PAUSED_STATUS);
         countingEquipmentRepository.save(countingEquipmentEntity);
 
-        ProductionOrder productionOrder = converter.convertToDomainObject(persistedProductionOrder);
+        ProductionOrderDto productionOrder = converter.toDto(persistedProductionOrder);
 
         return Optional.of(productionOrder);
     }
 
     @Override
+    //TODO: Remove transacional
     @Transactional
-    public ProductionOrder save(ProductionOrderDto productionOrderDto) {
+    public ProductionOrderDto save(ProductionOrderDto productionOrderDto) {
 
         Optional<CountingEquipmentEntity> countingEquipmentEntityOpt =
                 countingEquipmentRepository.findById(productionOrderDto.getEquipmentId());
@@ -89,7 +91,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
             return null;
         }
 
-        ProductionOrderEntity productionOrderEntity = converter.convertToEntity(productionOrderDto);
+        ProductionOrderEntity productionOrderEntity = converter.toEntity(productionOrderDto);
         productionOrderEntity.setCreatedAt(new Date());
         productionOrderEntity.setCompleted(false);
         productionOrderEntity.setCode(generateCode());
@@ -98,13 +100,14 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         countingEquipmentEntityOpt.get().setEquipmentStatus(EQUIPMENT_ACTIVE_STATUS);
 
         try {
+            //TODO: remove to MesProtocolProcess level
             publishToPlc(persistedProductionOrder);
         } catch (MesMqttException e) {
             log.severe("Unable to publish Production Order over MQTT.");
             return null;
         }
 
-        return converter.convertToDomainObject(persistedProductionOrder);
+        return converter.toDto(persistedProductionOrder);
     }
 
     @Override
@@ -129,7 +132,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     }
 
     private void publishToPlc(ProductionOrderEntity productionOrderEntity) throws MesMqttException {
-        ProductionOrderMqttDto productionOrderMqttDto = converter.convertToMqttDto(productionOrderEntity);
-        mqttClient.publish("DEV/MASILVA/OBO/PROTOCOL_COUNT_V0/PLC", productionOrderMqttDto);
+        ProductionOrderMqttDto productionOrderMqttDto = converter.toMqttDto(productionOrderEntity);
+        mqttClient.publish(mqttSettings.getProtCountPlcTopic(), productionOrderMqttDto);
     }
 }
