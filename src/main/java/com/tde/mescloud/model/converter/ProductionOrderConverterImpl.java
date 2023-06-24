@@ -26,10 +26,6 @@ public class ProductionOrderConverterImpl implements ProductionOrderConverter {
         productionOrderEntity.setCategory(productionOrderDto.getCategory());
         productionOrderEntity.setWashingProcess(productionOrderDto.getWashingProcess());
 
-        CountingEquipmentEntity countingEquipmentEntity = new CountingEquipmentEntity();
-        countingEquipmentEntity.setId(productionOrderDto.getId());
-        productionOrderEntity.setEquipment(countingEquipmentEntity);
-
         return productionOrderEntity;
     }
 

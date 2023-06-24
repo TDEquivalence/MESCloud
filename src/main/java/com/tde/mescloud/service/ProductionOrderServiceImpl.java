@@ -95,10 +95,14 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         productionOrderEntity.setCreatedAt(new Date());
         productionOrderEntity.setCompleted(false);
         productionOrderEntity.setCode(generateCode());
+
+        CountingEquipmentEntity countingEquipmentEntity = countingEquipmentEntityOpt.get();
+        //TODO: Check who controls equipment status
+        countingEquipmentEntity.setEquipmentStatus(EQUIPMENT_ACTIVE_STATUS);
+        countingEquipmentEntity.setId(productionOrderDto.getEquipmentId());
+        productionOrderEntity.setEquipment(countingEquipmentEntity);
+
         ProductionOrderEntity persistedProductionOrder = repository.save(productionOrderEntity);
-
-        countingEquipmentEntityOpt.get().setEquipmentStatus(EQUIPMENT_ACTIVE_STATUS);
-
         try {
             //TODO: remove to MesProtocolProcess level
             publishToPlc(persistedProductionOrder);
