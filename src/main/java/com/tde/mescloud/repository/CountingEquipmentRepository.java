@@ -1,37 +1,29 @@
 package com.tde.mescloud.repository;
 
 import com.tde.mescloud.model.entity.CountingEquipmentEntity;
-import com.tde.mescloud.model.entity.ProductionOrderEntity;
-import com.tde.mescloud.utility.SpringContext;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.criteria.*;
+import org.springframework.data.jpa.repository.EntityGraph;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;
 
 public interface CountingEquipmentRepository extends CrudRepository<CountingEquipmentEntity, Long> {
 
-    default List<CountingEquipmentEntity> findByProductionOrderStatus(boolean forActiveProductionOrder) {
+    @Override
+    @EntityGraph(attributePaths = "outputs")
+    List<CountingEquipmentEntity> findAll();
 
-        EntityManager entityManager = SpringContext.getEntityManager();
-        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-        CriteriaQuery<CountingEquipmentEntity> query = cb.createQuery(CountingEquipmentEntity.class);
-
-        Root<CountingEquipmentEntity> countingEquipmentRoot = query.from(CountingEquipmentEntity.class);
-        Join<CountingEquipmentEntity, ProductionOrderEntity> productionOrderJoin = countingEquipmentRoot.join("productionOrders");
-
-        Subquery<Long> subquery = query.subquery(Long.class);
-        Root<ProductionOrderEntity> subqueryRoot = subquery.from(ProductionOrderEntity.class);
-        subquery.select(cb.max(subqueryRoot.get("id")))
-                .where(cb.equal(subqueryRoot.get("equipment").get("id"), countingEquipmentRoot.get("id")));
-
-        query.select(countingEquipmentRoot)
-                .where(cb.and(
-                        cb.equal(productionOrderJoin.get("id"), subquery)),
-                        cb.equal(productionOrderJoin.get("isCompleted"), !forActiveProductionOrder)
-                );
-
-        List<CountingEquipmentEntity> results = entityManager.createQuery(query).getResultList();
-        return results;
-    }
+    @Query(value = "SELECT DISTINCT " +
+            "ce.id AS id, " +
+            "ce.code AS code, " +
+            "ce.alias AS alias, " +
+            "ce.section_id AS section, " +
+            "ce.equipment_status AS equipmentStatus, " +
+            "ce.p_timer_communication_cycle AS pTimerCommunicationCycle, " +
+            "CASE WHEN po.is_completed = false THEN true ELSE false END AS hasActiveProductionOrder " +
+            "FROM counting_equipment ce " +
+            "LEFT JOIN production_order po ON ce.id = po.equipment_id " +
+            "LEFT JOIN equipment_output eo ON eo.counting_equipment_id = ce.id " +
+            "ORDER BY ce.id", nativeQuery = true)
+    List<CountingEquipmentProjection> findAllWithProductionOrderStatus();
 }

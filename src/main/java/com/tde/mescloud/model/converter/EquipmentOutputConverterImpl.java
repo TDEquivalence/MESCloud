@@ -39,4 +39,18 @@ public class EquipmentOutputConverterImpl implements EquipmentOutputConverter {
 
         return equipmentOutputDto;
     }
+
+    @Override
+    public EquipmentOutputDto toDto(EquipmentOutputEntity entity) {
+
+        EquipmentOutputDto equipmentOutputDto = new EquipmentOutputDto();
+        equipmentOutputDto.setId(entity.getId());
+        equipmentOutputDto.setCode(entity.getCode());
+
+        if (entity.getAlias() != null) {
+            equipmentOutputDto.setAlias(entity.getAlias().getAlias());
+        }
+
+        return equipmentOutputDto;
+    }
 }

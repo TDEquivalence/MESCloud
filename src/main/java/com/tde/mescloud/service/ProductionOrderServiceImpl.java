@@ -6,7 +6,9 @@ import com.tde.mescloud.model.ProductionOrder;
 import com.tde.mescloud.model.converter.ProductionOrderConverter;
 import com.tde.mescloud.model.dto.ProductionOrderDto;
 import com.tde.mescloud.model.dto.ProductionOrderMqttDto;
+import com.tde.mescloud.model.entity.CountingEquipmentEntity;
 import com.tde.mescloud.model.entity.ProductionOrderEntity;
+import com.tde.mescloud.repository.CountingEquipmentRepository;
 import com.tde.mescloud.repository.ProductionOrderRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
@@ -26,13 +28,18 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     private static final String NEW_CODE_FORMAT = "%02d";
     private static final int CODE_VALUE_INDEX = 4;
 
+    private static final int EQUIPMENT_PAUSED_STATUS = 0;
+    private static final int EQUIPMENT_ACTIVE_STATUS = 1;
+
     private final ProductionOrderRepository repository;
     private final ProductionOrderConverter converter;
+    private final CountingEquipmentRepository countingEquipmentRepository;
     private final MqttClient mqttClient;
 
 
     @Override
     public ProductionOrder findByCode(String code) {
+        //TODO: use projection
         ProductionOrderEntity entity = repository.findByCode(code);
         return converter.convertToDomainObject(entity);
     }
@@ -44,17 +51,30 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     }
 
     @Override
-    @Transactional
-    public Optional<ProductionOrder> complete(long countingEquipmentId) {
-        Optional<ProductionOrderEntity> productionOrderEntityOpt = repository.findActive(countingEquipmentId);
+    public Optional<ProductionOrder> complete(long equipmentId) {
+
+        Optional<ProductionOrderEntity> productionOrderEntityOpt = repository.findActive(equipmentId);
         if (productionOrderEntityOpt.isEmpty()) {
+            //TODO: Handle & log error
+            return Optional.empty();
+        }
+
+        Optional<CountingEquipmentEntity> countingEquipmentOpt = countingEquipmentRepository.findById(equipmentId);
+        if(countingEquipmentOpt.isEmpty()) {
+            //TODO: Handle & log error
             return Optional.empty();
         }
 
         ProductionOrderEntity productionOrderEntity = productionOrderEntityOpt.get();
         productionOrderEntity.setCompleted(true);
-        ProductionOrderEntity persistedProductionOrderEntity = repository.save(productionOrderEntity);
-        ProductionOrder productionOrder = converter.convertToDomainObject(persistedProductionOrderEntity);
+        ProductionOrderEntity persistedProductionOrder = repository.save(productionOrderEntity);
+
+        CountingEquipmentEntity countingEquipmentEntity = countingEquipmentOpt.get();
+        countingEquipmentEntity.setEquipmentStatus(EQUIPMENT_PAUSED_STATUS);
+        countingEquipmentRepository.save(countingEquipmentEntity);
+
+        ProductionOrder productionOrder = converter.convertToDomainObject(persistedProductionOrder);
+
         return Optional.of(productionOrder);
     }
 
@@ -62,11 +82,20 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     @Transactional
     public ProductionOrder save(ProductionOrderDto productionOrderDto) {
 
+        Optional<CountingEquipmentEntity> countingEquipmentEntityOpt =
+                countingEquipmentRepository.findById(productionOrderDto.getEquipmentId());
+        if (countingEquipmentEntityOpt.isEmpty()) {
+            //TODO: Handle & log error
+            return null;
+        }
+
         ProductionOrderEntity productionOrderEntity = converter.convertToEntity(productionOrderDto);
         productionOrderEntity.setCreatedAt(new Date());
         productionOrderEntity.setCompleted(false);
         productionOrderEntity.setCode(generateCode());
         ProductionOrderEntity persistedProductionOrder = repository.save(productionOrderEntity);
+
+        countingEquipmentEntityOpt.get().setEquipmentStatus(EQUIPMENT_ACTIVE_STATUS);
 
         try {
             publishToPlc(persistedProductionOrder);

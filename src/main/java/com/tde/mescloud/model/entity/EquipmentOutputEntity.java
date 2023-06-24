@@ -15,7 +15,7 @@ public class EquipmentOutputEntity {
     @ManyToOne
     private CountingEquipmentEntity countingEquipment;
     private String code;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "equipment_output_alias_id")
     private EquipmentOutputAliasEntity alias;
 }

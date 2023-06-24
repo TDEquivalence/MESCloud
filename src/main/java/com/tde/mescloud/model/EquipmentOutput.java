@@ -10,7 +10,7 @@ import lombok.Setter;
 public class EquipmentOutput {
 
     private long id;
-    private CountingEquipment countingEquipment;
+    private long countingEquipmentId;
     private String code;
     private String alias;
 }

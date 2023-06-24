@@ -1,23 +1,17 @@
 package com.tde.mescloud.model.converter;
 
 import com.tde.mescloud.constant.MqttDTOConstants;
-import com.tde.mescloud.model.CountingEquipment;
 import com.tde.mescloud.model.ProductionOrder;
-import com.tde.mescloud.model.dto.CountingEquipmentDto;
 import com.tde.mescloud.model.dto.ProductionOrderDto;
 import com.tde.mescloud.model.dto.ProductionOrderMqttDto;
 import com.tde.mescloud.model.entity.CountingEquipmentEntity;
 import com.tde.mescloud.model.entity.ProductionOrderEntity;
-import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Component;
 
 @Component
-@AllArgsConstructor
 @Log
 public class ProductionOrderConverterImpl implements ProductionOrderConverter {
-
-    private CountingEquipmentConverter countingEquipmentConverter;
 
 
     @Override
@@ -35,8 +29,7 @@ public class ProductionOrderConverterImpl implements ProductionOrderConverter {
         productionOrder.setWashingProcess(entity.getWashingProcess());
 
         if (entity.getEquipment() != null) {
-            CountingEquipment countingEquipment = countingEquipmentConverter.convertToDomainObject(entity.getEquipment());
-            productionOrder.setEquipment(countingEquipment);
+            productionOrder.setCountingEquipmentId(entity.getEquipment().getId());
         }
 
         return productionOrder;
@@ -56,8 +49,7 @@ public class ProductionOrderConverterImpl implements ProductionOrderConverter {
         productionOrderDto.setCategory(productionOrder.getCategory());
         productionOrderDto.setWashingProcess(productionOrder.getWashingProcess());
 
-        CountingEquipmentDto countingEquipmentDto = countingEquipmentConverter.convertToDto(productionOrder.getEquipment());
-        productionOrderDto.setEquipment(countingEquipmentDto);
+        productionOrderDto.setEquipmentId(productionOrderDto.getEquipmentId());
 
         return productionOrderDto;
     }
@@ -76,8 +68,8 @@ public class ProductionOrderConverterImpl implements ProductionOrderConverter {
         productionOrderEntity.setCategory(productionOrderDto.getCategory());
         productionOrderEntity.setWashingProcess(productionOrderDto.getWashingProcess());
 
-        CountingEquipmentEntity countingEquipmentEntity =
-                countingEquipmentConverter.convertToEntity(productionOrderDto.getEquipment());
+        CountingEquipmentEntity countingEquipmentEntity = new CountingEquipmentEntity();
+        countingEquipmentEntity.setId(productionOrderDto.getId());
         productionOrderEntity.setEquipment(countingEquipmentEntity);
 
         return productionOrderEntity;

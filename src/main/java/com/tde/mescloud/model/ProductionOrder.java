@@ -12,7 +12,7 @@ import java.util.Date;
 public class ProductionOrder {
 
     private long id;
-    private CountingEquipment equipment;
+    private Long countingEquipmentId;
     private String code;
     private int targetAmount;
     //TODO: Implement productionInstruction

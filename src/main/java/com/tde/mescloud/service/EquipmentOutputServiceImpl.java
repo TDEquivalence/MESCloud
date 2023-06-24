@@ -24,9 +24,4 @@ public class EquipmentOutputServiceImpl implements EquipmentOutputService {
         EquipmentOutputEntity entity = repository.findByCode(equipmentOutputCode);
         return converter.convertToDomainObject(entity);
     }
-
-    public String getOutputAlias(String equipmentOutputCode) {
-        //TODO: Implement
-        return "TestAlias";
-    }
 }

@@ -1,11 +1,9 @@
 package com.tde.mescloud.model.converter;
 
-import com.tde.mescloud.model.CountingEquipment;
-import com.tde.mescloud.model.EquipmentOutput;
 import com.tde.mescloud.model.dto.CountingEquipmentDto;
 import com.tde.mescloud.model.dto.EquipmentOutputDto;
 import com.tde.mescloud.model.entity.CountingEquipmentEntity;
-import com.tde.mescloud.model.entity.ProductionOrderEntity;
+import com.tde.mescloud.repository.CountingEquipmentProjection;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Component;
@@ -19,49 +17,34 @@ public class CountingEquipmentConverterImpl implements CountingEquipmentConverte
 
     private final EquipmentOutputConverter equipmentOutputConverter;
 
-    public CountingEquipment convertToDomainObject(CountingEquipmentEntity entity) {
-        CountingEquipment countingEquipment = new CountingEquipment();
-        countingEquipment.setId(entity.getId());
-        countingEquipment.setAlias(entity.getAlias());
-        countingEquipment.setCode(entity.getCode());
-        countingEquipment.setPTimerCommunicationCycle(entity.getPTimerCommunicationCycle());
-        countingEquipment.setEquipmentStatus(entity.getEquipmentStatus());
 
-        List<EquipmentOutput> equipmentOutputs = equipmentOutputConverter.convertToDomainObject(entity.getOutputs());
-        countingEquipment.setOutputs(equipmentOutputs);
+    @Override
+    public CountingEquipmentDto toDto(CountingEquipmentEntity entity) {
 
-        List<ProductionOrderEntity> productionOrders = entity.getProductionOrders();
-        if (productionOrders != null && productionOrders.size() > 0) {
-            ProductionOrderEntity lastProductionOrder = productionOrders.get(productionOrders.size() - 1);
-            countingEquipment.setHasActiveProductionOrder(!lastProductionOrder.isCompleted());
-        }
-
-        return countingEquipment;
-    }
-
-    public CountingEquipmentDto convertToDto(CountingEquipment countingEquipment) {
         CountingEquipmentDto countingEquipmentDto = new CountingEquipmentDto();
-        countingEquipmentDto.setId(countingEquipment.getId());
-        countingEquipmentDto.setAlias(countingEquipment.getAlias());
-        countingEquipmentDto.setCode(countingEquipment.getCode());
-        countingEquipmentDto.setPTimerCommunicationCycle(countingEquipment.getPTimerCommunicationCycle());
-        countingEquipmentDto.setEquipmentStatus(countingEquipment.getEquipmentStatus());
-        countingEquipmentDto.setHasActiveProductionOrder(countingEquipment.isHasActiveProductionOrder());
+        countingEquipmentDto.setId(entity.getId());
+        countingEquipmentDto.setCode(entity.getCode());
+        countingEquipmentDto.setAlias(entity.getAlias());
+        countingEquipmentDto.setEquipmentStatus(entity.getEquipmentStatus());
+        countingEquipmentDto.setPTimerCommunicationCycle(entity.getPTimerCommunicationCycle());
 
-        List<EquipmentOutputDto> equipmentOutputDtos = equipmentOutputConverter.convertToDto(countingEquipment.getOutputs());
+        List<EquipmentOutputDto> equipmentOutputDtos = equipmentOutputConverter.toDto(entity.getOutputs());
         countingEquipmentDto.setOutputs(equipmentOutputDtos);
 
         return countingEquipmentDto;
     }
 
     @Override
-    public CountingEquipmentEntity convertToEntity(CountingEquipmentDto countingEquipmentDto) {
-        CountingEquipmentEntity countingEquipmentEntity = new CountingEquipmentEntity();
-        countingEquipmentEntity.setId(countingEquipmentDto.getId());
-        countingEquipmentEntity.setEquipmentStatus(countingEquipmentDto.getEquipmentStatus());
-        countingEquipmentEntity.setCode(countingEquipmentDto.getCode());
-        countingEquipmentEntity.setAlias(countingEquipmentDto.getAlias());
-        countingEquipmentEntity.setPTimerCommunicationCycle(countingEquipmentDto.getPTimerCommunicationCycle());
-        return countingEquipmentEntity;
+    public CountingEquipmentDto toDto(CountingEquipmentProjection projection) {
+
+        CountingEquipmentDto dto = new CountingEquipmentDto();
+        dto.setId(projection.getId());
+        dto.setCode(projection.getCode());
+        dto.setAlias(projection.getAlias());
+        dto.setEquipmentStatus(projection.getEquipmentStatus());
+        dto.setPTimerCommunicationCycle(projection.getPTimerCommunicationCycle());
+        dto.setHasActiveProductionOrder(projection.isHasActiveProductionOrder());
+
+        return dto;
     }
 }

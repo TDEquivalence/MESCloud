@@ -1,13 +1,13 @@
 package com.tde.mescloud.service;
 
-import com.tde.mescloud.model.CountingEquipment;
+import com.tde.mescloud.model.dto.CountingEquipmentDto;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface CountingEquipmentService {
 
-    List<CountingEquipment> findAll();
+    List<CountingEquipmentDto> findAll();
 
-    Optional<CountingEquipment> findById(long id);
+    Optional<CountingEquipmentDto> findById(long id);
 }

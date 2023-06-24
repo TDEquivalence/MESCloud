@@ -1,39 +1,22 @@
 package com.tde.mescloud.model.converter;
 
-import com.tde.mescloud.model.CountingEquipment;
 import com.tde.mescloud.model.dto.CountingEquipmentDto;
 import com.tde.mescloud.model.entity.CountingEquipmentEntity;
+import com.tde.mescloud.repository.CountingEquipmentProjection;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 public interface CountingEquipmentConverter {
 
-    CountingEquipment convertToDomainObject(CountingEquipmentEntity countingEquipmentEntity);
+    CountingEquipmentDto toDto(CountingEquipmentEntity entity);
 
-    default List<CountingEquipment> convertToDomainObject(Iterable<CountingEquipmentEntity> countingEquipmentEntities) {
+    CountingEquipmentDto toDto(CountingEquipmentProjection projection);
 
-        List<CountingEquipment> countingEquipments = new ArrayList<>();
-        for (CountingEquipmentEntity countingEquipmentEntity : countingEquipmentEntities) {
-            CountingEquipment countingEquipment = convertToDomainObject(countingEquipmentEntity);
-            countingEquipments.add(countingEquipment);
-        }
-
-        return countingEquipments;
+    default List<CountingEquipmentDto> projectionToDto(Iterable<CountingEquipmentProjection> entities) {
+        return StreamSupport.stream(entities.spliterator(), false)
+                .map(this::toDto)
+                .collect(Collectors.toList());
     }
-
-    CountingEquipmentDto convertToDto(CountingEquipment countingEquipment);
-
-    default List<CountingEquipmentDto> convertToDto(Iterable<CountingEquipment> countingEquipments) {
-
-        List<CountingEquipmentDto> countingEquipmentDtos = new ArrayList<>();
-        for (CountingEquipment countingEquipment : countingEquipments) {
-            CountingEquipmentDto countingEquipmentDto = convertToDto(countingEquipment);
-            countingEquipmentDtos.add(countingEquipmentDto);
-        }
-
-        return countingEquipmentDtos;
-    }
-
-    CountingEquipmentEntity convertToEntity(CountingEquipmentDto countingEquipmentDto);
 }

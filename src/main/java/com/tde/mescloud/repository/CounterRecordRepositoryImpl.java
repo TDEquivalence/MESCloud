@@ -20,6 +20,7 @@ import java.util.List;
 @AllArgsConstructor
 @Repository
 public class CounterRecordRepositoryImpl {
+
     private EntityManager entityManager;
 
     private static final String ID_PROP = "id";

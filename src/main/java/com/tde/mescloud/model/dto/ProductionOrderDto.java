@@ -10,7 +10,7 @@ import java.util.Date;
 public class ProductionOrderDto {
 
     private long id;
-    private CountingEquipmentDto equipment;
+    private long equipmentId;
     private String code;
     private int targetAmount;
     private Date createdAt;

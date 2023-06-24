@@ -1,8 +1,5 @@
 package com.tde.mescloud.api.rest;
 
-import com.tde.mescloud.model.CountingEquipment;
-import com.tde.mescloud.model.converter.CountingEquipmentConverter;
-import com.tde.mescloud.model.converter.ProductionOrderConverter;
 import com.tde.mescloud.model.dto.CountingEquipmentDto;
 import com.tde.mescloud.service.CountingEquipmentService;
 import com.tde.mescloud.service.ProductionOrderService;
@@ -23,30 +20,26 @@ import java.util.Optional;
 public class CountingEquipmentController {
 
     private CountingEquipmentService countingEquipmentService;
-    private CountingEquipmentConverter countingEquipmentConverter;
     private ProductionOrderService productionOrderService;
-    private ProductionOrderConverter productionOrderConverter;
 
     @GetMapping
-    public ResponseEntity<List<CountingEquipmentDto>> getEquipments() {
-        List<CountingEquipment> countingEquipments = countingEquipmentService.findAll();
-        List<CountingEquipmentDto> countingEquipmentDtos = countingEquipmentConverter.convertToDto(countingEquipments);
-        return new ResponseEntity<>(countingEquipmentDtos, HttpStatus.OK);
+    public ResponseEntity<List<CountingEquipmentDto>> findAll() {
+        List<CountingEquipmentDto> countingEquipments = countingEquipmentService.findAll();
+        return new ResponseEntity<>(countingEquipments, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<CountingEquipmentDto> findById(@PathVariable long id) {
-        Optional<CountingEquipment> countingEquipmentOpt = countingEquipmentService.findById(id);
+        Optional<CountingEquipmentDto> countingEquipmentOpt = countingEquipmentService.findById(id);
         if (countingEquipmentOpt.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        CountingEquipment countingEquipment = countingEquipmentOpt.get();
-        CountingEquipmentDto countingEquipmentDto = countingEquipmentConverter.convertToDto(countingEquipment);
-
+        CountingEquipmentDto countingEquipment = countingEquipmentOpt.get();
+        //TODO: This can be removed using Projections. Consider changing the entity...
         boolean hasActiveProductionOrder = productionOrderService.hasActiveProductionOrder(countingEquipment.getId());
-        countingEquipmentDto.setHasActiveProductionOrder(hasActiveProductionOrder);
+        countingEquipment.setHasActiveProductionOrder(hasActiveProductionOrder);
 
-        return new ResponseEntity<>(countingEquipmentDto, HttpStatus.OK);
+        return new ResponseEntity<>(countingEquipment, HttpStatus.OK);
     }
 }
