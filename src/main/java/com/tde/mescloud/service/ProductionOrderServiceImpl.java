@@ -36,7 +36,6 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
 
     @Override
     public ProductionOrderDto findByCode(String code) {
-        //TODO: use projection
         ProductionOrderEntity entity = repository.findByCode(code);
         return converter.toDto(entity);
     }
