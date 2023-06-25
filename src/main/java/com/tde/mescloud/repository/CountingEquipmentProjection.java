@@ -12,6 +12,6 @@ public interface CountingEquipmentProjection {
     SectionEntity getSection();
     int getEquipmentStatus();
     int getPTimerCommunicationCycle();
-    boolean isHasActiveProductionOrder();
+    String getProductionOrderCode();
     List<EquipmentOutputEntity> getOutputs();
 }

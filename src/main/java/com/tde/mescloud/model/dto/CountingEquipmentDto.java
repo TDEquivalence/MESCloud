@@ -13,7 +13,7 @@ public class CountingEquipmentDto {
     private String code;
     private String alias;
     private int equipmentStatus;
-    private boolean hasActiveProductionOrder;
+    private String productionOrderCode;
     private int pTimerCommunicationCycle;
     private List<EquipmentOutputDto> outputs;
 }

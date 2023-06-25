@@ -35,11 +35,6 @@ public class CountingEquipmentController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        CountingEquipmentDto countingEquipment = countingEquipmentOpt.get();
-        //TODO: This can be removed using Projections. Consider changing the entity...
-        boolean hasActiveProductionOrder = productionOrderService.hasActiveProductionOrder(countingEquipment.getId());
-        countingEquipment.setHasActiveProductionOrder(hasActiveProductionOrder);
-
-        return new ResponseEntity<>(countingEquipment, HttpStatus.OK);
+        return new ResponseEntity<>(countingEquipmentOpt.get(), HttpStatus.OK);
     }
 }
