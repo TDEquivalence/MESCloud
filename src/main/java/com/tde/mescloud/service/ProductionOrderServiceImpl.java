@@ -13,7 +13,6 @@ import com.tde.mescloud.repository.ProductionOrderRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -27,9 +26,6 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     private static final String CODE_PREFIX = "PO";
     private static final String NEW_CODE_FORMAT = "%02d";
     private static final int CODE_VALUE_INDEX = 4;
-
-    private static final int EQUIPMENT_PAUSED_STATUS = 0;
-    private static final int EQUIPMENT_ACTIVE_STATUS = 1;
 
     private final ProductionOrderRepository repository;
     private final ProductionOrderConverter converter;
@@ -54,15 +50,15 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     @Override
     public Optional<ProductionOrderDto> complete(long equipmentId) {
 
-        Optional<ProductionOrderEntity> productionOrderEntityOpt = repository.findActive(equipmentId);
-        if (productionOrderEntityOpt.isEmpty()) {
-            //TODO: Handle & log error
+        Optional<CountingEquipmentEntity> countingEquipmentOpt = countingEquipmentRepository.findById(equipmentId);
+        if(countingEquipmentOpt.isEmpty()) {
+            log.warning(() -> String.format("Unable to find an Equipment with id [%s]", equipmentId));
             return Optional.empty();
         }
 
-        Optional<CountingEquipmentEntity> countingEquipmentOpt = countingEquipmentRepository.findById(equipmentId);
-        if(countingEquipmentOpt.isEmpty()) {
-            //TODO: Handle & log error
+        Optional<ProductionOrderEntity> productionOrderEntityOpt = repository.findActive(equipmentId);
+        if (productionOrderEntityOpt.isEmpty()) {
+            log.warning(() -> String.format("No active Production Order found for an Equipment with id [%s]", equipmentId));
             return Optional.empty();
         }
 
@@ -71,8 +67,6 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         ProductionOrderEntity persistedProductionOrder = repository.save(productionOrderEntity);
 
         CountingEquipmentEntity countingEquipmentEntity = countingEquipmentOpt.get();
-        //TODO: Check who controls equipment status
-        countingEquipmentEntity.setEquipmentStatus(EQUIPMENT_PAUSED_STATUS);
         countingEquipmentRepository.save(countingEquipmentEntity);
 
         ProductionOrderDto productionOrder = converter.toDto(persistedProductionOrder);
@@ -86,7 +80,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         Optional<CountingEquipmentEntity> countingEquipmentEntityOpt =
                 countingEquipmentRepository.findById(productionOrder.getEquipmentId());
         if (countingEquipmentEntityOpt.isEmpty()) {
-            //TODO: Log error
+            log.warning(() -> String.format("Unable to find Equipment with id [%s]", productionOrder.getEquipmentId()));
             return Optional.empty();
         }
 
@@ -96,12 +90,11 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         productionOrderEntity.setCode(generateCode());
 
         CountingEquipmentEntity countingEquipmentEntity = countingEquipmentEntityOpt.get();
-        //TODO: Check who controls equipment status
-        countingEquipmentEntity.setEquipmentStatus(EQUIPMENT_ACTIVE_STATUS);
         countingEquipmentEntity.setId(productionOrder.getEquipmentId());
         productionOrderEntity.setEquipment(countingEquipmentEntity);
 
         ProductionOrderEntity persistedProductionOrder = repository.save(productionOrderEntity);
+
         try {
             //TODO: remove to MesProtocolProcess level
             publishToPlc(persistedProductionOrder);

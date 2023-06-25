@@ -26,6 +26,7 @@ public class CounterRecordProcess extends AbstractMesProtocolProcess<EquipmentCo
         }
         counterRecordService.save(equipmentCountsMqttDTO);
 
+        //TODO: Update equipment status
         //TODO: Check for alert needs
            //Counter values are the same for 3 consecutive counts
            //Equipment status is not 1

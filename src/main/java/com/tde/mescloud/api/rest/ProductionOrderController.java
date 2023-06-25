@@ -20,18 +20,19 @@ public class ProductionOrderController {
     @PostMapping
     public ResponseEntity<ProductionOrderDto> save(@RequestBody ProductionOrderDto requestProductionOrder) {
         Optional<ProductionOrderDto> productionOrderOpt = productionOrderService.save(requestProductionOrder);
-        return handleResponse(productionOrderOpt);
-    }
+        if (productionOrderOpt.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        return new ResponseEntity<>(productionOrderOpt.get(), HttpStatus.OK);    }
 
     @PostMapping("{countingEquipmentId}/complete")
     public ResponseEntity<ProductionOrderDto> complete(@PathVariable long countingEquipmentId) {
         Optional<ProductionOrderDto> productionOrderOpt = productionOrderService.complete(countingEquipmentId);
-        return handleResponse(productionOrderOpt);
-    }
+        if (productionOrderOpt.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
 
-    private ResponseEntity<ProductionOrderDto> handleResponse(Optional<ProductionOrderDto> productionOrderOpt) {
-        return productionOrderOpt.isEmpty() ?
-                new ResponseEntity<>(HttpStatus.BAD_REQUEST) :
-                new ResponseEntity<>(productionOrderOpt.get(), HttpStatus.OK);
+        return new ResponseEntity<>(productionOrderOpt.get(), HttpStatus.OK);
     }
 }

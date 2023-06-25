@@ -20,6 +20,6 @@ import com.tde.mescloud.constant.MqttDTOConstants;
 public interface MqttDto {
 
     String getJsonType();
-    //TODO: Check if this property should be declared at interface level, abstract class level, or not declared at all
+
     String getEquipmentCode();
 }

@@ -75,7 +75,6 @@ public class CounterRecordServiceImpl implements CounterRecordService {
         return counterRecord;
     }
 
-    //TODO: Discuss MQTT Protocol -> MC-80 .2
     private void setEquipmentOutput(CounterRecordEntity counterRecord, String equipmentOutputCode) {
         EquipmentOutputDto equipmentOutput = equipmentOutputService.findByCode(equipmentOutputCode);
         EquipmentOutputEntity equipmentOutputEntity = new EquipmentOutputEntity();
@@ -85,7 +84,6 @@ public class CounterRecordServiceImpl implements CounterRecordService {
         counterRecord.setEquipmentOutputAlias(equipmentOutput.getAlias());
     }
 
-    //TODO: Discuss MQTT Protocol -> MC-80 .2
     private void setProductionOrder(CounterRecordEntity counterRecord, String productionOrderCode) {
         ProductionOrderDto productionOrder = productionOrderService.findByCode(productionOrderCode);
         ProductionOrderEntity productionOrderEntity = new ProductionOrderEntity();

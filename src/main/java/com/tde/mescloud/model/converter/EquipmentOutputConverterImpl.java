@@ -17,7 +17,6 @@ public class EquipmentOutputConverterImpl implements EquipmentOutputConverter {
         equipmentOutputDto.setCode(entity.getCode());
 
         if (entity.getAlias() != null) {
-            //TODO: Improve alias naming -> getAlias().getName();
             equipmentOutputDto.setAlias(entity.getAlias().getAlias());
         }
 
