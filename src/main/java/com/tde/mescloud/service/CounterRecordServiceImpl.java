@@ -52,7 +52,7 @@ public class CounterRecordServiceImpl implements CounterRecordService {
 
     @Override
     public void save(EquipmentCountsMqttDto equipmentCountsMqttDto) {
-
+        //TODO: if there's no PO, save without po
         List<CounterRecordEntity> counterRecords = new ArrayList<>(equipmentCountsMqttDto.getCounters().length);
         for (CounterMqttDto counterMqttDto : equipmentCountsMqttDto.getCounters()) {
             CounterRecordEntity counterRecord = extractCounterRecordEntity(counterMqttDto, equipmentCountsMqttDto);
@@ -85,10 +85,14 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     }
 
     private void setProductionOrder(CounterRecordEntity counterRecord, String productionOrderCode) {
-        ProductionOrderDto productionOrder = productionOrderService.findByCode(productionOrderCode);
+        //TODO: Work with optionals. If there's no PO, set the value to null
+        Optional<ProductionOrderDto> productionOrder = productionOrderService.findByCode(productionOrderCode);
         ProductionOrderEntity productionOrderEntity = new ProductionOrderEntity();
-        productionOrderEntity.setId(productionOrder.getId());
-
+        if (productionOrder.isEmpty()) {
+            productionOrderEntity.setId(null);
+        } else {
+            productionOrderEntity.setId(productionOrder.get().getId());
+        }
         counterRecord.setProductionOrder(productionOrderEntity);
     }
 
@@ -135,14 +139,14 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     }
 
     public boolean areValidInitialCounts(String productionOrderCode) {
-        ProductionOrderEntity productionOrderEntity = productionOrderRepository.findByCode(productionOrderCode);
-        return productionOrderEntity != null &&
-                repository.findLast(productionOrderEntity.getId()).isEmpty();
+        Optional<ProductionOrderEntity> productionOrderOpt = productionOrderRepository.findByCode(productionOrderCode);
+        return productionOrderOpt.isPresent() &&
+                repository.findLast(productionOrderOpt.get().getId()).isEmpty();
     }
 
     public boolean areValidContinuationCounts(String productionOrderCode) {
-        ProductionOrderEntity productionOrderEntity = productionOrderRepository.findByCode(productionOrderCode);
-        return productionOrderEntity != null &&
-                repository.findLast(productionOrderEntity.getId()).isPresent();
+        Optional<ProductionOrderEntity> productionOrderOpt = productionOrderRepository.findByCode(productionOrderCode);
+        return productionOrderOpt.isPresent() &&
+                repository.findLast(productionOrderOpt.get().getId()).isPresent();
     }
 }

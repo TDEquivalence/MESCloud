@@ -6,7 +6,7 @@ import java.util.Optional;
 
 public interface ProductionOrderService {
 
-    ProductionOrderDto findByCode(String code);
+    Optional<ProductionOrderDto> findByCode(String code);
 
     String generateCode();
 

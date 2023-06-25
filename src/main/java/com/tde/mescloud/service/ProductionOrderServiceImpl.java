@@ -35,9 +35,14 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
 
 
     @Override
-    public ProductionOrderDto findByCode(String code) {
-        ProductionOrderEntity entity = repository.findByCode(code);
-        return converter.toDto(entity);
+    public Optional<ProductionOrderDto> findByCode(String code) {
+        Optional<ProductionOrderEntity> persistedProductionOrderOpt = repository.findByCode(code);
+        if (persistedProductionOrderOpt.isEmpty()) {
+            return Optional.empty();
+        }
+
+        ProductionOrderDto productionOrder = converter.toDto(persistedProductionOrderOpt.get());
+        return Optional.of(productionOrder);
     }
 
     @Override
@@ -116,7 +121,11 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     }
 
     private int calculateNewCodeValue() {
+        //TODO: Refactor
         ProductionOrderEntity productionOrderEntity = repository.findTopByOrderByIdDesc();
+        if (productionOrderEntity == null) {
+            return 1;
+        }
         String lastValueAsString = productionOrderEntity.getCode().substring(CODE_VALUE_INDEX);
         int lastCodeValue = Integer.parseInt(lastValueAsString);
         return ++lastCodeValue;

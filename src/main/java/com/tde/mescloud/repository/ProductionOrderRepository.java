@@ -10,7 +10,7 @@ import java.util.Optional;
 @Repository
 public interface ProductionOrderRepository extends JpaRepository<ProductionOrderEntity, Long> {
 
-    ProductionOrderEntity findByCode(String equipmentOutputCode);
+    Optional<ProductionOrderEntity> findByCode(String equipmentOutputCode);
 
     ProductionOrderEntity findTopByOrderByIdDesc();
 
