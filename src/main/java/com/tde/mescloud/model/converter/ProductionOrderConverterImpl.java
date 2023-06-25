@@ -29,13 +29,13 @@ public class ProductionOrderConverterImpl implements ProductionOrderConverter {
     }
 
     @Override
-    public ProductionOrderMqttDto toMqttDto(ProductionOrderEntity entity) {
+    public ProductionOrderMqttDto toMqttDto(ProductionOrderEntity entity, boolean isEquipmentEnabled) {
 
         ProductionOrderMqttDto mqttDto = new ProductionOrderMqttDto();
         mqttDto.setJsonType(MqttDTOConstants.PRODUCTION_ORDER_DTO_NAME);
         mqttDto.setProductionOrderCode(entity.getCode());
         mqttDto.setTargetAmount(entity.getTargetAmount());
-        mqttDto.setEquipmentEnabled(entity.isEquipmentEnabled());
+        mqttDto.setEquipmentEnabled(isEquipmentEnabled);
 
         if (entity.getEquipment() != null) {
             mqttDto.setEquipmentCode(entity.getEquipment().getCode());

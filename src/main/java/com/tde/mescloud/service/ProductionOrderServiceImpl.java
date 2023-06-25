@@ -74,7 +74,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         countingEquipmentRepository.save(countingEquipmentEntity);
 
         ProductionOrderDto productionOrder = converter.toDto(persistedProductionOrder);
-
+        //TODO: Publish to plc, equipment enabled = false
         return Optional.of(productionOrder);
     }
 
@@ -137,7 +137,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     }
 
     private void publishToPlc(ProductionOrderEntity productionOrderEntity) throws MesMqttException {
-        ProductionOrderMqttDto productionOrderMqttDto = converter.toMqttDto(productionOrderEntity);
+        ProductionOrderMqttDto productionOrderMqttDto = converter.toMqttDto(productionOrderEntity, true);
         mqttClient.publish(mqttSettings.getProtCountPlcTopic(), productionOrderMqttDto);
     }
 }

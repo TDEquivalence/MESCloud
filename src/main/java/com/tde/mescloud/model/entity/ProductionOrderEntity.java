@@ -21,7 +21,6 @@ public class ProductionOrderEntity {
     private CountingEquipmentEntity equipment;
     private int targetAmount;
     private boolean isCompleted;
-    private boolean isEquipmentEnabled;
     private Date createdAt;
     @OneToMany(mappedBy = "productionOrder")
     private List<ProductionInstructionEntity> productionInstructions;

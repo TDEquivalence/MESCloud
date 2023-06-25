@@ -9,7 +9,7 @@ public interface ProductionOrderConverter {
 
     ProductionOrderEntity toEntity(ProductionOrderDto productionOrderDto);
 
-    ProductionOrderMqttDto toMqttDto(ProductionOrderEntity productionOrderDto);
+    ProductionOrderMqttDto toMqttDto(ProductionOrderEntity productionOrderDto, boolean isEquipmentEnabled);
 
     ProductionOrderDto toDto(ProductionOrderEntity entity);
 }
