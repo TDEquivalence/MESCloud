@@ -7,8 +7,8 @@ import lombok.Setter;
 @Setter
 public class EquipmentCountsMqttDto extends AbstractMqttDto {
 
-    private String productionOrderCode;
     private String equipmentCode;
+    private String productionOrderCode;
     private int equipmentStatus;
     private CounterMqttDto[] counters;
 }

@@ -7,8 +7,8 @@ import lombok.Setter;
 @Setter
 public class ProductionOrderMqttDto extends AbstractMqttDto {
 
-    private String productionOrderCode;
     private String equipmentCode;
+    private String productionOrderCode;
     private int targetAmount;
     private boolean isEquipmentEnabled;
 }
