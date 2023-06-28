@@ -31,7 +31,7 @@ public class AuthenticationController {
     @PostMapping("/login")
     public ResponseEntity<AuthenticationResponse> login(@RequestBody AuthenticateRequest request, HttpServletResponse response) {
         AuthenticationResponse authenticationResponse = authenticationService.authenticate(request);
-        HttpHeaders headers = authenticationService.getJwtHeader(authenticationResponse);
-        return new ResponseEntity<>(authenticationResponse, headers, HttpStatus.OK);
+        authenticationService.setJwtTokenCookie(authenticationResponse, response);
+        return new ResponseEntity<>(authenticationResponse, HttpStatus.OK);
     }
 }

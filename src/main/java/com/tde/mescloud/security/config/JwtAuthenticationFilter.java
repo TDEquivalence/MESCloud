@@ -3,6 +3,7 @@ package com.tde.mescloud.security.config;
 import com.tde.mescloud.security.repository.TokenRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -16,9 +17,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Optional;
 
 import static com.tde.mescloud.security.constant.SecurityConstant.TOKEN_PREFIX;
-import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 @Component
 @RequiredArgsConstructor
@@ -30,16 +32,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
-        final String authHeader = request.getHeader(AUTHORIZATION);
+        final String jwtToken = getJwtTokenFromCookie(request);
         final String username;
-        final String jwtToken;
 
-        if(authHeader == null ||!authHeader.startsWith(TOKEN_PREFIX)) {
+        if(jwtToken == null) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        jwtToken = authHeader.substring(TOKEN_PREFIX.length());
         username = jwtTokenService.extractUsername(jwtToken);
 
         if(username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
@@ -60,5 +60,31 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
             filterChain.doFilter(request, response);
         }
+    }
+
+    public String getJwtTokenFromCookie(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            Optional<Cookie> jwtTokenCookie = Arrays.stream(cookies)
+                    .filter(cookie -> cookie.getName().equals("jwtToken"))
+                    .findFirst();
+            if (jwtTokenCookie.isPresent()) {
+                String cookieValue = jwtTokenCookie.get().getValue();
+                return extractJwtTokenValue(cookieValue);
+            }
+        }
+        return null;
+    }
+
+    public String extractJwtTokenValue(String jwtTokenCookie) {
+        String[] cookieParts = jwtTokenCookie.split(";");
+
+        for (String cookiePart : cookieParts) {
+            String trimmedCookiePart = cookiePart.trim();
+            if (trimmedCookiePart.startsWith("jwtToken=")) {
+                return trimmedCookiePart.substring("jwtToken=".length());
+            }
+        }
+        return null;
     }
 }

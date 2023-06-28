@@ -12,6 +12,8 @@ import com.tde.mescloud.security.model.token.TokenType;
 import com.tde.mescloud.security.repository.TokenRepository;
 import com.tde.mescloud.security.repository.UserRepository;
 import com.tde.mescloud.security.role.Role;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -84,12 +86,13 @@ public class AuthenticationService {
         }
     }
 
-    public HttpHeaders getJwtHeader(AuthenticationResponse authenticationResponse) {
+    public void setJwtTokenCookie(AuthenticationResponse authenticationResponse, HttpServletResponse response) {
         UserEntity user = userRepository.findUserByUsername(authenticationResponse.getUsername());
         String jwtToken = jwtTokenService.generateToken(user);
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(JWT_TOKEN_HEADER, jwtToken);
-        return headers;
+        Cookie cookie = new Cookie("jwtToken", jwtToken);
+        cookie.setSecure(false);
+        cookie.setHttpOnly(true);
+        response.addCookie(cookie);
     }
 
     private AuthenticationResponse userToAuthenticationResponse(UserEntity userEntity) {
