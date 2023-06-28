@@ -1,7 +1,6 @@
 package com.tde.mescloud.security.service;
 
 import com.tde.mescloud.model.entity.UserEntity;
-import com.tde.mescloud.security.config.JwtTokenService;
 import com.tde.mescloud.security.exception.UsernameExistException;
 import com.tde.mescloud.security.mapper.EntityDtoMapper;
 import com.tde.mescloud.security.model.auth.AuthenticateRequest;
@@ -15,7 +14,6 @@ import com.tde.mescloud.security.role.Role;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -24,7 +22,6 @@ import org.springframework.stereotype.Service;
 import java.util.Date;
 import java.util.List;
 
-import static com.tde.mescloud.security.constant.SecurityConstant.JWT_TOKEN_HEADER;
 import static com.tde.mescloud.security.constant.UserServiceImpConstant.USERNAME_ALREADY_EXISTS;
 
 @Service
@@ -90,7 +87,8 @@ public class AuthenticationService {
         UserEntity user = userRepository.findUserByUsername(authenticationResponse.getUsername());
         String jwtToken = jwtTokenService.generateToken(user);
         Cookie cookie = new Cookie("jwtToken", jwtToken);
-        cookie.setSecure(false);
+        cookie.setPath("/");
+        cookie.setSecure(true);
         cookie.setHttpOnly(true);
         response.addCookie(cookie);
     }

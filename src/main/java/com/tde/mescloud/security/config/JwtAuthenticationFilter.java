@@ -1,6 +1,7 @@
 package com.tde.mescloud.security.config;
 
 import com.tde.mescloud.security.repository.TokenRepository;
+import com.tde.mescloud.security.service.JwtTokenService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -19,8 +20,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Optional;
-
-import static com.tde.mescloud.security.constant.SecurityConstant.TOKEN_PREFIX;
 
 @Component
 @RequiredArgsConstructor
