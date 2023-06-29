@@ -3,6 +3,7 @@ package com.tde.mescloud.api.rest;
 import com.tde.mescloud.model.dto.UserDto;
 import com.tde.mescloud.security.exception.UserNotFoundException;
 import com.tde.mescloud.service.UserService;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

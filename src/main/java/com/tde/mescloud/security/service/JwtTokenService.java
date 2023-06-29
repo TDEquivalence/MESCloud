@@ -1,4 +1,4 @@
-package com.tde.mescloud.security.config;
+package com.tde.mescloud.security.service;
 
 import com.tde.mescloud.security.constant.SecurityConstant;
 import io.jsonwebtoken.Claims;
@@ -6,6 +6,9 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -15,6 +18,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
+
+import static com.tde.mescloud.security.constant.SecurityConstant.COOKIE_TOKEN_NAME;
 
 @Service
 public class JwtTokenService {
@@ -71,5 +76,27 @@ public class JwtTokenService {
     private Key getSigningKey() {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);
+    }
+
+    public String getJwtTokenFromCookie(Cookie[] cookies) {
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals(COOKIE_TOKEN_NAME)) {
+                    return cookie.getValue();
+                }
+            }
+        }
+        return null;
+    }
+
+    public boolean isTokenInCookie(Cookie[] cookies) {
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals(COOKIE_TOKEN_NAME)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }
