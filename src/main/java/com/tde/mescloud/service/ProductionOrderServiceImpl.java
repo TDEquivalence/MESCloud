@@ -74,7 +74,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         countingEquipmentRepository.save(countingEquipmentEntity);
 
         ProductionOrderDto productionOrder = converter.toDto(persistedProductionOrder);
-        //TODO: Publish to plc, equipment enabled = false
+        //TODO: Publish to plc, equipment enabled = false; productionOrder: ""
         return Optional.of(productionOrder);
     }
 
