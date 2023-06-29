@@ -82,7 +82,7 @@ public class SecurityConfig {
         config.setAllowedHeaders(Collections.singletonList("*"));
         config.addExposedHeader("Access-Control-Allow-Origin");
         config.addExposedHeader("Access-Control-Allow-Headers");
-        config.addExposedHeader(JWT_TOKEN_HEADER);
+        //config.addExposedHeader(JWT_TOKEN_HEADER);
         config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

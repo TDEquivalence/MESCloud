@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import java.util.Date;
 import java.util.List;
 
+import static com.tde.mescloud.security.constant.SecurityConstant.TOKEN_PREFIX;
 import static com.tde.mescloud.security.constant.UserServiceImpConstant.USERNAME_ALREADY_EXISTS;
 
 @Service
