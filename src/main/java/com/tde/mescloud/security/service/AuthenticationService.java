@@ -87,6 +87,8 @@ public class AuthenticationService {
         UserEntity user = userRepository.findUserByUsername(authenticationResponse.getUsername());
         String jwtToken = jwtTokenService.generateToken(user);
         Cookie cookie = new Cookie("jwtToken", jwtToken);
+        int cookieMaxAgeInSeconds = 86400; // 86400 seconds = 1 day
+        cookie.setMaxAge(cookieMaxAgeInSeconds);
         cookie.setPath("/");
         cookie.setSecure(true);
         cookie.setHttpOnly(true);

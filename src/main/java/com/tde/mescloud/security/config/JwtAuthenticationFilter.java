@@ -18,8 +18,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -64,24 +62,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     public String getJwtTokenFromCookie(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
-            Optional<Cookie> jwtTokenCookie = Arrays.stream(cookies)
-                    .filter(cookie -> cookie.getName().equals("jwtToken"))
-                    .findFirst();
-            if (jwtTokenCookie.isPresent()) {
-                String cookieValue = jwtTokenCookie.get().getValue();
-                return extractJwtTokenValue(cookieValue);
-            }
-        }
-        return null;
-    }
-
-    public String extractJwtTokenValue(String jwtTokenCookie) {
-        String[] cookieParts = jwtTokenCookie.split(";");
-
-        for (String cookiePart : cookieParts) {
-            String trimmedCookiePart = cookiePart.trim();
-            if (trimmedCookiePart.startsWith("jwtToken=")) {
-                return trimmedCookiePart.substring("jwtToken=".length());
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals("jwtToken")) {
+                    return cookie.getValue();
+                }
             }
         }
         return null;
