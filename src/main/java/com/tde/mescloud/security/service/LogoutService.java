@@ -10,6 +10,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.stereotype.Service;
 
+import static com.tde.mescloud.security.constant.SecurityConstant.COOKIE_TOKEN_NAME;
+
 @Service
 @RequiredArgsConstructor
 public class LogoutService implements LogoutHandler {
@@ -27,12 +29,27 @@ public class LogoutService implements LogoutHandler {
         }
 
         jwtToken  = jwtTokenService.getJwtTokenFromCookie(cookies);
+        removeCookie(request, response);
         TokenEntity storedToken = tokenRepository.findByToken(jwtToken)
                 .orElse(null);
         if(storedToken != null) {
             storedToken.setExpired(true);
             storedToken.setRevoked(true);
             tokenRepository.save(storedToken);
+        }
+    }
+
+    public void removeCookie(HttpServletRequest request, HttpServletResponse response) {
+        Cookie[] cookies = request.getCookies();
+
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals(COOKIE_TOKEN_NAME)) {
+                    cookie.setMaxAge(0);
+                    cookie.setPath("/");
+                    response.addCookie(cookie);
+                }
+            }
         }
     }
 }
