@@ -14,7 +14,7 @@ public interface CounterRecordService {
 
     List<CounterRecordDto> findAllByCriteria(CounterRecordFilterDto filterDto);
 
-    void save(EquipmentCountsMqttDto equipmentCountsMqttDTO);
+    List<CounterRecordDto> save(EquipmentCountsMqttDto equipmentCountsMqttDTO);
 
     boolean areValidInitialCounts(String productionOrderCode);
 

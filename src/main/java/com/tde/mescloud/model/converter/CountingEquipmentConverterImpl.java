@@ -6,6 +6,7 @@ import com.tde.mescloud.model.entity.CountingEquipmentEntity;
 import com.tde.mescloud.repository.CountingEquipmentProjection;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -16,6 +17,7 @@ import java.util.List;
 public class CountingEquipmentConverterImpl implements CountingEquipmentConverter {
 
     private final EquipmentOutputConverter equipmentOutputConverter;
+    private final ModelMapper mapper;
 
 
     @Override
@@ -49,5 +51,40 @@ public class CountingEquipmentConverterImpl implements CountingEquipmentConverte
 //        dto.setOutputs(outputs);
 
         return dto;
+    }
+
+    @Override
+    public CountingEquipmentEntity toEntity(CountingEquipmentDto dto) {
+
+        CountingEquipmentEntity entity = new CountingEquipmentEntity();
+        entity.setId(dto.getId());
+        entity.setCode(dto.getCode());
+        entity.setEquipmentStatus(dto.getEquipmentStatus());
+        entity.setAlias(dto.getAlias());
+        entity.setPTimerCommunicationCycle(dto.getPTimerCommunicationCycle());
+
+//        if (dto.getOutputs() != null ) {
+//            equipmentOutputConverter.toEntity(dto.getOutputs());
+//        }
+//        entity.setOutputs();
+
+        return entity;
+    }
+
+
+    public CountingEquipmentDto convertToDto(CountingEquipmentEntity factoryEntity) {
+        return mapper.map(factoryEntity, CountingEquipmentDto.class);
+    }
+
+    public CountingEquipmentEntity convertToEntity(CountingEquipmentDto factoryDto) {
+        return (factoryDto == null) ? null : mapper.map(factoryDto, CountingEquipmentEntity.class);
+    }
+
+    public List<CountingEquipmentDto> convertToDto(List<CountingEquipmentEntity> factoryEntityList) {
+        return factoryEntityList.stream().map(this::convertToDto).toList();
+    }
+
+    public List<CountingEquipmentEntity> convertToEntity(List<CountingEquipmentDto> factoryDtoList) {
+        return factoryDtoList.stream().map(this::convertToEntity).toList();
     }
 }

@@ -2,6 +2,7 @@ package com.tde.mescloud.service;
 
 import com.tde.mescloud.model.converter.CountingEquipmentConverter;
 import com.tde.mescloud.model.dto.CountingEquipmentDto;
+import com.tde.mescloud.model.entity.CountingEquipmentEntity;
 import com.tde.mescloud.repository.CountingEquipmentProjection;
 import com.tde.mescloud.repository.CountingEquipmentRepository;
 import lombok.AllArgsConstructor;
@@ -33,5 +34,24 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
 
         CountingEquipmentDto counterRecordDto = converter.toDto(entityOpt.get());
         return Optional.of(counterRecordDto);
+    }
+
+    @Override
+    public Optional<CountingEquipmentDto> findByCode(String code) {
+        Optional<CountingEquipmentEntity> countingEquipmentOpt = repository.findByCode(code);
+        if(countingEquipmentOpt.isEmpty()) {
+            //TODO: Log
+            return Optional.empty();
+        }
+
+        CountingEquipmentDto countingEquipmentDto = converter.toDto(countingEquipmentOpt.get());
+        return Optional.of(countingEquipmentDto);
+    }
+
+    @Override
+    public CountingEquipmentDto save(CountingEquipmentDto countingEquipment) {
+        CountingEquipmentEntity countingEquipmentEntity = converter.convertToEntity(countingEquipment);
+        CountingEquipmentEntity persistedCountingEquipment = repository.save(countingEquipmentEntity);
+        return converter.convertToDto(persistedCountingEquipment);
     }
 }

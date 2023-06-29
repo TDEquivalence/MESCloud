@@ -3,6 +3,7 @@ package com.tde.mescloud.service;
 import com.tde.mescloud.model.converter.CounterRecordConverter;
 import com.tde.mescloud.model.dto.*;
 import com.tde.mescloud.model.entity.CounterRecordEntity;
+import com.tde.mescloud.model.entity.CountingEquipmentEntity;
 import com.tde.mescloud.model.entity.EquipmentOutputEntity;
 import com.tde.mescloud.model.entity.ProductionOrderEntity;
 import com.tde.mescloud.repository.CounterRecordRepository;
@@ -31,6 +32,8 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     private final ProductionOrderService productionOrderService;
     private final ProductionOrderRepository productionOrderRepository;
 
+    private final CountingEquipmentService countingEquipmentService;
+
 
     @Override
     public List<CounterRecordDto> findAll() {
@@ -50,16 +53,33 @@ public class CounterRecordServiceImpl implements CounterRecordService {
         return converter.toDto(counterRecordEntities);
     }
 
+    private boolean isValid(EquipmentCountsMqttDto equipmentCounts) {
+        equipmentCounts.getEquipmentCode();
+        Optional<CountingEquipmentDto> countingEquipmentOpt =
+                countingEquipmentService.findByCode(equipmentCounts.getEquipmentCode());
+        if (countingEquipmentOpt.isEmpty()) {
+            return false;
+        }
+
+        return equipmentCounts.getCounters().length == countingEquipmentOpt.get().getOutputs().size();
+    }
+
     @Override
-    public void save(EquipmentCountsMqttDto equipmentCountsMqttDto) {
+    public List<CounterRecordDto> save(EquipmentCountsMqttDto equipmentCountsMqttDto) {
         //TODO: if there's no PO, save without po
+        if (!isValid(equipmentCountsMqttDto)) {
+            //TODO: Log
+            return null;
+        }
+
         List<CounterRecordEntity> counterRecords = new ArrayList<>(equipmentCountsMqttDto.getCounters().length);
         for (CounterMqttDto counterMqttDto : equipmentCountsMqttDto.getCounters()) {
             CounterRecordEntity counterRecord = extractCounterRecordEntity(counterMqttDto, equipmentCountsMqttDto);
             counterRecords.add(counterRecord);
         }
 
-        repository.saveAll(counterRecords);
+        Iterable<CounterRecordEntity> counterRecordEntities = repository.saveAll(counterRecords);
+        return converter.toDto(counterRecordEntities);
     }
 
     private CounterRecordEntity extractCounterRecordEntity(CounterMqttDto counterDto, EquipmentCountsMqttDto equipmentCountsDto) {
@@ -76,10 +96,14 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     }
 
     private void setEquipmentOutput(CounterRecordEntity counterRecord, String equipmentOutputCode) {
-        EquipmentOutputDto equipmentOutput = equipmentOutputService.findByCode(equipmentOutputCode);
+        Optional<EquipmentOutputDto> equipmentOutputOpt = equipmentOutputService.findByCode(equipmentOutputCode);
+        if (equipmentOutputOpt.isEmpty()) {
+            return;
+        }
+
+        EquipmentOutputDto equipmentOutput = equipmentOutputOpt.get();
         EquipmentOutputEntity equipmentOutputEntity = new EquipmentOutputEntity();
         equipmentOutputEntity.setId(equipmentOutput.getId());
-
         counterRecord.setEquipmentOutput(equipmentOutputEntity);
         counterRecord.setEquipmentOutputAlias(equipmentOutput.getAlias());
     }

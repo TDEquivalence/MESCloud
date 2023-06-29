@@ -7,6 +7,8 @@ import com.tde.mescloud.repository.EquipmentOutputRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @AllArgsConstructor
 public class EquipmentOutputServiceImpl implements EquipmentOutputService {
@@ -16,8 +18,15 @@ public class EquipmentOutputServiceImpl implements EquipmentOutputService {
 
 
     @Override
-    public EquipmentOutputDto findByCode(String equipmentOutputCode) {
-        EquipmentOutputEntity entity = repository.findByCode(equipmentOutputCode);
-        return converter.toDto(entity);
+    public Optional<EquipmentOutputDto> findByCode(String equipmentOutputCode) {
+
+        Optional<EquipmentOutputEntity> entity = repository.findByCode(equipmentOutputCode);
+        if (entity.isEmpty()) {
+            //TODO: Add logs
+            return Optional.empty();
+        }
+
+        EquipmentOutputDto equipmentOutput = converter.toDto(entity.get());
+        return Optional.of(equipmentOutput);
     }
 }

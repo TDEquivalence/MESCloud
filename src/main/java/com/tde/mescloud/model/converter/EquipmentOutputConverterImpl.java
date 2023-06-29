@@ -22,4 +22,10 @@ public class EquipmentOutputConverterImpl implements EquipmentOutputConverter {
 
         return equipmentOutputDto;
     }
+
+    @Override
+    public EquipmentOutputEntity toEntity(EquipmentOutputDto dto) {
+        //TODO: remove
+        return null;
+    }
 }

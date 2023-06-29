@@ -10,6 +10,8 @@ import java.util.Optional;
 
 public interface CountingEquipmentRepository extends CrudRepository<CountingEquipmentEntity, Long> {
 
+    Optional<CountingEquipmentEntity> findByCode(String code);
+
     @Query(value = "SELECT DISTINCT ON (ce.id) " +
             "ce.id AS id, " +
             "ce.code AS code, " +

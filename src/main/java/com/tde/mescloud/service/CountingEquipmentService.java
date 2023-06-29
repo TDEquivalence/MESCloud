@@ -10,4 +10,8 @@ public interface CountingEquipmentService {
     List<CountingEquipmentDto> findAll();
 
     Optional<CountingEquipmentDto> findById(long id);
+
+    Optional<CountingEquipmentDto> findByCode(String code);
+
+    CountingEquipmentDto save(CountingEquipmentDto countingEquipment);
 }

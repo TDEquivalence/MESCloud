@@ -19,4 +19,10 @@ public interface CountingEquipmentConverter {
                 .map(this::toDto)
                 .collect(Collectors.toList());
     }
+
+    CountingEquipmentEntity toEntity(CountingEquipmentDto dto);
+
+    CountingEquipmentDto convertToDto(CountingEquipmentEntity entity);
+
+    CountingEquipmentEntity convertToEntity(CountingEquipmentDto dto);
 }
