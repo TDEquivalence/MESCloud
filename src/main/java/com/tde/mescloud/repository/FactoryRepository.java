@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface FactoryRepository extends JpaRepository<FactoryEntity, Long> {
 
-    FactoryEntity findByFactoryId(Long id);
+    FactoryEntity findFactoryById(Long id);
     FactoryEntity findByName(String name);
 }
