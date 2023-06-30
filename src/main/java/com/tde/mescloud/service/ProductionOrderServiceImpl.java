@@ -1,6 +1,7 @@
 package com.tde.mescloud.service;
 
 import com.tde.mescloud.api.mqtt.MqttClient;
+import com.tde.mescloud.constant.MqttDTOConstants;
 import com.tde.mescloud.exception.MesMqttException;
 import com.tde.mescloud.model.converter.ProductionOrderConverter;
 import com.tde.mescloud.model.dto.ProductionOrderDto;
@@ -70,11 +71,20 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         productionOrderEntity.setCompleted(true);
         ProductionOrderEntity persistedProductionOrder = repository.save(productionOrderEntity);
 
-        CountingEquipmentEntity countingEquipmentEntity = countingEquipmentOpt.get();
-        countingEquipmentRepository.save(countingEquipmentEntity);
-
         ProductionOrderDto productionOrder = converter.toDto(persistedProductionOrder);
-        //TODO: Publish to plc, equipment enabled = false
+
+        try {
+            ProductionOrderMqttDto productionOrderMqttDto = new ProductionOrderMqttDto();
+            productionOrderMqttDto.setJsonType(MqttDTOConstants.PRODUCTION_ORDER_INIT_DTO_NAME);
+            productionOrderMqttDto.setEquipmentEnabled(false);
+            productionOrderMqttDto.setProductionOrderCode("");
+            productionOrderMqttDto.setTargetAmount(0);
+            productionOrderMqttDto.setEquipmentCode(countingEquipmentOpt.get().getCode());
+            mqttClient.publish(mqttSettings.getProtCountPlcTopic(), productionOrderMqttDto);
+        } catch (MesMqttException e) {
+            log.severe(() -> String.format("Unable to publish Order Completion to PLC for equipment [%s]", equipmentId));
+        }
+
         return Optional.of(productionOrder);
     }
 

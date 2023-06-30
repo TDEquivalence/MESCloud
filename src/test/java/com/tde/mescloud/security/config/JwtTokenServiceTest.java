@@ -2,6 +2,7 @@ package com.tde.mescloud.security.config;
 
 import com.tde.mescloud.model.entity.UserEntity;
 import com.tde.mescloud.security.role.Role;
+import com.tde.mescloud.security.service.JwtTokenService;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;

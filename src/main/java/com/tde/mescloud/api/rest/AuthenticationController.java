@@ -7,7 +7,6 @@ import com.tde.mescloud.security.model.auth.RegisterRequest;
 import com.tde.mescloud.security.service.AuthenticationService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,7 +30,7 @@ public class AuthenticationController {
     @PostMapping("/login")
     public ResponseEntity<AuthenticationResponse> login(@RequestBody AuthenticateRequest request, HttpServletResponse response) {
         AuthenticationResponse authenticationResponse = authenticationService.authenticate(request);
-        HttpHeaders headers = authenticationService.getJwtHeader(authenticationResponse);
-        return new ResponseEntity<>(authenticationResponse, headers, HttpStatus.OK);
+        authenticationService.setJwtTokenCookie(authenticationResponse, response);
+        return new ResponseEntity<>(authenticationResponse, HttpStatus.OK);
     }
 }
