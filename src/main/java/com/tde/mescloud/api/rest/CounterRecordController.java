@@ -18,13 +18,7 @@ public class CounterRecordController {
 
     private final CounterRecordService service;
     private final CounterRecordConverter converter;
-
-
-    @GetMapping
-    public ResponseEntity<List<CounterRecordDto>> getCounterRecords() {
-        List<CounterRecordDto> counterRecords = service.findAll();
-        return new ResponseEntity<>(counterRecords, HttpStatus.OK);
-    }
+    
 
     @PostMapping("/filter")
     public ResponseEntity<List<CounterRecordDto>> findAllByCriteria(@RequestBody CounterRecordFilterDto filter) {

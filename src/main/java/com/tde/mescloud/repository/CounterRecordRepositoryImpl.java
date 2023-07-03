@@ -13,6 +13,7 @@ import jakarta.persistence.criteria.*;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Timestamp;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,23 +46,15 @@ public class CounterRecordRepositoryImpl {
         CriteriaQuery<CounterRecordEntity> criteriaQuery = criteriaBuilder.createQuery(CounterRecordEntity.class);
         Root<CounterRecordEntity> root = criteriaQuery.from(CounterRecordEntity.class);
 
-        Subquery<Long> countSubquery = criteriaQuery.subquery(Long.class);
-        Root<CounterRecordEntity> countSubqueryRoot = countSubquery.from(CounterRecordEntity.class);
-        countSubquery.select(criteriaBuilder.count(countSubqueryRoot.get(ID_PROP)));
-        countSubquery.where(
-                criteriaBuilder.and(
-                        criteriaBuilder.equal(root.get(EQUIPMENT_OUTPUT_PROP), countSubqueryRoot.get(EQUIPMENT_OUTPUT_PROP)),
-                        criteriaBuilder.greaterThan(countSubqueryRoot.get(REGISTERED_AT_PROP), root.get(REGISTERED_AT_PROP))
-                )
-        );
+        Path<Timestamp> registeredAtPath = root.get("registeredAt");
+        Order order = criteriaBuilder.desc(registeredAtPath);
 
         List<Predicate> predicates = new ArrayList<>();
         addPredicates(filterDto, predicates, criteriaBuilder, root);
 
         List<Order> orders = new ArrayList<>();
         addSortOrders(filterDto.getSort(), orders, criteriaBuilder, root);
-        orders.add(criteriaBuilder.asc(countSubquery));
-        orders.add(criteriaBuilder.asc(root.get(EQUIPMENT_OUTPUT_PROP).get(ID_PROP)));
+        orders.add(order);
 
         EntityGraph<CounterRecordEntity> entityGraph = entityManager.createEntityGraph(CounterRecordEntity.class);
         entityGraph.addSubgraph(PRODUCTION_ORDER_PROP);
