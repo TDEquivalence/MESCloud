@@ -1,30 +1,32 @@
 package com.tde.mescloud.api.rest;
 
-import com.tde.mescloud.model.entity.FactoryEntity;
-import com.tde.mescloud.repository.FactoryRepository;
+import com.tde.mescloud.model.dto.FactoryDto;
+import com.tde.mescloud.service.FactoryService;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/factory")
+@RequestMapping("api/factory")
+@AllArgsConstructor
 public class FactoryController {
 
-    private FactoryRepository factoryRepository;
+    private final FactoryService factoryService;
 
-    public FactoryController(FactoryRepository factoryRepository) {
-        this.factoryRepository = factoryRepository;
+    @GetMapping("/{id}")
+    public ResponseEntity<FactoryDto> getFactoryById(@PathVariable("id") Long id) {
+        FactoryDto factoryDto = factoryService.getFactoryById(id);
+        if (factoryDto != null) {
+            return ResponseEntity.ok(factoryDto);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
-    @GetMapping("/save")
-    public ResponseEntity<String> save() {
-        FactoryEntity factoryEntity = new FactoryEntity();
-        factoryEntity.setName("testFactory");
-
-        factoryRepository.save(factoryEntity);
-
-        return new ResponseEntity<>("Saved", HttpStatus.OK);
+    @PostMapping("/save")
+    public ResponseEntity<FactoryDto> saveFactory(@RequestBody FactoryDto factoryDto) {
+        FactoryDto savedFactoryDto = factoryService.saveFactory(factoryDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedFactoryDto);
     }
 }
