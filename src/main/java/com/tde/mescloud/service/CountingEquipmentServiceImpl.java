@@ -28,7 +28,7 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
     public Optional<CountingEquipmentDto> findById(long id) {
 
         Optional<CountingEquipmentProjection> entityOpt = repository.findProjectionById(id);
-        if(entityOpt.isEmpty()) {
+        if (entityOpt.isEmpty()) {
             return Optional.empty();
         }
 
@@ -39,12 +39,12 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
     @Override
     public Optional<CountingEquipmentDto> findByCode(String code) {
         Optional<CountingEquipmentEntity> countingEquipmentOpt = repository.findByCode(code);
-        if(countingEquipmentOpt.isEmpty()) {
+        if (countingEquipmentOpt.isEmpty()) {
             //TODO: Log
             return Optional.empty();
         }
 
-        CountingEquipmentDto countingEquipmentDto = converter.toDto(countingEquipmentOpt.get());
+        CountingEquipmentDto countingEquipmentDto = converter.convertToDto(countingEquipmentOpt.get());
         return Optional.of(countingEquipmentDto);
     }
 

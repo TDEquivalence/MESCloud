@@ -10,6 +10,7 @@ import java.util.List;
 public class CountingEquipmentDto {
 
     private long id;
+    private long sectionId;
     private String code;
     private String alias;
     private int equipmentStatus;

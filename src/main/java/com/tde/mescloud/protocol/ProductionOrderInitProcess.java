@@ -37,7 +37,8 @@ public class ProductionOrderInitProcess extends AbstractMesProtocolProcess<Equip
             return;
         }
 
-        Optional<CountingEquipmentDto> countingEquipmentOpt = equipmentService.findByCode(equipmentCounts.getEquipmentCode());
+        Optional<CountingEquipmentDto> countingEquipmentOpt =
+                equipmentService.findByCode(equipmentCounts.getEquipmentCode());
         if (countingEquipmentOpt.isEmpty()) {
             return;
             //TODO: handle exception
