@@ -15,13 +15,13 @@ public class CounterRecordEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "equipment_output_id")
     private EquipmentOutputEntity equipmentOutput;
     private String equipmentOutputAlias;
     private int realValue;
     private int computedValue;
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "production_order_id")
     private ProductionOrderEntity productionOrder;
     @Temporal(TemporalType.TIMESTAMP)

@@ -56,17 +56,12 @@ public class CounterRecordRepositoryImpl {
         addSortOrders(filterDto.getSort(), orders, criteriaBuilder, root);
         orders.add(order);
 
-        EntityGraph<CounterRecordEntity> entityGraph = entityManager.createEntityGraph(CounterRecordEntity.class);
-        entityGraph.addSubgraph(PRODUCTION_ORDER_PROP);
-        entityGraph.addSubgraph(EQUIPMENT_OUTPUT_PROP).addSubgraph(COUNTING_EQUIPMENT_PROP);
-
         criteriaQuery.select(root)
                 .distinct(true)
                 .where(criteriaBuilder.and(predicates.toArray(new Predicate[0])))
                 .orderBy(orders);
 
         return entityManager.createQuery(criteriaQuery)
-                .setHint(JAKARTA_FETCHGRAPH, entityGraph)
                 .setFirstResult(filterDto.getSkip())
                 .setMaxResults(filterDto.getTake() + 1)
                 .getResultList();
@@ -123,7 +118,7 @@ public class CounterRecordRepositoryImpl {
             Predicate predicate;
             switch (search.getId()) {
                 case COMPUTED_VALUE_PROP ->
-                        predicate = criteriaBuilder.equal(counterRecordRoot.get(COMPUTED_VALUE_PROP), search.getValue());
+                        predicate = criteriaBuilder.greaterThanOrEqualTo(counterRecordRoot.get(COMPUTED_VALUE_PROP), search.getValue());
                 case DATE_START_FILTER_FIELD -> {
                     ZonedDateTime dateStart = ZonedDateTime.parse(search.getValue());
                     predicate = criteriaBuilder.greaterThanOrEqualTo(counterRecordRoot.get(REGISTERED_AT_PROP), dateStart);
@@ -135,15 +130,15 @@ public class CounterRecordRepositoryImpl {
                 default -> {
                     Path<?> path = getPath(counterRecordRoot, search.getId());
                     String value = SQL_WILDCARD + search.getValue().toUpperCase() + SQL_WILDCARD;
-                    predicate = createLikePredicate(path, value, criteriaBuilder);
+                    predicate = createEqualPredicate(path, value, criteriaBuilder);
                 }
             }
             predicates.add(predicate);
         }
     }
 
-    private Predicate createLikePredicate(Path<?> path, String value, CriteriaBuilder criteriaBuilder) {
-        return criteriaBuilder.like(criteriaBuilder.upper(path.as(String.class)), value);
+    private Predicate createEqualPredicate(Path<?> path, String value, CriteriaBuilder criteriaBuilder) {
+        return criteriaBuilder.equal(criteriaBuilder.upper(path.as(String.class)), value);
     }
 
     private void addSortOrders(CounterRecordSortDto[] sortList, List<Order> orders, CriteriaBuilder criteriaBuilder, Root<CounterRecordEntity> counterRecordRoot) {
