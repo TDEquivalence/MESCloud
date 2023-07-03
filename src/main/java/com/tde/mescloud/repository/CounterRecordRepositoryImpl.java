@@ -130,14 +130,14 @@ public class CounterRecordRepositoryImpl {
                 default -> {
                     Path<?> path = getPath(counterRecordRoot, search.getId());
                     String value = SQL_WILDCARD + search.getValue().toUpperCase() + SQL_WILDCARD;
-                    predicate = createEqualPredicate(path, value, criteriaBuilder);
+                    predicate = createLikePredicate(path, value, criteriaBuilder);
                 }
             }
             predicates.add(predicate);
         }
     }
 
-    private Predicate createEqualPredicate(Path<?> path, String value, CriteriaBuilder criteriaBuilder) {
+    private Predicate createLikePredicate(Path<?> path, String value, CriteriaBuilder criteriaBuilder) {
         return criteriaBuilder.equal(criteriaBuilder.upper(path.as(String.class)), value);
     }
 
