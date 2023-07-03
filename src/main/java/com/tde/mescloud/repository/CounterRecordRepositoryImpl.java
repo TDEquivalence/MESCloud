@@ -61,6 +61,7 @@ public class CounterRecordRepositoryImpl {
         entityGraph.addSubgraph(EQUIPMENT_OUTPUT_PROP).addSubgraph(COUNTING_EQUIPMENT_PROP);
 
         criteriaQuery.select(root)
+                .distinct(true)
                 .where(criteriaBuilder.and(predicates.toArray(new Predicate[0])))
                 .orderBy(orders);
 
