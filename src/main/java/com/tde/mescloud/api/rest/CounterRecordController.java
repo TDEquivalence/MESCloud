@@ -3,6 +3,7 @@ package com.tde.mescloud.api.rest;
 import com.tde.mescloud.model.converter.CounterRecordConverter;
 import com.tde.mescloud.model.dto.CounterRecordDto;
 import com.tde.mescloud.model.dto.CounterRecordFilterDto;
+import com.tde.mescloud.model.dto.PaginatedCounterRecordsDto;
 import com.tde.mescloud.service.CounterRecordService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,12 +19,12 @@ public class CounterRecordController {
 
     private final CounterRecordService service;
     private final CounterRecordConverter converter;
-    
+
 
     @PostMapping("/filter")
-    public ResponseEntity<List<CounterRecordDto>> findAllByCriteria(@RequestBody CounterRecordFilterDto filter) {
-        List<CounterRecordDto> counterRecords = service.findAllByCriteria(filter);
-        return new ResponseEntity<>(counterRecords, HttpStatus.OK);
+    public ResponseEntity<PaginatedCounterRecordsDto> getFilteredAndPaginated(@RequestBody CounterRecordFilterDto filter) {
+        PaginatedCounterRecordsDto paginatedCounterRecords = service.getFilteredAndPaginated(filter);
+        return new ResponseEntity<>(paginatedCounterRecords, HttpStatus.OK);
     }
 
     @PostMapping("/completion")

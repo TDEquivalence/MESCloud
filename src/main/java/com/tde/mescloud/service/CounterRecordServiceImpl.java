@@ -48,9 +48,24 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     }
 
     @Override
-    public List<CounterRecordDto> findAllByCriteria(CounterRecordFilterDto filterDto) {
+    public PaginatedCounterRecordsDto getFilteredAndPaginated(CounterRecordFilterDto filterDto) {
+        int requestedRecords = filterDto.getTake();
+        filterDto.setTake(filterDto.getTake() + 1);
+
         List<CounterRecordEntity> counterRecordEntities = repository.findByCriteria(filterDto);
-        return converter.toDto(counterRecordEntities);
+        boolean hasNextPage = counterRecordEntities.size() > requestedRecords;
+
+        if (hasNextPage) {
+            counterRecordEntities.remove(counterRecordEntities.size() - 1);
+        }
+
+        List<CounterRecordDto> counterRecords = converter.toDto(counterRecordEntities);
+
+        PaginatedCounterRecordsDto paginatedCounterRecords = new PaginatedCounterRecordsDto();
+        paginatedCounterRecords.setHasNextPage(hasNextPage);
+        paginatedCounterRecords.setCounterRecords(counterRecords);
+
+        return paginatedCounterRecords;
     }
 
     private boolean isValid(EquipmentCountsMqttDto equipmentCounts) {

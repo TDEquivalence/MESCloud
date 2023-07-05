@@ -3,6 +3,7 @@ package com.tde.mescloud.service;
 import com.tde.mescloud.model.dto.CounterRecordDto;
 import com.tde.mescloud.model.dto.CounterRecordFilterDto;
 import com.tde.mescloud.model.dto.EquipmentCountsMqttDto;
+import com.tde.mescloud.model.dto.PaginatedCounterRecordsDto;
 
 import java.util.List;
 
@@ -12,7 +13,7 @@ public interface CounterRecordService {
 
     List<CounterRecordDto> findLastPerProductionOrder(CounterRecordFilterDto filterDto);
 
-    List<CounterRecordDto> findAllByCriteria(CounterRecordFilterDto filterDto);
+    PaginatedCounterRecordsDto getFilteredAndPaginated(CounterRecordFilterDto filterDto);
 
     List<CounterRecordDto> save(EquipmentCountsMqttDto equipmentCountsMqttDTO);
 
