@@ -56,12 +56,17 @@ public class CounterRecordRepositoryImpl {
         addSortOrders(filterDto.getSort(), orders, criteriaBuilder, root);
         orders.add(order);
 
+        EntityGraph<CounterRecordEntity> entityGraph = entityManager.createEntityGraph(CounterRecordEntity.class);
+        entityGraph.addSubgraph(PRODUCTION_ORDER_PROP);
+        entityGraph.addSubgraph(EQUIPMENT_OUTPUT_PROP).addSubgraph(COUNTING_EQUIPMENT_PROP);
+
         criteriaQuery.select(root)
                 .distinct(true)
                 .where(criteriaBuilder.and(predicates.toArray(new Predicate[0])))
                 .orderBy(orders);
 
         return entityManager.createQuery(criteriaQuery)
+                .setHint(JAKARTA_FETCHGRAPH, entityGraph)
                 .setFirstResult(filterDto.getSkip())
                 .setMaxResults(filterDto.getTake() + 1)
                 .getResultList();
@@ -129,7 +134,7 @@ public class CounterRecordRepositoryImpl {
                 }
                 default -> {
                     Path<?> path = getPath(counterRecordRoot, search.getId());
-                    String value = SQL_WILDCARD + search.getValue().toUpperCase() + SQL_WILDCARD;
+                    String value = search.getValue().toUpperCase();
                     predicate = createLikePredicate(path, value, criteriaBuilder);
                 }
             }
@@ -138,7 +143,7 @@ public class CounterRecordRepositoryImpl {
     }
 
     private Predicate createLikePredicate(Path<?> path, String value, CriteriaBuilder criteriaBuilder) {
-        return criteriaBuilder.equal(criteriaBuilder.upper(path.as(String.class)), value);
+        return criteriaBuilder.like(criteriaBuilder.upper(path.as(String.class)), value.toUpperCase());
     }
 
     private void addSortOrders(CounterRecordSortDto[] sortList, List<Order> orders, CriteriaBuilder criteriaBuilder, Root<CounterRecordEntity> counterRecordRoot) {
