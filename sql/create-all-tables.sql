@@ -64,54 +64,62 @@ CREATE TABLE section (
 );
 
 CREATE TABLE counting_equipment (
-	id int GENERATED ALWAYS AS IDENTITY,
-	code varchar(20) UNIQUE NOT NULL,
-	alias varchar(100),
-	section_id int,
-	equipment_status int,
-	p_timer_communication_cycle int,
+    id int GENERATED ALWAYS AS IDENTITY,
+    code varchar(20) UNIQUE NOT NULL,
+    alias varchar(100),
+    section_id int,
+    equipment_status int,
+    p_timer_communication_cycle int,
 
-	PRIMARY KEY(id),
-	FOREIGN KEY(section_id) REFERENCES section(id)
+    PRIMARY KEY(id),
+    FOREIGN KEY(section_id) REFERENCES section(id)
 );
+
+CREATE INDEX idx_counting_equipment_section_id ON counting_equipment (section_id);
 
 CREATE TABLE equipment_output_alias (
-	id int GENERATED ALWAYS AS IDENTITY,
-	alias varchar(100) UNIQUE,
+    id int GENERATED ALWAYS AS IDENTITY,
+    alias varchar(100) UNIQUE,
 
-	PRIMARY KEY(id)
+    PRIMARY KEY(id)
 );
+
+CREATE INDEX idx_equipment_output_alias_alias ON equipment_output_alias (alias);
 
 CREATE TABLE equipment_output (
-	id int GENERATED ALWAYS AS IDENTITY,
-	counting_equipment_id int,
-	code varchar(20) UNIQUE NOT NULL,
-	equipment_output_alias_id int,
+    id int GENERATED ALWAYS AS IDENTITY,
+    counting_equipment_id int,
+    code varchar(20) UNIQUE NOT NULL,
+    equipment_output_alias_id int,
 
-	PRIMARY KEY(id),
-	FOREIGN KEY(equipment_output_alias_id) REFERENCES equipment_output_alias(id)
+    PRIMARY KEY(id),
+    FOREIGN KEY(equipment_output_alias_id) REFERENCES equipment_output_alias(id)
 );
+
+CREATE INDEX idx_equipment_output_code ON equipment_output (code);
 
 CREATE TABLE production_order (
-	id int GENERATED ALWAYS AS IDENTITY,
-	equipment_id int,
-	code varchar(20) UNIQUE NOT NULL,
-	target_amount int,
-	is_equipment_enabled boolean,
-	is_completed boolean,
-	created_at date,
-	input_batch varchar(100),
-	source varchar(100),
-	gauge varchar(100),
-	category varchar(100),
-	washing_process varchar(100),
+    id int GENERATED ALWAYS AS IDENTITY,
+    equipment_id int,
+    code varchar(20) UNIQUE NOT NULL,
+    target_amount int,
+    is_equipment_enabled boolean,
+    is_completed boolean,
+    created_at date,
+    input_batch varchar(100),
+    source varchar(100),
+    gauge varchar(100),
+    category varchar(100),
+    washing_process varchar(100),
 
-	PRIMARY KEY(id),
-	FOREIGN KEY(equipment_id) REFERENCES counting_equipment(id)
+    PRIMARY KEY(id),
+    FOREIGN KEY(equipment_id) REFERENCES counting_equipment(id)
 );
 
+CREATE INDEX idx_production_order_code ON production_order (code);
+
 CREATE TABLE production_instruction (
-	id int GENERATED ALWAYS AS IDENTITY,
+    id int GENERATED ALWAYS AS IDENTITY,
     instruction int,
     production_order_id int,
     created_at date,
@@ -123,25 +131,29 @@ CREATE TABLE production_instruction (
 );
 
 CREATE TABLE counter_record (
-	id int GENERATED ALWAYS AS IDENTITY,
-	equipment_output_id int,
-	equipment_output_alias varchar(100),
-	real_value int,
-	computed_value int,
-	production_order_id int,
-	registered_at timestamp,
+    id int GENERATED ALWAYS AS IDENTITY,
+    equipment_output_id int,
+    equipment_output_alias varchar(100),
+    real_value int,
+    computed_value int,
+    production_order_id int,
+    registered_at timestamp,
 
-	PRIMARY KEY(id),
-	FOREIGN KEY(equipment_output_id) REFERENCES equipment_output(id),
-	FOREIGN KEY(production_order_id) REFERENCES production_order(id)
+    PRIMARY KEY(id),
+    FOREIGN KEY(equipment_output_id) REFERENCES equipment_output(id),
+    FOREIGN KEY(production_order_id) REFERENCES production_order(id)
 );
 
-CREATE TABLE equipment_status_record (
-	id int GENERATED ALWAYS AS IDENTITY,
-	counting_equipment_id int,
-	equipment_status int,
-	registered_at date,
+CREATE INDEX idx_counter_record_equipment_output_id ON counter_record (equipment_output_id);
+CREATE INDEX idx_counter_record_production_order_id ON counter_record (production_order_id);
+CREATE INDEX idx_counter_record_registered_at ON counter_record (registered_at);
 
-	PRIMARY KEY(id),
-	FOREIGN KEY(counting_equipment_id) REFERENCES counting_equipment(id)
+CREATE TABLE equipment_status_record (
+    id int GENERATED ALWAYS AS IDENTITY,
+    counting_equipment_id int,
+    equipment_status int,
+    registered_at date,
+
+    PRIMARY KEY(id),
+    FOREIGN KEY(counting_equipment_id) REFERENCES counting_equipment(id)
 );

@@ -112,7 +112,7 @@ public class CounterRecordRepositoryImpl {
         return entityManager.createQuery(criteriaQuery)
                 .setHint(JAKARTA_FETCHGRAPH, entityGraph)
                 .setFirstResult(filterDto.getSkip())
-                .setMaxResults(filterDto.getTake() + 1)
+                .setMaxResults(filterDto.getTake())
                 .getResultList();
     }
 
