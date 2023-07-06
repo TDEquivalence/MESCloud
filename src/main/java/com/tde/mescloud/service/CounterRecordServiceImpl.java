@@ -3,7 +3,6 @@ package com.tde.mescloud.service;
 import com.tde.mescloud.model.converter.CounterRecordConverter;
 import com.tde.mescloud.model.dto.*;
 import com.tde.mescloud.model.entity.CounterRecordEntity;
-import com.tde.mescloud.model.entity.CountingEquipmentEntity;
 import com.tde.mescloud.model.entity.EquipmentOutputEntity;
 import com.tde.mescloud.model.entity.ProductionOrderEntity;
 import com.tde.mescloud.repository.CounterRecordRepository;
@@ -36,15 +35,24 @@ public class CounterRecordServiceImpl implements CounterRecordService {
 
 
     @Override
-    public List<CounterRecordDto> findAll() {
-        Iterable<CounterRecordEntity> counterRecordEntities = repository.findAll();
-        return converter.toDto(counterRecordEntities);
-    }
+    public PaginatedCounterRecordsDto findLastPerProductionOrder(CounterRecordFilterDto filter) {
+        int requestedRecords = filter.getTake();
+        filter.setTake(filter.getTake() + 1);
 
-    @Override
-    public List<CounterRecordDto> findLastPerProductionOrder(CounterRecordFilterDto filter) {
-        Iterable<CounterRecordEntity> counterRecordEntities = repository.findLastPerProductionOrder(filter);
-        return converter.toDto(counterRecordEntities);
+        List<CounterRecordEntity> counterRecordEntities = repository.findLastPerProductionOrder(filter);
+        boolean hasNextPage = counterRecordEntities.size() > requestedRecords;
+
+        if (hasNextPage) {
+            counterRecordEntities.remove(counterRecordEntities.size() - 1);
+        }
+
+        List<CounterRecordDto> counterRecords = converter.toDto(counterRecordEntities);
+
+        PaginatedCounterRecordsDto paginatedCounterRecords = new PaginatedCounterRecordsDto();
+        paginatedCounterRecords.setHasNextPage(hasNextPage);
+        paginatedCounterRecords.setCounterRecords(counterRecords);
+
+        return paginatedCounterRecords;
     }
 
     @Override
@@ -52,7 +60,7 @@ public class CounterRecordServiceImpl implements CounterRecordService {
         int requestedRecords = filterDto.getTake();
         filterDto.setTake(filterDto.getTake() + 1);
 
-        List<CounterRecordEntity> counterRecordEntities = repository.findByCriteria(filterDto);
+        List<CounterRecordEntity> counterRecordEntities = repository.getFilteredAndPaginated(filterDto);
         boolean hasNextPage = counterRecordEntities.size() > requestedRecords;
 
         if (hasNextPage) {

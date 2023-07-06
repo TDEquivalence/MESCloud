@@ -28,8 +28,8 @@ public class CounterRecordController {
     }
 
     @PostMapping("/completion")
-    public ResponseEntity<List<CounterRecordDto>> getLastPerProductionOrder(@RequestBody CounterRecordFilterDto filter) {
-        List<CounterRecordDto> counterRecords = service.findLastPerProductionOrder(filter);
-        return new ResponseEntity<>(counterRecords, HttpStatus.OK);
+    public ResponseEntity<PaginatedCounterRecordsDto> getLastPerProductionOrder(@RequestBody CounterRecordFilterDto filter) {
+        PaginatedCounterRecordsDto paginatedCounterRecords = service.findLastPerProductionOrder(filter);
+        return new ResponseEntity<>(paginatedCounterRecords, HttpStatus.OK);
     }
 }

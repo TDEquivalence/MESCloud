@@ -41,39 +41,7 @@ public class CounterRecordRepositoryImpl {
     private static final String JAKARTA_FETCHGRAPH = "jakarta.persistence.fetchgraph";
     private static final String SQL_WILDCARD = "%";
 
-    public List<CounterRecordEntity> findByCriteria(CounterRecordFilterDto filterDto) {
-        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<CounterRecordEntity> criteriaQuery = criteriaBuilder.createQuery(CounterRecordEntity.class);
-        Root<CounterRecordEntity> root = criteriaQuery.from(CounterRecordEntity.class);
-
-        Path<Timestamp> registeredAtPath = root.get("registeredAt");
-        Order order = criteriaBuilder.desc(registeredAtPath);
-
-        List<Predicate> predicates = new ArrayList<>();
-        addPredicates(filterDto, predicates, criteriaBuilder, root);
-
-        List<Order> orders = new ArrayList<>();
-        addSortOrders(filterDto.getSort(), orders, criteriaBuilder, root);
-        orders.add(order);
-
-        EntityGraph<CounterRecordEntity> entityGraph = entityManager.createEntityGraph(CounterRecordEntity.class);
-        entityGraph.addSubgraph(PRODUCTION_ORDER_PROP);
-        entityGraph.addSubgraph(EQUIPMENT_OUTPUT_PROP).addSubgraph(COUNTING_EQUIPMENT_PROP);
-
-        criteriaQuery.select(root)
-                .distinct(true)
-                .where(criteriaBuilder.and(predicates.toArray(new Predicate[0])))
-                .orderBy(orders);
-
-        return entityManager.createQuery(criteriaQuery)
-                .setHint(JAKARTA_FETCHGRAPH, entityGraph)
-                .setFirstResult(filterDto.getSkip())
-                .setMaxResults(filterDto.getTake())
-                .getResultList();
-    }
-
-    public List<CounterRecordEntity> findLastPerProductionOrder(CounterRecordFilterDto filterDto) {
-
+    public List<CounterRecordEntity> getFilteredAndPaginated(CounterRecordFilterDto filterDto) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<CounterRecordEntity> criteriaQuery = criteriaBuilder.createQuery(CounterRecordEntity.class);
 
@@ -100,8 +68,8 @@ public class CounterRecordRepositoryImpl {
 
         List<Order> orders = new ArrayList<>();
         addSortOrders(filterDto.getSort(), orders, criteriaBuilder, root);
-        orders.add(criteriaBuilder.desc(productionOrderJoin.get(ID_PROP)));
-        orders.add(criteriaBuilder.asc(equipmentOutputJoin.get(ID_PROP)));
+        Order order = criteriaBuilder.desc(root.get(REGISTERED_AT_PROP));
+        orders.add(order);
 
         EntityGraph<CounterRecordEntity> entityGraph = entityManager.createEntityGraph(CounterRecordEntity.class);
         entityGraph.addSubgraph(PRODUCTION_ORDER_PROP);
@@ -113,6 +81,51 @@ public class CounterRecordRepositoryImpl {
 
         return entityManager.createQuery(criteriaQuery)
                 .setHint(JAKARTA_FETCHGRAPH, entityGraph)
+                .setFirstResult(filterDto.getSkip())
+                .setMaxResults(filterDto.getTake())
+                .getResultList();
+    }
+
+    public List<CounterRecordEntity> findLastPerProductionOrder(CounterRecordFilterDto filterDto) {
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<CounterRecordEntity> criteriaQuery = criteriaBuilder.createQuery(CounterRecordEntity.class);
+
+        Root<CounterRecordEntity> root = criteriaQuery.from(CounterRecordEntity.class);
+        Join<CounterRecordEntity, EquipmentOutputEntity> equipmentOutputJoin = root.join("equipmentOutput");
+        Join<CounterRecordEntity, ProductionOrderEntity> productionOrderJoin = root.join("productionOrder");
+
+        Subquery<Long> maxIdSubquery = criteriaQuery.subquery(Long.class);
+        Root<CounterRecordEntity> maxIdRoot = maxIdSubquery.from(CounterRecordEntity.class);
+        maxIdSubquery.select(criteriaBuilder.max(maxIdRoot.get("id")))
+                .where(criteriaBuilder.equal(maxIdRoot.get("equipmentOutput"), equipmentOutputJoin),
+                        criteriaBuilder.equal(maxIdRoot.get("productionOrder"), productionOrderJoin));
+
+        Subquery<Long> maxIdPerOutputSubquery = criteriaQuery.subquery(Long.class);
+        Root<CounterRecordEntity> maxIdPerOutputRoot = maxIdPerOutputSubquery.from(CounterRecordEntity.class);
+        maxIdPerOutputSubquery.select(criteriaBuilder.max(maxIdPerOutputRoot.get("id")))
+                .where(criteriaBuilder.equal(maxIdPerOutputRoot.get("equipmentOutput"), equipmentOutputJoin),
+                        criteriaBuilder.equal(maxIdPerOutputRoot.get("productionOrder"), productionOrderJoin));
+
+        List<Predicate> predicates = new ArrayList<>();
+        predicates.add(criteriaBuilder.equal(root.get("id"), maxIdSubquery.getSelection()));
+        predicates.add(criteriaBuilder.equal(root.get("id"), maxIdPerOutputSubquery.getSelection()));
+        addPredicates(filterDto, predicates, criteriaBuilder, root);
+
+        List<Order> orders = new ArrayList<>();
+        addSortOrders(filterDto.getSort(), orders, criteriaBuilder, root);
+        Order order = criteriaBuilder.desc(root.get("registeredAt"));
+        orders.add(order);
+
+        EntityGraph<CounterRecordEntity> entityGraph = entityManager.createEntityGraph(CounterRecordEntity.class);
+        entityGraph.addSubgraph("productionOrder");
+        entityGraph.addSubgraph("equipmentOutput").addSubgraph("countingEquipment");
+
+        criteriaQuery.select(root)
+                .where(criteriaBuilder.and(predicates.toArray(new Predicate[0])))
+                .orderBy(orders);
+
+        return entityManager.createQuery(criteriaQuery)
+                .setHint("javax.persistence.fetchgraph", entityGraph)
                 .setFirstResult(filterDto.getSkip())
                 .setMaxResults(filterDto.getTake() + 1)
                 .getResultList();

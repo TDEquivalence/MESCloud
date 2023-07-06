@@ -9,9 +9,7 @@ import java.util.List;
 
 public interface CounterRecordService {
 
-    List<CounterRecordDto> findAll();
-
-    List<CounterRecordDto> findLastPerProductionOrder(CounterRecordFilterDto filterDto);
+    PaginatedCounterRecordsDto findLastPerProductionOrder(CounterRecordFilterDto filterDto);
 
     PaginatedCounterRecordsDto getFilteredAndPaginated(CounterRecordFilterDto filterDto);
 
