@@ -43,30 +43,28 @@ public class CounterRecordRepositoryImpl {
 
 
     public List<CounterRecordEntity> getFilteredAndPaginated(CounterRecordFilterDto filterDto) {
-        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<CounterRecordEntity> criteriaQuery = criteriaBuilder.createQuery(CounterRecordEntity.class);
-        Root<CounterRecordEntity> root = criteriaQuery.from(CounterRecordEntity.class);
 
-        Path<Timestamp> registeredAtPath = root.get(REGISTERED_AT_PROP);
-        Order order = criteriaBuilder.desc(registeredAtPath);
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<CounterRecordEntity> query = cb.createQuery(CounterRecordEntity.class);
+        Root<CounterRecordEntity> root = query.from(CounterRecordEntity.class);
 
         List<Predicate> predicates = new ArrayList<>();
-        addPredicates(filterDto, predicates, criteriaBuilder, root);
+        addPredicates(filterDto, predicates, cb, root);
 
         List<Order> orders = new ArrayList<>();
-        addSortOrders(filterDto.getSort(), orders, criteriaBuilder, root);
-        orders.add(order);
+        addSortOrders(filterDto.getSort(), orders, cb, root);
+        Order newestOrder = cb.desc(root.get(ID_PROP));
+        orders.add(newestOrder);
 
         EntityGraph<CounterRecordEntity> entityGraph = entityManager.createEntityGraph(CounterRecordEntity.class);
         entityGraph.addSubgraph(PRODUCTION_ORDER_PROP);
         entityGraph.addSubgraph(EQUIPMENT_OUTPUT_PROP).addSubgraph(COUNTING_EQUIPMENT_PROP);
 
-        criteriaQuery.select(root)
-                .distinct(true)
-                .where(criteriaBuilder.and(predicates.toArray(new Predicate[0])))
+        query.select(root)
+                .where(cb.and(predicates.toArray(new Predicate[0])))
                 .orderBy(orders);
 
-        return entityManager.createQuery(criteriaQuery)
+        return entityManager.createQuery(query)
                 .setHint(JAKARTA_FETCHGRAPH, entityGraph)
                 .setFirstResult(filterDto.getSkip())
                 .setMaxResults(filterDto.getTake())
