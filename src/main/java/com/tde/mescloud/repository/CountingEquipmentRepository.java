@@ -37,23 +37,9 @@ public interface CountingEquipmentRepository extends CrudRepository<CountingEqui
     @EntityGraph(attributePaths = "outputs")
     List<CountingEquipmentEntity> findAll();
 
-    @Query(value = "SELECT DISTINCT ON (ce.id) " +
-            "ce.id AS id, " +
-            "ce.code AS code, " +
-            "ce.alias AS alias, " +
-            "ce.section_id AS section, " +
-            "ce.equipment_status AS equipmentStatus, " +
-            "ce.p_timer_communication_cycle AS pTimerCommunicationCycle, " +
-            "CASE WHEN po.is_completed = false THEN po.code ELSE NULL END AS productionOrderCode, " +
-            "eo.id AS outputs " +
-            "FROM counting_equipment ce " +
-            "LEFT JOIN equipment_output eo ON eo.counting_equipment_id = ce.id " +
-            "LEFT JOIN ( " +
-            "   SELECT DISTINCT ON (equipment_id) equipment_id, code, is_completed " +
-            "   FROM production_order " +
-            "   WHERE is_completed = false " +
-            "   ORDER BY equipment_id, created_at DESC " +
-            ") po ON po.equipment_id = ce.id " +
-            "ORDER BY ce.id, eo.id", nativeQuery = true)
-    List<CountingEquipmentProjection> findAllWithActiveProductionOrderCode();
+    @Query("SELECT ce FROM counting_equipment ce " +
+            "LEFT JOIN FETCH ce.productionOrders po " +
+            "WHERE po IS NULL OR po.id = (SELECT MAX(p.id) FROM production_order p WHERE p.equipment = ce)" +
+            "ORDER BY ce.id")
+    List<CountingEquipmentEntity> findAllWithLastProductionOrder();
 }

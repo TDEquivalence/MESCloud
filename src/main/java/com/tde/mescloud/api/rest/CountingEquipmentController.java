@@ -24,7 +24,7 @@ public class CountingEquipmentController {
 
     @GetMapping
     public ResponseEntity<List<CountingEquipmentDto>> findAll() {
-        List<CountingEquipmentDto> countingEquipments = countingEquipmentService.findAll();
+        List<CountingEquipmentDto> countingEquipments = countingEquipmentService.findAllWithLastProductionOrder();
         return new ResponseEntity<>(countingEquipments, HttpStatus.OK);
     }
 

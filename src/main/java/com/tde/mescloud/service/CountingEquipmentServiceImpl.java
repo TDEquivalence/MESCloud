@@ -8,6 +8,7 @@ import com.tde.mescloud.repository.CountingEquipmentRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,9 +20,23 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
     private CountingEquipmentConverter converter;
 
     @Override
-    public List<CountingEquipmentDto> findAll() {
-        Iterable<CountingEquipmentProjection> countingEquipments = repository.findAllWithActiveProductionOrderCode();
-        return converter.projectionToDto(countingEquipments);
+    public List<CountingEquipmentDto> findAllWithLastProductionOrder() {
+        List<CountingEquipmentEntity> countingEquipments = repository.findAllWithLastProductionOrder();
+
+        List<CountingEquipmentDto> dtos = new ArrayList<>(countingEquipments.size());
+        for (CountingEquipmentEntity entity : countingEquipments) {
+            CountingEquipmentDto dto = converter.toDto(entity);
+
+            if (entity.getProductionOrders() != null &&
+                    entity.getProductionOrders().size() > 0 &&
+                    !entity.getProductionOrders().get(0).isCompleted()) {
+                dto.setProductionOrderCode(entity.getProductionOrders().get(0).getCode());
+            }
+
+            dtos.add(dto);
+        }
+
+        return dtos;
     }
 
     @Override
