@@ -13,4 +13,5 @@ public class MqttDTOConstants {
     public static final String COUNTING_RECORD_DTO_NAME = "ProductionCount";
     public static final String HAS_RECEIVED_DTO_NAME = "Received";
     public static final String EQUIPMENT_CONFIG_DTO_NAME = "Configuration";
+    public static final String EQUIPMENT_CONFIG_RESPONSE_DTO_NAME = "ConfigurationResponse";
 }

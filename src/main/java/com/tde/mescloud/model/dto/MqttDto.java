@@ -12,7 +12,8 @@ import com.tde.mescloud.constant.MqttDTOConstants;
         visible = true)
 @JsonSubTypes({
         @Type(value = HasReceivedMqttDto.class, name = MqttDTOConstants.HAS_RECEIVED_DTO_NAME),
-        @Type(value = EquipmentConfigMqttDto.class, name = MqttDTOConstants.EQUIPMENT_CONFIG_DTO_NAME),
+        @Type(value = EquipmentConfigMqttDto.class,
+                names = {MqttDTOConstants.EQUIPMENT_CONFIG_DTO_NAME, MqttDTOConstants.EQUIPMENT_CONFIG_RESPONSE_DTO_NAME}),
         @Type(value = EquipmentCountsMqttDto.class,
                 names = {MqttDTOConstants.COUNTING_RECORD_DTO_NAME, MqttDTOConstants.PRODUCTION_ORDER_INIT_DTO_NAME}),
         @Type(value = ProductionOrderMqttDto.class, name = MqttDTOConstants.PRODUCTION_ORDER_DTO_NAME)

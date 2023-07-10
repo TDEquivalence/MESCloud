@@ -51,8 +51,8 @@ public class CountProtocol extends AbstractMesProtocol {
                 this.getClass().toString(), message.getTopic(), message.getStringPayload()));
 
         Optional<MqttDto> optMqttDTO = parseMqttDTO(message);
-        if(optMqttDTO.isEmpty()) {
-            publishNotReceived();
+        if (optMqttDTO.isEmpty()) {
+            log.warning("An error occurred while parsing the MQTT message");
             return;
         }
 
@@ -73,20 +73,10 @@ public class CountProtocol extends AbstractMesProtocol {
             return Optional.empty();
         }
     }
-
-    private void publishNotReceived() {
-        try {
-            log.severe("Unable to parse a valid MqttDTO from payload.");
-            mqttClient.publish(mesMqttSettings.getProtCountPlcTopic(), new HasReceivedMqttDto(false));
-        } catch (MesMqttException e) {
-            log.log(Level.SEVERE,"Failed to publish Not Received message", e);
-            throw new RuntimeException(e);
-        }
-    }
-
+    
     private void publishHasReceived(MqttDto mqttDTO) {
         try {
-            HasReceivedMqttDto hasReceivedMqttDTO = new HasReceivedMqttDto(mqttDTO.getEquipmentCode(), true);
+            HasReceivedMqttDto hasReceivedMqttDTO = new HasReceivedMqttDto(mqttDTO.getEquipmentCode());
             mqttClient.publish(mesMqttSettings.getProtCountPlcTopic(), hasReceivedMqttDTO);
         } catch (MesMqttException e) {
             log.log(Level.SEVERE, e, () -> String.format("Failed to publish Has Received message as a response to [%s] for equipment [%s]",
