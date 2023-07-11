@@ -29,9 +29,8 @@ public class CounterRecordProcess extends AbstractMesProtocolProcess<EquipmentCo
         if (areInvalidContinuationCounts(equipmentCounts)) {
             log.warning(() -> String.format("Invalid continuation count - Production Order [%s] has no initial records or does not exist",
                     equipmentCounts.getProductionOrderCode()));
-            return;
         }
-        
+
         counterRecordService.save(equipmentCounts);
 
         //TODO: Check for alert needs

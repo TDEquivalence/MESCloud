@@ -77,21 +77,19 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     }
 
     private boolean isValid(EquipmentCountsMqttDto equipmentCounts) {
-        equipmentCounts.getEquipmentCode();
+
         Optional<CountingEquipmentDto> countingEquipmentOpt =
                 countingEquipmentService.findByCode(equipmentCounts.getEquipmentCode());
-        if (countingEquipmentOpt.isEmpty()) {
-            return false;
-        }
 
-        return equipmentCounts.getCounters().length == countingEquipmentOpt.get().getOutputs().size();
+        return countingEquipmentOpt.isPresent() &&
+                equipmentCounts.getCounters().length == countingEquipmentOpt.get().getOutputs().size();
     }
 
     @Override
     public List<CounterRecordDto> save(EquipmentCountsMqttDto equipmentCountsMqttDto) {
-        //TODO: if there's no PO, save without po
+
         if (!isValid(equipmentCountsMqttDto)) {
-            //TODO: Log
+            log.warning(() -> String.format("Received counts are invalid either because no Counting Equipment was found with the code [%s] or because received equipment outputs number [%s] does not match the Counting Equipment outputs number", equipmentCountsMqttDto.getEquipmentCode(), equipmentCountsMqttDto.getCounters().length));
             return null;
         }
 
@@ -113,7 +111,10 @@ public class CounterRecordServiceImpl implements CounterRecordService {
 
         setEquipmentOutput(counterRecord, counterDto.getOutputCode());
         setProductionOrder(counterRecord, equipmentCountsDto.getProductionOrderCode());
-        setComputedValue(counterRecord);
+        
+        if (counterRecord.getProductionOrder() != null) {
+            setComputedValue(counterRecord);
+        }
 
         return counterRecord;
     }
@@ -121,9 +122,11 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     private void setEquipmentOutput(CounterRecordEntity counterRecord, String equipmentOutputCode) {
         Optional<EquipmentOutputDto> equipmentOutputOpt = equipmentOutputService.findByCode(equipmentOutputCode);
         if (equipmentOutputOpt.isEmpty()) {
+            log.warning(() -> String.format("No Equipment Output found with the code [%s]", equipmentOutputCode));
             return;
         }
 
+        //TODO: This should rely on a converter
         EquipmentOutputDto equipmentOutput = equipmentOutputOpt.get();
         EquipmentOutputEntity equipmentOutputEntity = new EquipmentOutputEntity();
         equipmentOutputEntity.setId(equipmentOutput.getId());
@@ -132,14 +135,15 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     }
 
     private void setProductionOrder(CounterRecordEntity counterRecord, String productionOrderCode) {
-        //TODO: Work with optionals. If there's no PO, set the value to null
-        Optional<ProductionOrderDto> productionOrder = productionOrderService.findByCode(productionOrderCode);
-        ProductionOrderEntity productionOrderEntity = new ProductionOrderEntity();
-        if (productionOrder.isEmpty()) {
-            productionOrderEntity.setId(null);
-        } else {
-            productionOrderEntity.setId(productionOrder.get().getId());
+
+        Optional<ProductionOrderDto> productionOrderOpt = productionOrderService.findByCode(productionOrderCode);
+        if (productionOrderOpt.isEmpty()) {
+            log.warning(() -> String.format("No Production Order found with the code [%s]", productionOrderCode));
+            return;
         }
+
+        ProductionOrderEntity productionOrderEntity = new ProductionOrderEntity();
+        productionOrderEntity.setId(productionOrderOpt.get().getId());
         counterRecord.setProductionOrder(productionOrderEntity);
     }
 
@@ -158,7 +162,7 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     private Optional<CounterRecordEntity> findLastPersistedCount(CounterRecordEntity counterRecord) {
         Long productionOrderId = counterRecord.getProductionOrder().getId();
         Long equipmentOutputId = counterRecord.getEquipmentOutput().getId();
-        return repository.findLast(productionOrderId, equipmentOutputId);
+        return repository.findLastByProductionOrderId(productionOrderId, equipmentOutputId);
     }
 
     private int calculateComputedValue(CounterRecordEntity lastPersistedCount, CounterRecordEntity receivedCount) {
@@ -188,12 +192,12 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     public boolean areValidInitialCounts(String productionOrderCode) {
         Optional<ProductionOrderEntity> productionOrderOpt = productionOrderRepository.findByCode(productionOrderCode);
         return productionOrderOpt.isPresent() &&
-                repository.findLast(productionOrderOpt.get().getId()).isEmpty();
+                repository.findLastByProductionOrderId(productionOrderOpt.get().getId()).isEmpty();
     }
 
     public boolean areValidContinuationCounts(String productionOrderCode) {
         Optional<ProductionOrderEntity> productionOrderOpt = productionOrderRepository.findByCode(productionOrderCode);
         return productionOrderOpt.isPresent() &&
-                repository.findLast(productionOrderOpt.get().getId()).isPresent();
+                repository.findLastByProductionOrderId(productionOrderOpt.get().getId()).isPresent();
     }
 }

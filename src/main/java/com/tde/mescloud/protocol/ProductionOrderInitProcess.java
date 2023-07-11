@@ -31,7 +31,6 @@ public class ProductionOrderInitProcess extends AbstractMesProtocolProcess<Equip
         if (areInvalidInitialCounts(equipmentCounts)) {
             log.warning(() -> String.format("Invalid initial count - Production Order [%s] already has records or does not exist",
                     equipmentCounts.getProductionOrderCode()));
-            return;
         }
 
         counterRecordService.save(equipmentCounts);
