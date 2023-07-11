@@ -88,4 +88,20 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
         CountingEquipmentEntity persistedCountingEquipment = repository.save(countingEquipmentEntity);
         return converter.convertToDto(persistedCountingEquipment);
     }
+
+    @Override
+    public Optional<CountingEquipmentDto> updateEquipmentStatus(String equipmentCode, int equipmentStatus) {
+        Optional<CountingEquipmentEntity> countingEquipmentOpt = repository.findByCode(equipmentCode);
+        if (countingEquipmentOpt.isEmpty()) {
+            log.warning(() -> String.format("No Counting Equipment was found with the code [%s]", equipmentCode));
+            return Optional.empty();
+        }
+
+        CountingEquipmentEntity countingEquipment = countingEquipmentOpt.get();
+        countingEquipment.setEquipmentStatus(equipmentStatus);
+        CountingEquipmentEntity updatedCountingEquipment = repository.save(countingEquipment);
+
+        CountingEquipmentDto updatedCountingEquipmentDto = converter.convertToDto(updatedCountingEquipment);
+        return Optional.of(updatedCountingEquipmentDto);
+    }
 }

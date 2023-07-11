@@ -14,4 +14,6 @@ public interface CountingEquipmentService {
     Optional<CountingEquipmentDto> findByCode(String code);
 
     CountingEquipmentDto save(CountingEquipmentDto countingEquipment);
+
+    Optional<CountingEquipmentDto> updateEquipmentStatus(String equipmentCode, int equipmentStatus);
 }

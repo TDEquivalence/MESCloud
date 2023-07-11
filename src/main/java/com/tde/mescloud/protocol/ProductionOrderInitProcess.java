@@ -24,29 +24,17 @@ public class ProductionOrderInitProcess extends AbstractMesProtocolProcess<Equip
 
     @Override
     public void execute(EquipmentCountsMqttDto equipmentCounts) {
+
         log.info("Executing Production Order init process");
+        equipmentService.updateEquipmentStatus(equipmentCounts.getEquipmentCode(), equipmentCounts.getEquipmentStatus());
+
         if (areInvalidInitialCounts(equipmentCounts)) {
             log.warning(() -> String.format("Invalid initial count - Production Order [%s] already has records or does not exist",
                     equipmentCounts.getProductionOrderCode()));
             return;
         }
 
-        List<CounterRecordDto> counterRecords = counterRecordService.save(equipmentCounts);
-        if (counterRecords == null) {
-            //TODO: Handle & log
-            return;
-        }
-
-        Optional<CountingEquipmentDto> countingEquipmentOpt =
-                equipmentService.findByCode(equipmentCounts.getEquipmentCode());
-        if (countingEquipmentOpt.isEmpty()) {
-            return;
-            //TODO: handle exception
-        }
-
-        CountingEquipmentDto countingEquipment = countingEquipmentOpt.get();
-        countingEquipment.setEquipmentStatus(equipmentCounts.getEquipmentStatus());
-        equipmentService.save(countingEquipment);
+        counterRecordService.save(equipmentCounts);
     }
 
     private boolean areInvalidInitialCounts(EquipmentCountsMqttDto equipmentCountsMqttDTO) {
