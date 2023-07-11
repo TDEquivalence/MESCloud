@@ -72,44 +72,48 @@ public class CounterRecordRepositoryImpl {
     }
 
     public List<CounterRecordEntity> findLastPerProductionOrder(CounterRecordFilterDto filterDto) {
-        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<CounterRecordEntity> criteriaQuery = criteriaBuilder.createQuery(CounterRecordEntity.class);
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<CounterRecordEntity> query = cb.createQuery(CounterRecordEntity.class);
 
-        Root<CounterRecordEntity> root = criteriaQuery.from(CounterRecordEntity.class);
-        Join<CounterRecordEntity, EquipmentOutputEntity> equipmentOutputJoin = root.join(EQUIPMENT_OUTPUT_PROP);
-        Join<CounterRecordEntity, ProductionOrderEntity> productionOrderJoin = root.join(PRODUCTION_ORDER_PROP);
+        Root<CounterRecordEntity> counterRecordRoot = query.from(CounterRecordEntity.class);
+        Join<CounterRecordEntity, EquipmentOutputEntity> equipmentOutputJoin =
+                counterRecordRoot.join(EQUIPMENT_OUTPUT_PROP, JoinType.INNER);
+        Join<EquipmentOutputEntity, ProductionOrderEntity> productionOrderJoin =
+                equipmentOutputJoin.join(COUNTING_EQUIPMENT_PROP, JoinType.INNER).join("productionOrders", JoinType.INNER);
 
-        Subquery<Long> maxIdSubquery = criteriaQuery.subquery(Long.class);
-        Root<CounterRecordEntity> maxIdRoot = maxIdSubquery.from(CounterRecordEntity.class);
-        maxIdSubquery.select(criteriaBuilder.max(maxIdRoot.get(ID_PROP)))
-                .where(criteriaBuilder.equal(maxIdRoot.get(EQUIPMENT_OUTPUT_PROP), equipmentOutputJoin),
-                        criteriaBuilder.equal(maxIdRoot.get(PRODUCTION_ORDER_PROP), productionOrderJoin));
+        Subquery<Long> subquery = query.subquery(Long.class);
+        Root<CounterRecordEntity> subqueryCounterRecordRoot = subquery.from(CounterRecordEntity.class);
+        Join<CounterRecordEntity, EquipmentOutputEntity> subqueryEquipmentOutputJoin =
+                subqueryCounterRecordRoot.join(EQUIPMENT_OUTPUT_PROP, JoinType.INNER);
+        Join<EquipmentOutputEntity, ProductionOrderEntity> subqueryProductionOrderJoin =
+                subqueryEquipmentOutputJoin.join(COUNTING_EQUIPMENT_PROP, JoinType.INNER).join("productionOrders", JoinType.INNER);
 
-        Subquery<Long> maxIdPerOutputSubquery = criteriaQuery.subquery(Long.class);
-        Root<CounterRecordEntity> maxIdPerOutputRoot = maxIdPerOutputSubquery.from(CounterRecordEntity.class);
-        maxIdPerOutputSubquery.select(criteriaBuilder.max(maxIdPerOutputRoot.get(ID_PROP)))
-                .where(criteriaBuilder.equal(maxIdPerOutputRoot.get(EQUIPMENT_OUTPUT_PROP), equipmentOutputJoin),
-                        criteriaBuilder.equal(maxIdPerOutputRoot.get(PRODUCTION_ORDER_PROP), productionOrderJoin));
+        subquery.select(cb.max(subqueryCounterRecordRoot.get(ID_PROP)))
+                .where(
+                        cb.equal(equipmentOutputJoin.get(ID_PROP), subqueryEquipmentOutputJoin.get(ID_PROP)),
+                        cb.equal(productionOrderJoin.get(ID_PROP), subqueryProductionOrderJoin.get(ID_PROP))
+                )
+                .groupBy(subqueryEquipmentOutputJoin.get(ID_PROP), subqueryProductionOrderJoin.get(ID_PROP));
 
         List<Predicate> predicates = new ArrayList<>();
-        predicates.add(criteriaBuilder.equal(root.get(ID_PROP), maxIdSubquery.getSelection()));
-        predicates.add(criteriaBuilder.equal(root.get(ID_PROP), maxIdPerOutputSubquery.getSelection()));
-        addPredicates(filterDto, predicates, criteriaBuilder, root);
+        Predicate defaultPredicate = cb.equal(counterRecordRoot.get(ID_PROP), subquery);
+        predicates.add(defaultPredicate);
+        addPredicates(filterDto, predicates, cb, counterRecordRoot);
 
         List<Order> orders = new ArrayList<>();
-        addSortOrders(filterDto.getSort(), orders, criteriaBuilder, root);
-        Order order = criteriaBuilder.desc(root.get(REGISTERED_AT_PROP));
-        orders.add(order);
+        addSortOrders(filterDto.getSort(), orders, cb, counterRecordRoot);
+//        Order newestOrder = cb.desc(counterRecordRoot.get(ID_PROP));
+//        orders.add(newestOrder);
 
         EntityGraph<CounterRecordEntity> entityGraph = entityManager.createEntityGraph(CounterRecordEntity.class);
         entityGraph.addSubgraph(PRODUCTION_ORDER_PROP);
         entityGraph.addSubgraph(EQUIPMENT_OUTPUT_PROP).addSubgraph(COUNTING_EQUIPMENT_PROP);
 
-        criteriaQuery.select(root)
-                .where(criteriaBuilder.and(predicates.toArray(new Predicate[0])))
+        query.select(counterRecordRoot)
+                .where(cb.and(predicates.toArray(new Predicate[0])))
                 .orderBy(orders);
 
-        return entityManager.createQuery(criteriaQuery)
+        return entityManager.createQuery(query)
                 .setHint(JAKARTA_FETCHGRAPH, entityGraph)
                 .setFirstResult(filterDto.getSkip())
                 .setMaxResults(filterDto.getTake())
