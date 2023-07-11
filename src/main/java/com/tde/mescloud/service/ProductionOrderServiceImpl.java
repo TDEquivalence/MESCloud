@@ -24,9 +24,10 @@ import java.util.Optional;
 @Log
 public class ProductionOrderServiceImpl implements ProductionOrderService {
 
+    private static final String OBO_SECTION_PREFIX = "OBO";
     private static final String CODE_PREFIX = "PO";
-    private static final String NEW_CODE_FORMAT = "%02d";
-    private static final int CODE_VALUE_INDEX = 4;
+    private static final String NEW_CODE_FORMAT = "%05d";
+    private static final int CODE_VALUE_INDEX = 10;
 
     private final ProductionOrderRepository repository;
     private final ProductionOrderConverter converter;
@@ -56,7 +57,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     public Optional<ProductionOrderDto> complete(long equipmentId) {
 
         Optional<CountingEquipmentEntity> countingEquipmentOpt = countingEquipmentRepository.findById(equipmentId);
-        if(countingEquipmentOpt.isEmpty()) {
+        if (countingEquipmentOpt.isEmpty()) {
             log.warning(() -> String.format("Unable to find an Equipment with id [%s]", equipmentId));
             return Optional.empty();
         }
@@ -123,7 +124,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
 
     @Override
     public String generateCode() {
-        return CODE_PREFIX + getYearForCode() + getNewCodeValueFormatted();
+        return OBO_SECTION_PREFIX + CODE_PREFIX + getYearForCode() + getNewCodeValueFormatted();
     }
 
     private int getYearForCode() {
