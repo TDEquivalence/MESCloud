@@ -72,10 +72,15 @@ public class CounterRecordRepositoryImpl {
         CriteriaQuery<CounterRecordConclusionEntity> query = criteriaBuilder.createQuery(CounterRecordConclusionEntity.class);
         Root<CounterRecordConclusionEntity> root = query.from(CounterRecordConclusionEntity.class);
 
+        List<Predicate> predicates = new ArrayList<>();
+        addPredicatesConclusion(filterDto, predicates, criteriaBuilder, root);
+
         root.fetch(EQUIPMENT_OUTPUT_PROP, JoinType.LEFT);
         root.fetch(PRODUCTION_ORDER_PROP, JoinType.LEFT);
 
-        query.select(root).distinct(true);
+        query.select(root)
+                .where(criteriaBuilder.and(predicates.toArray(new Predicate[0])))
+                .distinct(true);
 
         return entityManager.createQuery(query).getResultList();
     }
@@ -104,6 +109,30 @@ public class CounterRecordRepositoryImpl {
         }
     }
 
+    private void addPredicatesConclusion(CounterRecordFilterDto filterDto, List<Predicate> predicates, CriteriaBuilder criteriaBuilder, Root<CounterRecordConclusionEntity> counterRecordRoot) {
+        for (CounterRecordSearchDto search : filterDto.getSearch()) {
+            Predicate predicate;
+            switch (search.getId()) {
+                case COMPUTED_VALUE_PROP ->
+                        predicate = criteriaBuilder.greaterThanOrEqualTo(counterRecordRoot.get(COMPUTED_VALUE_PROP), search.getValue());
+                case DATE_START_FILTER_FIELD -> {
+                    ZonedDateTime dateStart = ZonedDateTime.parse(search.getValue());
+                    predicate = criteriaBuilder.greaterThanOrEqualTo(counterRecordRoot.get(REGISTERED_AT_PROP), dateStart);
+                }
+                case DATE_END_FILTER_FIELD -> {
+                    ZonedDateTime dateEnd = ZonedDateTime.parse(search.getValue());
+                    predicate = criteriaBuilder.lessThanOrEqualTo(counterRecordRoot.get(REGISTERED_AT_PROP), dateEnd);
+                }
+                default -> {
+                    Path<?> path = getPathConclusion(counterRecordRoot, search.getId());
+                    String value = search.getValue().toUpperCase();
+                    predicate = createLikePredicate(path, value, criteriaBuilder);
+                }
+            }
+            predicates.add(predicate);
+        }
+    }
+
     private Predicate createLikePredicate(Path<?> path, String value, CriteriaBuilder criteriaBuilder) {
         return criteriaBuilder.like(criteriaBuilder.upper(path.as(String.class)), value.toUpperCase());
     }
@@ -118,6 +147,26 @@ public class CounterRecordRepositoryImpl {
     }
 
     private Path<?> getPath(Root<CounterRecordEntity> counterRecordRoot, String property) {
+        switch (property) {
+            case EQUIPMENT_ALIAS_FILTER_FIELD -> {
+                Join<CounterRecordEntity, EquipmentOutputEntity> equipmentOutputJoin =
+                        counterRecordRoot.join(EQUIPMENT_OUTPUT_PROP);
+                Join<EquipmentOutputEntity, CountingEquipmentEntity> countingEquipmentJoin =
+                        equipmentOutputJoin.join(COUNTING_EQUIPMENT_PROP);
+                return countingEquipmentJoin.get(COUNTING_EQUIPMENT_ALIAS_PROP);
+            }
+            case PRODUCTION_ORDER_CODE_FILTER_FIELD -> {
+                Join<CounterRecordEntity, ProductionOrderEntity> productionOrderJoin =
+                        counterRecordRoot.join(PRODUCTION_ORDER_PROP);
+                return productionOrderJoin.get(PRODUCTION_ORDER_CODE_PROP);
+            }
+            default -> {
+                return counterRecordRoot.get(property);
+            }
+        }
+    }
+
+    private Path<?> getPathConclusion(Root<CounterRecordConclusionEntity> counterRecordRoot, String property) {
         switch (property) {
             case EQUIPMENT_ALIAS_FILTER_FIELD -> {
                 Join<CounterRecordEntity, EquipmentOutputEntity> equipmentOutputJoin =
