@@ -85,9 +85,8 @@ public class CounterRecordRepositoryImpl {
 
         query.select(root)
                 .where(criteriaBuilder.and(predicates.toArray(new Predicate[0])))
-                .distinct(true)
                 .orderBy(orders);
-
+        
         return entityManager.createQuery(query)
                 .setFirstResult(filterDto.getSkip())
                 .setMaxResults(filterDto.getTake())
@@ -191,14 +190,14 @@ public class CounterRecordRepositoryImpl {
     private Path<?> getPathConclusion(Root<CounterRecordConclusionEntity> counterRecordRoot, String property) {
         switch (property) {
             case EQUIPMENT_ALIAS_FILTER_FIELD -> {
-                Join<CounterRecordEntity, EquipmentOutputEntity> equipmentOutputJoin =
+                Join<CounterRecordConclusionEntity, EquipmentOutputEntity> equipmentOutputJoin =
                         counterRecordRoot.join(EQUIPMENT_OUTPUT_PROP);
                 Join<EquipmentOutputEntity, CountingEquipmentEntity> countingEquipmentJoin =
                         equipmentOutputJoin.join(COUNTING_EQUIPMENT_PROP);
                 return countingEquipmentJoin.get(COUNTING_EQUIPMENT_ALIAS_PROP);
             }
             case PRODUCTION_ORDER_CODE_FILTER_FIELD -> {
-                Join<CounterRecordEntity, ProductionOrderEntity> productionOrderJoin =
+                Join<CounterRecordConclusionEntity, ProductionOrderEntity> productionOrderJoin =
                         counterRecordRoot.join(PRODUCTION_ORDER_PROP);
                 return productionOrderJoin.get(PRODUCTION_ORDER_CODE_PROP);
             }
