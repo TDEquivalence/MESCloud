@@ -1,7 +1,6 @@
 package com.tde.mescloud.protocol;
 
 import com.tde.mescloud.constant.MqttDTOConstants;
-import com.tde.mescloud.model.dto.EquipmentCountsMqttDto;
 import com.tde.mescloud.model.dto.PlcMqttDto;
 import com.tde.mescloud.service.CounterRecordService;
 import com.tde.mescloud.service.CountingEquipmentService;
