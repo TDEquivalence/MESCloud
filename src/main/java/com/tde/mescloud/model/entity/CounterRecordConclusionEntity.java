@@ -17,10 +17,12 @@ public class CounterRecordConclusionEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "equipment_output_id")
     private EquipmentOutputEntity equipmentOutput;
+    private String equipmentOutputAlias;
+    private int realValue;
+    private int computedValue;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "production_order_id")
     private ProductionOrderEntity productionOrder;
-    private int realValue;
-    private int computedValue;
+    @Temporal(TemporalType.TIMESTAMP)
     private Date registeredAt;
 }
