@@ -78,7 +78,7 @@ public class CounterRecordServiceImpl implements CounterRecordService {
         return paginatedCounterRecords;
     }
 
-    private boolean isValid(EquipmentCountsMqttDto equipmentCounts) {
+    private boolean isValid(PlcMqttDto equipmentCounts) {
 
         Optional<CountingEquipmentDto> countingEquipmentOpt =
                 countingEquipmentService.findByCode(equipmentCounts.getEquipmentCode());
@@ -88,7 +88,7 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     }
 
     @Override
-    public List<CounterRecordDto> save(EquipmentCountsMqttDto equipmentCountsMqttDto) {
+    public List<CounterRecordDto> save(PlcMqttDto equipmentCountsMqttDto) {
 
         if (!isValid(equipmentCountsMqttDto)) {
             log.warning(() -> String.format("Received counts are invalid either because no Counting Equipment was found with the code [%s] or because received equipment outputs number [%s] does not match the Counting Equipment outputs number", equipmentCountsMqttDto.getEquipmentCode(), equipmentCountsMqttDto.getCounters().length));
@@ -105,7 +105,7 @@ public class CounterRecordServiceImpl implements CounterRecordService {
         return converter.toDto(counterRecordEntities);
     }
 
-    private CounterRecordEntity extractCounterRecordEntity(CounterMqttDto counterDto, EquipmentCountsMqttDto equipmentCountsDto) {
+    private CounterRecordEntity extractCounterRecordEntity(CounterMqttDto counterDto, PlcMqttDto equipmentCountsDto) {
 
         CounterRecordEntity counterRecord = new CounterRecordEntity();
         counterRecord.setRegisteredAt(new Date());

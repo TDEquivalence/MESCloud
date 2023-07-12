@@ -3,6 +3,7 @@ package com.tde.mescloud.protocol;
 import com.tde.mescloud.constant.MqttDTOConstants;
 import com.tde.mescloud.model.dto.CountingEquipmentDto;
 import com.tde.mescloud.model.dto.EquipmentCountsMqttDto;
+import com.tde.mescloud.model.dto.PlcMqttDto;
 import com.tde.mescloud.service.CounterRecordService;
 import com.tde.mescloud.service.CountingEquipmentService;
 import lombok.AllArgsConstructor;
@@ -14,14 +15,14 @@ import java.util.Optional;
 @Service
 @Log
 @AllArgsConstructor
-public class CounterRecordProcess extends AbstractMesProtocolProcess<EquipmentCountsMqttDto> {
+public class CounterRecordProcess extends AbstractMesProtocolProcess<PlcMqttDto> {
 
     private final CounterRecordService counterRecordService;
     private final CountingEquipmentService equipmentService;
 
 
     @Override
-    public void execute(EquipmentCountsMqttDto equipmentCounts) {
+    public void execute(PlcMqttDto equipmentCounts) {
 
         log.info("Executing Counter Record process");
         equipmentService.updateEquipmentStatus(equipmentCounts.getEquipmentCode(), equipmentCounts.getEquipmentStatus());
@@ -39,7 +40,7 @@ public class CounterRecordProcess extends AbstractMesProtocolProcess<EquipmentCo
         //3 pTimerCommunicationCycles without receiving counts
     }
 
-    private boolean areInvalidContinuationCounts(EquipmentCountsMqttDto equipmentCountsMqttDTO) {
+    private boolean areInvalidContinuationCounts(PlcMqttDto equipmentCountsMqttDTO) {
         return !counterRecordService.areValidContinuationCounts(equipmentCountsMqttDTO.getProductionOrderCode());
     }
 
