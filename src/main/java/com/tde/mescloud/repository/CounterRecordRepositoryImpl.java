@@ -75,14 +75,23 @@ public class CounterRecordRepositoryImpl {
         List<Predicate> predicates = new ArrayList<>();
         addPredicatesConclusion(filterDto, predicates, criteriaBuilder, root);
 
+        List<Order> orders = new ArrayList<>();
+        addSortOrdersConclusion(filterDto.getSort(), orders, criteriaBuilder, root);
+        Order newestOrder = criteriaBuilder.desc(root.get(ID_PROP));
+        orders.add(newestOrder);
+
         root.fetch(EQUIPMENT_OUTPUT_PROP, JoinType.LEFT);
         root.fetch(PRODUCTION_ORDER_PROP, JoinType.LEFT);
 
         query.select(root)
                 .where(criteriaBuilder.and(predicates.toArray(new Predicate[0])))
-                .distinct(true);
+                .distinct(true)
+                .orderBy(orders);
 
-        return entityManager.createQuery(query).getResultList();
+        return entityManager.createQuery(query)
+                .setFirstResult(filterDto.getSkip())
+                .setMaxResults(filterDto.getTake())
+                .getResultList();
     }
 
     private void addPredicates(CounterRecordFilterDto filterDto, List<Predicate> predicates, CriteriaBuilder criteriaBuilder, Root<CounterRecordEntity> counterRecordRoot) {
@@ -142,6 +151,19 @@ public class CounterRecordRepositoryImpl {
             Order order = sort.isDesc() ?
                     criteriaBuilder.desc(getPath(counterRecordRoot, sort.getId())) :
                     criteriaBuilder.asc(getPath(counterRecordRoot, sort.getId()));
+            orders.add(order);
+        }
+    }
+
+    private void addSortOrdersConclusion(CounterRecordSortDto[] sortList, List<Order> orders,
+                                         CriteriaBuilder criteriaBuilder,
+                                         Root<CounterRecordConclusionEntity> counterRecordRoot) {
+
+        for (CounterRecordSortDto sort : sortList) {
+
+            Order order = sort.isDesc() ?
+                    criteriaBuilder.desc(getPathConclusion(counterRecordRoot, sort.getId())) :
+                    criteriaBuilder.asc(getPathConclusion(counterRecordRoot, sort.getId()));
             orders.add(order);
         }
     }
