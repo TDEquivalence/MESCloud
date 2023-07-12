@@ -1,6 +1,7 @@
 package com.tde.mescloud.repository;
 
 import com.tde.mescloud.model.dto.CounterRecordFilterDto;
+import com.tde.mescloud.model.entity.CounterRecordConclusionEntity;
 import com.tde.mescloud.model.entity.CounterRecordEntity;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -16,7 +17,7 @@ public interface CounterRecordRepository extends CrudRepository<CounterRecordEnt
     @Query(value = "SELECT * FROM counter_record cr WHERE (cr.production_order_id = :productionOrderId) LIMIT 1", nativeQuery = true)
     Optional<CounterRecordEntity> findLastByProductionOrderId(Long productionOrderId);
 
-    List<CounterRecordEntity> findLastPerProductionOrder(CounterRecordFilterDto filterDto);
+    List<CounterRecordConclusionEntity> findLastPerProductionOrder(CounterRecordFilterDto filterDto);
 
     //    @EntityGraph(attributePaths = { "equipmentOutput", "equipmentOutput.countingEquipment", "productionOrder" })
     List<CounterRecordEntity> getFilteredAndPaginated(CounterRecordFilterDto filterDto);

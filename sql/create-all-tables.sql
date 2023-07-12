@@ -157,3 +157,15 @@ CREATE TABLE equipment_status_record (
     PRIMARY KEY(id),
     FOREIGN KEY(counting_equipment_id) REFERENCES counting_equipment(id)
 );
+
+CREATE VIEW counter_record_production_conclusion AS
+SELECT cr.id, cr.equipment_output_id, cr.production_order_id, cr.real_value, cr.computed_value, cr.registered_at
+FROM (
+    SELECT eo.id AS equipment_output_id, po.id AS production_order_id, MAX(cr.id) AS max_counter_record_id
+    FROM equipment_output eo
+    INNER JOIN production_order po ON eo.counting_equipment_id = po.equipment_id
+    INNER JOIN counter_record cr ON eo.id = cr.equipment_output_id AND po.id = cr.production_order_id
+    GROUP BY eo.id, po.id
+) AS last_counter
+JOIN counter_record cr ON last_counter.max_counter_record_id = cr.id
+ORDER BY cr.id DESC;

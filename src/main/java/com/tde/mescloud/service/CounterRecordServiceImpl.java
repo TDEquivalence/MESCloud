@@ -2,6 +2,7 @@ package com.tde.mescloud.service;
 
 import com.tde.mescloud.model.converter.CounterRecordConverter;
 import com.tde.mescloud.model.dto.*;
+import com.tde.mescloud.model.entity.CounterRecordConclusionEntity;
 import com.tde.mescloud.model.entity.CounterRecordEntity;
 import com.tde.mescloud.model.entity.EquipmentOutputEntity;
 import com.tde.mescloud.model.entity.ProductionOrderEntity;
@@ -10,6 +11,7 @@ import com.tde.mescloud.repository.ProductionOrderRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -39,14 +41,14 @@ public class CounterRecordServiceImpl implements CounterRecordService {
         int requestedRecords = filter.getTake();
         filter.setTake(filter.getTake() + 1);
 
-        List<CounterRecordEntity> counterRecordEntities = repository.findLastPerProductionOrder(filter);
-        boolean hasNextPage = counterRecordEntities.size() > requestedRecords;
+        List<CounterRecordConclusionEntity> counterRecordConclusionEntities = repository.findLastPerProductionOrder(filter);
+        boolean hasNextPage = counterRecordConclusionEntities.size() > requestedRecords;
 
         if (hasNextPage) {
-            counterRecordEntities.remove(counterRecordEntities.size() - 1);
+            counterRecordConclusionEntities.remove(counterRecordConclusionEntities.size() - 1);
         }
 
-        List<CounterRecordDto> counterRecords = converter.toDto(counterRecordEntities);
+        List<CounterRecordDto> counterRecords = converter.conclusionViewToDto(counterRecordConclusionEntities);
 
         PaginatedCounterRecordsDto paginatedCounterRecords = new PaginatedCounterRecordsDto();
         paginatedCounterRecords.setHasNextPage(hasNextPage);
@@ -111,7 +113,7 @@ public class CounterRecordServiceImpl implements CounterRecordService {
 
         setEquipmentOutput(counterRecord, counterDto.getOutputCode());
         setProductionOrder(counterRecord, equipmentCountsDto.getProductionOrderCode());
-        
+
         if (counterRecord.getProductionOrder() != null) {
             setComputedValue(counterRecord);
         }
