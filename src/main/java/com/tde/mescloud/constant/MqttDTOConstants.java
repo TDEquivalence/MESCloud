@@ -2,6 +2,7 @@ package com.tde.mescloud.constant;
 
 public class MqttDTOConstants {
 
+
     private MqttDTOConstants() throws IllegalAccessException {
         String msg = String.format("[%s] is an utility class, thus should not be instantiated", this.getClass().getName());
         throw new IllegalAccessException(msg);
@@ -14,4 +15,6 @@ public class MqttDTOConstants {
     public static final String HAS_RECEIVED_DTO_NAME = "Received";
     public static final String EQUIPMENT_CONFIG_DTO_NAME = "Configuration";
     public static final String EQUIPMENT_CONFIG_RESPONSE_DTO_NAME = "ConfigurationResponse";
+    public static final String PRODUCTION_ORDER_CONCLUSION_DTO_NAME = "ProductionOrderConclusion";
+    public static final String PRODUCTION_ORDER_CONCLUSION_RESPONSE_DTO_NAME = "ProductionOrderConclusionResponse";
 }

@@ -17,7 +17,9 @@ import com.tde.mescloud.constant.MqttDTOConstants;
         @Type(value = PlcMqttDto.class,
                 names = {MqttDTOConstants.EQUIPMENT_CONFIG_RESPONSE_DTO_NAME,
                         MqttDTOConstants.PRODUCTION_ORDER_RESPONSE_DTO_NAME,
-                        MqttDTOConstants.COUNTING_RECORD_DTO_NAME
+                        MqttDTOConstants.COUNTING_RECORD_DTO_NAME,
+                        MqttDTOConstants.PRODUCTION_ORDER_CONCLUSION_DTO_NAME,
+                        MqttDTOConstants.PRODUCTION_ORDER_CONCLUSION_RESPONSE_DTO_NAME
                 })
 })
 public interface MqttDto {

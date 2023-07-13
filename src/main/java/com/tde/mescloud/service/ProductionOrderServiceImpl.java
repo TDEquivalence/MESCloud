@@ -68,17 +68,11 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
             return Optional.empty();
         }
 
-        ProductionOrderEntity productionOrderEntity = productionOrderEntityOpt.get();
-        productionOrderEntity.setCompleted(true);
-        ProductionOrderEntity persistedProductionOrder = repository.save(productionOrderEntity);
-
-        ProductionOrderDto productionOrder = converter.toDto(persistedProductionOrder);
-
         try {
             ProductionOrderMqttDto productionOrderMqttDto = new ProductionOrderMqttDto();
-            productionOrderMqttDto.setJsonType(MqttDTOConstants.PRODUCTION_ORDER_DTO_NAME);
-            productionOrderMqttDto.setEquipmentEnabled(false);
-            productionOrderMqttDto.setProductionOrderCode("");
+            productionOrderMqttDto.setJsonType(MqttDTOConstants.PRODUCTION_ORDER_CONCLUSION_DTO_NAME);
+            productionOrderMqttDto.setEquipmentEnabled(true);
+            productionOrderMqttDto.setProductionOrderCode(productionOrderEntityOpt.get().getCode());
             productionOrderMqttDto.setTargetAmount(0);
             productionOrderMqttDto.setEquipmentCode(countingEquipmentOpt.get().getCode());
             mqttClient.publish(mqttSettings.getProtCountPlcTopic(), productionOrderMqttDto);
@@ -86,6 +80,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
             log.severe(() -> String.format("Unable to publish Order Completion to PLC for equipment [%s]", equipmentId));
         }
 
+        ProductionOrderDto productionOrder = converter.toDto(productionOrderEntityOpt.get());
         return Optional.of(productionOrder);
     }
 
