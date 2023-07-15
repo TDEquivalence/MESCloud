@@ -31,15 +31,24 @@ public class ProductionOrderConclusionProcess extends AbstractMesProtocolProcess
     public void execute(PlcMqttDto equipmentCounts) {
 
         log.info("Executing Production Order conclusion process");
-        if(equipmentCounts.getProductionOrderCode() == null && equipmentCounts.getEquipmentCode() == null) {
+        Optional<CountingEquipmentDto> countingEquipmentOpt = equipmentService.updateEquipmentStatus(equipmentCounts.getEquipmentCode(), equipmentCounts.getEquipmentStatus());
+
+        if(countingEquipmentOpt.isEmpty()) {
             log.warning(() -> String.format("Unable to find an Equipment with code [%s]", equipmentCounts.getEquipmentCode()));
             return;
         }
 
-        equipmentService.updateEquipmentStatus(equipmentCounts.getEquipmentCode(), equipmentCounts.getEquipmentStatus());
-        counterRecordService.save(equipmentCounts);
+        if (areInvalidInitialCounts(equipmentCounts)) {
+            log.warning(() -> String.format("Invalid initial count - Production Order [%s] already has records or does not exist",
+                    equipmentCounts.getProductionOrderCode()));
+        }
 
-        executeProductionOrderConclusion(equipmentCounts.getProductionOrderCode(), equipmentCounts.getEquipmentCode());
+        counterRecordService.save(equipmentCounts);
+        executeProductionOrderConclusion(countingEquipmentOpt.get());
+    }
+
+    private boolean areInvalidInitialCounts(PlcMqttDto equipmentCountsMqttDTO) {
+        return !counterRecordService.areValidInitialCounts(equipmentCountsMqttDTO.getProductionOrderCode());
     }
 
     @Override
@@ -47,11 +56,11 @@ public class ProductionOrderConclusionProcess extends AbstractMesProtocolProcess
         return MqttDTOConstants.PRODUCTION_ORDER_CONCLUSION_RESPONSE_DTO_NAME;
     }
 
-    public void executeProductionOrderConclusion(String productionOrderCode, String equipmentCode) {
+    public void executeProductionOrderConclusion(CountingEquipmentDto countingEquipmentOpt) {
 
-        Optional<ProductionOrderEntity> productionOrderEntityOpt = repository.findByCode(productionOrderCode);
+        Optional<ProductionOrderEntity> productionOrderEntityOpt = repository.findByCode(countingEquipmentOpt.getProductionOrderCode());
         if (productionOrderEntityOpt.isEmpty()) {
-            log.warning(() -> String.format("No Production Order found for an Equipment with code [%s]", productionOrderCode));
+            log.warning(() -> String.format("No Production Order found for an Equipment with code [%s]", countingEquipmentOpt.getProductionOrderCode()));
             return;
         }
 
@@ -62,10 +71,10 @@ public class ProductionOrderConclusionProcess extends AbstractMesProtocolProcess
                 productionOrderMqttDto.setEquipmentEnabled(false);
                 productionOrderMqttDto.setProductionOrderCode("");
                 productionOrderMqttDto.setTargetAmount(0);
-                productionOrderMqttDto.setEquipmentCode(equipmentCode);
+                productionOrderMqttDto.setEquipmentCode(countingEquipmentOpt.getCode());
                 mqttClient.publish(mqttSettings.getProtCountPlcTopic(), productionOrderMqttDto);
             } catch (MesMqttException e) {
-                log.severe(() -> String.format("Unable to publish Order Completion to PLC for equipment with code [%s]", equipmentCode));
+                log.severe(() -> String.format("Unable to publish Order Completion to PLC for equipment [%s]", countingEquipmentOpt.getId()));
             }
         }
 
