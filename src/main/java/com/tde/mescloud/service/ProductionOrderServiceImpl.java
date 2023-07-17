@@ -81,6 +81,9 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         }
 
         ProductionOrderDto productionOrder = converter.toDto(productionOrderEntityOpt.get());
+        //TODO: we have to return production order to FE with code and equipmentId without values to change PO status. We only reset values in ProductionOrderConclusionProcess
+        productionOrder.setCode("");
+        productionOrder.setEquipmentId(0);
         return Optional.of(productionOrder);
     }
 
