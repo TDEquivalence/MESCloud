@@ -57,6 +57,7 @@ public class ProductionOrderConclusionProcess extends AbstractMesProtocolProcess
 
         if(!productionOrderEntityOpt.get().isCompleted()) {
             try {
+                Thread.sleep(100);
                 ProductionOrderMqttDto productionOrderMqttDto = new ProductionOrderMqttDto();
                 productionOrderMqttDto.setJsonType(MqttDTOConstants.PRODUCTION_ORDER_DTO_NAME);
                 productionOrderMqttDto.setEquipmentEnabled(false);
@@ -64,8 +65,10 @@ public class ProductionOrderConclusionProcess extends AbstractMesProtocolProcess
                 productionOrderMqttDto.setTargetAmount(0);
                 productionOrderMqttDto.setEquipmentCode(equipmentCode);
                 mqttClient.publish(mqttSettings.getProtCountPlcTopic(), productionOrderMqttDto);
-            } catch (MesMqttException e) {
+            } catch (MesMqttException | InterruptedException e) {
                 log.severe(() -> String.format("Unable to publish Order Completion to PLC for equipment with code [%s]", equipmentCode));
+                Thread.currentThread().interrupt();
+                throw new RuntimeException(e);
             }
         }
 
