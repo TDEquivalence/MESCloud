@@ -71,7 +71,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         try {
             ProductionOrderMqttDto productionOrderMqttDto = new ProductionOrderMqttDto();
             productionOrderMqttDto.setJsonType(MqttDTOConstants.PRODUCTION_ORDER_CONCLUSION_DTO_NAME);
-            productionOrderMqttDto.setEquipmentEnabled(true);
+            productionOrderMqttDto.setEquipmentEnabled(false);
             productionOrderMqttDto.setProductionOrderCode(productionOrderEntityOpt.get().getCode());
             productionOrderMqttDto.setTargetAmount(0);
             productionOrderMqttDto.setEquipmentCode(countingEquipmentOpt.get().getCode());
