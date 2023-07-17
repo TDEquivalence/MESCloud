@@ -76,11 +76,13 @@ public class CountProtocol extends AbstractMesProtocol {
     
     private void publishHasReceived(MqttDto mqttDTO) {
         try {
+            Thread.sleep(100);
             HasReceivedMqttDto hasReceivedMqttDTO = new HasReceivedMqttDto(mqttDTO.getEquipmentCode());
             mqttClient.publish(mesMqttSettings.getProtCountPlcTopic(), hasReceivedMqttDTO);
-        } catch (MesMqttException e) {
+        } catch (MesMqttException | InterruptedException e) {
             log.log(Level.SEVERE, e, () -> String.format("Failed to publish Has Received message as a response to [%s] for equipment [%s]",
                     mqttDTO.getJsonType(), mqttDTO.getEquipmentCode()));
+            Thread.currentThread().interrupt();
             throw new RuntimeException(e);
         }
     }
