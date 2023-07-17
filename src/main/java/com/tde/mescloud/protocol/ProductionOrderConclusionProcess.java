@@ -57,7 +57,7 @@ public class ProductionOrderConclusionProcess extends AbstractMesProtocolProcess
 
         if(!productionOrderEntityOpt.get().isCompleted()) {
             try {
-                Thread.sleep(100);
+                Thread.sleep(250);
                 ProductionOrderMqttDto productionOrderMqttDto = new ProductionOrderMqttDto();
                 productionOrderMqttDto.setJsonType(MqttDTOConstants.PRODUCTION_ORDER_DTO_NAME);
                 productionOrderMqttDto.setEquipmentEnabled(false);
