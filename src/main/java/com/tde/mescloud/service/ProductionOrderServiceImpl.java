@@ -27,7 +27,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     private static final String OBO_SECTION_PREFIX = "OBO";
     private static final String CODE_PREFIX = "PO";
     private static final String NEW_CODE_FORMAT = "%05d";
-    private static final int CODE_VALUE_INDEX = 10;
+    private static final int CODE_VALUE_INDEX =7;
 
     private final ProductionOrderRepository repository;
     private final ProductionOrderConverter converter;
