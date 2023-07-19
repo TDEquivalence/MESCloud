@@ -20,7 +20,6 @@ import java.util.Optional;
 public class CountingEquipmentController {
 
     private CountingEquipmentService countingEquipmentService;
-    private ProductionOrderService productionOrderService;
 
     @GetMapping
     public ResponseEntity<List<CountingEquipmentDto>> findAll() {
