@@ -80,10 +80,15 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
             log.severe(() -> String.format("Unable to publish Order Completion to PLC for equipment [%s]", equipmentId));
         }
 
+        while(!productionOrderEntityOpt.get().isCompleted()) {
+            try {
+                Thread.sleep(500); // Wait for 1 second before checking the condition again.
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
         ProductionOrderDto productionOrder = converter.toDto(productionOrderEntityOpt.get());
-        //TODO: we have to return production order to FE with code and equipmentId without values to change PO status. We only reset values in ProductionOrderConclusionProcess
-        productionOrder.setCode("");
-        productionOrder.setEquipmentId(0);
         return Optional.of(productionOrder);
     }
 

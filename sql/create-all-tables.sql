@@ -1,15 +1,15 @@
-DROP TABLE IF EXISTS factory_user;
-DROP TABLE IF EXISTS production_instruction;
-DROP TABLE IF EXISTS equipment_status_record;
-DROP TABLE IF EXISTS counter_record;
-DROP TABLE IF EXISTS production_order;
-DROP TABLE IF EXISTS counting_equipment;
-DROP TABLE IF EXISTS equipment_output;
-DROP TABLE IF EXISTS equipment_output_alias;
-DROP TABLE IF EXISTS section;
-DROP TABLE IF EXISTS factory;
-DROP TABLE IF EXISTS token;
-DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS factory_user CASCADE;
+DROP TABLE IF EXISTS production_instruction CASCADE;
+DROP TABLE IF EXISTS equipment_status_record CASCADE;
+DROP TABLE IF EXISTS counter_record CASCADE;
+DROP TABLE IF EXISTS production_order CASCADE;
+DROP TABLE IF EXISTS counting_equipment CASCADE;
+DROP TABLE IF EXISTS equipment_output CASCADE;
+DROP TABLE IF EXISTS equipment_output_alias CASCADE;
+DROP TABLE IF EXISTS section CASCADE;
+DROP TABLE IF EXISTS factory CASCADE;
+DROP TABLE IF EXISTS token CASCADE;
+DROP TABLE IF EXISTS users CASCADE;
 
 CREATE TABLE users (
   id int GENERATED ALWAYS AS IDENTITY,
