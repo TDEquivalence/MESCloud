@@ -159,13 +159,22 @@ CREATE TABLE equipment_status_record (
 );
 
 CREATE VIEW counter_record_production_conclusion AS
-SELECT cr.id, cr.equipment_output_id, cr.production_order_id, cr.real_value, cr.computed_value, cr.registered_at
-FROM (
-    SELECT eo.id AS equipment_output_id, po.id AS production_order_id, MAX(cr.id) AS max_counter_record_id
-    FROM equipment_output eo
-    INNER JOIN production_order po ON eo.counting_equipment_id = po.equipment_id
-    INNER JOIN counter_record cr ON eo.id = cr.equipment_output_id AND po.id = cr.production_order_id
-    GROUP BY eo.id, po.id
-) AS last_counter
-JOIN counter_record cr ON last_counter.max_counter_record_id = cr.id
-ORDER BY cr.id DESC;
+ SELECT cr.id,
+    cr.equipment_output_id,
+    cr.equipment_output_alias,
+    cr.real_value,
+    cr.computed_value,
+    cr.production_order_id,
+    cr.registered_at,
+    po.code AS production_order_code
+   FROM ( SELECT eo.id AS equipment_output_id,
+            cr_1.equipment_output_alias,
+            po_1.id AS production_order_id,
+            max(cr_1.id) AS max_counter_record_id
+           FROM equipment_output eo
+             JOIN production_order po_1 ON eo.counting_equipment_id = po_1.equipment_id
+             JOIN counter_record cr_1 ON eo.id = cr_1.equipment_output_id AND po_1.id = cr_1.production_order_id
+          GROUP BY eo.id, cr_1.equipment_output_alias, po_1.id) last_counter
+     JOIN counter_record cr ON last_counter.max_counter_record_id = cr.id
+     JOIN production_order po ON cr.production_order_id = po.id
+     ORDER BY cr.id DESC;

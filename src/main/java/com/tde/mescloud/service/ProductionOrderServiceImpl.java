@@ -80,14 +80,6 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
             log.severe(() -> String.format("Unable to publish Order Completion to PLC for equipment [%s]", equipmentId));
         }
 
-        while(!productionOrderEntityOpt.get().isCompleted()) {
-            try {
-                Thread.sleep(500); // Wait for 1 second before checking the condition again.
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-
         ProductionOrderDto productionOrder = converter.toDto(productionOrderEntityOpt.get());
         return Optional.of(productionOrder);
     }
