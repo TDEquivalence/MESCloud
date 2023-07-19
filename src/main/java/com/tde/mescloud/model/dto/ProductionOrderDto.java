@@ -14,7 +14,6 @@ public class ProductionOrderDto {
     private String code;
     private int targetAmount;
     private Date createdAt;
-    private boolean isCompleted;
 
     private String inputBatch;
     private String source;

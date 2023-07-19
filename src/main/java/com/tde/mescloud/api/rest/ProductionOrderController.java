@@ -33,16 +33,6 @@ public class ProductionOrderController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        try {
-            Thread.sleep(500);
-            Optional<ProductionOrderDto> refreshedProductionOrderOpt = productionOrderService.findByCode(productionOrderOpt.get().getCode());
-            if(refreshedProductionOrderOpt.isEmpty()) {
-                return new ResponseEntity<>(HttpStatus.EXPECTATION_FAILED);
-            }
-            return new ResponseEntity<>(refreshedProductionOrderOpt.get(), HttpStatus.OK);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new RuntimeException(e);
-        }
+        return new ResponseEntity<>(productionOrderOpt.get(), HttpStatus.OK);
     }
 }

@@ -3,7 +3,6 @@ package com.tde.mescloud.protocol;
 import com.tde.mescloud.api.mqtt.MqttClient;
 import com.tde.mescloud.constant.MqttDTOConstants;
 import com.tde.mescloud.exception.MesMqttException;
-import com.tde.mescloud.model.dto.CountingEquipmentDto;
 import com.tde.mescloud.model.dto.PlcMqttDto;
 import com.tde.mescloud.model.dto.ProductionOrderMqttDto;
 import com.tde.mescloud.model.entity.ProductionOrderEntity;
