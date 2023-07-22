@@ -16,8 +16,9 @@ public abstract class AbstractMesProtocol implements MesProtocol {
         mesProcessByDTOName.put(mesDTOName, mesProtocolProcess);
     }
 
+    //TODO: Consider updating the equipment status at this level, since all mqttProcesses do it. This would imply changing this method argument from MqttDto to PlcMqttDto
     public void executeMesProcess(MqttDto mqttDTO) {
-        MesProtocolProcess mesProtocolProcess =  mesProcessByDTOName.get(mqttDTO.getJsonType());
+        MesProtocolProcess mesProtocolProcess = mesProcessByDTOName.get(mqttDTO.getJsonType());
         if (mesProtocolProcess == null) {
             log.warning(() -> String.format("Unable to find a MES Protocol Process for the JSON Type [%s]", mqttDTO.getJsonType()));
         } else {

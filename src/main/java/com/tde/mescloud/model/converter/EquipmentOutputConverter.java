@@ -20,17 +20,4 @@ public interface EquipmentOutputConverter {
 
         return dtos;
     }
-
-    default List<EquipmentOutputEntity> toEntity(List<EquipmentOutputDto> dtos) {
-
-        List<EquipmentOutputEntity> entities = new ArrayList<>(dtos.size());
-        for (EquipmentOutputDto dto : dtos) {
-            EquipmentOutputEntity entity = toEntity(dto);
-            entities.add(entity);
-        }
-
-        return entities;
-    }
-
-    EquipmentOutputEntity toEntity(EquipmentOutputDto dto);
 }

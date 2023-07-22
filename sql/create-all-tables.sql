@@ -1,15 +1,15 @@
-DROP TABLE IF EXISTS factory_user;
-DROP TABLE IF EXISTS production_instruction;
-DROP TABLE IF EXISTS equipment_status_record;
-DROP TABLE IF EXISTS counter_record;
-DROP TABLE IF EXISTS production_order;
-DROP TABLE IF EXISTS counting_equipment;
-DROP TABLE IF EXISTS equipment_output;
-DROP TABLE IF EXISTS equipment_output_alias;
-DROP TABLE IF EXISTS section;
-DROP TABLE IF EXISTS factory;
-DROP TABLE IF EXISTS token;
-DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS factory_user CASCADE;
+DROP TABLE IF EXISTS production_instruction CASCADE;
+DROP TABLE IF EXISTS equipment_status_record CASCADE;
+DROP TABLE IF EXISTS counter_record CASCADE;
+DROP TABLE IF EXISTS production_order CASCADE;
+DROP TABLE IF EXISTS counting_equipment CASCADE;
+DROP TABLE IF EXISTS equipment_output CASCADE;
+DROP TABLE IF EXISTS equipment_output_alias CASCADE;
+DROP TABLE IF EXISTS section CASCADE;
+DROP TABLE IF EXISTS factory CASCADE;
+DROP TABLE IF EXISTS token CASCADE;
+DROP TABLE IF EXISTS users CASCADE;
 
 CREATE TABLE users (
   id int GENERATED ALWAYS AS IDENTITY,
@@ -157,3 +157,24 @@ CREATE TABLE equipment_status_record (
     PRIMARY KEY(id),
     FOREIGN KEY(counting_equipment_id) REFERENCES counting_equipment(id)
 );
+
+CREATE VIEW counter_record_production_conclusion AS
+ SELECT cr.id,
+    cr.equipment_output_id,
+    cr.equipment_output_alias,
+    cr.real_value,
+    cr.computed_value,
+    cr.production_order_id,
+    cr.registered_at,
+    po.code AS production_order_code
+   FROM ( SELECT eo.id AS equipment_output_id,
+            cr_1.equipment_output_alias,
+            po_1.id AS production_order_id,
+            max(cr_1.id) AS max_counter_record_id
+           FROM equipment_output eo
+             JOIN production_order po_1 ON eo.counting_equipment_id = po_1.equipment_id
+             JOIN counter_record cr_1 ON eo.id = cr_1.equipment_output_id AND po_1.id = cr_1.production_order_id
+          GROUP BY eo.id, cr_1.equipment_output_alias, po_1.id) last_counter
+     JOIN counter_record cr ON last_counter.max_counter_record_id = cr.id
+     JOIN production_order po ON cr.production_order_id = po.id
+     ORDER BY cr.id DESC;

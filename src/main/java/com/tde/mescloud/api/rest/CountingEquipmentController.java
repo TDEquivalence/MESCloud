@@ -2,7 +2,6 @@ package com.tde.mescloud.api.rest;
 
 import com.tde.mescloud.model.dto.CountingEquipmentDto;
 import com.tde.mescloud.service.CountingEquipmentService;
-import com.tde.mescloud.service.ProductionOrderService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +19,6 @@ import java.util.Optional;
 public class CountingEquipmentController {
 
     private CountingEquipmentService countingEquipmentService;
-    private ProductionOrderService productionOrderService;
 
     @GetMapping
     public ResponseEntity<List<CountingEquipmentDto>> findAll() {

@@ -11,6 +11,7 @@ import com.tde.mescloud.model.entity.ProductionOrderEntity;
 import com.tde.mescloud.protocol.MesMqttSettings;
 import com.tde.mescloud.repository.CountingEquipmentRepository;
 import com.tde.mescloud.repository.ProductionOrderRepository;
+import com.tde.mescloud.utility.LockUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
@@ -24,15 +25,16 @@ import java.util.Optional;
 @Log
 public class ProductionOrderServiceImpl implements ProductionOrderService {
 
+    private static final String OBO_SECTION_PREFIX = "OBO";
     private static final String CODE_PREFIX = "PO";
-    private static final String NEW_CODE_FORMAT = "%02d";
-    private static final int CODE_VALUE_INDEX = 4;
+    private static final String NEW_CODE_FORMAT = "%05d";
 
     private final ProductionOrderRepository repository;
     private final ProductionOrderConverter converter;
     private final CountingEquipmentRepository countingEquipmentRepository;
     private final MqttClient mqttClient;
     private final MesMqttSettings mqttSettings;
+    private final LockUtil lock;
 
 
     @Override
@@ -56,7 +58,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     public Optional<ProductionOrderDto> complete(long equipmentId) {
 
         Optional<CountingEquipmentEntity> countingEquipmentOpt = countingEquipmentRepository.findById(equipmentId);
-        if(countingEquipmentOpt.isEmpty()) {
+        if (countingEquipmentOpt.isEmpty()) {
             log.warning(() -> String.format("Unable to find an Equipment with id [%s]", equipmentId));
             return Optional.empty();
         }
@@ -67,17 +69,11 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
             return Optional.empty();
         }
 
-        ProductionOrderEntity productionOrderEntity = productionOrderEntityOpt.get();
-        productionOrderEntity.setCompleted(true);
-        ProductionOrderEntity persistedProductionOrder = repository.save(productionOrderEntity);
-
-        ProductionOrderDto productionOrder = converter.toDto(persistedProductionOrder);
-
         try {
             ProductionOrderMqttDto productionOrderMqttDto = new ProductionOrderMqttDto();
-            productionOrderMqttDto.setJsonType(MqttDTOConstants.PRODUCTION_ORDER_DTO_NAME);
+            productionOrderMqttDto.setJsonType(MqttDTOConstants.PRODUCTION_ORDER_CONCLUSION_DTO_NAME);
             productionOrderMqttDto.setEquipmentEnabled(false);
-            productionOrderMqttDto.setProductionOrderCode("");
+            productionOrderMqttDto.setProductionOrderCode(productionOrderEntityOpt.get().getCode());
             productionOrderMqttDto.setTargetAmount(0);
             productionOrderMqttDto.setEquipmentCode(countingEquipmentOpt.get().getCode());
             mqttClient.publish(mqttSettings.getProtCountPlcTopic(), productionOrderMqttDto);
@@ -85,6 +81,14 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
             log.severe(() -> String.format("Unable to publish Order Completion to PLC for equipment [%s]", equipmentId));
         }
 
+        try {
+            lock.waitForExecute();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            e.printStackTrace();
+        }
+
+        ProductionOrderDto productionOrder = converter.toDto(productionOrderEntityOpt.get());
         return Optional.of(productionOrder);
     }
 
@@ -123,7 +127,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
 
     @Override
     public String generateCode() {
-        return CODE_PREFIX + getYearForCode() + getNewCodeValueFormatted();
+        return OBO_SECTION_PREFIX + CODE_PREFIX + getYearForCode() + getNewCodeValueFormatted();
     }
 
     private int getYearForCode() {
@@ -136,7 +140,8 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         if (productionOrderEntity == null) {
             return 1;
         }
-        String lastValueAsString = productionOrderEntity.getCode().substring(CODE_VALUE_INDEX);
+        String codeValueIndex = OBO_SECTION_PREFIX + CODE_PREFIX + getYearForCode();
+        String lastValueAsString = productionOrderEntity.getCode().substring(codeValueIndex.length());
         int lastCodeValue = Integer.parseInt(lastValueAsString);
         return ++lastCodeValue;
     }

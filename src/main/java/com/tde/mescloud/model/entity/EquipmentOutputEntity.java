@@ -12,7 +12,7 @@ public class EquipmentOutputEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private CountingEquipmentEntity countingEquipment;
     private String code;
     @ManyToOne(fetch = FetchType.EAGER)

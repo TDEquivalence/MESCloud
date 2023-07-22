@@ -19,7 +19,7 @@ import java.util.logging.Level;
 @Log
 public class CountProtocol extends AbstractMesProtocol {
 
-    public final static String BEAN_NAME = "protCountService";
+    public static final String BEAN_NAME = "protCountService";
 
     private final ObjectMapper objectMapper;
     private final MqttClient mqttClient;

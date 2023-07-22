@@ -12,7 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 @ExtendWith(MockitoExtension.class)
 @SpringBootTest
-public class MqttClientTest {
+class MqttClientTest {
 
     private final MqttClient mqttClient;
 
@@ -26,7 +26,7 @@ public class MqttClientTest {
     }
 
     @Test
-    public void subscribe() throws MesMqttException {
+     void subscribe() throws MesMqttException {
         mqttClient.subscribe("Test topic");
         Assertions.assertDoesNotThrow(() -> mqttClient.subscribe("Test topic"));
     }

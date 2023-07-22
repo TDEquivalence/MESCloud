@@ -7,13 +7,12 @@ import lombok.Setter;
 import java.util.Date;
 
 @Entity
-@Table(name = "counter_record")
+@Table(name = "counter_record_production_conclusion")
 @Getter
 @Setter
-public class CounterRecordEntity {
+public class CounterRecordConclusionEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "equipment_output_id")

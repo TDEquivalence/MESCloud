@@ -1,9 +1,6 @@
 package com.tde.mescloud.service;
 
-import com.tde.mescloud.model.dto.CounterRecordDto;
-import com.tde.mescloud.model.dto.CounterRecordFilterDto;
-import com.tde.mescloud.model.dto.EquipmentCountsMqttDto;
-import com.tde.mescloud.model.dto.PaginatedCounterRecordsDto;
+import com.tde.mescloud.model.dto.*;
 
 import java.util.List;
 
@@ -13,7 +10,7 @@ public interface CounterRecordService {
 
     PaginatedCounterRecordsDto getFilteredAndPaginated(CounterRecordFilterDto filterDto);
 
-    List<CounterRecordDto> save(EquipmentCountsMqttDto equipmentCountsMqttDTO);
+    List<CounterRecordDto> save(PlcMqttDto equipmentCountsMqttDTO);
 
     boolean areValidInitialCounts(String productionOrderCode);
 
