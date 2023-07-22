@@ -69,7 +69,7 @@ public class ProductionOrderConclusionProcess extends AbstractMesProtocolProcess
             } catch (MesMqttException | InterruptedException e) {
                 log.severe(() -> String.format("Unable to publish Order Completion to PLC for equipment with code [%s]", equipmentCode));
                 Thread.currentThread().interrupt();
-                throw new RuntimeException(e);
+                e.printStackTrace();
             }
         }
 
