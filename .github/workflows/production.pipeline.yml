@@ -111,11 +111,11 @@ jobs:
       postgres:
         image: postgres
         env:
-          POSTGRES_PORT: ${{ secrets.DB_PORT }}
-          POSTGRES_HOST: ${{ secrets.DB_HOST }}
-          POSTGRES_USER: ${{ secrets.DB_USERNAME }}
-          POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          POSTGRES_DB: ${{ secrets.DB_NAME }}
+          POSTGRES_PORT: ${{ vars.DB_PORT }}
+          POSTGRES_HOST: ${{ vars.DB_HOST }}
+          POSTGRES_USER: ${{ vars.DB_USERNAME }}
+          POSTGRES_PASSWORD: ${{ vars.DB_PASSWORD }}
+          POSTGRES_DB: ${{ vars.DB_NAME }}
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
