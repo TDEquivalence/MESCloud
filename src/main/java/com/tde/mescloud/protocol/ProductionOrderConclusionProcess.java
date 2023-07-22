@@ -9,6 +9,7 @@ import com.tde.mescloud.model.entity.ProductionOrderEntity;
 import com.tde.mescloud.repository.ProductionOrderRepository;
 import com.tde.mescloud.service.CounterRecordService;
 import com.tde.mescloud.service.CountingEquipmentService;
+import com.tde.mescloud.utility.LockUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,7 @@ public class ProductionOrderConclusionProcess extends AbstractMesProtocolProcess
     private final MqttClient mqttClient;
     private final ProductionOrderRepository repository;
     private final MesMqttSettings mqttSettings;
+    private final LockUtil lock;
 
     @Override
     public void execute(PlcMqttDto equipmentCounts) {
@@ -74,5 +76,7 @@ public class ProductionOrderConclusionProcess extends AbstractMesProtocolProcess
         ProductionOrderEntity productionOrderEntity = productionOrderEntityOpt.get();
         productionOrderEntity.setCompleted(true);
         repository.save(productionOrderEntity);
+
+        lock.signalExecute();
     }
 }

@@ -11,6 +11,7 @@ import com.tde.mescloud.model.entity.ProductionOrderEntity;
 import com.tde.mescloud.protocol.MesMqttSettings;
 import com.tde.mescloud.repository.CountingEquipmentRepository;
 import com.tde.mescloud.repository.ProductionOrderRepository;
+import com.tde.mescloud.utility.LockUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
@@ -27,13 +28,13 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     private static final String OBO_SECTION_PREFIX = "OBO";
     private static final String CODE_PREFIX = "PO";
     private static final String NEW_CODE_FORMAT = "%05d";
-    private static final int CODE_VALUE_INDEX = 7;
 
     private final ProductionOrderRepository repository;
     private final ProductionOrderConverter converter;
     private final CountingEquipmentRepository countingEquipmentRepository;
     private final MqttClient mqttClient;
     private final MesMqttSettings mqttSettings;
+    private final LockUtil lock;
 
 
     @Override
@@ -78,6 +79,13 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
             mqttClient.publish(mqttSettings.getProtCountPlcTopic(), productionOrderMqttDto);
         } catch (MesMqttException e) {
             log.severe(() -> String.format("Unable to publish Order Completion to PLC for equipment [%s]", equipmentId));
+        }
+
+        try {
+            lock.waitForExecute();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            e.printStackTrace();
         }
 
         ProductionOrderDto productionOrder = converter.toDto(productionOrderEntityOpt.get());
