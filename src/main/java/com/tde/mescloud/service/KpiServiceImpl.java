@@ -2,6 +2,7 @@ package com.tde.mescloud.service;
 
 import com.tde.mescloud.model.dto.*;
 import com.tde.mescloud.utility.DateUtil;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -9,6 +10,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 @Service
+@AllArgsConstructor
 public class KpiServiceImpl implements KpiService {
 
     private final String NOT_VALID_OUTPUT = "NOTOK";
@@ -22,7 +24,14 @@ public class KpiServiceImpl implements KpiService {
         CounterRecordFilterDto counterRecordFilterDto = new CounterRecordFilterDto();
         counterRecordFilterDto.setTake(1000);
         counterRecordFilterDto.setSkip(0);
-        counterRecordFilterDto.setSearch(filter.getSearch());
+
+        if (filter.getSearch() == null) {
+            counterRecordFilterDto.setSearch(new CounterRecordSearchDto[0]);
+        } else {
+            counterRecordFilterDto.setSearch(filter.getSearch());
+        }
+
+        counterRecordFilterDto.setSort(new CounterRecordSortDto[0]);
 
         PaginatedCounterRecordsDto conclusionCounterRecords =
                 counterRecordService.findLastPerProductionOrder(counterRecordFilterDto);
