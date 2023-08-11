@@ -6,6 +6,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class CounterRecordSearchDto {
-    private String id;//dateStart
-    private String value;//2022-23...
+    private String id;
+    private String value;
 }
+

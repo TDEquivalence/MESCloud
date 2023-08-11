@@ -1,6 +1,5 @@
 package com.tde.mescloud.api.rest;
 
-import com.tde.mescloud.model.converter.CounterRecordConverter;
 import com.tde.mescloud.model.dto.CounterRecordFilterDto;
 import com.tde.mescloud.model.dto.PaginatedCounterRecordsDto;
 import com.tde.mescloud.service.CounterRecordService;
@@ -18,8 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class CounterRecordController {
 
     private final CounterRecordService service;
-    private final CounterRecordConverter converter;
-
 
     @PostMapping("/filter")
     public ResponseEntity<PaginatedCounterRecordsDto> getFilteredAndPaginated(@RequestBody CounterRecordFilterDto filter) {
