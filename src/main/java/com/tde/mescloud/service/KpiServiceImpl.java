@@ -5,9 +5,9 @@ import com.tde.mescloud.utility.DateUtil;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 @Service
 @AllArgsConstructor
@@ -25,10 +25,22 @@ public class KpiServiceImpl implements KpiService {
         counterRecordFilterDto.setTake(1000);
         counterRecordFilterDto.setSkip(0);
 
+        CounterRecordSearchDto dateStart = new CounterRecordSearchDto();
+        dateStart.setId("dateStart");
+        dateStart.setValue(filter.getStartDate());
+
+        CounterRecordSearchDto dateEnd = new CounterRecordSearchDto();
+        dateEnd.setId("dateEnd");
+        dateEnd.setValue(filter.getEndDate());
+
+
         if (filter.getSearch() == null) {
             counterRecordFilterDto.setSearch(new CounterRecordSearchDto[0]);
         } else {
-            counterRecordFilterDto.setSearch(filter.getSearch());
+            List<CounterRecordSearchDto> searchesAsList = new ArrayList<>(Arrays.stream(filter.getSearch()).toList());
+            searchesAsList.add(dateStart);
+            searchesAsList.add(dateEnd);
+            counterRecordFilterDto.setSearch(searchesAsList.toArray(new CounterRecordSearchDto[0]));
         }
 
         counterRecordFilterDto.setSort(new CounterRecordSortDto[0]);
@@ -41,9 +53,16 @@ public class KpiServiceImpl implements KpiService {
         }
 
         Map<String, CountingEquipmentKpiDto> equipmentKpiByEquipmentAlias = new LinkedHashMap<>();
-        final long daysInBetween = DateUtil.calculateDaysBetween(filter.getStartDate(), filter.getEndDate());
-        Date lastComputedDate = null;
-        int currentIndex = 0;
+
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_INSTANT;
+        Instant startInstant = Instant.from(formatter.parse(filter.getStartDate()));
+        Date startDate = Date.from(startInstant);
+        Instant endInstand = Instant.from(formatter.parse(filter.getEndDate()));
+        Date endDate = Date.from(endInstand);
+
+        final int daysInBetween = (int) DateUtil.spanInDays(startDate, endDate);//5
+        Date lastComputedDate = endDate;
+        int currentIndex = daysInBetween - 1;
 
         for (CounterRecordDto conclusionCounterRecord : conclusionCounterRecords.getCounterRecords()) {
 
@@ -55,17 +74,12 @@ public class KpiServiceImpl implements KpiService {
                 equipmentKpiByEquipmentAlias.put(equipmentAlias, equipmentKpi);
             }
 
-            if (lastComputedDate == null) {
-                lastComputedDate = conclusionCounterRecord.getRegisteredAt();
-            }
-
             //TODO: change to isDifferentDay? which checks FIRST if isDayBefore
             if (DateUtil.isDayBefore(conclusionCounterRecord.getRegisteredAt(), lastComputedDate)) {
-                lastComputedDate = conclusionCounterRecord.getRegisteredAt();
-                //TODO: Remove comment after testing
-                //Is any of the found machines empty? If so, set valid & invalidCounts with 0 at currentIndex before increment
-                //Actually, this is already done. int[] default value is 0. If no value is worked...
-                currentIndex++;
+                Date currentDate = conclusionCounterRecord.getRegisteredAt();//18, last computed = 20
+                final int intermediateDaysInBetween = (int) DateUtil.differenceInDays(currentDate, lastComputedDate); //2
+                currentIndex -= intermediateDaysInBetween;
+                lastComputedDate = currentDate;
             }
 
             //TODO: Change constants by boolean check

@@ -39,7 +39,7 @@ public class DateUtil {
                 firstCalendar.get(Calendar.DAY_OF_MONTH) == secondCalendar.get(Calendar.DAY_OF_MONTH);
     }
 
-    public static long calculateDaysBetween(Date startDate, Date endDate) {
+    public static long spanInDays(Date startDate, Date endDate) {
 
         Calendar startCalendar = Calendar.getInstance();
         startCalendar.setTime(startDate);
@@ -51,5 +51,47 @@ public class DateUtil {
 
         long differenceInMillis = endCalendar.getTimeInMillis() - startCalendar.getTimeInMillis();
         return TimeUnit.MILLISECONDS.toDays(differenceInMillis) + INCLUDE_START_AND_END_DATE;
+    }
+
+    public static long differenceInDays(Date startDate, Date endDate) {
+
+        Calendar startCalendar = Calendar.getInstance();
+        startCalendar.setTime(startDate);
+        truncateToDays(startCalendar);
+
+        Calendar endCalendar = Calendar.getInstance();
+        endCalendar.setTime(endDate);
+        truncateToDays(endCalendar);
+
+        long differenceInMillis = endCalendar.getTimeInMillis() - startCalendar.getTimeInMillis();
+        return TimeUnit.MILLISECONDS.toDays(differenceInMillis);
+    }
+
+    public static Calendar toCalendar(Date date) {
+        Calendar calendarToCompare = Calendar.getInstance();
+        calendarToCompare.setTime(date);
+        return calendarToCompare;
+    }
+
+    public static boolean isSameDay(Date firstDate, Date secondDate) {
+        Calendar firstCalendar = toCalendar(firstDate);
+        Calendar secondCalendar = toCalendar(secondDate);
+        return isSameDay(firstCalendar, secondCalendar);
+    }
+
+    public static Date getPreviousDay(Date inputDate) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(inputDate);
+
+        // Clear hours, minutes, seconds, and milliseconds
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+
+        // Subtract one day
+        calendar.add(Calendar.DAY_OF_MONTH, -1);
+
+        return calendar.getTime();
     }
 }

@@ -2,8 +2,6 @@ package com.tde.mescloud.model.dto;
 
 import lombok.Data;
 
-import java.util.Date;
-
 @Data
 public class KpiFilterDto {
 
@@ -15,7 +13,7 @@ public class KpiFilterDto {
     }
 
     private TimeMode timeMode;
-    private Date startDate;
-    private Date endDate;
+    private String startDate;
+    private String endDate;
     private CounterRecordSearchDto[] search;
 }
