@@ -43,9 +43,7 @@ public class KpiServiceImpl implements KpiService {
                 equipmentKpiByEquipmentAlias.put(equipmentAlias, equipmentKpi);
             }
 
-            //TODO: Starting from index 0 would be better as it would avoid subtracting the zero index based value
-            final int intermediateDaysInBetween = DateUtil.differenceInDays(equipmentCount.getRegisteredAt(), endDate);
-            int dayAsIndex = spanInDays - 1 - intermediateDaysInBetween;
+            final int dayAsIndex = DateUtil.differenceInDays(startDate, equipmentCount.getRegisteredAt());
 
             //TODO: Change constants by boolean check
             if (NOT_VALID_OUTPUT.equals(equipmentCount.getEquipmentOutputAlias())) {
