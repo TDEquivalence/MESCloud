@@ -1,5 +1,7 @@
 package com.tde.mescloud.utility;
 
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
@@ -39,7 +41,7 @@ public class DateUtil {
                 firstCalendar.get(Calendar.DAY_OF_MONTH) == secondCalendar.get(Calendar.DAY_OF_MONTH);
     }
 
-    public static long spanInDays(Date startDate, Date endDate) {
+    public static int spanInDays(Date startDate, Date endDate) {
 
         Calendar startCalendar = Calendar.getInstance();
         startCalendar.setTime(startDate);
@@ -50,10 +52,10 @@ public class DateUtil {
         truncateToDays(endCalendar);
 
         long differenceInMillis = endCalendar.getTimeInMillis() - startCalendar.getTimeInMillis();
-        return TimeUnit.MILLISECONDS.toDays(differenceInMillis) + INCLUDE_START_AND_END_DATE;
+        return (int) TimeUnit.MILLISECONDS.toDays(differenceInMillis) + INCLUDE_START_AND_END_DATE;
     }
 
-    public static long differenceInDays(Date startDate, Date endDate) {
+    public static int differenceInDays(Date startDate, Date endDate) {
 
         Calendar startCalendar = Calendar.getInstance();
         startCalendar.setTime(startDate);
@@ -64,7 +66,7 @@ public class DateUtil {
         truncateToDays(endCalendar);
 
         long differenceInMillis = endCalendar.getTimeInMillis() - startCalendar.getTimeInMillis();
-        return TimeUnit.MILLISECONDS.toDays(differenceInMillis);
+        return (int) TimeUnit.MILLISECONDS.toDays(differenceInMillis);
     }
 
     public static Calendar toCalendar(Date date) {
@@ -83,15 +85,19 @@ public class DateUtil {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(inputDate);
 
-        // Clear hours, minutes, seconds, and milliseconds
         calendar.set(Calendar.HOUR_OF_DAY, 0);
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);
         calendar.set(Calendar.MILLISECOND, 0);
 
-        // Subtract one day
         calendar.add(Calendar.DAY_OF_MONTH, -1);
 
         return calendar.getTime();
+    }
+
+    public static Date convertToDate(String dateAsString) {
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_INSTANT;
+        Instant instant = Instant.from(formatter.parse(dateAsString));
+        return Date.from(instant);
     }
 }

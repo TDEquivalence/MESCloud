@@ -5,8 +5,6 @@ import com.tde.mescloud.utility.DateUtil;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Service
@@ -18,80 +16,81 @@ public class KpiServiceImpl implements KpiService {
 
     CounterRecordService counterRecordService;
 
+    //TODO: computeEquipmentKpi
     @Override
-    public CountingEquipmentKpiDto[] getCountingEquipmentKpi(KpiFilterDto filter) {
+    public CountingEquipmentKpiDto[] getCountingEquipmentKpi(KpiFilterDto kpiFilter) {
 
-        CounterRecordFilterDto counterRecordFilterDto = new CounterRecordFilterDto();
-        counterRecordFilterDto.setTake(1000);
-        counterRecordFilterDto.setSkip(0);
+        CounterRecordFilterDto counterRecordFilter = convertToCounterRecordFilter(kpiFilter);
+        PaginatedCounterRecordsDto equipmentCounts = counterRecordService.findLastPerProductionOrder(counterRecordFilter);
 
-        CounterRecordSearchDto dateStart = new CounterRecordSearchDto();
-        dateStart.setId("dateStart");
-        dateStart.setValue(filter.getStartDate());
-
-        CounterRecordSearchDto dateEnd = new CounterRecordSearchDto();
-        dateEnd.setId("dateEnd");
-        dateEnd.setValue(filter.getEndDate());
-
-
-        if (filter.getSearch() == null) {
-            counterRecordFilterDto.setSearch(new CounterRecordSearchDto[0]);
-        } else {
-            List<CounterRecordSearchDto> searchesAsList = new ArrayList<>(Arrays.stream(filter.getSearch()).toList());
-            searchesAsList.add(dateStart);
-            searchesAsList.add(dateEnd);
-            counterRecordFilterDto.setSearch(searchesAsList.toArray(new CounterRecordSearchDto[0]));
-        }
-
-        counterRecordFilterDto.setSort(new CounterRecordSortDto[0]);
-
-        PaginatedCounterRecordsDto conclusionCounterRecords =
-                counterRecordService.findLastPerProductionOrder(counterRecordFilterDto);
-
-        if (conclusionCounterRecords.getCounterRecords().size() < 1) {
+        if (!hasCounterRecords(equipmentCounts)) {
             return new CountingEquipmentKpiDto[0];
         }
 
         Map<String, CountingEquipmentKpiDto> equipmentKpiByEquipmentAlias = new LinkedHashMap<>();
 
-        DateTimeFormatter formatter = DateTimeFormatter.ISO_INSTANT;
-        Instant startInstant = Instant.from(formatter.parse(filter.getStartDate()));
-        Date startDate = Date.from(startInstant);
-        Instant endInstand = Instant.from(formatter.parse(filter.getEndDate()));
-        Date endDate = Date.from(endInstand);
+        Date startDate = DateUtil.convertToDate(kpiFilter.getStartDate());
+        Date endDate = DateUtil.convertToDate(kpiFilter.getEndDate());
+        final int spanInDays = DateUtil.spanInDays(startDate, endDate);
 
-        final int daysInBetween = (int) DateUtil.spanInDays(startDate, endDate);//5
-        Date lastComputedDate = endDate;
-        int currentIndex = daysInBetween - 1;
+        for (CounterRecordDto equipmentCount : equipmentCounts.getCounterRecords()) {
 
-        for (CounterRecordDto conclusionCounterRecord : conclusionCounterRecords.getCounterRecords()) {
-
-            String equipmentAlias = conclusionCounterRecord.getEquipmentAlias();
+            String equipmentAlias = equipmentCount.getEquipmentAlias();
             CountingEquipmentKpiDto equipmentKpi = equipmentKpiByEquipmentAlias.get(equipmentAlias);
 
             if (equipmentKpi == null) {
-                equipmentKpi = new CountingEquipmentKpiDto(equipmentAlias, (int) daysInBetween);
+                equipmentKpi = new CountingEquipmentKpiDto(equipmentAlias, spanInDays);
                 equipmentKpiByEquipmentAlias.put(equipmentAlias, equipmentKpi);
             }
 
-            //TODO: change to isDifferentDay? which checks FIRST if isDayBefore
-            if (DateUtil.isDayBefore(conclusionCounterRecord.getRegisteredAt(), lastComputedDate)) {
-                Date currentDate = conclusionCounterRecord.getRegisteredAt();//18, last computed = 20
-                final int intermediateDaysInBetween = (int) DateUtil.differenceInDays(currentDate, lastComputedDate); //2
-                currentIndex -= intermediateDaysInBetween;
-                lastComputedDate = currentDate;
-            }
+            //TODO: Starting from index 0 would be better as it would avoid subtracting the zero index based value
+            final int intermediateDaysInBetween = DateUtil.differenceInDays(equipmentCount.getRegisteredAt(), endDate);
+            int dayAsIndex = spanInDays - 1 - intermediateDaysInBetween;
 
             //TODO: Change constants by boolean check
-            if (NOT_VALID_OUTPUT.equals(conclusionCounterRecord.getEquipmentOutputAlias())) {
-                equipmentKpi.getInvalidCounts()[currentIndex] += conclusionCounterRecord.getComputedValue();
+            if (NOT_VALID_OUTPUT.equals(equipmentCount.getEquipmentOutputAlias())) {
+                equipmentKpi.getInvalidCounts()[dayAsIndex] += equipmentCount.getComputedValue();
             }
 
-            if (VALID_OUTPUT.equals(conclusionCounterRecord.getEquipmentOutputAlias())) {
-                equipmentKpi.getValidCounts()[currentIndex] += conclusionCounterRecord.getComputedValue();
+            if (VALID_OUTPUT.equals(equipmentCount.getEquipmentOutputAlias())) {
+                equipmentKpi.getValidCounts()[dayAsIndex] += equipmentCount.getComputedValue();
             }
         }
 
         return equipmentKpiByEquipmentAlias.values().toArray(new CountingEquipmentKpiDto[equipmentKpiByEquipmentAlias.size()]);
+    }
+
+    private CounterRecordFilterDto convertToCounterRecordFilter(KpiFilterDto kpiFilter) {
+        //TODO: To be removed - KpiFilter and CounterRecordFilter should become one and the same <3
+        CounterRecordFilterDto counterRecordFilter = new CounterRecordFilterDto();
+        counterRecordFilter.setTake(1000);
+        counterRecordFilter.setSkip(0);
+
+        CounterRecordSearchDto dateStart = new CounterRecordSearchDto();
+        dateStart.setId("dateStart");
+        dateStart.setValue(kpiFilter.getStartDate());
+
+        CounterRecordSearchDto dateEnd = new CounterRecordSearchDto();
+        dateEnd.setId("dateEnd");
+        dateEnd.setValue(kpiFilter.getEndDate());
+
+
+        if (kpiFilter.getSearch() == null) {
+            counterRecordFilter.setSearch(new CounterRecordSearchDto[0]);
+        } else {
+            List<CounterRecordSearchDto> searchesAsList = new ArrayList<>(Arrays.stream(kpiFilter.getSearch()).toList());
+            searchesAsList.add(dateStart);
+            searchesAsList.add(dateEnd);
+            counterRecordFilter.setSearch(searchesAsList.toArray(new CounterRecordSearchDto[0]));
+        }
+
+        counterRecordFilter.setSort(new CounterRecordSortDto[0]);
+
+        return counterRecordFilter;
+    }
+
+    private boolean hasCounterRecords(PaginatedCounterRecordsDto paginatedCounterRecords) {
+        return paginatedCounterRecords.getCounterRecords() != null &&
+                paginatedCounterRecords.getCounterRecords().size() > 0;
     }
 }
