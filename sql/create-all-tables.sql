@@ -92,6 +92,7 @@ CREATE TABLE equipment_output (
     counting_equipment_id int,
     code varchar(20) UNIQUE NOT NULL,
     equipment_output_alias_id int,
+    is_valid_for_production boolean,
 
     PRIMARY KEY(id),
     FOREIGN KEY(equipment_output_alias_id) REFERENCES equipment_output_alias(id)

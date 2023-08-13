@@ -27,7 +27,9 @@ public class CounterRecordConverterImpl implements CounterRecordConverter {
     @Override
     public CounterRecordDto conclusionViewToDto(CounterRecordConclusionEntity entity) {
         CounterRecordDto dto = mapper.map(entity, CounterRecordDto.class);
+        //TODO: Learn how to do it with the mapper
         dto.setEquipmentAlias(entity.getEquipmentOutput().getCountingEquipment().getAlias());
+        dto.setValidForProduction(entity.getEquipmentOutput().isValidForProduction());
         return dto;
     }
 }

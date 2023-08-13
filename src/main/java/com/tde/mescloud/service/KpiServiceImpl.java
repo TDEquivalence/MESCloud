@@ -16,9 +16,9 @@ public class KpiServiceImpl implements KpiService {
 
     CounterRecordService counterRecordService;
 
-    //TODO: computeEquipmentKpi
+
     @Override
-    public CountingEquipmentKpiDto[] getCountingEquipmentKpi(KpiFilterDto kpiFilter) {
+    public CountingEquipmentKpiDto[] computeEquipmentKpi(KpiFilterDto kpiFilter) {
 
         CounterRecordFilterDto counterRecordFilter = convertToCounterRecordFilter(kpiFilter);
         PaginatedCounterRecordsDto equipmentCounts = counterRecordService.findLastPerProductionOrder(counterRecordFilter);
@@ -43,23 +43,16 @@ public class KpiServiceImpl implements KpiService {
                 equipmentKpiByEquipmentAlias.put(equipmentAlias, equipmentKpi);
             }
 
-            final int dayAsIndex = DateUtil.differenceInDays(startDate, equipmentCount.getRegisteredAt());
-
-            //TODO: Change constants by boolean check
-            if (NOT_VALID_OUTPUT.equals(equipmentCount.getEquipmentOutputAlias())) {
-                equipmentKpi.getInvalidCounts()[dayAsIndex] += equipmentCount.getComputedValue();
-            }
-
-            if (VALID_OUTPUT.equals(equipmentCount.getEquipmentOutputAlias())) {
-                equipmentKpi.getValidCounts()[dayAsIndex] += equipmentCount.getComputedValue();
-            }
+            final int timeUnitAsIndex = DateUtil.differenceInDays(startDate, equipmentCount.getRegisteredAt());
+            equipmentKpi.updateCounts(timeUnitAsIndex, equipmentCount);
         }
 
-        return equipmentKpiByEquipmentAlias.values().toArray(new CountingEquipmentKpiDto[equipmentKpiByEquipmentAlias.size()]);
+        return equipmentKpiByEquipmentAlias.values()
+                .toArray(new CountingEquipmentKpiDto[equipmentKpiByEquipmentAlias.size()]);
     }
 
+    //TODO: To be removed - KpiFilter and CounterRecordFilter should become one and the same <3
     private CounterRecordFilterDto convertToCounterRecordFilter(KpiFilterDto kpiFilter) {
-        //TODO: To be removed - KpiFilter and CounterRecordFilter should become one and the same <3
         CounterRecordFilterDto counterRecordFilter = new CounterRecordFilterDto();
         counterRecordFilter.setTake(1000);
         counterRecordFilter.setSkip(0);

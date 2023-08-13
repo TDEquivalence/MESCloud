@@ -14,4 +14,5 @@ public class CounterRecordDto {
     private String equipmentOutputAlias;
     private int computedValue;
     private Date registeredAt;
+    private boolean isValidForProduction;
 }

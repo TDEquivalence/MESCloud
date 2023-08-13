@@ -16,4 +16,13 @@ public class CountingEquipmentKpiDto {
     private String equipmentAlias;
     private int[] validCounts;
     private int[] invalidCounts;
+
+
+    public void updateCounts(int timeUnitAsIndex, CounterRecordDto equipmentCount) {
+        if (equipmentCount.isValidForProduction()) {
+            validCounts[timeUnitAsIndex] += equipmentCount.getComputedValue();
+        } else {
+            invalidCounts[timeUnitAsIndex] += equipmentCount.getComputedValue();
+        }
+    }
 }

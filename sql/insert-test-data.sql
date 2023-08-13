@@ -32,24 +32,24 @@ VALUES
 ('NOTOK');
 
 INSERT INTO equipment_output
-(counting_equipment_id, code, equipment_output_alias_id)
+(counting_equipment_id, code, equipment_output_alias_id, is_valid_for_production)
 VALUES
-(1, 'OBO001-001', 1),
-(1, 'OBO001-002', 2),
-(2, 'OBO002-001', 1),
-(2, 'OBO002-002', 2),
-(3, 'OBO003-001', 1),
-(3, 'OBO003-002', 2),
-(4, 'OBO004-001', 1),
-(4, 'OBO004-002', 2),
-(5, 'OBO005-001', 1),
-(5, 'OBO005-002', 2),
-(6, 'OBO006-001', 1),
-(6, 'OBO006-002', 2),
-(7, 'OBO007-001', 1),
-(7, 'OBO007-002', 2),
-(8, 'OBO008-001', 1),
-(8, 'OBO008-002', 2);
+(1, 'OBO001-001', 1, true),
+(1, 'OBO001-002', 2, false),
+(2, 'OBO002-001', 1, true),
+(2, 'OBO002-002', 2, false),
+(3, 'OBO003-001', 1, true),
+(3, 'OBO003-002', 2, false),
+(4, 'OBO004-001', 1, true),
+(4, 'OBO004-002', 2, false),
+(5, 'OBO005-001', 1, true),
+(5, 'OBO005-002', 2, false),
+(6, 'OBO006-001', 1, true),
+(6, 'OBO006-002', 2, false),
+(7, 'OBO007-001', 1, true),
+(7, 'OBO007-002', 2, false),
+(8, 'OBO008-001', 1, true),
+(8, 'OBO008-002', 2, false);
 
 INSERT INTO production_order
 (equipment_id, code, target_amount, is_equipment_enabled, is_completed, created_at, input_batch, source, gauge, category, washing_process)

@@ -18,4 +18,5 @@ public class EquipmentOutputEntity {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "equipment_output_alias_id")
     private EquipmentOutputAliasEntity alias;
+    private boolean isValidForProduction;
 }

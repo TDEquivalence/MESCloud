@@ -5,5 +5,5 @@ import com.tde.mescloud.model.dto.KpiFilterDto;
 
 public interface KpiService {
 
-    CountingEquipmentKpiDto[] getCountingEquipmentKpi(KpiFilterDto filter);
+    CountingEquipmentKpiDto[] computeEquipmentKpi(KpiFilterDto filter);
 }
