@@ -24,7 +24,8 @@ public class ProductionOrderController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        return new ResponseEntity<>(productionOrderOpt.get(), HttpStatus.OK);    }
+        return new ResponseEntity<>(productionOrderOpt.get(), HttpStatus.OK);
+    }
 
     @PostMapping("{countingEquipmentId}/complete")
     public ResponseEntity<ProductionOrderDto> complete(@PathVariable long countingEquipmentId) {
