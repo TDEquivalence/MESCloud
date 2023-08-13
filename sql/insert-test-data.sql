@@ -54,8 +54,8 @@ VALUES
 INSERT INTO production_order
 (equipment_id, code, target_amount, is_equipment_enabled, is_completed, created_at, input_batch, source, gauge, category, washing_process)
 VALUES
-(1, 'PO2301', 1000, true, false, '2023-05-09', 'POIN29Z12', '2123185BP', '45 x 24', 'Flor/Ext/Sup', 'MSN140X'),
-(2, 'PO2302', 3000, true, true, '2023-05-11', 'TTON29Z12', '1166685BP', '45 x 24', 'Flor/Ext/Ope', 'MOC145X');
+(1, 'OBOPO2300001', 1000, true, false, '2023-05-09', 'POIN29Z12', '2123185BP', '45 x 24', 'Flor/Ext/Sup', 'MSN140X'),
+(2, 'OBOPO2300002', 3000, true, true, '2023-05-11', 'TTON29Z12', '1166685BP', '45 x 24', 'Flor/Ext/Ope', 'MOC145X');
 
 
 INSERT INTO counter_record (equipment_output_id, equipment_output_alias, real_value, computed_value, production_order_id, registered_at)

@@ -11,6 +11,7 @@ import com.tde.mescloud.model.entity.ProductionOrderEntity;
 import com.tde.mescloud.protocol.MesMqttSettings;
 import com.tde.mescloud.repository.CountingEquipmentRepository;
 import com.tde.mescloud.repository.ProductionOrderRepository;
+import com.tde.mescloud.utility.DateUtil;
 import com.tde.mescloud.utility.LockUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
@@ -28,6 +29,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     private static final String OBO_SECTION_PREFIX = "OBO";
     private static final String CODE_PREFIX = "PO";
     private static final String NEW_CODE_FORMAT = "%05d";
+    private static int FIRST_CODE_VALUE = 1;
 
     private final ProductionOrderRepository repository;
     private final ProductionOrderConverter converter;
@@ -56,7 +58,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
 
     @Override
     public Optional<ProductionOrderDto> complete(long equipmentId) {
-
+        //TODO: Consider joining first and second DB call
         Optional<CountingEquipmentEntity> countingEquipmentOpt = countingEquipmentRepository.findById(equipmentId);
         if (countingEquipmentOpt.isEmpty()) {
             log.warning(() -> String.format("Unable to find an Equipment with id [%s]", equipmentId));
@@ -127,22 +129,20 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
 
     @Override
     public String generateCode() {
-        return OBO_SECTION_PREFIX + CODE_PREFIX + getYearForCode() + getNewCodeValueFormatted();
-    }
-
-    private int getYearForCode() {
-        return Calendar.getInstance().get(Calendar.YEAR) % 100;
+        return OBO_SECTION_PREFIX + CODE_PREFIX + DateUtil.getCurrentYearLastTwoDigits() + getNewCodeValueFormatted();
     }
 
     private int calculateNewCodeValue() {
-        //TODO: Refactor
+
         ProductionOrderEntity productionOrderEntity = repository.findTopByOrderByIdDesc();
+
         if (productionOrderEntity == null) {
-            return 1;
+            return FIRST_CODE_VALUE;
         }
-        String codeValueIndex = OBO_SECTION_PREFIX + CODE_PREFIX + getYearForCode();
-        String lastValueAsString = productionOrderEntity.getCode().substring(codeValueIndex.length());
-        int lastCodeValue = Integer.parseInt(lastValueAsString);
+
+        String codePrefix = OBO_SECTION_PREFIX + CODE_PREFIX + DateUtil.getCurrentYearLastTwoDigits();
+        String lastCodeValueAsString = productionOrderEntity.getCode().substring(codePrefix.length());
+        int lastCodeValue = Integer.parseInt(lastCodeValueAsString);
         return ++lastCodeValue;
     }
 

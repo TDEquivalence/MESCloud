@@ -100,4 +100,8 @@ public class DateUtil {
         Instant instant = Instant.from(formatter.parse(dateAsString));
         return Date.from(instant);
     }
+
+    public static int getCurrentYearLastTwoDigits() {
+        return Calendar.getInstance().get(Calendar.YEAR) % 100;
+    }
 }

@@ -5,12 +5,14 @@ import com.tde.mescloud.model.dto.EquipmentOutputDto;
 import com.tde.mescloud.model.entity.EquipmentOutputEntity;
 import com.tde.mescloud.repository.EquipmentOutputRepository;
 import lombok.AllArgsConstructor;
+import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
 @Service
 @AllArgsConstructor
+@Log
 public class EquipmentOutputServiceImpl implements EquipmentOutputService {
 
     private final EquipmentOutputRepository repository;
@@ -22,7 +24,7 @@ public class EquipmentOutputServiceImpl implements EquipmentOutputService {
 
         Optional<EquipmentOutputEntity> entity = repository.findByCode(equipmentOutputCode);
         if (entity.isEmpty()) {
-            //TODO: Add logs
+            log.warning(() -> String.format("Unable to find an equipment output with the code [%s]", equipmentOutputCode));
             return Optional.empty();
         }
 
