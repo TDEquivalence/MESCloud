@@ -178,7 +178,7 @@ jobs:
           application_name: mescloud
           environment_name: Mescloud-environment
           version_label: ${{ github.SHA }}
-          region: eu-west-3
+          region: eu-west-1
           deployment_package: mescloud-0.0.1-SNAPSHOT.jar
         if: github.ref == 'refs/heads/main'
 
