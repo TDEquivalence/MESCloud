@@ -27,4 +27,5 @@ mes:
     protCountBackendTopic: "MASILVA/OBO/PROTOCOL_COUNT_V0/BE"
     protCountPlcTopic: "MASILVA/OBO/PROTOCOL_COUNT_V0/PLC"
   security:
-    allowedOrigin: "https://www.mescloud.pt"
+    allowedOrigin: ${CORS_ALLOWED_ORIGIN}
+    #allowedOrigin: "https://www.mescloud.pt"
