@@ -5,14 +5,13 @@ import com.tde.mescloud.utility.DateUtil;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 @Service
 @AllArgsConstructor
 public class KpiServiceImpl implements KpiService {
-
-    private final String NOT_VALID_OUTPUT = "NOTOK";
-    private final String VALID_OUTPUT = "OK";
 
     CounterRecordService counterRecordService;
 
@@ -20,8 +19,7 @@ public class KpiServiceImpl implements KpiService {
     @Override
     public CountingEquipmentKpiDto[] computeEquipmentKpi(KpiFilterDto kpiFilter) {
 
-        CounterRecordFilterDto counterRecordFilter = convertToCounterRecordFilter(kpiFilter);
-        PaginatedCounterRecordsDto equipmentCounts = counterRecordService.findLastPerProductionOrder(counterRecordFilter);
+        PaginatedCounterRecordsDto equipmentCounts = counterRecordService.findLastPerProductionOrder(kpiFilter);
 
         if (!hasCounterRecords(equipmentCounts)) {
             return new CountingEquipmentKpiDto[0];
@@ -29,13 +27,15 @@ public class KpiServiceImpl implements KpiService {
 
         Map<String, CountingEquipmentKpiDto> equipmentKpiByEquipmentAlias = new LinkedHashMap<>();
 
-        Date startDate = DateUtil.convertToDate(kpiFilter.getStartDate());
-        Date endDate = DateUtil.convertToDate(kpiFilter.getEndDate());
+        Date startDate = getPropertyAsDate(kpiFilter, CounterRecordFilterDto.CounterRecordProperty.START_DATE);
+        Date endDate = getPropertyAsDate(kpiFilter, CounterRecordFilterDto.CounterRecordProperty.END_DATE);
+        //TODO: TimeMode should be applied here
         final int spanInDays = DateUtil.spanInDays(startDate, endDate);
 
         for (CounterRecordDto equipmentCount : equipmentCounts.getCounterRecords()) {
 
             String equipmentAlias = equipmentCount.getEquipmentAlias();
+
             CountingEquipmentKpiDto equipmentKpi = equipmentKpiByEquipmentAlias.get(equipmentAlias);
 
             if (equipmentKpi == null) {
@@ -51,37 +51,12 @@ public class KpiServiceImpl implements KpiService {
                 .toArray(new CountingEquipmentKpiDto[equipmentKpiByEquipmentAlias.size()]);
     }
 
-    //TODO: To be removed - KpiFilter and CounterRecordFilter should become one and the same <3
-    private CounterRecordFilterDto convertToCounterRecordFilter(KpiFilterDto kpiFilter) {
-        CounterRecordFilterDto counterRecordFilter = new CounterRecordFilterDto();
-        counterRecordFilter.setTake(1000);
-        counterRecordFilter.setSkip(0);
-
-        CounterRecordSearchDto dateStart = new CounterRecordSearchDto();
-        dateStart.setId("dateStart");
-        dateStart.setValue(kpiFilter.getStartDate());
-
-        CounterRecordSearchDto dateEnd = new CounterRecordSearchDto();
-        dateEnd.setId("dateEnd");
-        dateEnd.setValue(kpiFilter.getEndDate());
-
-
-        if (kpiFilter.getSearch() == null) {
-            counterRecordFilter.setSearch(new CounterRecordSearchDto[0]);
-        } else {
-            List<CounterRecordSearchDto> searchesAsList = new ArrayList<>(Arrays.stream(kpiFilter.getSearch()).toList());
-            searchesAsList.add(dateStart);
-            searchesAsList.add(dateEnd);
-            counterRecordFilter.setSearch(searchesAsList.toArray(new CounterRecordSearchDto[0]));
-        }
-
-        counterRecordFilter.setSort(new CounterRecordSortDto[0]);
-
-        return counterRecordFilter;
+    private Date getPropertyAsDate(KpiFilterDto filter, CounterRecordFilterDto.CounterRecordProperty counterRecordProperty) {
+        return DateUtil.convertToDate(filter.getSearchValue(counterRecordProperty));
     }
 
     private boolean hasCounterRecords(PaginatedCounterRecordsDto paginatedCounterRecords) {
         return paginatedCounterRecords.getCounterRecords() != null &&
-                paginatedCounterRecords.getCounterRecords().size() > 0;
+                !paginatedCounterRecords.getCounterRecords().isEmpty();
     }
 }

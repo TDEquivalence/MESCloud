@@ -1,8 +1,6 @@
 package com.tde.mescloud.repository;
 
 import com.tde.mescloud.model.dto.CounterRecordFilterDto;
-import com.tde.mescloud.model.dto.CounterRecordSearchDto;
-import com.tde.mescloud.model.dto.CounterRecordSortDto;
 import com.tde.mescloud.model.entity.*;
 import jakarta.persistence.EntityGraph;
 import jakarta.persistence.EntityManager;
@@ -29,8 +27,8 @@ public class CounterRecordRepositoryImpl {
     private static final String PRODUCTION_ORDER_CODE_PROP = "code";
     private static final String COUNTING_EQUIPMENT_ALIAS_PROP = "alias";
 
-    private static final String DATE_END_FILTER_FIELD = "dateEnd";
-    private static final String DATE_START_FILTER_FIELD = "dateStart";
+    private static final String DATE_START_FILTER_FIELD = "startDate";
+    private static final String DATE_END_FILTER_FIELD = "endDate";
     private static final String EQUIPMENT_ALIAS_FILTER_FIELD = "equipmentAlias";
     private static final String PRODUCTION_ORDER_CODE_FILTER_FIELD = "productionOrderCode";
 
@@ -48,7 +46,7 @@ public class CounterRecordRepositoryImpl {
         addPredicates(filterDto, predicates, cb, root);
 
         List<Order> orders = new ArrayList<>();
-        addSortOrders(filterDto.getSort(), orders, cb, root);
+        addSortOrders(filterDto, orders, cb, root);
         Order newestOrder = cb.desc(root.get(ID_PROP));
         orders.add(newestOrder);
 
@@ -68,6 +66,7 @@ public class CounterRecordRepositoryImpl {
     }
 
     public List<CounterRecordConclusionEntity> findLastPerProductionOrder(CounterRecordFilterDto filterDto) {
+
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<CounterRecordConclusionEntity> query = criteriaBuilder.createQuery(CounterRecordConclusionEntity.class);
         Root<CounterRecordConclusionEntity> root = query.from(CounterRecordConclusionEntity.class);
@@ -76,7 +75,7 @@ public class CounterRecordRepositoryImpl {
         addPredicatesConclusion(filterDto, predicates, criteriaBuilder, root);
 
         List<Order> orders = new ArrayList<>();
-        addSortOrdersConclusion(filterDto.getSort(), orders, criteriaBuilder, root);
+        addSortOrdersConclusion(filterDto, orders, criteriaBuilder, root);
         Order newestOrder = criteriaBuilder.desc(root.get(ID_PROP));
         orders.add(newestOrder);
 
@@ -86,30 +85,36 @@ public class CounterRecordRepositoryImpl {
         query.select(root)
                 .where(criteriaBuilder.and(predicates.toArray(new Predicate[0])))
                 .orderBy(orders);
-        
+
         return entityManager.createQuery(query)
                 .setFirstResult(filterDto.getSkip())
                 .setMaxResults(filterDto.getTake())
                 .getResultList();
     }
 
-    private void addPredicates(CounterRecordFilterDto filterDto, List<Predicate> predicates, CriteriaBuilder criteriaBuilder, Root<CounterRecordEntity> counterRecordRoot) {
-        for (CounterRecordSearchDto search : filterDto.getSearch()) {
+    private void addPredicates(CounterRecordFilterDto filter,
+                               List<Predicate> predicates,
+                               CriteriaBuilder criteriaBuilder,
+                               Root<CounterRecordEntity> counterRecordRoot) {
+
+        for (CounterRecordFilterDto.CounterRecordProperty counterRecordProperty : filter.getSearchKeys()) {
             Predicate predicate;
-            switch (search.getId()) {
-                case COMPUTED_VALUE_PROP ->
-                        predicate = criteriaBuilder.greaterThanOrEqualTo(counterRecordRoot.get(COMPUTED_VALUE_PROP), search.getValue());
+            switch (counterRecordProperty.getPropertyName()) {
+                case COMPUTED_VALUE_PROP -> {
+                    int computedValue = Integer.parseInt(filter.getSearchValue(counterRecordProperty));
+                    predicate = criteriaBuilder.greaterThanOrEqualTo(counterRecordRoot.get(COMPUTED_VALUE_PROP), computedValue);
+                }
                 case DATE_START_FILTER_FIELD -> {
-                    ZonedDateTime dateStart = ZonedDateTime.parse(search.getValue());
+                    ZonedDateTime dateStart = ZonedDateTime.parse(filter.getSearchValue(counterRecordProperty));
                     predicate = criteriaBuilder.greaterThanOrEqualTo(counterRecordRoot.get(REGISTERED_AT_PROP), dateStart);
                 }
                 case DATE_END_FILTER_FIELD -> {
-                    ZonedDateTime dateEnd = ZonedDateTime.parse(search.getValue());
+                    ZonedDateTime dateEnd = ZonedDateTime.parse(filter.getSearchValue(counterRecordProperty));
                     predicate = criteriaBuilder.lessThanOrEqualTo(counterRecordRoot.get(REGISTERED_AT_PROP), dateEnd);
                 }
                 default -> {
-                    Path<?> path = getPath(counterRecordRoot, search.getId());
-                    String value = search.getValue().toUpperCase();
+                    Path<?> path = getPath(counterRecordRoot, counterRecordProperty.getPropertyName());
+                    String value = filter.getSearchValue(counterRecordProperty).toUpperCase();
                     predicate = createLikePredicate(path, value, criteriaBuilder);
                 }
             }
@@ -117,23 +122,29 @@ public class CounterRecordRepositoryImpl {
         }
     }
 
-    private void addPredicatesConclusion(CounterRecordFilterDto filterDto, List<Predicate> predicates, CriteriaBuilder criteriaBuilder, Root<CounterRecordConclusionEntity> counterRecordRoot) {
-        for (CounterRecordSearchDto search : filterDto.getSearch()) {
+    private void addPredicatesConclusion(CounterRecordFilterDto filter,
+                                         List<Predicate> predicates,
+                                         CriteriaBuilder criteriaBuilder,
+                                         Root<CounterRecordConclusionEntity> counterRecordRoot) {
+
+        for (CounterRecordFilterDto.CounterRecordProperty counterRecordProperty : filter.getSearchKeys()) {
             Predicate predicate;
-            switch (search.getId()) {
-                case COMPUTED_VALUE_PROP ->
-                        predicate = criteriaBuilder.greaterThanOrEqualTo(counterRecordRoot.get(COMPUTED_VALUE_PROP), search.getValue());
+            switch (counterRecordProperty.getPropertyName()) {
+                case COMPUTED_VALUE_PROP -> {
+                    int computedValue = Integer.parseInt(filter.getSearchValue(counterRecordProperty));
+                    predicate = criteriaBuilder.greaterThanOrEqualTo(counterRecordRoot.get(COMPUTED_VALUE_PROP), computedValue);
+                }
                 case DATE_START_FILTER_FIELD -> {
-                    ZonedDateTime dateStart = ZonedDateTime.parse(search.getValue());
+                    ZonedDateTime dateStart = ZonedDateTime.parse(filter.getSearchValue(counterRecordProperty));
                     predicate = criteriaBuilder.greaterThanOrEqualTo(counterRecordRoot.get(REGISTERED_AT_PROP), dateStart);
                 }
                 case DATE_END_FILTER_FIELD -> {
-                    ZonedDateTime dateEnd = ZonedDateTime.parse(search.getValue());
+                    ZonedDateTime dateEnd = ZonedDateTime.parse(filter.getSearchValue(counterRecordProperty));
                     predicate = criteriaBuilder.lessThanOrEqualTo(counterRecordRoot.get(REGISTERED_AT_PROP), dateEnd);
                 }
                 default -> {
-                    Path<?> path = getPathConclusion(counterRecordRoot, search.getId());
-                    String value = search.getValue().toUpperCase();
+                    Path<?> path = getPathConclusion(counterRecordRoot, counterRecordProperty.getPropertyName());
+                    String value = filter.getSearchValue(counterRecordProperty).toUpperCase();
                     predicate = createLikePredicate(path, value, criteriaBuilder);
                 }
             }
@@ -145,24 +156,30 @@ public class CounterRecordRepositoryImpl {
         return criteriaBuilder.like(criteriaBuilder.upper(path.as(String.class)), value.toUpperCase());
     }
 
-    private void addSortOrders(CounterRecordSortDto[] sortList, List<Order> orders, CriteriaBuilder criteriaBuilder, Root<CounterRecordEntity> counterRecordRoot) {
-        for (CounterRecordSortDto sort : sortList) {
-            Order order = sort.isDesc() ?
-                    criteriaBuilder.desc(getPath(counterRecordRoot, sort.getId())) :
-                    criteriaBuilder.asc(getPath(counterRecordRoot, sort.getId()));
+    private void addSortOrders(CounterRecordFilterDto filter,
+                               List<Order> orders,
+                               CriteriaBuilder criteriaBuilder,
+                               Root<CounterRecordEntity> counterRecordRoot) {
+
+        for (CounterRecordFilterDto.CounterRecordProperty counterRecordProperty : filter.getSortKeys()) {
+
+            Order order = filter.isDescendingSort(counterRecordProperty) ?
+                    criteriaBuilder.desc(getPath(counterRecordRoot, counterRecordProperty.getPropertyName())) :
+                    criteriaBuilder.asc(getPath(counterRecordRoot, counterRecordProperty.getPropertyName()));
             orders.add(order);
         }
     }
 
-    private void addSortOrdersConclusion(CounterRecordSortDto[] sortList, List<Order> orders,
+    private void addSortOrdersConclusion(CounterRecordFilterDto filter,
+                                         List<Order> orders,
                                          CriteriaBuilder criteriaBuilder,
                                          Root<CounterRecordConclusionEntity> counterRecordRoot) {
 
-        for (CounterRecordSortDto sort : sortList) {
+        for (CounterRecordFilterDto.CounterRecordProperty counterRecordProperty : filter.getSortKeys()) {
 
-            Order order = sort.isDesc() ?
-                    criteriaBuilder.desc(getPathConclusion(counterRecordRoot, sort.getId())) :
-                    criteriaBuilder.asc(getPathConclusion(counterRecordRoot, sort.getId()));
+            Order order = filter.isDescendingSort(counterRecordProperty) ?
+                    criteriaBuilder.desc(getPathConclusion(counterRecordRoot, counterRecordProperty.getPropertyName())) :
+                    criteriaBuilder.asc(getPathConclusion(counterRecordRoot, counterRecordProperty.getPropertyName()));
             orders.add(order);
         }
     }

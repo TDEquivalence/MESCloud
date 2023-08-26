@@ -2,8 +2,9 @@ package com.tde.mescloud.model.dto;
 
 import lombok.Data;
 
+//TODO: Should not extend CounterRecordFilter, it just needs the search bit
 @Data
-public class KpiFilterDto {
+public class KpiFilterDto extends CounterRecordFilterDto {
 
     public enum TimeMode {
         DAY,
@@ -13,7 +14,4 @@ public class KpiFilterDto {
     }
 
     private TimeMode timeMode;
-    private String startDate;
-    private String endDate;
-    private CounterRecordSearchDto[] search;
 }

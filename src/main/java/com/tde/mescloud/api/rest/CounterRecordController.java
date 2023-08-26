@@ -14,7 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/counter-records")
 @AllArgsConstructor
-public class CounterRecordController {
+public class
+CounterRecordController {
 
     private final CounterRecordService service;
 
