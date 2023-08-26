@@ -52,7 +52,7 @@ public class KpiServiceImpl implements KpiService {
     }
 
     private Date getPropertyAsDate(KpiFilterDto filter, CounterRecordFilterDto.CounterRecordProperty counterRecordProperty) {
-        return DateUtil.convertToDate(filter.getSearchValue(counterRecordProperty));
+        return DateUtil.convertToDate(filter.getSearch().getValue(counterRecordProperty));
     }
 
     private boolean hasCounterRecords(PaginatedCounterRecordsDto paginatedCounterRecords) {

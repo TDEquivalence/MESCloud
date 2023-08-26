@@ -1,10 +1,15 @@
 package com.tde.mescloud.model.dto;
 
-import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import com.tde.mescloud.model.dto.filter.FilterSearchDto;
+import lombok.Setter;
 
-//TODO: Should not extend CounterRecordFilter, it just needs the search bit
-@Data
-public class KpiFilterDto extends CounterRecordFilterDto {
+@Setter
+public class KpiFilterDto {
+
+    private TimeMode timeMode;
+    @JsonUnwrapped
+    private FilterSearchDto<CounterRecordFilterDto.CounterRecordProperty> search;
 
     public enum TimeMode {
         DAY,
@@ -12,6 +17,4 @@ public class KpiFilterDto extends CounterRecordFilterDto {
         MONTH,
         YEAR
     }
-
-    private TimeMode timeMode;
 }

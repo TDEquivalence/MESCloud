@@ -1,6 +1,8 @@
 package com.tde.mescloud.model.dto;
 
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.fasterxml.jackson.annotation.JsonValue;
+import com.tde.mescloud.model.dto.filter.FilterSearchDto;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,30 +15,13 @@ import java.util.Set;
 public class CounterRecordFilterDto {
 
     private static final String DEFAULT_SORTING_VALUE = "DESCENDING";
-    
+
     private int take;
     private int skip;
-    private Map<CounterRecordProperty, String> searchValueByName;
+    @JsonUnwrapped
+    private FilterSearchDto<CounterRecordFilterDto.CounterRecordProperty> search;
     //TODO: change the Boolean value to a String value - ASCENDING OR DESCENDING to avoid nulls
     private Map<CounterRecordProperty, Boolean> sortDescendingByName;
-
-
-    private Map<CounterRecordProperty, String> getSearchValueByName() {
-
-        if (this.searchValueByName == null) {
-            this.searchValueByName = new EnumMap<>(CounterRecordProperty.class);
-        }
-
-        return this.searchValueByName;
-    }
-
-    public String getSearchValue(CounterRecordProperty searchProperty) {
-        return getSearchValueByName().get(searchProperty);
-    }
-
-    public Set<CounterRecordProperty> getSearchKeys() {
-        return getSearchValueByName().keySet();
-    }
 
     private Map<CounterRecordProperty, Boolean> getSortDescendingByName() {
 

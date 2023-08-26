@@ -24,7 +24,7 @@ aws:
 
 mes:
   mqtt:
-    protCountBackendTopic: "MASILVA/OBO/PROTOCOL_COUNT_V0/BE"
-    protCountPlcTopic: "MASILVA/OBO/PROTOCOL_COUNT_V0/PLC"
+    protCountBackendTopic: ${PROT_COUNT_BACKEND_TOPIC}
+    protCountPlcTopic: ${PROT_COUNT_PLC_TOPIC}
   security:
     allowedOrigin: ${CORS_ALLOWED_ORIGIN}

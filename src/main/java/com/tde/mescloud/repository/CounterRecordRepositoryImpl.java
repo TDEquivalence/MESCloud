@@ -97,24 +97,24 @@ public class CounterRecordRepositoryImpl {
                                CriteriaBuilder criteriaBuilder,
                                Root<CounterRecordEntity> counterRecordRoot) {
 
-        for (CounterRecordFilterDto.CounterRecordProperty counterRecordProperty : filter.getSearchKeys()) {
+        for (CounterRecordFilterDto.CounterRecordProperty counterRecordProperty : filter.getSearch().getKeys()) {
             Predicate predicate;
             switch (counterRecordProperty.getPropertyName()) {
                 case COMPUTED_VALUE_PROP -> {
-                    int computedValue = Integer.parseInt(filter.getSearchValue(counterRecordProperty));
+                    int computedValue = Integer.parseInt(filter.getSearch().getValue(counterRecordProperty));
                     predicate = criteriaBuilder.greaterThanOrEqualTo(counterRecordRoot.get(COMPUTED_VALUE_PROP), computedValue);
                 }
                 case DATE_START_FILTER_FIELD -> {
-                    ZonedDateTime dateStart = ZonedDateTime.parse(filter.getSearchValue(counterRecordProperty));
+                    ZonedDateTime dateStart = ZonedDateTime.parse(filter.getSearch().getValue(counterRecordProperty));
                     predicate = criteriaBuilder.greaterThanOrEqualTo(counterRecordRoot.get(REGISTERED_AT_PROP), dateStart);
                 }
                 case DATE_END_FILTER_FIELD -> {
-                    ZonedDateTime dateEnd = ZonedDateTime.parse(filter.getSearchValue(counterRecordProperty));
+                    ZonedDateTime dateEnd = ZonedDateTime.parse(filter.getSearch().getValue(counterRecordProperty));
                     predicate = criteriaBuilder.lessThanOrEqualTo(counterRecordRoot.get(REGISTERED_AT_PROP), dateEnd);
                 }
                 default -> {
                     Path<?> path = getPath(counterRecordRoot, counterRecordProperty.getPropertyName());
-                    String value = filter.getSearchValue(counterRecordProperty).toUpperCase();
+                    String value = filter.getSearch().getValue(counterRecordProperty).toUpperCase();
                     predicate = createLikePredicate(path, value, criteriaBuilder);
                 }
             }
@@ -127,24 +127,24 @@ public class CounterRecordRepositoryImpl {
                                          CriteriaBuilder criteriaBuilder,
                                          Root<CounterRecordConclusionEntity> counterRecordRoot) {
 
-        for (CounterRecordFilterDto.CounterRecordProperty counterRecordProperty : filter.getSearchKeys()) {
+        for (CounterRecordFilterDto.CounterRecordProperty counterRecordProperty : filter.getSearch().getKeys()) {
             Predicate predicate;
             switch (counterRecordProperty.getPropertyName()) {
                 case COMPUTED_VALUE_PROP -> {
-                    int computedValue = Integer.parseInt(filter.getSearchValue(counterRecordProperty));
+                    int computedValue = Integer.parseInt(filter.getSearch().getValue(counterRecordProperty));
                     predicate = criteriaBuilder.greaterThanOrEqualTo(counterRecordRoot.get(COMPUTED_VALUE_PROP), computedValue);
                 }
                 case DATE_START_FILTER_FIELD -> {
-                    ZonedDateTime dateStart = ZonedDateTime.parse(filter.getSearchValue(counterRecordProperty));
+                    ZonedDateTime dateStart = ZonedDateTime.parse(filter.getSearch().getValue(counterRecordProperty));
                     predicate = criteriaBuilder.greaterThanOrEqualTo(counterRecordRoot.get(REGISTERED_AT_PROP), dateStart);
                 }
                 case DATE_END_FILTER_FIELD -> {
-                    ZonedDateTime dateEnd = ZonedDateTime.parse(filter.getSearchValue(counterRecordProperty));
+                    ZonedDateTime dateEnd = ZonedDateTime.parse(filter.getSearch().getValue(counterRecordProperty));
                     predicate = criteriaBuilder.lessThanOrEqualTo(counterRecordRoot.get(REGISTERED_AT_PROP), dateEnd);
                 }
                 default -> {
                     Path<?> path = getPathConclusion(counterRecordRoot, counterRecordProperty.getPropertyName());
-                    String value = filter.getSearchValue(counterRecordProperty).toUpperCase();
+                    String value = filter.getSearch().getValue(counterRecordProperty).toUpperCase();
                     predicate = createLikePredicate(path, value, criteriaBuilder);
                 }
             }
