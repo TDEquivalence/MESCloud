@@ -62,7 +62,7 @@ public class DateUtil {
         truncateToDays(endCalendar);
 
         long differenceInMillis = endCalendar.getTimeInMillis() - startCalendar.getTimeInMillis();
-        return (int) TimeUnit.MILLISECONDS.toDays(differenceInMillis) + INCLUDE_START_AND_END_DATE;
+        return (int) TimeUnit.MILLISECONDS.toDays(differenceInMillis);
     }
 
     public static int differenceInDays(Date startDate, Date endDate) {
@@ -107,5 +107,9 @@ public class DateUtil {
 
     public static int getCurrentYearLastTwoDigits() {
         return Calendar.getInstance().get(Calendar.YEAR) % 100;
+    }
+
+    public static Instant convertToInstant(String dateAsString) {
+        return Instant.parse(dateAsString);
     }
 }
