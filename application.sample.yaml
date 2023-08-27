@@ -1,4 +1,5 @@
 #Search for your_MES or your_TDE to find placeholders
+#NOTE: Make sure the allowedOrigin matches your frontend URL instance precisely (ex.: localhost != 127.0.0.1 for security purposes)
 spring:
   profiles:
     active:
@@ -18,8 +19,15 @@ jwt:
 
 aws:
   mqtt:
-      clientId: ${MES_MQTT_CLIENT_ID:your_MES_mqtt_client_id}
-      clientEndpoint: ${MES_MQTT_CLIENT_ENDPOINT:your_MES_mqtt_client_endpoint}
-      awsRegion: ${MES_MQTT_AWS_REGION:your_MES_mqtt_aws_region}
-      awsAccessKeyId: ${TDE_AWS_ACCESS_KEY_ID:your_TDE_user_aws_access_key_id}
-      awsSecretAccessKey: ${TDE_AWS_SECRET_ACCESS_KEY:your_TDE_user_aws_secret_access_key}
+    clientId: ${MES_MQTT_CLIENT_ID:your_MES_mqtt_client_id}
+    clientEndpoint: ${MES_MQTT_CLIENT_ENDPOINT:your_MES_mqtt_client_endpoint}
+    awsRegion: ${MES_MQTT_AWS_REGION:your_MES_mqtt_aws_region}
+    awsAccessKeyId: ${TDE_AWS_ACCESS_KEY_ID:your_TDE_user_aws_access_key_id}
+    awsSecretAccessKey: ${TDE_AWS_SECRET_ACCESS_KEY:your_TDE_user_aws_secret_access_key}
+
+mes:
+  mqtt:
+    protCountBackendTopic: "LOCAL/DEV/PROTOCOL_COUNT_V0/BE"
+    protCountPlcTopic: "LOCAL/DEV/PROTOCOL_COUNT_V0/PLC"
+  security:
+    allowedOrigin: "http://localhost:5173"
