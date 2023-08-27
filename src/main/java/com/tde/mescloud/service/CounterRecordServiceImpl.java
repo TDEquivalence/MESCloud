@@ -2,6 +2,7 @@ package com.tde.mescloud.service;
 
 import com.tde.mescloud.model.converter.CounterRecordConverter;
 import com.tde.mescloud.model.dto.*;
+import com.tde.mescloud.model.dto.filter.SearchableProperty;
 import com.tde.mescloud.model.entity.CounterRecordConclusionEntity;
 import com.tde.mescloud.model.entity.CounterRecordEntity;
 import com.tde.mescloud.model.entity.EquipmentOutputEntity;
@@ -11,7 +12,6 @@ import com.tde.mescloud.repository.ProductionOrderRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -23,9 +23,9 @@ import java.util.Optional;
 @Log
 public class CounterRecordServiceImpl implements CounterRecordService {
 
-    private final int INITIAL_COMPUTED_VALUE = 0;
-    private final int ROLLOVER_OFFSET = 1;
-    private final int PL_UINT_MAX_VALUE = 65535;
+    private static final int INITIAL_COMPUTED_VALUE = 0;
+    private static final int ROLLOVER_OFFSET = 1;
+    private static final int PL_UINT_MAX_VALUE = 65535;
 
     private final CounterRecordConverter converter;
     private final CounterRecordRepository repository;
@@ -35,9 +35,14 @@ public class CounterRecordServiceImpl implements CounterRecordService {
 
     private final CountingEquipmentService countingEquipmentService;
 
+    @Override
+    public List<CounterRecordDto> winnowConclusionRecordsKpi(KpiFilterDto filter) {
+        List<CounterRecordConclusionEntity> counterRecordConclusionEntities = repository.findLastPerProductionOrder(filter);
+        return converter.conclusionViewToDto(counterRecordConclusionEntities);
+    }
 
     @Override
-    public PaginatedCounterRecordsDto findLastPerProductionOrder(CounterRecordFilterDto filter) {
+    public PaginatedCounterRecordsDto winnowConclusionRecordsPaginated(CounterRecordFilterDto filter) {
         int requestedRecords = filter.getTake();
         filter.setTake(filter.getTake() + 1);
 

@@ -7,9 +7,11 @@ import lombok.Setter;
 @Setter
 public class CountingEquipmentKpiDto {
 
+    private static final int ZERO_BASED_INDEX_OFFSET = 1;
+
     public CountingEquipmentKpiDto(final String equipmentAlias, final int numberOfTimeUnits) {
         this.equipmentAlias = equipmentAlias;
-        validCounts = new int[numberOfTimeUnits];
+        validCounts = new int[numberOfTimeUnits - ZERO_BASED_INDEX_OFFSET];
         invalidCounts = new int[numberOfTimeUnits];
     }
 
