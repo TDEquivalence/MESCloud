@@ -3,7 +3,7 @@ package com.tde.mescloud.repository;
 import com.tde.mescloud.model.dto.CounterRecordFilterDto;
 import com.tde.mescloud.model.dto.KpiFilterDto;
 import com.tde.mescloud.model.dto.filter.Searchable;
-import com.tde.mescloud.model.dto.filter.SearchableProperty;
+import com.tde.mescloud.model.dto.filter.Sortable;
 import com.tde.mescloud.model.entity.*;
 import jakarta.persistence.EntityGraph;
 import jakarta.persistence.EntityManager;
@@ -14,7 +14,6 @@ import org.springframework.stereotype.Repository;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @AllArgsConstructor
 @Repository
@@ -122,7 +121,7 @@ public class CounterRecordRepositoryImpl {
                 .getResultList();
     }
 
-    private void addPredicates(CounterRecordFilterDto filter,
+    private void addPredicates(Searchable<CounterRecordFilterDto.CounterRecordProperty> filter,
                                List<Predicate> predicates,
                                CriteriaBuilder criteriaBuilder,
                                Root<CounterRecordEntity> counterRecordRoot) {
@@ -152,7 +151,7 @@ public class CounterRecordRepositoryImpl {
         }
     }
 
-    private void addPredicatesConclusion(Searchable filter,
+    private void addPredicatesConclusion(Searchable<CounterRecordFilterDto.CounterRecordProperty> filter,
                                          List<Predicate> predicates,
                                          CriteriaBuilder criteriaBuilder,
                                          Root<CounterRecordConclusionEntity> counterRecordRoot) {
@@ -186,28 +185,28 @@ public class CounterRecordRepositoryImpl {
         return criteriaBuilder.like(criteriaBuilder.upper(path.as(String.class)), value.toUpperCase());
     }
 
-    private void addSortOrders(CounterRecordFilterDto filter,
+    private void addSortOrders(Sortable<CounterRecordFilterDto.CounterRecordProperty> filter,
                                List<Order> orders,
                                CriteriaBuilder criteriaBuilder,
                                Root<CounterRecordEntity> counterRecordRoot) {
 
-        for (CounterRecordFilterDto.CounterRecordProperty counterRecordProperty : filter.getSortKeys()) {
+        for (CounterRecordFilterDto.CounterRecordProperty counterRecordProperty : filter.getSort().getKeys()) {
 
-            Order order = filter.isDescendingSort(counterRecordProperty) ?
+            Order order = filter.getSort().isDescendingSort(counterRecordProperty) ?
                     criteriaBuilder.desc(getPath(counterRecordRoot, counterRecordProperty.getPropertyName())) :
                     criteriaBuilder.asc(getPath(counterRecordRoot, counterRecordProperty.getPropertyName()));
             orders.add(order);
         }
     }
 
-    private void addSortOrdersConclusion(CounterRecordFilterDto filter,
+    private void addSortOrdersConclusion(Sortable<CounterRecordFilterDto.CounterRecordProperty> filter,
                                          List<Order> orders,
                                          CriteriaBuilder criteriaBuilder,
                                          Root<CounterRecordConclusionEntity> counterRecordRoot) {
 
-        for (CounterRecordFilterDto.CounterRecordProperty counterRecordProperty : filter.getSortKeys()) {
+        for (CounterRecordFilterDto.CounterRecordProperty counterRecordProperty : filter.getSort().getKeys()) {
 
-            Order order = filter.isDescendingSort(counterRecordProperty) ?
+            Order order = filter.getSort().isDescendingSort(counterRecordProperty) ?
                     criteriaBuilder.desc(getPathConclusion(counterRecordRoot, counterRecordProperty.getPropertyName())) :
                     criteriaBuilder.asc(getPathConclusion(counterRecordRoot, counterRecordProperty.getPropertyName()));
             orders.add(order);

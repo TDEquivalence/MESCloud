@@ -1,6 +1,6 @@
 package com.tde.mescloud.model.dto.filter;
 
-public interface Sortable {
+public interface Sortable<T extends SearchableProperty> {
 
-    FilterSort getSort();
+    FilterSort<T> getSort();
 }

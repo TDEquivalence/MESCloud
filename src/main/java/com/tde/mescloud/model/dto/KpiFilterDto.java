@@ -8,7 +8,7 @@ import lombok.Setter;
 
 @Setter
 @Getter
-public class KpiFilterDto implements Searchable {
+public class KpiFilterDto implements Searchable<CounterRecordFilterDto.CounterRecordProperty> {
 
     private TimeMode timeMode;
     @JsonUnwrapped

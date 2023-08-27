@@ -2,19 +2,14 @@ package com.tde.mescloud.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.fasterxml.jackson.annotation.JsonValue;
-import com.tde.mescloud.model.dto.filter.FilterSearch;
-import com.tde.mescloud.model.dto.filter.Searchable;
-import com.tde.mescloud.model.dto.filter.SearchableProperty;
+import com.tde.mescloud.model.dto.filter.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.EnumMap;
-import java.util.Map;
-import java.util.Set;
-
 @Getter
 @Setter
-public class CounterRecordFilterDto implements Searchable {
+public class CounterRecordFilterDto implements Searchable<CounterRecordFilterDto.CounterRecordProperty>,
+        Sortable<CounterRecordFilterDto.CounterRecordProperty> {
 
     private static final String DEFAULT_SORTING_VALUE = "DESCENDING";
 
@@ -22,36 +17,12 @@ public class CounterRecordFilterDto implements Searchable {
     private int skip;
     @JsonUnwrapped
     private FilterSearch<CounterRecordProperty> search;
-    //TODO: change the Boolean value to a String value - ASCENDING OR DESCENDING to avoid nulls
-    private Map<CounterRecordProperty, Boolean> sortDescendingByName;
-
-    private Map<CounterRecordProperty, Boolean> getSortDescendingByName() {
-
-        if (this.sortDescendingByName == null) {
-            this.sortDescendingByName = new EnumMap<>(CounterRecordProperty.class);
-        }
-
-        return this.sortDescendingByName;
-    }
-
-    private Boolean getSortValue(CounterRecordProperty sortProperty) {
-        return getSortDescendingByName().get(sortProperty);
-    }
-
-    public boolean isDescendingSort(CounterRecordProperty sortProperty) {
-        Boolean isDescending = getSortValue(sortProperty);
-        return isDescending == null || isDescending;
-    }
-
-    public Boolean isAscendingSort(CounterRecordProperty sortProperty) {
-        return !isDescendingSort(sortProperty);
-    }
-
-    public Set<CounterRecordProperty> getSortKeys() {
-        return getSortDescendingByName().keySet();
-    }
+    @JsonUnwrapped
+    private FilterSort<CounterRecordProperty> sort;
 
     public enum CounterRecordProperty implements SearchableProperty {
+        //TODO: These values are the same used in the Repo. Replace by Constants & think about defining the searchable properties
+        //through another way.
         PRODUCTION_ORDER_CODE("productionOrderCode"),
         EQUIPMENT_OUTPUT_ALIAS("equipmentOutputAlias"),
         EQUIPMENT_ALIAS("equipmentAlias"),

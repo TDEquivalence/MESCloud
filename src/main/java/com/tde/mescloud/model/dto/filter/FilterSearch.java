@@ -6,10 +6,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class FilterSearch<T extends Enum<T>> {
+public class FilterSearch<T extends SearchableProperty> {
 
     @JsonProperty("searchValueByName")
     private Map<T, String> searchValueByName;
+
 
     private Map<T, String> getSearchValueByName() {
 
