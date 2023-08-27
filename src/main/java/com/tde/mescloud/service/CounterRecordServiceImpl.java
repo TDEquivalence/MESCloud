@@ -12,7 +12,6 @@ import com.tde.mescloud.repository.ProductionOrderRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -37,16 +36,13 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     private final CountingEquipmentService countingEquipmentService;
 
     @Override
-    public List<CounterRecordDto> findLastPerProductionOrder(KpiFilterDto filter) {
-        SearchableProperty prop;
-
-
+    public List<CounterRecordDto> winnowConclusionRecordsKpi(KpiFilterDto filter) {
         List<CounterRecordConclusionEntity> counterRecordConclusionEntities = repository.findLastPerProductionOrder(filter);
         return converter.conclusionViewToDto(counterRecordConclusionEntities);
     }
 
     @Override
-    public PaginatedCounterRecordsDto findLastPerProductionOrder(CounterRecordFilterDto filter) {
+    public PaginatedCounterRecordsDto winnowConclusionRecordsPaginated(CounterRecordFilterDto filter) {
         int requestedRecords = filter.getTake();
         filter.setTake(filter.getTake() + 1);
 

@@ -27,7 +27,7 @@ CounterRecordController {
 
     @PostMapping("/completion")
     public ResponseEntity<PaginatedCounterRecordsDto> getLastPerProductionOrder(@RequestBody CounterRecordFilterDto filter) {
-        PaginatedCounterRecordsDto paginatedCounterRecords = service.findLastPerProductionOrder(filter);
+        PaginatedCounterRecordsDto paginatedCounterRecords = service.winnowConclusionRecordsPaginated(filter);
         return new ResponseEntity<>(paginatedCounterRecords, HttpStatus.OK);
     }
 }

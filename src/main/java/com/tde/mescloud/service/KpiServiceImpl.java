@@ -20,7 +20,7 @@ public class KpiServiceImpl implements KpiService {
     @Override
     public CountingEquipmentKpiDto[] computeEquipmentKpi(KpiFilterDto kpiFilter) {
 
-        List<CounterRecordDto> equipmentCounts = counterRecordService.findLastPerProductionOrder(kpiFilter);
+        List<CounterRecordDto> equipmentCounts = counterRecordService.winnowConclusionRecordsKpi(kpiFilter);
 
         if (equipmentCounts.isEmpty()) {
             return new CountingEquipmentKpiDto[0];
