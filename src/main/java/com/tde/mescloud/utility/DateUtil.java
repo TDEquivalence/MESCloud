@@ -8,7 +8,11 @@ import java.util.concurrent.TimeUnit;
 
 public class DateUtil {
 
+    private DateUtil() {
+    }
+
     private static final int INCLUDE_START_AND_END_DATE = 1;
+
 
     public static boolean isDayBefore(Date dateToCompare, Date referenceDate) {
 
@@ -26,6 +30,12 @@ public class DateUtil {
 
         return calendarToCompare.before(referenceCalendar) &&
                 !isSameDay(calendarToCompare, referenceCalendar);
+    }
+
+    public static boolean isSameDay(Date firstDate, Date secondDate) {
+        Calendar firstCalendar = toCalendar(firstDate);
+        Calendar secondCalendar = toCalendar(secondDate);
+        return isSameDay(firstCalendar, secondCalendar);
     }
 
     public static void truncateToDays(Calendar calendar) {
@@ -73,12 +83,6 @@ public class DateUtil {
         Calendar calendarToCompare = Calendar.getInstance();
         calendarToCompare.setTime(date);
         return calendarToCompare;
-    }
-
-    public static boolean isSameDay(Date firstDate, Date secondDate) {
-        Calendar firstCalendar = toCalendar(firstDate);
-        Calendar secondCalendar = toCalendar(secondDate);
-        return isSameDay(firstCalendar, secondCalendar);
     }
 
     public static Date getPreviousDay(Date inputDate) {

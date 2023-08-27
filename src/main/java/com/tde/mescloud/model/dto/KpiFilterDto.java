@@ -1,9 +1,18 @@
 package com.tde.mescloud.model.dto;
 
-import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import com.tde.mescloud.model.dto.filter.FilterSearch;
+import com.tde.mescloud.model.dto.filter.Searchable;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
-public class KpiFilterDto {
+@Setter
+@Getter
+public class KpiFilterDto implements Searchable<CounterRecordFilterDto.CounterRecordProperty> {
+
+    private TimeMode timeMode;
+    @JsonUnwrapped
+    private FilterSearch<CounterRecordFilterDto.CounterRecordProperty> search;
 
     public enum TimeMode {
         DAY,
@@ -11,9 +20,4 @@ public class KpiFilterDto {
         MONTH,
         YEAR
     }
-
-    private TimeMode timeMode;
-    private String startDate;
-    private String endDate;
-    private CounterRecordSearchDto[] search;
 }
