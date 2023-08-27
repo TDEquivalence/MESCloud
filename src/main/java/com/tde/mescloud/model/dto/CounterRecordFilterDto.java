@@ -21,7 +21,7 @@ public class CounterRecordFilterDto implements Searchable {
     private int take;
     private int skip;
     @JsonUnwrapped
-    private FilterSearch search;
+    private FilterSearch<CounterRecordProperty> search;
     //TODO: change the Boolean value to a String value - ASCENDING OR DESCENDING to avoid nulls
     private Map<CounterRecordProperty, Boolean> sortDescendingByName;
 

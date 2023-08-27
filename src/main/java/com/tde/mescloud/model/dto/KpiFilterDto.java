@@ -12,7 +12,7 @@ public class KpiFilterDto implements Searchable {
 
     private TimeMode timeMode;
     @JsonUnwrapped
-    private FilterSearch search;
+    private FilterSearch<CounterRecordFilterDto.CounterRecordProperty> search;
 
     public enum TimeMode {
         DAY,

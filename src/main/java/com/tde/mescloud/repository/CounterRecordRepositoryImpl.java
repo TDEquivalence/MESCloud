@@ -14,6 +14,7 @@ import org.springframework.stereotype.Repository;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @AllArgsConstructor
 @Repository
@@ -126,7 +127,7 @@ public class CounterRecordRepositoryImpl {
                                CriteriaBuilder criteriaBuilder,
                                Root<CounterRecordEntity> counterRecordRoot) {
 
-        for (SearchableProperty counterRecordProperty : filter.getSearch().getKeys()) {
+        for (CounterRecordFilterDto.CounterRecordProperty counterRecordProperty : filter.getSearch().getKeys()) {
             Predicate predicate;
             switch (counterRecordProperty.getPropertyName()) {
                 case COMPUTED_VALUE_PROP -> {
@@ -156,7 +157,7 @@ public class CounterRecordRepositoryImpl {
                                          CriteriaBuilder criteriaBuilder,
                                          Root<CounterRecordConclusionEntity> counterRecordRoot) {
 
-        for (SearchableProperty counterRecordProperty : filter.getSearch().getKeys()) {
+        for (CounterRecordFilterDto.CounterRecordProperty counterRecordProperty : filter.getSearch().getKeys()) {
             Predicate predicate;
             switch (counterRecordProperty.getPropertyName()) {
                 case COMPUTED_VALUE_PROP -> {
