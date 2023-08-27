@@ -23,13 +23,10 @@ public class DateUtilTest {
         String startDateString = "2023-08-26T00:00:00.000Z";
         String endDateString = "2023-08-27T23:59:59.999Z";
 
-        Date startDate = DateUtil.convertToDate(startDateString);
-        Date endDate = DateUtil.convertToDate(endDateString);
+        Instant startDate = DateUtil.convertToInstant(startDateString);
+        Instant endDate = DateUtil.convertToInstant(endDateString);
 
         int span = DateUtil.spanInDays(startDate, endDate);
-
-        long differenceInMillis = endDate.getTime() - startDate.getTime();
-//        int expectedSpan = (int) (differenceInMillis / (24 * 60 * 60 * 1000)) + 1;
 
         Assertions.assertEquals(2, span);
     }
@@ -39,27 +36,15 @@ public class DateUtilTest {
         String startDateString = "2023-08-26T00:00:00.000Z";
         String endDateString = "2023-08-27T23:59:59.999Z";
 
-        Date startDate = DateUtil.convertToDate(startDateString);
-        Date endDate = DateUtil.convertToDate(endDateString);
+        Instant startDate = DateUtil.convertToInstant(startDateString);
+        Instant endDate = DateUtil.convertToInstant(endDateString);
 
-        int difference = DateUtil.differenceInDays(startDate, endDate);
+        int difference = DateUtil.differenceInDays(startDate, Date.from(endDate));
 
         // Calculate expected difference manually
-        long differenceInMillis = endDate.getTime() - startDate.getTime();
+        long differenceInMillis = Date.from(endDate).getTime() - Date.from(startDate).getTime();
         int expectedDifference = (int) (differenceInMillis / (24 * 60 * 60 * 1000));
 
         Assertions.assertEquals(expectedDifference, difference);
-    }
-
-
-    @Test
-    public void testConvertToDate() {
-        String dateAsString = "2023-08-26T00:00:00.000Z";
-        Date convertedDate = DateUtil.convertToDate(dateAsString);
-
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-        String convertedDateAsString = dateFormat.format(convertedDate);
-
-        Assertions.assertEquals(dateAsString, convertedDateAsString);
     }
 }
