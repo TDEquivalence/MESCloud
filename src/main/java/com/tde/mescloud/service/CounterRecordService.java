@@ -6,6 +6,8 @@ import java.util.List;
 
 public interface CounterRecordService {
 
+    List<CounterRecordDto> findLastPerProductionOrder(KpiFilterDto filterDto);
+
     PaginatedCounterRecordsDto findLastPerProductionOrder(CounterRecordFilterDto filterDto);
 
     PaginatedCounterRecordsDto getFilteredAndPaginated(CounterRecordFilterDto filterDto);

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -19,9 +20,9 @@ public class KpiServiceImpl implements KpiService {
     @Override
     public CountingEquipmentKpiDto[] computeEquipmentKpi(KpiFilterDto kpiFilter) {
 
-        PaginatedCounterRecordsDto equipmentCounts = counterRecordService.findLastPerProductionOrder(kpiFilter);
+        List<CounterRecordDto> equipmentCounts = counterRecordService.findLastPerProductionOrder(kpiFilter);
 
-        if (!hasCounterRecords(equipmentCounts)) {
+        if (equipmentCounts.isEmpty()) {
             return new CountingEquipmentKpiDto[0];
         }
 
@@ -32,7 +33,7 @@ public class KpiServiceImpl implements KpiService {
         //TODO: TimeMode should be applied here
         final int spanInDays = DateUtil.spanInDays(startDate, endDate);
 
-        for (CounterRecordDto equipmentCount : equipmentCounts.getCounterRecords()) {
+        for (CounterRecordDto equipmentCount : equipmentCounts) {
 
             String equipmentAlias = equipmentCount.getEquipmentAlias();
 
@@ -51,12 +52,8 @@ public class KpiServiceImpl implements KpiService {
                 .toArray(new CountingEquipmentKpiDto[equipmentKpiByEquipmentAlias.size()]);
     }
 
+    //TODO: This should be a filter behavior
     private Date getPropertyAsDate(KpiFilterDto filter, CounterRecordFilterDto.CounterRecordProperty counterRecordProperty) {
         return DateUtil.convertToDate(filter.getSearch().getValue(counterRecordProperty));
-    }
-
-    private boolean hasCounterRecords(PaginatedCounterRecordsDto paginatedCounterRecords) {
-        return paginatedCounterRecords.getCounterRecords() != null &&
-                !paginatedCounterRecords.getCounterRecords().isEmpty();
     }
 }

@@ -35,6 +35,11 @@ public class CounterRecordServiceImpl implements CounterRecordService {
 
     private final CountingEquipmentService countingEquipmentService;
 
+    @Override
+    public List<CounterRecordDto> findLastPerProductionOrder(KpiFilterDto filter) {
+        List<CounterRecordConclusionEntity> counterRecordConclusionEntities = repository.findLastPerProductionOrder(filter);
+        return converter.conclusionViewToDto(counterRecordConclusionEntities);
+    }
 
     @Override
     public PaginatedCounterRecordsDto findLastPerProductionOrder(CounterRecordFilterDto filter) {

@@ -2,7 +2,9 @@ package com.tde.mescloud.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.fasterxml.jackson.annotation.JsonValue;
-import com.tde.mescloud.model.dto.filter.FilterSearchDto;
+import com.tde.mescloud.model.dto.filter.FilterSearch;
+import com.tde.mescloud.model.dto.filter.Searchable;
+import com.tde.mescloud.model.dto.filter.SearchableProperty;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,14 +14,14 @@ import java.util.Set;
 
 @Getter
 @Setter
-public class CounterRecordFilterDto {
+public class CounterRecordFilterDto implements Searchable {
 
     private static final String DEFAULT_SORTING_VALUE = "DESCENDING";
 
     private int take;
     private int skip;
     @JsonUnwrapped
-    private FilterSearchDto<CounterRecordFilterDto.CounterRecordProperty> search;
+    private FilterSearch search;
     //TODO: change the Boolean value to a String value - ASCENDING OR DESCENDING to avoid nulls
     private Map<CounterRecordProperty, Boolean> sortDescendingByName;
 
@@ -49,7 +51,7 @@ public class CounterRecordFilterDto {
         return getSortDescendingByName().keySet();
     }
 
-    public enum CounterRecordProperty {
+    public enum CounterRecordProperty implements SearchableProperty {
         PRODUCTION_ORDER_CODE("productionOrderCode"),
         EQUIPMENT_OUTPUT_ALIAS("equipmentOutputAlias"),
         EQUIPMENT_ALIAS("equipmentAlias"),

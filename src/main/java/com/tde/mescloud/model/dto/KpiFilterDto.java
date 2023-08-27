@@ -1,15 +1,18 @@
 package com.tde.mescloud.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
-import com.tde.mescloud.model.dto.filter.FilterSearchDto;
+import com.tde.mescloud.model.dto.filter.FilterSearch;
+import com.tde.mescloud.model.dto.filter.Searchable;
+import lombok.Getter;
 import lombok.Setter;
 
 @Setter
-public class KpiFilterDto {
+@Getter
+public class KpiFilterDto implements Searchable {
 
     private TimeMode timeMode;
     @JsonUnwrapped
-    private FilterSearchDto<CounterRecordFilterDto.CounterRecordProperty> search;
+    private FilterSearch search;
 
     public enum TimeMode {
         DAY,

@@ -1,6 +1,9 @@
 package com.tde.mescloud.repository;
 
 import com.tde.mescloud.model.dto.CounterRecordFilterDto;
+import com.tde.mescloud.model.dto.KpiFilterDto;
+import com.tde.mescloud.model.dto.filter.Searchable;
+import com.tde.mescloud.model.dto.filter.SearchableProperty;
 import com.tde.mescloud.model.entity.*;
 import jakarta.persistence.EntityGraph;
 import jakarta.persistence.EntityManager;
@@ -92,12 +95,38 @@ public class CounterRecordRepositoryImpl {
                 .getResultList();
     }
 
+    public List<CounterRecordConclusionEntity> findLastPerProductionOrder(KpiFilterDto filterDto) {
+
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<CounterRecordConclusionEntity> query = criteriaBuilder.createQuery(CounterRecordConclusionEntity.class);
+        Root<CounterRecordConclusionEntity> root = query.from(CounterRecordConclusionEntity.class);
+
+        List<Predicate> predicates = new ArrayList<>();
+        addPredicatesConclusion(filterDto, predicates, criteriaBuilder, root);
+
+        List<Order> orders = new ArrayList<>();
+        //TODO: Implement sort
+        //addSortOrdersConclusion(filterDto, orders, criteriaBuilder, root);
+        Order newestOrder = criteriaBuilder.desc(root.get(ID_PROP));
+        orders.add(newestOrder);
+
+        root.fetch(EQUIPMENT_OUTPUT_PROP, JoinType.LEFT);
+        root.fetch(PRODUCTION_ORDER_PROP, JoinType.LEFT);
+
+        query.select(root)
+                .where(criteriaBuilder.and(predicates.toArray(new Predicate[0])))
+                .orderBy(orders);
+
+        return entityManager.createQuery(query)
+                .getResultList();
+    }
+
     private void addPredicates(CounterRecordFilterDto filter,
                                List<Predicate> predicates,
                                CriteriaBuilder criteriaBuilder,
                                Root<CounterRecordEntity> counterRecordRoot) {
 
-        for (CounterRecordFilterDto.CounterRecordProperty counterRecordProperty : filter.getSearch().getKeys()) {
+        for (SearchableProperty counterRecordProperty : filter.getSearch().getKeys()) {
             Predicate predicate;
             switch (counterRecordProperty.getPropertyName()) {
                 case COMPUTED_VALUE_PROP -> {
@@ -122,12 +151,12 @@ public class CounterRecordRepositoryImpl {
         }
     }
 
-    private void addPredicatesConclusion(CounterRecordFilterDto filter,
+    private void addPredicatesConclusion(Searchable filter,
                                          List<Predicate> predicates,
                                          CriteriaBuilder criteriaBuilder,
                                          Root<CounterRecordConclusionEntity> counterRecordRoot) {
 
-        for (CounterRecordFilterDto.CounterRecordProperty counterRecordProperty : filter.getSearch().getKeys()) {
+        for (SearchableProperty counterRecordProperty : filter.getSearch().getKeys()) {
             Predicate predicate;
             switch (counterRecordProperty.getPropertyName()) {
                 case COMPUTED_VALUE_PROP -> {
