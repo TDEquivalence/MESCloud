@@ -39,13 +39,8 @@ public class KpiServiceImpl implements KpiService {
         for (CounterRecordDto equipmentCount : equipmentCounts) {
 
             String equipmentAlias = equipmentCount.getEquipmentAlias();
-
-            CountingEquipmentKpiDto equipmentKpi = equipmentKpiByEquipmentAlias.get(equipmentAlias);
-
-            if (equipmentKpi == null) {
-                equipmentKpi = new CountingEquipmentKpiDto(equipmentAlias, spanInDays);
-                equipmentKpiByEquipmentAlias.put(equipmentAlias, equipmentKpi);
-            }
+            CountingEquipmentKpiDto equipmentKpi = equipmentKpiByEquipmentAlias.computeIfAbsent(equipmentAlias,
+                    equipmentAliasKey -> new CountingEquipmentKpiDto(equipmentAliasKey, spanInDays));
 
             final int timeUnitAsIndex = DateUtil.differenceInDays(startDate, equipmentCount.getRegisteredAt());
             equipmentKpi.updateCounts(timeUnitAsIndex, equipmentCount);
