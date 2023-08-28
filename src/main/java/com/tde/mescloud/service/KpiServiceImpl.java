@@ -1,11 +1,14 @@
 package com.tde.mescloud.service;
 
-import com.tde.mescloud.model.dto.*;
+import com.tde.mescloud.model.dto.CounterRecordDto;
+import com.tde.mescloud.model.dto.CounterRecordFilterDto;
+import com.tde.mescloud.model.dto.CountingEquipmentKpiDto;
+import com.tde.mescloud.model.dto.KpiFilterDto;
 import com.tde.mescloud.utility.DateUtil;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
+import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,8 +31,8 @@ public class KpiServiceImpl implements KpiService {
 
         Map<String, CountingEquipmentKpiDto> equipmentKpiByEquipmentAlias = new LinkedHashMap<>();
 
-        Date startDate = getPropertyAsDate(kpiFilter, CounterRecordFilterDto.CounterRecordProperty.START_DATE);
-        Date endDate = getPropertyAsDate(kpiFilter, CounterRecordFilterDto.CounterRecordProperty.END_DATE);
+        Instant startDate = getPropertyAsInstant(kpiFilter, CounterRecordFilterDto.CounterRecordProperty.START_DATE);
+        Instant endDate = getPropertyAsInstant(kpiFilter, CounterRecordFilterDto.CounterRecordProperty.END_DATE);
         //TODO: TimeMode should be applied here
         final int spanInDays = DateUtil.spanInDays(startDate, endDate);
 
@@ -53,7 +56,7 @@ public class KpiServiceImpl implements KpiService {
     }
 
     //TODO: This should be a filter behavior
-    private Date getPropertyAsDate(KpiFilterDto filter, CounterRecordFilterDto.CounterRecordProperty counterRecordProperty) {
-        return DateUtil.convertToDate(filter.getSearch().getValue(counterRecordProperty));
+    private Instant getPropertyAsInstant(KpiFilterDto filter, CounterRecordFilterDto.CounterRecordProperty counterRecordProperty) {
+        return DateUtil.convertToInstant(filter.getSearch().getValue(counterRecordProperty));
     }
 }
