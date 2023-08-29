@@ -12,7 +12,7 @@ public class DataController {
 
     @GetMapping
     public ResponseEntity<String> healthCheck() {
-        return new ResponseEntity<>("We are Alive! Are we?! AUGUST 28: Just one small positive thought in the morning can change your whole day.", HttpStatus.OK);
+        return new ResponseEntity<>("We are Alive! Are we?! WiiiiW AUGUST 28: Just one small positive thought in the morning can change your whole day.", HttpStatus.OK);
     }
 
     @GetMapping("aws/health")
