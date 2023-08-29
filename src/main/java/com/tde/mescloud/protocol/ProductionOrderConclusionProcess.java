@@ -77,8 +77,8 @@ public class ProductionOrderConclusionProcess extends AbstractMesProtocolProcess
         productionOrderEntity.setCompleted(true);
         repository.save(productionOrderEntity);
 
-        log.info("ProductionOrderConclusionProcess - releasing lock");
+//        log.info("ProductionOrderConclusionProcess - releasing lock");
         lock.signalExecute();
-        log.info("ProductionOrderConclusionProcess - signal executed");
+//        log.info("ProductionOrderConclusionProcess - signal executed");
     }
 }
