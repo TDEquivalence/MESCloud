@@ -17,7 +17,7 @@ public class DataController {
 
     @GetMapping("aws/health")
     public ResponseEntity<String> health() {
-        return new ResponseEntity<>("HEALTH PATH! We are alive! ARE WE? AUGUST 28: \"There is nothing impossible to they who will try.\"\n" +
+        return new ResponseEntity<>("HEALTH PATH! We are alive! ARE WE??? AUGUST 28: \"There is nothing impossible to they who will try.\"\n" +
                 "— Alexander the Great!!!", HttpStatus.OK);
     }
 }
