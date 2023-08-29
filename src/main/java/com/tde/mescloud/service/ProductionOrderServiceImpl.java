@@ -90,6 +90,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
             e.printStackTrace();
         }
 
+        log.info("ProductionOrderServiceImpl: lock released");
         ProductionOrderDto productionOrder = converter.toDto(productionOrderEntityOpt.get());
         return Optional.of(productionOrder);
     }
