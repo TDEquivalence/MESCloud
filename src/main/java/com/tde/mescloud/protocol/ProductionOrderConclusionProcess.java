@@ -58,7 +58,7 @@ public class ProductionOrderConclusionProcess extends AbstractMesProtocolProcess
 
         if (!productionOrderEntityOpt.get().isCompleted()) {
             try {
-                Thread.sleep(250);
+                Thread.sleep(500);
                 ProductionOrderMqttDto productionOrderMqttDto = new ProductionOrderMqttDto();
                 productionOrderMqttDto.setJsonType(MqttDTOConstants.PRODUCTION_ORDER_DTO_NAME);
                 productionOrderMqttDto.setEquipmentEnabled(false);
@@ -77,8 +77,8 @@ public class ProductionOrderConclusionProcess extends AbstractMesProtocolProcess
         productionOrderEntity.setCompleted(true);
         repository.save(productionOrderEntity);
 
-        log.info("ProductionOrderConclusionProcess - releasing lock");
+//        log.info("ProductionOrderConclusionProcess - releasing lock");
         lock.signalExecute();
-        log.info("ProductionOrderConclusionProcess - signal executed");
+//        log.info("ProductionOrderConclusionProcess - signal executed");
     }
 }
