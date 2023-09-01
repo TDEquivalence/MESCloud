@@ -28,4 +28,7 @@ public class ProductionOrderEntity {
     private String gauge;
     private String category;
     private String washingProcess;
+
+    @ManyToOne
+    private ComposedProductionOrderEntity composedProductionOrder;
 }
