@@ -10,7 +10,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -70,17 +69,6 @@ public class HitServiceImpl implements HitService {
         saveAndUpdateAll(hits);
     }
 
-
-    private SampleEntity getSample(List<HitDto> hitList) {
-        HitDto hitDto = hitList.get(0);
-        Optional<SampleEntity> sample = sampleService.findById(hitDto.getSampleId());
-        if(sample.isEmpty()) {
-            throw new IllegalArgumentException("Sample not found");
-        }
-
-        return sample.get();
-    }
-
     private float getTcaAverage(List<HitEntity> hits) {
         if (hits == null || hits.isEmpty()) {
             return 0.0f;
@@ -92,6 +80,16 @@ public class HitServiceImpl implements HitService {
         }
 
         return tcaSum / hits.size();
+    }
+    
+    private SampleEntity getSample(List<HitDto> hitList) {
+        HitDto hitDto = hitList.get(0);
+        Optional<SampleEntity> sample = sampleService.findById(hitDto.getSampleId());
+        if(sample.isEmpty()) {
+            throw new IllegalArgumentException("Sample not found");
+        }
+
+        return sample.get();
     }
 
     public HitEntity saveAndUpdate(HitEntity hitEntity) {
