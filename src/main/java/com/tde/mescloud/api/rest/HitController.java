@@ -20,7 +20,7 @@ public class HitController {
 
     private final HitService hitService;
 
-    @PostMapping("/create")
+    @PostMapping
     public ResponseEntity<List<HitDto>> create(@RequestBody RequestHitDto requestHitDto) {
         List<HitDto> createdHits = hitService.create(requestHitDto);
         if (createdHits.isEmpty()) {

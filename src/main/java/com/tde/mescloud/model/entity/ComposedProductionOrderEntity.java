@@ -19,6 +19,6 @@ public class ComposedProductionOrderEntity {
 
     private String code;
 
-    @OneToMany(mappedBy = "composedProductionOrder")
+    @OneToMany(mappedBy = "composedProductionOrder", cascade = CascadeType.MERGE)
     private List<ProductionOrderEntity> productionOrders = new ArrayList<>();
 }

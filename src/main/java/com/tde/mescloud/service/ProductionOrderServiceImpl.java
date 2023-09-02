@@ -173,10 +173,11 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         return repository.findById(id);
     }
 
-    public List<Long> checkOrderIdsExistInDatabase(List<Long> orderIds) {
-        // Filter the list of IDs that exist in the database
-        return orderIds.stream()
-                .filter(repository::existsById)
+    public List<Long> findExistingIds(List<Long> ids) {
+        List<ProductionOrderEntity> existingEntities = repository.findByIdIn(ids);
+
+        return existingEntities.stream()
+                .map(ProductionOrderEntity::getId)
                 .collect(Collectors.toList());
     }
 }

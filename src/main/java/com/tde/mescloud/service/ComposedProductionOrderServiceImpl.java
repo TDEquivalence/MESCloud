@@ -28,9 +28,9 @@ public class ComposedProductionOrderServiceImpl implements ComposedProductionOrd
     @Override
     public Optional<ComposedProductionOrderDto> create(RequestComposedDto productionOrderIds) {
 
-        List<Long> validProductionOrderIds = productionOrderService.checkOrderIdsExistInDatabase(productionOrderIds.getProductionOrderIds());
+        List<Long> validProductionOrderIds = productionOrderService.findExistingIds(productionOrderIds.getProductionOrderIds());
         if(validProductionOrderIds.isEmpty()) {
-            return Optional.empty();
+            throw new IllegalArgumentException("Production Order Ids are not valid");
         }
 
         ComposedProductionOrderEntity composedEntity = createComposed();
@@ -42,7 +42,6 @@ public class ComposedProductionOrderServiceImpl implements ComposedProductionOrd
             }
             productionOrderEntity.get().setComposedProductionOrder(composedEntity);
             composedEntity.getProductionOrders().add(productionOrderEntity.get());
-            productionOrderService.saveAndUpdate(productionOrderEntity.get());
         }
 
         saveAndUpdate(composedEntity);

@@ -24,11 +24,11 @@ public class HitServiceImpl implements HitService {
 
     @Override
     public List<HitDto> create(RequestHitDto requestHitDto) {
-        if (!areAllSampleIdsEqual(requestHitDto.getHitDtoList())) {
+        if (!areAllSampleIdsEqual(requestHitDto.getHits())) {
             throw new IllegalArgumentException("Not all sampleIds are equal");
         }
 
-        return saveHitsAndUpdateSample(requestHitDto.getHitDtoList());
+        return saveHitsAndUpdateSample(requestHitDto.getHits());
     }
 
     private boolean areAllSampleIdsEqual(List<HitDto> hitDtoList) {

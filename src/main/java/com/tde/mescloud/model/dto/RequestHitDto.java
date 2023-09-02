@@ -9,5 +9,5 @@ import java.util.List;
 @Setter
 public class RequestHitDto {
 
-    private List<HitDto> hitDtoList;
+    private List<HitDto> hits;
 }

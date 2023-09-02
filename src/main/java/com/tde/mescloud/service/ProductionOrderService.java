@@ -24,5 +24,5 @@ public interface ProductionOrderService {
 
     Optional<ProductionOrderEntity> findById(Long id);
 
-    List<Long> checkOrderIdsExistInDatabase(List<Long> orderIds);
+    List<Long> findExistingIds(List<Long> ids);
 }
