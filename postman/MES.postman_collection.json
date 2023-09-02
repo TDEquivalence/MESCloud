@@ -304,7 +304,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n   \"jsonType\": \"ProductionOrderInit\",\r\n   \"productionOrderCode\": \"PO2301\",\r\n   \"equipmentCode\":\"OBO001\",\r\n   \"equipmentStatus\":1,\r\n   \"counters\":[\r\n      {\r\n         \"outputCode\":\"OBO001-001\",\r\n         \"value\":250\r\n      },\r\n      {\r\n         \"outputCode\":\"OBO001-002\",\r\n         \"value\":220\r\n      },\r\n      {\r\n         \"outputCode\":\"OBO001-003\",\r\n         \"value\":65435\r\n      },\r\n      {\r\n         \"outputCode\":\"OBO001-004\",\r\n         \"value\":430\r\n      }\r\n   ]\r\n}",
+							"raw": "{\r\n   \"jsonType\": \"ProductionOrderInit\",\r\n   \"productionOrderCode\": \"PO2301\",\r\n   \"equipmentCode\":\"OBO001\",\r\n   \"equipmentStatus\":2,\r\n   \"counters\":[\r\n      {\r\n         \"outputCode\":\"OBO001-001\",\r\n         \"value\":250\r\n      },\r\n      {\r\n         \"outputCode\":\"OBO001-002\",\r\n         \"value\":220\r\n      }\r\n   ]\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -349,7 +349,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n   \"jsonType\": \"ProductionCount\",\r\n   \"productionOrderCode\": \"PO2301\",\r\n   \"equipmentCode\":\"OBO001\",\r\n   \"equipmentStatus\":1,\r\n   \"counters\":[\r\n      {\r\n         \"outputCode\":\"OBO001-001\",\r\n         \"value\":350\r\n      },\r\n      {\r\n         \"outputCode\":\"OBO001-002\",\r\n         \"value\":320\r\n      },\r\n      {\r\n         \"outputCode\":\"OBO001-003\",\r\n         \"value\":100\r\n      },\r\n      {\r\n         \"outputCode\":\"OBO001-004\",\r\n         \"value\":600\r\n      }\r\n   ]\r\n}",
+							"raw": "{\r\n   \"jsonType\": \"ProductionCount\",\r\n   \"productionOrderCode\": \"PO2301\",\r\n   \"equipmentCode\":\"OBO001\",\r\n   \"equipmentStatus\":0,\r\n   \"counters\":[\r\n      {\r\n         \"outputCode\":\"OBO001-001\",\r\n         \"value\":350\r\n      },\r\n      {\r\n         \"outputCode\":\"OBO001-002\",\r\n         \"value\":320\r\n      }\r\n   ]\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -499,35 +499,27 @@
 								}
 							]
 						},
-						"method": "GET",
+						"method": "POST",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"take\": 10,\r\n    \"skip\": 0,\r\n    \"searchValueByName\": {\r\n        \"startDate\": \"2023-06-15T00:00:00.000Z\",\r\n        \"endDate\": \"2023-06-20T23:59:59.000Z\"\r\n    },\r\n    \"sortValueByName\": {\r\n        \"computedValue\": \"ASC\"\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
 						"url": {
-							"raw": "localhost:8080/api/counter-records?skip=10&take=20&search%5B0%5D.id=1&search%5B0%5D.value=test",
+							"raw": "localhost:8080/api/counter-records/filter",
 							"host": [
 								"localhost"
 							],
 							"port": "8080",
 							"path": [
 								"api",
-								"counter-records"
-							],
-							"query": [
-								{
-									"key": "skip",
-									"value": "10"
-								},
-								{
-									"key": "take",
-									"value": "20"
-								},
-								{
-									"key": "search%5B0%5D.id",
-									"value": "1"
-								},
-								{
-									"key": "search%5B0%5D.value",
-									"value": "test"
-								}
+								"counter-records",
+								"filter"
 							]
 						}
 					},
@@ -602,6 +594,46 @@
 					"response": []
 				},
 				{
+					"name": "ProductionOrder -> Complete for 1",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwtoken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"equipment\": {\r\n        \"id\": 1\r\n    },\r\n    \"targetAmount\": 1000,\r\n    \"inputBatch\": \"PLA8231\",\r\n    \"source\": \"32\",\r\n    \"gauge\": \"47 x 50\",\r\n    \"category\": \"Rosa\",\r\n    \"washingProcess\": \"IMS32\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}:{{port}}/api/production-orders/1/complete",
+							"host": [
+								"{{url}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"production-orders",
+								"1",
+								"complete"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "CountingEquipment -> Find All",
 					"request": {
 						"auth": {
@@ -655,6 +687,35 @@
 								"api",
 								"counting-equipments",
 								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "KPI -> EquipmentCounts",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"timeMode\": \"DAY\",\r\n    \"startDate\": \"2023-06-19\",\r\n    \"endDate\": \"2023-06-20\",\r\n    \"search\": []\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/kpi/equipment-counts",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"kpi",
+								"equipment-counts"
 							]
 						}
 					},
