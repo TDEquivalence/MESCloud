@@ -1,7 +1,6 @@
 package com.tde.mescloud.service;
 
 import com.tde.mescloud.model.converter.ComposedProductionOrderConverter;
-import com.tde.mescloud.model.converter.ProductionOrderConverter;
 import com.tde.mescloud.model.dto.ComposedProductionOrderDto;
 import com.tde.mescloud.model.dto.ProductionOrderDto;
 import com.tde.mescloud.model.dto.RequestSampleDto;
@@ -46,6 +45,10 @@ public class ComposedProductionOrderServiceImpl implements ComposedProductionOrd
             productionOrderRepository.save(productionOrderEntity.get());
         }
 
+        if(composedProductionOrderEntity.getProductionOrderEntity().isEmpty()) {
+            composedProductionOrderRepository.delete(composedProductionOrderEntity);
+        }
+
         return Optional.of(composedArticleConverter.convertToDto(composedProductionOrderEntity));
     }
 
@@ -63,8 +66,7 @@ public class ComposedProductionOrderServiceImpl implements ComposedProductionOrd
         Optional<String> savedLastMaxCode = composedProductionOrderRepository.findLastMaxCode();
 
         if (savedLastMaxCode.isPresent()) {
-            int lastMaxCode = Integer.parseInt(savedLastMaxCode.get().substring(2));
-            return generateComposedArticleCode(lastMaxCode);
+            return generateComposedArticleCode(Integer.parseInt(savedLastMaxCode.get()));
         } else {
             return generateComposedArticleCode(COMPOSED_PRODUCTION_CODE_INIT);
         }
