@@ -17,4 +17,5 @@ public class CountingEquipmentDto {
     private String productionOrderCode;
     private int pTimerCommunicationCycle;
     private List<EquipmentOutputDto> outputs;
+    private String imsCode;
 }

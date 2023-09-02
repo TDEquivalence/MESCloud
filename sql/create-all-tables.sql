@@ -84,7 +84,7 @@ CREATE TABLE counting_equipment (
     section_id int,
     equipment_status int,
     p_timer_communication_cycle int,
-    ims_id int,
+    ims_id int UNIQUE,
 
     PRIMARY KEY(id),
     FOREIGN KEY(section_id) REFERENCES section(id),
