@@ -12,7 +12,7 @@ public interface ProductionOrderService {
 
     String generateCode();
 
-    Optional<ProductionOrderDto> save(ProductionOrderDto productionOrderDto);
+    Optional<ProductionOrderDto> create(ProductionOrderDto productionOrderDto);
 
     boolean hasActiveProductionOrder(long countingEquipmentId);
 

@@ -91,13 +91,12 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
             e.printStackTrace();
         }
 
-//        log.info("ProductionOrderServiceImpl: lock released");
         ProductionOrderDto productionOrder = converter.toDto(productionOrderEntityOpt.get());
         return Optional.of(productionOrder);
     }
 
     @Override
-    public Optional<ProductionOrderDto> save(ProductionOrderDto productionOrder) {
+    public Optional<ProductionOrderDto> create(ProductionOrderDto productionOrder) {
 
         Optional<CountingEquipmentEntity> countingEquipmentEntityOpt =
                 countingEquipmentRepository.findById(productionOrder.getEquipmentId());

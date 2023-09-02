@@ -13,17 +13,24 @@ INSERT INTO section
 VALUES
 (1, 'OBO');
 
-INSERT INTO counting_equipment
-(code, alias, section_id, equipment_status, p_timer_communication_cycle)
+INSERT INTO ims
+(code)
 VALUES
-('OBO001', 'Máquina 1', 1, 1, 60),
-('OBO002', 'Máquina 2', 1, 1, 120),
-('OBO003', 'Máquina 3', 1, 0, 120),
-('OBO004', 'Máquina 4', 1, 0, 180),
-('OBO005', 'Máquina 5', 1, 0, 60),
-('OBO006', 'Máquina 6', 1, 0, 180),
-('OBO007', 'Máquina 7', 1, 0, 120),
-('OBO008', 'Máquina 8', 1, 0, 180);
+('N15000001'),
+('N15000002'),
+('N15000003');
+
+INSERT INTO counting_equipment
+(code, alias, section_id, equipment_status, p_timer_communication_cycle, ims_id)
+VALUES
+('OBO001', 'Máquina 1', 1, 1, 60, 1),
+('OBO002', 'Máquina 2', 1, 1, 120, 2),
+('OBO003', 'Máquina 3', 1, 0, 120, null),
+('OBO004', 'Máquina 4', 1, 0, 180, 3),
+('OBO005', 'Máquina 5', 1, 0, 60, null),
+('OBO006', 'Máquina 6', 1, 0, 180, null),
+('OBO007', 'Máquina 7', 1, 0, 120, null),
+('OBO008', 'Máquina 8', 1, 0, 180, null);
 
 INSERT INTO equipment_output_alias
 (alias)
