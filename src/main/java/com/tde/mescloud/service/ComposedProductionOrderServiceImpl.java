@@ -34,7 +34,6 @@ public class ComposedProductionOrderServiceImpl implements ComposedProductionOrd
         composedProductionOrderDto.setCode(composedProductionCode);
 
         ComposedProductionOrderEntity composedProductionOrderEntity = composedArticleConverter.convertToEntity(composedProductionOrderDto);
-        composedProductionOrderRepository.save(composedProductionOrderEntity);
 
         for(ProductionOrderDto po : requestComposedArticleDto) {
             Optional<ProductionOrderEntity> productionOrderEntity = productionOrderRepository.findById(po.getId());
@@ -42,7 +41,8 @@ public class ComposedProductionOrderServiceImpl implements ComposedProductionOrd
                 continue;
             }
             productionOrderEntity.get().setComposedProductionOrder(composedProductionOrderEntity);
-            productionOrderRepository.save(productionOrderEntity.get());
+            composedProductionOrderEntity.getProductionOrderEntity().add(productionOrderEntity.get());
+            composedProductionOrderRepository.save(composedProductionOrderEntity);
         }
 
         if(composedProductionOrderEntity.getProductionOrderEntity() == null) {
