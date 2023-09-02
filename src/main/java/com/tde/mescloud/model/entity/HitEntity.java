@@ -18,5 +18,5 @@ public class HitEntity {
 
     private Float tca;
 
-    private boolean isValidForReliability;
+    private Boolean isValidForReliability;
 }
