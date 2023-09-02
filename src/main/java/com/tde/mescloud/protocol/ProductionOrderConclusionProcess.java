@@ -32,7 +32,7 @@ public class ProductionOrderConclusionProcess extends AbstractMesProtocolProcess
     public void execute(PlcMqttDto equipmentCounts) {
 
         log.info("Executing Production Order conclusion process");
-        if(equipmentCounts.getProductionOrderCode() == null && equipmentCounts.getEquipmentCode() == null) {
+        if (equipmentCounts.getProductionOrderCode() == null && equipmentCounts.getEquipmentCode() == null) {
             log.warning(() -> String.format("Unable to find an Equipment with code [%s]", equipmentCounts.getEquipmentCode()));
             return;
         }
@@ -56,9 +56,9 @@ public class ProductionOrderConclusionProcess extends AbstractMesProtocolProcess
             return;
         }
 
-        if(!productionOrderEntityOpt.get().isCompleted()) {
+        if (!productionOrderEntityOpt.get().isCompleted()) {
             try {
-                Thread.sleep(250);
+                Thread.sleep(500);
                 ProductionOrderMqttDto productionOrderMqttDto = new ProductionOrderMqttDto();
                 productionOrderMqttDto.setJsonType(MqttDTOConstants.PRODUCTION_ORDER_DTO_NAME);
                 productionOrderMqttDto.setEquipmentEnabled(false);
@@ -77,6 +77,8 @@ public class ProductionOrderConclusionProcess extends AbstractMesProtocolProcess
         productionOrderEntity.setCompleted(true);
         repository.save(productionOrderEntity);
 
+//        log.info("ProductionOrderConclusionProcess - releasing lock");
         lock.signalExecute();
+//        log.info("ProductionOrderConclusionProcess - signal executed");
     }
 }
