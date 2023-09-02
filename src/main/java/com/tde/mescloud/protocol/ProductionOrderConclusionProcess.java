@@ -21,6 +21,8 @@ import java.util.Optional;
 @AllArgsConstructor
 public class ProductionOrderConclusionProcess extends AbstractMesProtocolProcess<PlcMqttDto> {
 
+    private static final int THREAD_SLEEP_DURATION = 500;
+
     private final CounterRecordService counterRecordService;
     private final CountingEquipmentService equipmentService;
     private final MqttClient mqttClient;
@@ -58,7 +60,7 @@ public class ProductionOrderConclusionProcess extends AbstractMesProtocolProcess
 
         if (!productionOrderEntityOpt.get().isCompleted()) {
             try {
-                Thread.sleep(500);
+                Thread.sleep(THREAD_SLEEP_DURATION);
                 ProductionOrderMqttDto productionOrderMqttDto = new ProductionOrderMqttDto();
                 productionOrderMqttDto.setJsonType(MqttDTOConstants.PRODUCTION_ORDER_DTO_NAME);
                 productionOrderMqttDto.setEquipmentEnabled(false);
