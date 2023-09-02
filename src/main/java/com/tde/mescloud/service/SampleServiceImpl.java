@@ -44,7 +44,7 @@ public class SampleServiceImpl implements SampleService {
     }
 
     private ComposedProductionOrderEntity createComposed(RequestSampleDto requestSampleDto) {
-        Optional<ComposedProductionOrderDto> composedDto = composedService.create(requestSampleDto.getProductionOrder());
+        Optional<ComposedProductionOrderDto> composedDto = composedService.create(requestSampleDto.getProductionOrders());
         if(composedDto.isEmpty()) {
             return null;
         }
