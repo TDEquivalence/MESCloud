@@ -24,8 +24,12 @@ public class HitServiceImpl implements HitService {
 
     @Override
     public List<HitDto> create(RequestHitDto requestHitDto) {
+        if (requestHitDto.getHits().isEmpty() ||requestHitDto.getHits() == null) {
+            throw new IllegalArgumentException("Hits list are not valid");
+        }
+
         if (!areAllSampleIdsEqual(requestHitDto.getHits())) {
-            throw new IllegalArgumentException("Not all sampleIds are equal");
+            throw new IllegalArgumentException("Not all Sample Ids are equal");
         }
 
         return saveHitsAndUpdateSample(requestHitDto.getHits());
