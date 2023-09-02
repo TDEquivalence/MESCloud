@@ -181,7 +181,7 @@ CREATE TABLE sample (
   amount INT,
   tca_average INT,
   reliability INT,
-  created_by INT,
+  created_at date,
   PRIMARY KEY (id),
   FOREIGN KEY (composed_production_order_id) REFERENCES composed_production_order (id)
 );
