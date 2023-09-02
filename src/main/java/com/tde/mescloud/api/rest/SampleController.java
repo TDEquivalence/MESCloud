@@ -20,7 +20,7 @@ public class SampleController {
 
     private final SampleService sampleService;
 
-    @PostMapping("/create")
+    @PostMapping
     public ResponseEntity<SampleDto> createSample(@RequestBody RequestSampleDto requestSampleDto) {
         Optional<SampleDto> sampleDto = sampleService.create(requestSampleDto);
         if (sampleDto.isEmpty()) {

@@ -17,9 +17,10 @@ import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 
-import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -155,5 +156,28 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     private void publishToPlc(ProductionOrderEntity productionOrderEntity) throws MesMqttException {
         ProductionOrderMqttDto productionOrderMqttDto = converter.toMqttDto(productionOrderEntity, true);
         mqttClient.publish(mqttSettings.getProtCountPlcTopic(), productionOrderMqttDto);
+    }
+
+    @Override
+    public ProductionOrderEntity saveAndUpdate(ProductionOrderEntity productionOrder) {
+        return repository.save(productionOrder);
+    }
+
+    @Override
+    public void delete(ProductionOrderEntity productionOrder) {
+        repository.delete(productionOrder);
+    }
+
+    @Override
+    public Optional<ProductionOrderEntity> findById(Long id) {
+        return repository.findById(id);
+    }
+
+    public List<Long> findExistingIds(List<Long> ids) {
+        List<ProductionOrderEntity> existingEntities = repository.findByIdIn(ids);
+
+        return existingEntities.stream()
+                .map(ProductionOrderEntity::getId)
+                .collect(Collectors.toList());
     }
 }
