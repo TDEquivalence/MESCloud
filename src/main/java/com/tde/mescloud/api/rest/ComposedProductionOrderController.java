@@ -2,12 +2,14 @@ package com.tde.mescloud.api.rest;
 
 import com.tde.mescloud.model.dto.ComposedProductionOrderDto;
 import com.tde.mescloud.model.dto.ProductionOrderDto;
-import com.tde.mescloud.model.dto.RequestSampleDto;
 import com.tde.mescloud.service.ComposedProductionOrderService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Optional;
 
@@ -23,16 +25,6 @@ public class ComposedProductionOrderController {
         Optional<ComposedProductionOrderDto> composedProductionOpt = composedProductionOrderService.create(requestComposedProductionDto);
         if (composedProductionOpt.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-
-        return new ResponseEntity<>(composedProductionOpt.get(), HttpStatus.OK);
-    }
-
-    @PostMapping("/sample")
-    public ResponseEntity<ComposedProductionOrderDto> createSample(@RequestBody RequestSampleDto requestSampleDto) {
-        Optional<ComposedProductionOrderDto> composedProductionOpt = composedProductionOrderService.createSample(requestSampleDto);
-        if (composedProductionOpt.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
         return new ResponseEntity<>(composedProductionOpt.get(), HttpStatus.OK);

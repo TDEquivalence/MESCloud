@@ -22,11 +22,11 @@ public class ComposedProductionOrderConverterImpl implements ComposedProductionO
         return (composedProductionOrderDto == null) ? null : mapper.map(composedProductionOrderDto, ComposedProductionOrderEntity.class);
     }
 
-    public List<ComposedProductionOrderDto> convertToDto(List<ComposedProductionOrderEntity> factoryEntityList) {
-        return factoryEntityList.stream().map(this::convertToDto).toList();
+    public List<ComposedProductionOrderDto> convertToDto(List<ComposedProductionOrderEntity> composedEntityList) {
+        return composedEntityList.stream().map(this::convertToDto).toList();
     }
 
-    public List<ComposedProductionOrderEntity> convertToEntity(List<ComposedProductionOrderDto> factoryDtoList) {
-        return factoryDtoList.stream().map(this::convertToEntity).toList();
+    public List<ComposedProductionOrderEntity> convertToEntity(List<ComposedProductionOrderDto> composedDtoList) {
+        return composedDtoList.stream().map(this::convertToEntity).toList();
     }
 }

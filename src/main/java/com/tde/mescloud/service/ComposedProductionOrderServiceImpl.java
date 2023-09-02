@@ -3,7 +3,6 @@ package com.tde.mescloud.service;
 import com.tde.mescloud.model.converter.ComposedProductionOrderConverter;
 import com.tde.mescloud.model.dto.ComposedProductionOrderDto;
 import com.tde.mescloud.model.dto.ProductionOrderDto;
-import com.tde.mescloud.model.dto.RequestSampleDto;
 import com.tde.mescloud.model.entity.ComposedProductionOrderEntity;
 import com.tde.mescloud.model.entity.ProductionOrderEntity;
 import com.tde.mescloud.repository.ComposedProductionOrderRepository;
@@ -19,8 +18,8 @@ import java.util.Optional;
 @Log
 public class ComposedProductionOrderServiceImpl implements ComposedProductionOrderService {
 
-    private final ComposedProductionOrderRepository composedProductionOrderRepository;
-    private final ComposedProductionOrderConverter composedConverter;
+    private final ComposedProductionOrderRepository composedRepository;
+    private final ComposedProductionOrderConverter converter;
 
     private final ProductionOrderRepository productionOrderRepository;
 
@@ -41,20 +40,13 @@ public class ComposedProductionOrderServiceImpl implements ComposedProductionOrd
             productionOrderRepository.save(productionOrderEntity.get());
         }
 
-        composedProductionOrderRepository.save(composedEntity);
+        composedRepository.save(composedEntity);
         if(composedEntity.getProductionOrderEntity() == null) {
-            composedProductionOrderRepository.delete(composedEntity);
+            composedRepository.delete(composedEntity);
             return Optional.empty();
         }
 
-        return Optional.of(composedConverter.convertToDto(composedEntity));
-    }
-
-    @Override
-    public Optional<ComposedProductionOrderDto> createSample(RequestSampleDto requestSampleDto) {
-        ComposedProductionOrderEntity composedEntity = createComposed();
-
-        return Optional.empty();
+        return Optional.of(converter.convertToDto(composedEntity));
     }
 
     private ComposedProductionOrderEntity createComposed() {
@@ -62,8 +54,8 @@ public class ComposedProductionOrderServiceImpl implements ComposedProductionOrd
         String composedProductionCode = generateCode();
         composedDto.setCode(composedProductionCode);
 
-        ComposedProductionOrderEntity composedEntity = composedConverter.convertToEntity(composedDto);
-        return composedProductionOrderRepository.save(composedEntity);
+        ComposedProductionOrderEntity composedEntity = converter.convertToEntity(composedDto);
+        return composedRepository.save(composedEntity);
     }
 
     private String incrementAndGenerateCode(int lastMaxCode) {
@@ -72,7 +64,7 @@ public class ComposedProductionOrderServiceImpl implements ComposedProductionOrd
     }
 
     private String generateCode() {
-        Optional<String> savedLastMaxCode = composedProductionOrderRepository.findLastMaxCode();
+        Optional<String> savedLastMaxCode = composedRepository.findLastMaxCode();
 
         if (savedLastMaxCode.isPresent()) {
             return incrementAndGenerateCode(Integer.parseInt(savedLastMaxCode.get()));

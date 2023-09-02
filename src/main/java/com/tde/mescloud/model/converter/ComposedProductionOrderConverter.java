@@ -8,11 +8,11 @@ import java.util.List;
 
 public interface ComposedProductionOrderConverter {
 
-    public ComposedProductionOrderDto convertToDto(ComposedProductionOrderEntity factoryEntity);
+    public ComposedProductionOrderDto convertToDto(ComposedProductionOrderEntity composedEntity);
 
-    public ComposedProductionOrderEntity convertToEntity(ComposedProductionOrderDto factoryDto);
+    public ComposedProductionOrderEntity convertToEntity(ComposedProductionOrderDto composedEntity);
 
-    public List<ComposedProductionOrderDto> convertToDto(List<ComposedProductionOrderEntity> factoryEntityList);
+    public List<ComposedProductionOrderDto> convertToDto(List<ComposedProductionOrderEntity> composedEntityList);
 
-    public List<ComposedProductionOrderEntity> convertToEntity(List<ComposedProductionOrderDto> factoryDtoList);
+    public List<ComposedProductionOrderEntity> convertToEntity(List<ComposedProductionOrderDto> composedDtoList);
 }
