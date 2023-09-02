@@ -16,6 +16,7 @@ DROP TABLE IF EXISTS users CASCADE;
 DROP TABLE IF EXISTS token CASCADE;
 DROP TABLE IF EXISTS factory_user CASCADE;
 DROP TABLE IF EXISTS factory CASCADE;
+DROP TABLE IF EXISTS ims CASCADE;
 
 CREATE TABLE users (
   id int GENERATED ALWAYS AS IDENTITY,
@@ -69,6 +70,13 @@ CREATE TABLE section (
  FOREIGN KEY(factory_id) REFERENCES factory(id)
 );
 
+CREATE TABLE ims (
+    id int GENERATED ALWAYS AS IDENTITY,
+    code varchar(100) NOT NULL,
+
+    PRIMARY KEY(id)
+);
+
 CREATE TABLE counting_equipment (
     id int GENERATED ALWAYS AS IDENTITY,
     code varchar(20) UNIQUE NOT NULL,
@@ -76,9 +84,11 @@ CREATE TABLE counting_equipment (
     section_id int,
     equipment_status int,
     p_timer_communication_cycle int,
+    ims_id int,
 
     PRIMARY KEY(id),
-    FOREIGN KEY(section_id) REFERENCES section(id)
+    FOREIGN KEY(section_id) REFERENCES section(id),
+    FOREIGN KEY(ims_id) REFERENCES ims(id)
 );
 
 CREATE INDEX idx_counting_equipment_section_id ON counting_equipment (section_id);

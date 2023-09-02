@@ -20,6 +20,10 @@ public class CountingEquipmentEntity {
     private SectionEntity section;
     private int equipmentStatus;
     private int pTimerCommunicationCycle;
+    @OneToOne(orphanRemoval = false, cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "ims_id", referencedColumnName = "id")
+    private ImsEntity ims;
+
     @OneToMany(mappedBy = "countingEquipment", fetch = FetchType.EAGER)
     List<EquipmentOutputEntity> outputs;
     @OneToMany(mappedBy = "equipment", fetch = FetchType.LAZY)
