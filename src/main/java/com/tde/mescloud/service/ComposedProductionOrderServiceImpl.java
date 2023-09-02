@@ -45,8 +45,9 @@ public class ComposedProductionOrderServiceImpl implements ComposedProductionOrd
             productionOrderRepository.save(productionOrderEntity.get());
         }
 
-        if(composedProductionOrderEntity.getProductionOrderEntity().isEmpty()) {
+        if(composedProductionOrderEntity.getProductionOrderEntity() == null) {
             composedProductionOrderRepository.delete(composedProductionOrderEntity);
+            return Optional.empty();
         }
 
         return Optional.of(composedArticleConverter.convertToDto(composedProductionOrderEntity));
