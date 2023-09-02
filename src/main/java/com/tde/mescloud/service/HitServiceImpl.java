@@ -29,7 +29,7 @@ public class HitServiceImpl implements HitService {
             throw new IllegalArgumentException("Not all sampleIds are equal");
         }
 
-        return setSampleForHitEntities(requestHitDto.getHitDtoList());
+        return updateHitsAndSample(requestHitDto.getHitDtoList());
     }
 
     private boolean areAllSampleIdsEqual(List<HitDto> hitDtoList) {
@@ -47,21 +47,29 @@ public class HitServiceImpl implements HitService {
         return true;
     }
 
-    private List<HitDto> setSampleForHitEntities(List<HitDto> hitList) {
+    private List<HitDto> updateHitsAndSample(List<HitDto> hitList) {
         SampleEntity sample = getSample(hitList);
         List<HitEntity> hits = converter.convertToEntity(hitList);
-        int tcaAverage = (int) getTcaAverage(hits);
 
+        setSampleForHits(sample, hits);
+        setTcaAverageInSample(sample, hits);
+
+        return converter.convertToDto(hits);
+    }
+
+    private void setSampleForHits(SampleEntity sample, List<HitEntity> hits) {
         for (HitEntity hitEntity : hits) {
             hitEntity.setSample(sample);
         }
+    }
 
+    private void setTcaAverageInSample(SampleEntity sample, List<HitEntity> hits) {
+        int tcaAverage = (int) getTcaAverage(hits);
         sample.setTcaAverage(tcaAverage);
         sampleService.saveAndUpdate(sample);
-
         saveAndUpdateAll(hits);
-        return converter.convertToDto(hits);
     }
+
 
     private SampleEntity getSample(List<HitDto> hitList) {
         HitDto hitDto = hitList.get(0);
