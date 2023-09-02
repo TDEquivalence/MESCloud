@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -19,5 +20,5 @@ public class ComposedProductionOrderEntity {
     private String code;
 
     @OneToMany(mappedBy = "composedProductionOrder")
-    private List<ProductionOrderEntity> productionOrderEntity;
+    private List<ProductionOrderEntity> productionOrderEntity = new ArrayList<>();
 }

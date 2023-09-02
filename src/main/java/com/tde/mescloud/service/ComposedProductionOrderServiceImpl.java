@@ -34,6 +34,7 @@ public class ComposedProductionOrderServiceImpl implements ComposedProductionOrd
         composedProductionOrderDto.setCode(composedProductionCode);
 
         ComposedProductionOrderEntity composedProductionOrderEntity = composedArticleConverter.convertToEntity(composedProductionOrderDto);
+        composedProductionOrderRepository.save(composedProductionOrderEntity);
 
         for(ProductionOrderDto po : requestComposedArticleDto) {
             Optional<ProductionOrderEntity> productionOrderEntity = productionOrderRepository.findById(po.getId());
@@ -42,9 +43,10 @@ public class ComposedProductionOrderServiceImpl implements ComposedProductionOrd
             }
             productionOrderEntity.get().setComposedProductionOrder(composedProductionOrderEntity);
             composedProductionOrderEntity.getProductionOrderEntity().add(productionOrderEntity.get());
-            composedProductionOrderRepository.save(composedProductionOrderEntity);
+            productionOrderRepository.save(productionOrderEntity.get());
         }
 
+        composedProductionOrderRepository.save(composedProductionOrderEntity);
         if(composedProductionOrderEntity.getProductionOrderEntity() == null) {
             composedProductionOrderRepository.delete(composedProductionOrderEntity);
             return Optional.empty();
@@ -58,7 +60,7 @@ public class ComposedProductionOrderServiceImpl implements ComposedProductionOrd
         return Optional.empty();
     }
 
-    private String generateComposedArticleCode(int lastMaxCode) {
+    private String incrementAndGenerateComposedArticleCode(int lastMaxCode) {
         int codeIncremented = lastMaxCode + 1;
         return COMPOSED_PRODUCTION_CODE_PREFIX + String.format("%05d", codeIncremented);
     }
@@ -67,9 +69,9 @@ public class ComposedProductionOrderServiceImpl implements ComposedProductionOrd
         Optional<String> savedLastMaxCode = composedProductionOrderRepository.findLastMaxCode();
 
         if (savedLastMaxCode.isPresent()) {
-            return generateComposedArticleCode(Integer.parseInt(savedLastMaxCode.get()));
+            return incrementAndGenerateComposedArticleCode(Integer.parseInt(savedLastMaxCode.get()));
         } else {
-            return generateComposedArticleCode(COMPOSED_PRODUCTION_CODE_INIT);
+            return incrementAndGenerateComposedArticleCode(COMPOSED_PRODUCTION_CODE_INIT);
         }
     }
 
