@@ -7,6 +7,6 @@ import lombok.Setter;
 @Setter
 public class RequestSampleDto {
 
-    private ProductionOrderDto[] productionOrder;
+    private ProductionOrderDto[] productionOrders;
     private int amount;
 }
