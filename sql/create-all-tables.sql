@@ -1,6 +1,6 @@
 DROP VIEW IF EXISTS counter_record_production_conclusion CASCADE;
 DROP TABLE IF EXISTS batch CASCADE;
-DROP TABLE IF EXISTS hits CASCADE;
+DROP TABLE IF EXISTS hit CASCADE;
 DROP TABLE IF EXISTS sample CASCADE;
 DROP TABLE IF EXISTS production_instruction CASCADE;
 DROP TABLE IF EXISTS composed_production_order CASCADE;
@@ -186,7 +186,7 @@ CREATE TABLE sample (
   FOREIGN KEY (composed_production_order_id) REFERENCES composed_production_order (id)
 );
 
-CREATE TABLE hits (
+CREATE TABLE hit (
   id int GENERATED ALWAYS AS IDENTITY,
   sample_id INT,
   tca FLOAT,
