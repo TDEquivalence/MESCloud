@@ -5,10 +5,7 @@ import com.tde.mescloud.service.CountingEquipmentService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -18,21 +15,31 @@ import java.util.Optional;
 @AllArgsConstructor
 public class CountingEquipmentController {
 
-    private CountingEquipmentService countingEquipmentService;
+    private CountingEquipmentService service;
 
     @GetMapping
     public ResponseEntity<List<CountingEquipmentDto>> findAll() {
-        List<CountingEquipmentDto> countingEquipments = countingEquipmentService.findAllWithLastProductionOrder();
+        List<CountingEquipmentDto> countingEquipments = service.findAllWithLastProductionOrder();
         return new ResponseEntity<>(countingEquipments, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<CountingEquipmentDto> findById(@PathVariable long id) {
-        Optional<CountingEquipmentDto> countingEquipmentOpt = countingEquipmentService.findById(id);
+        Optional<CountingEquipmentDto> countingEquipmentOpt = service.findById(id);
         if (countingEquipmentOpt.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
         return new ResponseEntity<>(countingEquipmentOpt.get(), HttpStatus.OK);
+    }
+
+    @PutMapping("/{equipmentId}/ims")
+    public ResponseEntity<CountingEquipmentDto> updateIms(@PathVariable long equipmentId, @RequestBody Long imsId) {
+        Optional<CountingEquipmentDto> updatedIms = service.setIms(equipmentId, imsId);
+        if (updatedIms.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        return new ResponseEntity<>(updatedIms.get(), HttpStatus.OK);
     }
 }

@@ -10,4 +10,6 @@ public interface ImsService {
     Optional<ImsDto> create(ImsDto ims);
 
     List<ImsDto> getAll();
+
+    Optional<ImsDto> findById(Long id);
 }

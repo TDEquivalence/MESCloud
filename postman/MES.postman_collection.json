@@ -635,6 +635,46 @@
 								}
 							},
 							"response": []
+						},
+						{
+							"name": "CountingEquipment -> Set IMS",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{jwtoken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "3",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8080/api/counting-equipments/1/ims",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"counting-equipments",
+										"1",
+										"ims"
+									]
+								}
+							},
+							"response": []
 						}
 					]
 				},

@@ -2,7 +2,9 @@ package com.tde.mescloud.service;
 
 import com.tde.mescloud.model.converter.CountingEquipmentConverter;
 import com.tde.mescloud.model.dto.CountingEquipmentDto;
+import com.tde.mescloud.model.dto.ImsDto;
 import com.tde.mescloud.model.entity.CountingEquipmentEntity;
+import com.tde.mescloud.model.entity.ImsEntity;
 import com.tde.mescloud.repository.CountingEquipmentRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
@@ -19,6 +21,7 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
 
     private CountingEquipmentRepository repository;
     private CountingEquipmentConverter converter;
+    private ImsService imsService;
 
     @Override
     public List<CountingEquipmentDto> findAllWithLastProductionOrder() {
@@ -82,10 +85,14 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
     }
 
     @Override
-    public CountingEquipmentDto save(CountingEquipmentDto countingEquipment) {
-
+    public CountingEquipmentDto create(CountingEquipmentDto countingEquipment) {
         CountingEquipmentEntity countingEquipmentEntity = converter.convertToEntity(countingEquipment);
-        CountingEquipmentEntity persistedCountingEquipment = repository.save(countingEquipmentEntity);
+        return create(countingEquipmentEntity);
+    }
+
+    @Override
+    public CountingEquipmentDto create(CountingEquipmentEntity countingEquipment) {
+        CountingEquipmentEntity persistedCountingEquipment = repository.save(countingEquipment);
         return converter.convertToDto(persistedCountingEquipment);
     }
 
@@ -103,5 +110,30 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
 
         CountingEquipmentDto updatedCountingEquipmentDto = converter.convertToDto(updatedCountingEquipment);
         return Optional.of(updatedCountingEquipmentDto);
+    }
+
+    @Override
+    public Optional<CountingEquipmentDto> setIms(Long equipmentId, Long imsId) {
+        Optional<CountingEquipmentEntity> countingEquipmentOpt = repository.findById(equipmentId);
+        if (countingEquipmentOpt.isEmpty()) {
+            log.warning(String.format("Unable to set IMS - no counting equipment found with id [%s]", equipmentId));
+            return Optional.empty();
+        }
+
+        Optional<ImsDto> persistedImsOpt = imsService.findById(imsId);
+        if (persistedImsOpt.isEmpty()) {
+            log.warning(String.format("Unable to set IMS - no IMS found with id [%s]", imsId));
+            return Optional.empty();
+        }
+
+        //TODO: Check if another machine has that IMS and if that Machine is with an active PO
+
+        CountingEquipmentEntity countingEquipment = countingEquipmentOpt.get();
+        ImsEntity imsEntity = new ImsEntity();
+        imsEntity.setId(imsId);
+        countingEquipment.setIms(imsEntity);
+
+        CountingEquipmentDto countingEquipmentDto = create(countingEquipment);
+        return Optional.of(countingEquipmentDto);
     }
 }

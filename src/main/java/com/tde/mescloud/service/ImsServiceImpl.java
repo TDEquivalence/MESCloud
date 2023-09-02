@@ -27,6 +27,18 @@ public class ImsServiceImpl implements ImsService {
         return converter.toDto(entities);
     }
 
+    @Override
+    public Optional<ImsDto> findById(Long id) {
+        Optional<ImsEntity> persistedImsOpt = repository.findById(id);
+        if (persistedImsOpt.isEmpty()) {
+            log.warning(String.format("Unable to find IMS with id [%s]", id));
+            return Optional.empty();
+        }
+
+        ImsDto ims = converter.toDto(persistedImsOpt.get());
+        return Optional.of(ims);
+    }
+
     public Optional<ImsDto> create(ImsDto imsDto) {
 
         //TODO: DB not null no code
