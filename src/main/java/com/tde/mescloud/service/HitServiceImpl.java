@@ -28,7 +28,7 @@ public class HitServiceImpl implements HitService {
             throw new IllegalArgumentException("Not all sampleIds are equal");
         }
 
-        return updateHitsAndSample(requestHitDto.getHitDtoList());
+        return saveHitsAndUpdateSample(requestHitDto.getHitDtoList());
     }
 
     private boolean areAllSampleIdsEqual(List<HitDto> hitDtoList) {
@@ -46,27 +46,27 @@ public class HitServiceImpl implements HitService {
         return true;
     }
 
-    private List<HitDto> updateHitsAndSample(List<HitDto> hitList) {
+    private List<HitDto> saveHitsAndUpdateSample(List<HitDto> hitList) {
         SampleEntity sample = getSample(hitList);
         List<HitEntity> hits = converter.convertToEntity(hitList);
 
-        setSampleForHits(sample, hits);
+        saveHitAndSetSample(sample, hits);
         setTcaAverageInSample(sample, hits);
 
         return converter.convertToDto(hits);
     }
 
-    private void setSampleForHits(SampleEntity sample, List<HitEntity> hits) {
+    private void saveHitAndSetSample(SampleEntity sample, List<HitEntity> hits) {
         for (HitEntity hitEntity : hits) {
             hitEntity.setSample(sample);
         }
+        saveAndUpdateAll(hits);
     }
 
     private void setTcaAverageInSample(SampleEntity sample, List<HitEntity> hits) {
         int tcaAverage = (int) getTcaAverage(hits);
         sample.setTcaAverage(tcaAverage);
         sampleService.saveAndUpdate(sample);
-        saveAndUpdateAll(hits);
     }
 
     private float getTcaAverage(List<HitEntity> hits) {
