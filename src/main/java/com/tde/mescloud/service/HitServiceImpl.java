@@ -81,7 +81,7 @@ public class HitServiceImpl implements HitService {
 
         return tcaSum / hits.size();
     }
-    
+
     private SampleEntity getSample(List<HitDto> hitList) {
         HitDto hitDto = hitList.get(0);
         Optional<SampleEntity> sample = sampleService.findById(hitDto.getSampleId());
