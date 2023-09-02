@@ -30,7 +30,7 @@ public class ComposedProductionOrderServiceImpl implements ComposedProductionOrd
     @Override
     public Optional<ComposedProductionOrderDto> create(ProductionOrderDto[] requestComposedArticleDto) {
         ComposedProductionOrderDto composedProductionOrderDto = new ComposedProductionOrderDto();
-        String composedProductionCode = generateComposedArticleCode();
+        String composedProductionCode = generateComposedProductionOrderCode();
         composedProductionOrderDto.setCode(composedProductionCode);
 
         ComposedProductionOrderEntity composedProductionOrderEntity = composedArticleConverter.convertToEntity(composedProductionOrderDto);
@@ -60,18 +60,18 @@ public class ComposedProductionOrderServiceImpl implements ComposedProductionOrd
         return Optional.empty();
     }
 
-    private String incrementAndGenerateComposedArticleCode(int lastMaxCode) {
+    private String incrementAndGenerateComposedProductionOrderCode(int lastMaxCode) {
         int codeIncremented = lastMaxCode + 1;
         return COMPOSED_PRODUCTION_CODE_PREFIX + String.format("%05d", codeIncremented);
     }
 
-    private String generateComposedArticleCode() {
+    private String generateComposedProductionOrderCode() {
         Optional<String> savedLastMaxCode = composedProductionOrderRepository.findLastMaxCode();
 
         if (savedLastMaxCode.isPresent()) {
-            return incrementAndGenerateComposedArticleCode(Integer.parseInt(savedLastMaxCode.get()));
+            return incrementAndGenerateComposedProductionOrderCode(Integer.parseInt(savedLastMaxCode.get()));
         } else {
-            return incrementAndGenerateComposedArticleCode(COMPOSED_PRODUCTION_CODE_INIT);
+            return incrementAndGenerateComposedProductionOrderCode(COMPOSED_PRODUCTION_CODE_INIT);
         }
     }
 
