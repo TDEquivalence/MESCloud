@@ -28,10 +28,10 @@ public class ComposedProductionOrderServiceImpl implements ComposedProductionOrd
     private static final int CODE_INITIAL_VALUE = 0;
 
     @Override
-    public Optional<ComposedProductionOrderDto> create(ProductionOrderDto[] requestComposedArticleDto) {
+    public Optional<ComposedProductionOrderDto> create(ProductionOrderDto[] requestComposedDto) {
         ComposedProductionOrderEntity composedEntity = createComposed();
 
-        for(ProductionOrderDto po : requestComposedArticleDto) {
+        for(ProductionOrderDto po : requestComposedDto) {
             Optional<ProductionOrderEntity> productionOrderEntity = productionOrderRepository.findById(po.getId());
             if(productionOrderEntity.isEmpty()) {
                 continue;
