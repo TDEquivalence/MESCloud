@@ -18,6 +18,6 @@ public class EquipmentOutputConverterImpl implements EquipmentOutputConverter {
 
     @Override
     public EquipmentOutputDto toDto(EquipmentOutputEntity entity) {
-        return modelMapper.map(entity, EquipmentOutputDto.class);Z
+        return modelMapper.map(entity, EquipmentOutputDto.class);
     }
 }
