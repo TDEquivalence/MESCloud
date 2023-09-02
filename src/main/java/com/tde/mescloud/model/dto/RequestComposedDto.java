@@ -7,8 +7,7 @@ import java.util.List;
 
 @Getter
 @Setter
-public class RequestSampleDto {
+public class RequestComposedDto {
 
-    private List<Long> productionOrdersIds;
-    private int amount;
+    private List<Long> productionOrderIds;
 }

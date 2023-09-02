@@ -5,7 +5,9 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
@@ -30,4 +32,7 @@ public class SampleEntity {
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_at")
     private Date createdAt;
+
+    @OneToMany(mappedBy = "sample")
+    private List<HitEntity> hits = new ArrayList<>();
 }

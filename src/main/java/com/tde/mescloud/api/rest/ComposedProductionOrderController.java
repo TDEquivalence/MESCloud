@@ -1,7 +1,7 @@
 package com.tde.mescloud.api.rest;
 
 import com.tde.mescloud.model.dto.ComposedProductionOrderDto;
-import com.tde.mescloud.model.dto.ProductionOrderDto;
+import com.tde.mescloud.model.dto.RequestComposedDto;
 import com.tde.mescloud.service.ComposedProductionOrderService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -21,8 +22,8 @@ public class ComposedProductionOrderController {
     private final ComposedProductionOrderService composedProductionOrderService;
 
     @PostMapping
-    public ResponseEntity<ComposedProductionOrderDto> create(@RequestBody ProductionOrderDto[] requestComposedProductionDto) {
-        Optional<ComposedProductionOrderDto> composedProductionOpt = composedProductionOrderService.create(requestComposedProductionDto);
+    public ResponseEntity<ComposedProductionOrderDto> create(@RequestBody RequestComposedDto productionOrderIds) {
+        Optional<ComposedProductionOrderDto> composedProductionOpt = composedProductionOrderService.create(productionOrderIds);
         if (composedProductionOpt.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }

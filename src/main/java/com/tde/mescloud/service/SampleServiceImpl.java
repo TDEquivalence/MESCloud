@@ -38,16 +38,30 @@ public class SampleServiceImpl implements SampleService {
 
         SampleEntity sampleEntity = converter.convertToEntity(sampleDto);
         sampleEntity.setComposedProductionOrder(composedEntity);
-        repository.save(sampleEntity);
+        saveAndUpdate(sampleEntity);
 
         return Optional.of(converter.convertToDto(sampleEntity));
     }
 
     private ComposedProductionOrderEntity createComposed(RequestSampleDto requestSampleDto) {
-        Optional<ComposedProductionOrderDto> composedDto = composedService.create(requestSampleDto.getProductionOrders());
+        Optional<ComposedProductionOrderDto> composedDto = composedService.create(requestSampleDto.getProductionOrdersIds());
         if(composedDto.isEmpty()) {
             return null;
         }
         return composedConverter.convertToEntity(composedDto.get());
+    }
+
+    public SampleEntity saveAndUpdate(SampleEntity sample) {
+        return repository.save(sample);
+    }
+
+    @Override
+    public void delete(SampleEntity sampleEntity) {
+        repository.delete(sampleEntity);
+    }
+
+    @Override
+    public Optional<SampleEntity> findById(Long id) {
+        return repository.findById(id);
     }
 }
