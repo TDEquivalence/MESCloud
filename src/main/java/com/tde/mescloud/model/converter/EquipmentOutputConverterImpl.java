@@ -20,16 +20,4 @@ public class EquipmentOutputConverterImpl implements EquipmentOutputConverter {
     public EquipmentOutputDto toDto(EquipmentOutputEntity entity) {
         return modelMapper.map(entity, EquipmentOutputDto.class);
     }
-
-    /*
-     EquipmentOutputDto equipmentOutputDto = new EquipmentOutputDto();
-        equipmentOutputDto.setId(entity.getId());
-        equipmentOutputDto.setCode(entity.getCode());
-
-        if (entity.getAlias() != null) {
-            equipmentOutputDto.setAlias(entity.getAlias().getAlias());
-        }
-
-        return equipmentOutputDto;
-     */
 }

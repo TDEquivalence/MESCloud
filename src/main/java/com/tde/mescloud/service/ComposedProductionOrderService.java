@@ -18,6 +18,4 @@ public interface ComposedProductionOrderService {
     void delete(ComposedProductionOrderEntity composedEntity);
 
     Optional<ComposedProductionOrderEntity> findById(Long id);
-
-    List<ComposedProductionOrderDto> getAll();
 }

@@ -4,6 +4,7 @@ import com.tde.mescloud.model.converter.ComposedProductionOrderConverter;
 import com.tde.mescloud.model.dto.ComposedProductionOrderDto;
 import com.tde.mescloud.model.dto.RequestComposedDto;
 import com.tde.mescloud.model.entity.ComposedProductionOrderEntity;
+import com.tde.mescloud.model.entity.ProductionOrderEntity;
 import com.tde.mescloud.repository.ComposedProductionOrderRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
@@ -24,48 +25,42 @@ public class ComposedProductionOrderServiceImpl implements ComposedProductionOrd
 
     private static final String CODE_PREFIX = "CP";
     private static final int CODE_INITIAL_VALUE = 0;
-
-
     @Override
-    public Optional<ComposedProductionOrderDto> create(RequestComposedDto requestComposedDto) {
-        return create(requestComposedDto.getProductionOrderIds());
-    }
+    public Optional<ComposedProductionOrderDto> create(RequestComposedDto productionOrderIds) {
 
-    @Override
-    public Optional<ComposedProductionOrderDto> create(List<Long> productionOrderIds) {
+        List<Long> validProductionOrderIds = productionOrderService.findExistingIds(productionOrderIds.getProductionOrderIds());
+        if(validProductionOrderIds.isEmpty()) {
+            throw new IllegalArgumentException("Production Order Ids are not valid");
+        }
 
-        List<Long> validProductionOrderIds = getValidProductionOrders(productionOrderIds);
         ComposedProductionOrderEntity composedEntity = createComposed();
 
-        setProductionOrdersWithComposed(validProductionOrderIds, composedEntity);
+        for(Long id : validProductionOrderIds) {
+            Optional<ProductionOrderEntity> productionOrderEntity = productionOrderService.findById(id);
+            if(productionOrderEntity.isEmpty()) {
+                continue;
+            }
+            productionOrderEntity.get().setComposedProductionOrder(composedEntity);
+            composedEntity.getProductionOrders().add(productionOrderEntity.get());
+        }
 
         saveAndUpdate(composedEntity);
         return Optional.of(converter.convertToDto(composedEntity));
     }
 
-    private void setProductionOrdersWithComposed(List<Long> validProductionOrderIds, ComposedProductionOrderEntity composedEntity) {
-        for(Long id : validProductionOrderIds) {
-            productionOrderService.findById(id).ifPresent(productionOrderEntity -> {
-                productionOrderEntity.setComposedProductionOrder(composedEntity);
-                composedEntity.getProductionOrders().add(productionOrderEntity);
-            });
-        }
-    }
-
-    private List<Long> getValidProductionOrders(List<Long> productionOrderIds) {
-        List<Long> validProductionOrderIds = productionOrderService.findExistingIds(productionOrderIds);
-        if(validProductionOrderIds.isEmpty()) {
-            throw new IllegalArgumentException("Production Order Ids are not valid");
-        }
-
-        return validProductionOrderIds;
+    @Override
+    public Optional<ComposedProductionOrderDto> create(List<Long> productionOrderIds) {
+        RequestComposedDto requestComposedDto = new RequestComposedDto();
+        requestComposedDto.setProductionOrderIds(productionOrderIds);
+        return create(requestComposedDto);
     }
 
     private ComposedProductionOrderEntity createComposed() {
-        ComposedProductionOrderEntity composedEntity = new ComposedProductionOrderEntity();
+        ComposedProductionOrderDto composedDto = new ComposedProductionOrderDto();
         String composedProductionCode = generateCode();
-        composedEntity.setCode(composedProductionCode);
+        composedDto.setCode(composedProductionCode);
 
+        ComposedProductionOrderEntity composedEntity = converter.convertToEntity(composedDto);
         return repository.save(composedEntity);
     }
 
@@ -97,10 +92,5 @@ public class ComposedProductionOrderServiceImpl implements ComposedProductionOrd
     @Override
     public Optional<ComposedProductionOrderEntity> findById(Long id) {
         return repository.findById(id);
-    }
-
-    @Override
-    public List<ComposedProductionOrderDto> getAll() {
-        return converter.convertToDto(repository.findAll());
     }
 }

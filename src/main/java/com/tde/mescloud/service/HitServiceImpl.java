@@ -105,23 +105,11 @@ public class HitServiceImpl implements HitService {
         return repository.saveAll(hitList);
     }
 
-    @Override
     public void delete(HitEntity hitEntity) {
         repository.delete(hitEntity);
     }
 
-    @Override
     public Optional<HitEntity> findById(Long id) {
         return repository.findById(id);
-    }
-
-    @Override
-    public List<HitDto> getAll() {
-        return converter.convertToDto(repository.findAll());
-    }
-
-    @Override
-    public List<HitDto> getAll() {
-        return converter.convertToDto(repository.findAll());
     }
 }
