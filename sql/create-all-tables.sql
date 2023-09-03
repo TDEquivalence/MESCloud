@@ -172,6 +172,7 @@ CREATE TABLE counter_record (
     computed_value int,
     production_order_id int,
     registered_at timestamp,
+    is_valid_for_production boolean,
 
     PRIMARY KEY(id),
     FOREIGN KEY(equipment_output_id) REFERENCES equipment_output(id),
@@ -221,8 +222,9 @@ CREATE TABLE batch (
   FOREIGN KEY (composed_production_order_id) REFERENCES composed_production_order (id)
 );
 
+-- Create views
 CREATE OR REPLACE VIEW counter_record_production_conclusion AS
-SELECT cr.id, cr.equipment_output_id, cr.equipment_output_alias, cr.real_value, cr.computed_value, cr.production_order_id, cr.registered_at, po.code AS production_order_code
+SELECT cr.id, cr.equipment_output_id, cr.equipment_output_alias, cr.real_value, cr.computed_value, cr.production_order_id, cr.registered_at, cr.is_valid_for_production, po.code AS production_order_code
 FROM (
     SELECT eo.id AS equipment_output_id, cr.equipment_output_alias, po.id AS production_order_id, MAX(cr.id) AS max_counter_record_id
     FROM equipment_output eo
@@ -236,8 +238,6 @@ JOIN production_order po ON cr.production_order_id = po.id;
 CREATE OR REPLACE VIEW production_order_summary AS
 SELECT po.*, COALESCE(SUM(CAST(crpc.real_value AS bigint)), 0) AS valid_amount
 FROM production_order po
-LEFT JOIN composed_production_order cpo ON po.composed_production_order_id = cpo.id
 LEFT JOIN counter_record_production_conclusion crpc ON po.id = crpc.production_order_id
-LEFT JOIN equipment_output eo ON crpc.equipment_output_id = eo.id
-WHERE po.is_completed = true AND cpo.id IS NULL AND eo.is_valid_for_production = true
+WHERE po.is_completed = true AND po.composed_production_order_id IS NULL AND crpc.is_valid_for_production = true
 GROUP BY po.id;
