@@ -1,7 +1,7 @@
 package com.tde.mescloud.api.rest;
 
 import com.tde.mescloud.model.dto.RequestSampleDto;
-import com.tde.mescloud.model.dto.filter.SampleDto;
+import com.tde.mescloud.model.dto.SampleDto;
 import com.tde.mescloud.service.SampleService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;

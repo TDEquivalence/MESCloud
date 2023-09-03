@@ -4,7 +4,7 @@ import com.tde.mescloud.model.converter.ComposedProductionOrderConverter;
 import com.tde.mescloud.model.converter.SampleConverter;
 import com.tde.mescloud.model.dto.ComposedProductionOrderDto;
 import com.tde.mescloud.model.dto.RequestSampleDto;
-import com.tde.mescloud.model.dto.filter.SampleDto;
+import com.tde.mescloud.model.dto.SampleDto;
 import com.tde.mescloud.model.entity.ComposedProductionOrderEntity;
 import com.tde.mescloud.model.entity.SampleEntity;
 import com.tde.mescloud.repository.SampleRepository;

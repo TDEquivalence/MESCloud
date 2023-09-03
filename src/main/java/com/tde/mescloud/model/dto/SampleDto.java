@@ -1,4 +1,4 @@
-package com.tde.mescloud.model.dto.filter;
+package com.tde.mescloud.model.dto;
 
 import lombok.Getter;
 import lombok.Setter;
