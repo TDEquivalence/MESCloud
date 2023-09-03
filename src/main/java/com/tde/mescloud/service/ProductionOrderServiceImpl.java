@@ -20,7 +20,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -187,8 +186,8 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     }
 
     @Override
-    public List<ProductionOrderSummaryDto> getCompleted() {
-        List<ProductionOrderSummaryEntity> persistedProductionOrders = repository.findCompletedAndUnassociated();
+    public List<ProductionOrderSummaryDto> getCompletedWithoutComposed() {
+        List<ProductionOrderSummaryEntity> persistedProductionOrders = repository.findCompletedWithoutComposed();
         return summaryConverter.toDto(persistedProductionOrders);
     }
 }

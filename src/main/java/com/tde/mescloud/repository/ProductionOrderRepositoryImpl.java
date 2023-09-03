@@ -17,7 +17,7 @@ public class ProductionOrderRepositoryImpl {
 
     private EntityManager entityManager;
 
-    public List<ProductionOrderSummaryEntity> findCompletedAndUnassociated() {
+    public List<ProductionOrderSummaryEntity> findCompletedWithoutComposed() {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<ProductionOrderSummaryEntity> query = criteriaBuilder.createQuery(ProductionOrderSummaryEntity.class);
         Root<ProductionOrderSummaryEntity> root = query.from(ProductionOrderSummaryEntity.class);

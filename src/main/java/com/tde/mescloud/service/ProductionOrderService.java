@@ -27,5 +27,5 @@ public interface ProductionOrderService {
 
     List<Long> findExistingIds(List<Long> ids);
 
-    List<ProductionOrderSummaryDto> getCompleted();
+    List<ProductionOrderSummaryDto> getCompletedWithoutComposed();
 }

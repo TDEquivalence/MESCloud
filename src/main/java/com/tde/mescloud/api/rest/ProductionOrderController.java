@@ -42,7 +42,7 @@ public class ProductionOrderController {
 
     @GetMapping("/completed")
     public ResponseEntity<List<ProductionOrderSummaryDto>> getCompleted() {
-        List<ProductionOrderSummaryDto> completedOrders = service.getCompleted();
+        List<ProductionOrderSummaryDto> completedOrders = service.getCompletedWithoutComposed();
         return new ResponseEntity<>(completedOrders, HttpStatus.OK);
     }
 }
