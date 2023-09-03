@@ -14,9 +14,9 @@ public interface CountingEquipmentService {
 
     Optional<CountingEquipmentDto> findByCode(String code);
 
-    CountingEquipmentDto create(CountingEquipmentEntity countingEquipment);
+    CountingEquipmentDto save(CountingEquipmentEntity countingEquipment);
 
-    CountingEquipmentDto create(CountingEquipmentDto countingEquipment);
+    CountingEquipmentDto save(CountingEquipmentDto countingEquipment);
 
     Optional<CountingEquipmentDto> updateEquipmentStatus(String equipmentCode, int equipmentStatus);
 

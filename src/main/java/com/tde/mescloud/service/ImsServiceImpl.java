@@ -67,6 +67,4 @@ public class ImsServiceImpl implements ImsService {
         ImsEntity persistedIms = repository.save(imsEntity);
         return Optional.of(converter.toDto(persistedIms));
     }
-
-
 }

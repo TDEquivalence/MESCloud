@@ -84,13 +84,13 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
     }
 
     @Override
-    public CountingEquipmentDto create(CountingEquipmentDto countingEquipment) {
+    public CountingEquipmentDto save(CountingEquipmentDto countingEquipment) {
         CountingEquipmentEntity countingEquipmentEntity = converter.convertToEntity(countingEquipment);
-        return create(countingEquipmentEntity);
+        return save(countingEquipmentEntity);
     }
 
     @Override
-    public CountingEquipmentDto create(CountingEquipmentEntity countingEquipment) {
+    public CountingEquipmentDto save(CountingEquipmentEntity countingEquipment) {
         CountingEquipmentEntity persistedCountingEquipment = repository.save(countingEquipment);
         return converter.convertToDto(persistedCountingEquipment);
     }
@@ -125,11 +125,15 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
         }
 
         CountingEquipmentEntity countingEquipment = countingEquipmentOpt.get();
+        setIms(countingEquipment, imsId);
+
+        CountingEquipmentDto countingEquipmentDto = save(countingEquipment);
+        return Optional.of(countingEquipmentDto);
+    }
+
+    private void setIms(CountingEquipmentEntity countingEquipment, Long imsId) {
         ImsEntity imsEntity = new ImsEntity();
         imsEntity.setId(imsId);
         countingEquipment.setIms(imsEntity);
-
-        CountingEquipmentDto countingEquipmentDto = create(countingEquipment);
-        return Optional.of(countingEquipmentDto);
     }
 }
