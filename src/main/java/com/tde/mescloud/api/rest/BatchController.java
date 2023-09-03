@@ -18,7 +18,7 @@ public class BatchController {
     private final BatchService batchService;
 
     @PostMapping
-    public ResponseEntity<BatchDto> createSample(@RequestBody RequestBatchDto requestBatchDto) {
+    public ResponseEntity<BatchDto> create(@RequestBody RequestBatchDto requestBatchDto) {
         BatchDto batchDto = batchService.create(requestBatchDto);
         if (batchDto == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);

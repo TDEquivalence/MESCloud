@@ -32,22 +32,19 @@ public class BatchServiceImpl implements BatchService {
 
     private BatchEntity createBatch(RequestBatchDto requestBatch) {
         BatchEntity batch = converter.toEntity(requestBatch.getBatch());
-        batch.setComposed(checkAndGetComposed(requestBatch.getComposedId()));
+        batch.setComposed(getComposedById(requestBatch.getComposedId()));
         return batch;
     }
 
-    private ComposedProductionOrderEntity checkAndGetComposed(Long composedId) {
-        Optional<ComposedProductionOrderEntity> composedOpt = getComposedById(composedId);
+    private ComposedProductionOrderEntity getComposedById(Long composedId) {
+        Optional<ComposedProductionOrderEntity> composedOpt = composedService.findById(composedId);
         if (composedOpt.isEmpty()) {
             throw new IllegalStateException("Composed production order is null or empty");
         }
         return composedOpt.get();
     }
 
-    private Optional<ComposedProductionOrderEntity> getComposedById(Long id) {
-        return composedService.findById(id);
-    }
-
+    @Override
     public BatchEntity saveAndUpdate(BatchEntity batch) {
         return repository.save(batch);
     }
