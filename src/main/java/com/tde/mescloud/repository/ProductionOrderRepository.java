@@ -20,6 +20,4 @@ public interface ProductionOrderRepository extends JpaRepository<ProductionOrder
     Optional<ProductionOrderEntity> findActive(long equipmentId);
 
     List<ProductionOrderEntity> findByIdIn(List<Long> ids);
-
-    List<ProductionOrderSummaryEntity> findCompletedWithoutComposed();
 }

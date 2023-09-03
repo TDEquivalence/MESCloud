@@ -184,10 +184,4 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
                 .map(ProductionOrderEntity::getId)
                 .collect(Collectors.toList());
     }
-
-    @Override
-    public List<ProductionOrderSummaryDto> getCompletedWithoutComposed() {
-        List<ProductionOrderSummaryEntity> persistedProductionOrders = repository.findCompletedWithoutComposed();
-        return summaryConverter.toDto(persistedProductionOrders);
-    }
 }

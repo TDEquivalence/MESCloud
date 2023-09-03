@@ -19,16 +19,6 @@ public class FactoryServiceImpl implements FactoryService {
     private final FactoryRepository repository;
     private final FactoryConverterImpl converter;
 
-    @Getter
-    @Setter
-    private String timeZone;
-
-    public FactoryServiceImpl(FactoryRepository repository, FactoryConverterImpl converter) {
-        this.repository = repository;
-        this.converter = converter;
-    }
-
-
     @Override
     public FactoryDto saveFactory(FactoryDto factoryDto) {
         validateFactoryDto(factoryDto);

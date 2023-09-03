@@ -1,7 +1,6 @@
 package com.tde.mescloud.service;
 
 import com.tde.mescloud.model.dto.ProductionOrderDto;
-import com.tde.mescloud.model.dto.ProductionOrderSummaryDto;
 import com.tde.mescloud.model.entity.ProductionOrderEntity;
 
 import java.util.List;
@@ -26,6 +25,4 @@ public interface ProductionOrderService {
     Optional<ProductionOrderEntity> findById(Long id);
 
     List<Long> findExistingIds(List<Long> ids);
-
-    List<ProductionOrderSummaryDto> getCompletedWithoutComposed();
 }

@@ -4,7 +4,7 @@ import com.tde.mescloud.model.converter.ComposedProductionOrderConverter;
 import com.tde.mescloud.model.converter.SampleConverter;
 import com.tde.mescloud.model.dto.ComposedProductionOrderDto;
 import com.tde.mescloud.model.dto.RequestSampleDto;
-import com.tde.mescloud.model.dto.SampleDto;
+import com.tde.mescloud.model.dto.filter.SampleDto;
 import com.tde.mescloud.model.entity.ComposedProductionOrderEntity;
 import com.tde.mescloud.model.entity.SampleEntity;
 import com.tde.mescloud.repository.SampleRepository;
@@ -12,8 +12,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -28,25 +26,27 @@ public class SampleServiceImpl implements SampleService {
     private final ComposedProductionOrderConverter composedConverter;
 
     @Override
-    public SampleDto create(RequestSampleDto requestSampleDto) {
+    public Optional<SampleDto> create(RequestSampleDto requestSampleDto) {
         ComposedProductionOrderEntity composedEntity = createComposed(requestSampleDto);
-        return createSample(requestSampleDto, composedEntity);
-    }
 
-    private SampleDto createSample(RequestSampleDto requestSampleDto, ComposedProductionOrderEntity composedEntity) {
-        SampleEntity sampleEntity = new SampleEntity();
-        sampleEntity.setAmount(requestSampleDto.getAmount());
+        if(composedEntity == null) {
+            return Optional.empty();
+        }
+
+        SampleDto sampleDto = new SampleDto();
+        sampleDto.setAmount(requestSampleDto.getAmount());
+
+        SampleEntity sampleEntity = converter.convertToEntity(sampleDto);
         sampleEntity.setComposedProductionOrder(composedEntity);
-        sampleEntity.setCreatedAt(new Date());
-
         saveAndUpdate(sampleEntity);
-        return converter.convertToDto(sampleEntity);
+
+        return Optional.of(converter.convertToDto(sampleEntity));
     }
 
     private ComposedProductionOrderEntity createComposed(RequestSampleDto requestSampleDto) {
-        Optional<ComposedProductionOrderDto> composedDto = composedService.create(requestSampleDto.getProductionOrderIds());
-        if (composedDto.isEmpty()) {
-            throw new IllegalStateException("Composed Production Order creation error");
+        Optional<ComposedProductionOrderDto> composedDto = composedService.create(requestSampleDto.getProductionOrdersIds());
+        if(composedDto.isEmpty()) {
+            return null;
         }
         return composedConverter.convertToEntity(composedDto.get());
     }
@@ -63,11 +63,5 @@ public class SampleServiceImpl implements SampleService {
     @Override
     public Optional<SampleEntity> findById(Long id) {
         return repository.findById(id);
-    }
-
-
-    @Override
-    public List<SampleDto> getAll() {
-        return converter.convertToDto(repository.findAll());
     }
 }

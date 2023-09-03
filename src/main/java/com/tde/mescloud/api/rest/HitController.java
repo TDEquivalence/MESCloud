@@ -6,7 +6,10 @@ import com.tde.mescloud.service.HitService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -25,11 +28,5 @@ public class HitController {
         }
 
         return new ResponseEntity<>(createdHits, HttpStatus.OK);
-    }
-
-    @GetMapping
-    public ResponseEntity<List<HitDto>> findAll() {
-        List<HitDto> hitDtos = hitService.getAll();
-        return new ResponseEntity<>(hitDtos, HttpStatus.OK);
     }
 }

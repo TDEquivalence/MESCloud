@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 @AllArgsConstructor
 public class ImsConverterImpl implements ImsConverter {
 
-    private final ModelMapper modelMapper;
+    private ModelMapper modelMapper;
 
     @Override
     public ImsEntity toEntity(ImsDto dto) {

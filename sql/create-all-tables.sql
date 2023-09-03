@@ -1,7 +1,22 @@
--- Drop views
-DROP VIEW IF EXISTS production_order_summary;
-DROP VIEW IF EXISTS counter_record_production_conclusion;
-DROP VIEW IF EXISTS composed_summary;
+DROP VIEW IF EXISTS counter_record_production_conclusion CASCADE;
+DROP TABLE IF EXISTS batch CASCADE;
+DROP TABLE IF EXISTS hit CASCADE;
+DROP TABLE IF EXISTS sample CASCADE;
+DROP TABLE IF EXISTS production_instruction CASCADE;
+DROP TABLE IF EXISTS composed_production_order CASCADE;
+DROP TABLE IF EXISTS production_order CASCADE;
+DROP TABLE IF EXISTS production_order_recipe CASCADE;
+DROP TABLE IF EXISTS equipment_output CASCADE;
+DROP TABLE IF EXISTS equipment_output_alias CASCADE;
+DROP TABLE IF EXISTS counting_equipment CASCADE;
+DROP TABLE IF EXISTS section CASCADE;
+DROP TABLE IF EXISTS equipment_status_record CASCADE;
+DROP TABLE IF EXISTS counter_record CASCADE;
+DROP TABLE IF EXISTS users CASCADE;
+DROP TABLE IF EXISTS token CASCADE;
+DROP TABLE IF EXISTS factory_user CASCADE;
+DROP TABLE IF EXISTS factory CASCADE;
+DROP TABLE IF EXISTS ims CASCADE;
 
 -- Drop tables
 DROP TABLE IF EXISTS batch;
@@ -125,7 +140,6 @@ CREATE INDEX idx_equipment_output_code ON equipment_output (code);
 CREATE TABLE composed_production_order (
     id int GENERATED ALWAYS AS IDENTITY,
     code VARCHAR(255),
-    created_at date,
 
     PRIMARY KEY(id)
 );
@@ -199,8 +213,8 @@ CREATE TABLE sample (
   id int GENERATED ALWAYS AS IDENTITY,
   composed_production_order_id INT,
   amount INT,
-  tca_average DOUBLE PRECISION,
-  reliability DOUBLE PRECISION,
+  tca_average INT,
+  reliability INT,
   created_at date,
   PRIMARY KEY (id),
   FOREIGN KEY (composed_production_order_id) REFERENCES composed_production_order (id)
@@ -224,7 +238,6 @@ CREATE TABLE batch (
   FOREIGN KEY (composed_production_order_id) REFERENCES composed_production_order (id)
 );
 
--- Create views
 CREATE OR REPLACE VIEW counter_record_production_conclusion AS
 SELECT cr.id, cr.equipment_output_id, cr.equipment_output_alias, cr.real_value, cr.computed_value, cr.production_order_id, cr.registered_at, cr.is_valid_for_production, po.code AS production_order_code
 FROM (
