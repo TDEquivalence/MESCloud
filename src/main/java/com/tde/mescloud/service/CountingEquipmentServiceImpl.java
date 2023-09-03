@@ -2,7 +2,6 @@ package com.tde.mescloud.service;
 
 import com.tde.mescloud.model.converter.CountingEquipmentConverter;
 import com.tde.mescloud.model.dto.CountingEquipmentDto;
-import com.tde.mescloud.model.dto.ImsDto;
 import com.tde.mescloud.model.entity.CountingEquipmentEntity;
 import com.tde.mescloud.model.entity.ImsEntity;
 import com.tde.mescloud.repository.CountingEquipmentRepository;
@@ -113,20 +112,17 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
     }
 
     @Override
-    public Optional<CountingEquipmentDto> setIms(Long equipmentId, Long imsId) {
+    public Optional<CountingEquipmentDto> updateIms(Long equipmentId, Long imsId) {
         Optional<CountingEquipmentEntity> countingEquipmentOpt = repository.findById(equipmentId);
         if (countingEquipmentOpt.isEmpty()) {
             log.warning(String.format("Unable to set IMS - no counting equipment found with id [%s]", equipmentId));
             return Optional.empty();
         }
 
-        Optional<ImsDto> persistedImsOpt = imsService.findById(imsId);
-        if (persistedImsOpt.isEmpty()) {
-            log.warning(String.format("Unable to set IMS - no IMS found with id [%s]", imsId));
+        if (!imsService.isValidAndFree(imsId)) {
+            log.warning(String.format("IMS with ID [%s] either does NOT exist or is already in use", imsId));
             return Optional.empty();
         }
-
-        //TODO: Check if another machine has that IMS and if that Machine is with an active PO
 
         CountingEquipmentEntity countingEquipment = countingEquipmentOpt.get();
         ImsEntity imsEntity = new ImsEntity();

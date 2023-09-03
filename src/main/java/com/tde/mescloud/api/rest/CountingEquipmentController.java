@@ -35,7 +35,7 @@ public class CountingEquipmentController {
 
     @PutMapping("/{equipmentId}/ims")
     public ResponseEntity<CountingEquipmentDto> updateIms(@PathVariable long equipmentId, @RequestBody Long imsId) {
-        Optional<CountingEquipmentDto> updatedIms = service.setIms(equipmentId, imsId);
+        Optional<CountingEquipmentDto> updatedIms = service.updateIms(equipmentId, imsId);
         if (updatedIms.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }

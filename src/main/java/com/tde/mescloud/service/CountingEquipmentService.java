@@ -1,7 +1,6 @@
 package com.tde.mescloud.service;
 
 import com.tde.mescloud.model.dto.CountingEquipmentDto;
-import com.tde.mescloud.model.dto.ImsDto;
 import com.tde.mescloud.model.entity.CountingEquipmentEntity;
 
 import java.util.List;
@@ -21,5 +20,5 @@ public interface CountingEquipmentService {
 
     Optional<CountingEquipmentDto> updateEquipmentStatus(String equipmentCode, int equipmentStatus);
 
-    Optional<CountingEquipmentDto> setIms(Long equipmentId, Long imsId);
+    Optional<CountingEquipmentDto> updateIms(Long equipmentId, Long imsId);
 }

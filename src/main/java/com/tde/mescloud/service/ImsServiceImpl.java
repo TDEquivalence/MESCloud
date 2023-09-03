@@ -39,6 +39,23 @@ public class ImsServiceImpl implements ImsService {
         return Optional.of(ims);
     }
 
+    @Override
+    public boolean isValidAndFree(Long imsId) {
+        Optional<ImsEntity> imsEntityOpt = repository.findById(imsId);
+        if (imsEntityOpt.isEmpty()) {
+            log.warning(String.format("No IMS found with id [%s]", imsId));
+            return false;
+        }
+
+        ImsEntity imsEntity = imsEntityOpt.get();
+        if (imsEntity.isAssociated()) {
+            log.warning(String.format("IMS already in use at Counting Equipment with id [%s]", imsEntity.getCountingEquipment().getId()));
+            return false;
+        }
+
+        return true;
+    }
+
     public Optional<ImsDto> create(ImsDto imsDto) {
 
         //TODO: DB not null no code

@@ -12,4 +12,6 @@ public interface ImsService {
     List<ImsDto> getAll();
 
     Optional<ImsDto> findById(Long id);
+
+    boolean isValidAndFree(Long imsId);
 }

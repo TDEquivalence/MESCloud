@@ -15,4 +15,9 @@ public class ImsEntity {
     private String code;
     @OneToOne(mappedBy = "ims")
     CountingEquipmentEntity countingEquipment;
+
+
+    public boolean isAssociated() {
+        return countingEquipment != null;
+    }
 }
