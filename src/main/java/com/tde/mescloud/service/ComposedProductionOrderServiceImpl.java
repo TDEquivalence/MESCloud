@@ -93,4 +93,9 @@ public class ComposedProductionOrderServiceImpl implements ComposedProductionOrd
     public Optional<ComposedProductionOrderEntity> findById(Long id) {
         return repository.findById(id);
     }
+
+    @Override
+    public List<ComposedProductionOrderDto> getAll() {
+        return converter.convertToDto(repository.findAll());
+    }
 }

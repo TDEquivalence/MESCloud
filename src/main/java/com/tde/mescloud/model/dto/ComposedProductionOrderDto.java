@@ -9,5 +9,4 @@ public class ComposedProductionOrderDto {
 
     private Long id;
     private String code;
-    private int amount;
 }
