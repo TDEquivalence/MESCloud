@@ -6,117 +6,6 @@
 	},
 	"item": [
 		{
-			"name": "User",
-			"item": [
-				{
-					"name": "Register",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"firstName\": \"alcina\",\r\n    \"lastName\": \"toto\",\r\n    \"username\": \"admin\",\r\n    \"email\": \"pepe@email.com\",\r\n    \"role\": \"admin\",\r\n    \"password\": \"admin\"\r\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{url}}:{{port}}/api/auth/register",
-							"host": [
-								"{{url}}"
-							],
-							"port": "{{port}}",
-							"path": [
-								"api",
-								"auth",
-								"register"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Login",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.environment.set(\"jwtoken\", pm.response.headers.get('Jwt-Token'));"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"username\": \"admin\",\r\n    \"password\": \"admin\"\r\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{url}}:{{port}}/api/auth/login",
-							"host": [
-								"{{url}}"
-							],
-							"port": "{{port}}",
-							"path": [
-								"api",
-								"auth",
-								"login"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Find all",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{jwtoken}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "",
-								"type": "text",
-								"disabled": true
-							}
-						],
-						"url": {
-							"raw": "{{url}}:{{port}}/api/user/all",
-							"host": [
-								"{{url}}"
-							],
-							"port": "{{port}}",
-							"path": [
-								"api",
-								"user",
-								"all"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
 			"name": "MQTT",
 			"item": [
 				{
@@ -304,7 +193,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n   \"jsonType\": \"ProductionOrderInit\",\r\n   \"productionOrderCode\": \"PO2301\",\r\n   \"equipmentCode\":\"OBO001\",\r\n   \"equipmentStatus\":1,\r\n   \"counters\":[\r\n      {\r\n         \"outputCode\":\"OBO001-001\",\r\n         \"value\":250\r\n      },\r\n      {\r\n         \"outputCode\":\"OBO001-002\",\r\n         \"value\":220\r\n      },\r\n      {\r\n         \"outputCode\":\"OBO001-003\",\r\n         \"value\":65435\r\n      },\r\n      {\r\n         \"outputCode\":\"OBO001-004\",\r\n         \"value\":430\r\n      }\r\n   ]\r\n}",
+							"raw": "{\r\n   \"jsonType\": \"ProductionOrderInit\",\r\n   \"productionOrderCode\": \"PO2301\",\r\n   \"equipmentCode\":\"OBO001\",\r\n   \"equipmentStatus\":2,\r\n   \"counters\":[\r\n      {\r\n         \"outputCode\":\"OBO001-001\",\r\n         \"value\":250\r\n      },\r\n      {\r\n         \"outputCode\":\"OBO001-002\",\r\n         \"value\":220\r\n      }\r\n   ]\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -349,7 +238,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n   \"jsonType\": \"ProductionCount\",\r\n   \"productionOrderCode\": \"PO2301\",\r\n   \"equipmentCode\":\"OBO001\",\r\n   \"equipmentStatus\":1,\r\n   \"counters\":[\r\n      {\r\n         \"outputCode\":\"OBO001-001\",\r\n         \"value\":350\r\n      },\r\n      {\r\n         \"outputCode\":\"OBO001-002\",\r\n         \"value\":320\r\n      },\r\n      {\r\n         \"outputCode\":\"OBO001-003\",\r\n         \"value\":100\r\n      },\r\n      {\r\n         \"outputCode\":\"OBO001-004\",\r\n         \"value\":600\r\n      }\r\n   ]\r\n}",
+							"raw": "{\r\n   \"jsonType\": \"ProductionCount\",\r\n   \"productionOrderCode\": \"PO2301\",\r\n   \"equipmentCode\":\"OBO001\",\r\n   \"equipmentStatus\":0,\r\n   \"counters\":[\r\n      {\r\n         \"outputCode\":\"OBO001-001\",\r\n         \"value\":350\r\n      },\r\n      {\r\n         \"outputCode\":\"OBO001-002\",\r\n         \"value\":320\r\n      }\r\n   ]\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -428,237 +317,452 @@
 			"name": "REST",
 			"item": [
 				{
-					"name": "CounterRecord -> Find All",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{jwtoken}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{url}}:{{port}}/api/counter-records",
-							"host": [
-								"{{url}}"
-							],
-							"port": "{{port}}",
-							"path": [
-								"api",
-								"counter-records"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "CounterRecord -> Find All Completion",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{jwtoken}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{url}}:{{port}}/api/counter-records/completion",
-							"host": [
-								"{{url}}"
-							],
-							"port": "{{port}}",
-							"path": [
-								"api",
-								"counter-records",
-								"completion"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "CounterRecord -> Find w/ filter",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{jwtoken}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "localhost:8080/api/counter-records?skip=10&take=20&search%5B0%5D.id=1&search%5B0%5D.value=test",
-							"host": [
-								"localhost"
-							],
-							"port": "8080",
-							"path": [
-								"api",
-								"counter-records"
-							],
-							"query": [
-								{
-									"key": "skip",
-									"value": "10"
+					"name": "User",
+					"item": [
+						{
+							"name": "Register",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"firstName\": \"alcina\",\r\n    \"lastName\": \"toto\",\r\n    \"username\": \"admin\",\r\n    \"email\": \"pepe@email.com\",\r\n    \"role\": \"admin\",\r\n    \"password\": \"admin\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
 								},
+								"url": {
+									"raw": "{{url}}:{{port}}/api/auth/register",
+									"host": [
+										"{{url}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"auth",
+										"register"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Login",
+							"event": [
 								{
-									"key": "take",
-									"value": "20"
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.environment.set(\"jwtoken\", pm.response.headers.get('Jwt-Token'));"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"username\": \"admin\",\r\n    \"password\": \"admin\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
 								},
-								{
-									"key": "search%5B0%5D.id",
-									"value": "1"
+								"url": {
+									"raw": "{{url}}:{{port}}/api/auth/login",
+									"host": [
+										"{{url}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"auth",
+										"login"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Find all",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{jwtoken}}",
+											"type": "string"
+										}
+									]
 								},
-								{
-									"key": "search%5B0%5D.value",
-									"value": "test"
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "",
+										"type": "text",
+										"disabled": true
+									}
+								],
+								"url": {
+									"raw": "{{url}}:{{port}}/api/user/all",
+									"host": [
+										"{{url}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"user",
+										"all"
+									]
 								}
-							]
+							},
+							"response": []
 						}
-					},
-					"response": []
+					]
 				},
 				{
-					"name": "ProductionOrder -> Generate Code",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{jwtoken}}",
-									"type": "string"
+					"name": "CounterRecord",
+					"item": [
+						{
+							"name": "CounterRecord -> Find All Completion",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{jwtoken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"skip\": 0,\r\n    \"take\": 15,\r\n    \"searchValueByName\": {\r\n        \"endDate\": \"2023-08-19T23:59:59.999Z\",\r\n        \"startDate\": \"2023-08-15T00:00:00.000Z\"\r\n    },\r\n    \"sortValueByName\": {}\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}:{{port}}/api/counter-records/completion",
+									"host": [
+										"{{url}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"counter-records",
+										"completion"
+									]
 								}
-							]
+							},
+							"response": []
 						},
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "localhost:8080/api/production-orders/generate-code",
-							"host": [
-								"localhost"
-							],
-							"port": "8080",
-							"path": [
-								"api",
-								"production-orders",
-								"generate-code"
-							]
+						{
+							"name": "CounterRecord -> Find w/ filter",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{jwtoken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"take\": 10,\r\n    \"skip\": 0,\r\n    \"searchValueByName\": {\r\n        \"startDate\": \"2023-08-15T00:00:00.000Z\",\r\n        \"endDate\": \"2023-08-18T23:59:59.000Z\",\r\n        \"equipmentAlias\": \"Máquina 1\"\r\n    },\r\n    \"sortValueByName\": {\r\n        \"computedValue\": \"ASC\"\r\n    }\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8080/api/counter-records/filter",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"counter-records",
+										"filter"
+									]
+								}
+							},
+							"response": []
 						}
-					},
-					"response": []
+					]
 				},
 				{
-					"name": "ProductionOrder -> Save",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{jwtoken}}",
-									"type": "string"
+					"name": "ProductionOrder",
+					"item": [
+						{
+							"name": "ProductionOrder -> Save",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{jwtoken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"equipmentId\": 4,\r\n    \"targetAmount\": 1000,\r\n    \"inputBatch\": \"PLA8231\",\r\n    \"source\": \"32\",\r\n    \"gauge\": \"47 x 50\",\r\n    \"category\": \"Rosa\",\r\n    \"washingProcess\": \"IMS32\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}:{{port}}/api/production-orders",
+									"host": [
+										"{{url}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"production-orders"
+									]
 								}
-							]
+							},
+							"response": []
 						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"equipment\": {\r\n        \"id\": 1\r\n    },\r\n    \"targetAmount\": 1000,\r\n    \"inputBatch\": \"PLA8231\",\r\n    \"source\": \"32\",\r\n    \"gauge\": \"47 x 50\",\r\n    \"category\": \"Rosa\",\r\n    \"washingProcess\": \"IMS32\"\r\n}",
-							"options": {
-								"raw": {
-									"language": "json"
+						{
+							"name": "ProductionOrder -> Complete for 1",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{jwtoken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{url}}:{{port}}/api/production-orders/1/complete",
+									"host": [
+										"{{url}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"production-orders",
+										"1",
+										"complete"
+									]
 								}
-							}
-						},
-						"url": {
-							"raw": "{{url}}:{{port}}/api/production-orders",
-							"host": [
-								"{{url}}"
-							],
-							"port": "{{port}}",
-							"path": [
-								"api",
-								"production-orders"
-							]
+							},
+							"response": []
 						}
-					},
-					"response": []
+					]
 				},
 				{
-					"name": "CountingEquipment -> Find All",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{jwtoken}}",
-									"type": "string"
+					"name": "CountingEquipment",
+					"item": [
+						{
+							"name": "CountingEquipment -> Find All",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/api/counting-equipments",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"counting-equipments"
+									]
 								}
-							]
+							},
+							"response": []
 						},
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "localhost:8080/api/counting-equipments",
-							"host": [
-								"localhost"
-							],
-							"port": "8080",
-							"path": [
-								"api",
-								"counting-equipments"
-							]
+						{
+							"name": "CountingEquipment -> Find 1",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{jwtoken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/api/counting-equipments/1",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"counting-equipments",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "CountingEquipment -> Set IMS",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{jwtoken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "3",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8080/api/counting-equipments/1/ims",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"counting-equipments",
+										"1",
+										"ims"
+									]
+								}
+							},
+							"response": []
 						}
-					},
-					"response": []
+					]
 				},
 				{
-					"name": "CountingEquipment -> Find 1",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{jwtoken}}",
-									"type": "string"
+					"name": "IMS",
+					"item": [
+						{
+							"name": "IMS -> Find All",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{url}}:{{port}}/api/ims",
+									"host": [
+										"{{url}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"ims"
+									]
 								}
-							]
+							},
+							"response": []
 						},
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "localhost:8080/api/counting-equipments/1",
-							"host": [
-								"localhost"
-							],
-							"port": "8080",
-							"path": [
-								"api",
-								"counting-equipments",
-								"1"
-							]
+						{
+							"name": "IMS -> Create",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"code\": \"TEST00001\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}:{{port}}/api/ims",
+									"host": [
+										"{{url}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"ims"
+									]
+								}
+							},
+							"response": []
 						}
-					},
-					"response": []
+					]
+				},
+				{
+					"name": "KPI",
+					"item": [
+						{
+							"name": "KPI -> EquipmentCounts",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"searchValueByName\": {\r\n        \"endDate\": \"2023-08-20T23:59:59.999Z\",\r\n        \"startDate\": \"2023-08-15T00:00:00.000Z\"\r\n    },\r\n    \"timeMode\": \"DAY\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8080/api/kpi/equipment-counts",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"kpi",
+										"equipment-counts"
+									]
+								}
+							},
+							"response": []
+						}
+					]
 				}
 			]
 		}

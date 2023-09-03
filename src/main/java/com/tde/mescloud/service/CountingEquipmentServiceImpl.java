@@ -3,6 +3,7 @@ package com.tde.mescloud.service;
 import com.tde.mescloud.model.converter.CountingEquipmentConverter;
 import com.tde.mescloud.model.dto.CountingEquipmentDto;
 import com.tde.mescloud.model.entity.CountingEquipmentEntity;
+import com.tde.mescloud.model.entity.ImsEntity;
 import com.tde.mescloud.repository.CountingEquipmentRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
@@ -19,6 +20,7 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
 
     private CountingEquipmentRepository repository;
     private CountingEquipmentConverter converter;
+    private ImsService imsService;
 
     @Override
     public List<CountingEquipmentDto> findAllWithLastProductionOrder() {
@@ -83,9 +85,13 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
 
     @Override
     public CountingEquipmentDto save(CountingEquipmentDto countingEquipment) {
-
         CountingEquipmentEntity countingEquipmentEntity = converter.convertToEntity(countingEquipment);
-        CountingEquipmentEntity persistedCountingEquipment = repository.save(countingEquipmentEntity);
+        return save(countingEquipmentEntity);
+    }
+
+    @Override
+    public CountingEquipmentDto save(CountingEquipmentEntity countingEquipment) {
+        CountingEquipmentEntity persistedCountingEquipment = repository.save(countingEquipment);
         return converter.convertToDto(persistedCountingEquipment);
     }
 
@@ -103,5 +109,31 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
 
         CountingEquipmentDto updatedCountingEquipmentDto = converter.convertToDto(updatedCountingEquipment);
         return Optional.of(updatedCountingEquipmentDto);
+    }
+
+    @Override
+    public Optional<CountingEquipmentDto> updateIms(Long equipmentId, Long imsId) {
+        Optional<CountingEquipmentEntity> countingEquipmentOpt = repository.findById(equipmentId);
+        if (countingEquipmentOpt.isEmpty()) {
+            log.warning(String.format("Unable to set IMS - no counting equipment found with id [%s]", equipmentId));
+            return Optional.empty();
+        }
+
+        if (!imsService.isValidAndFree(imsId)) {
+            log.warning(String.format("IMS with ID [%s] either does NOT exist or is already in use", imsId));
+            return Optional.empty();
+        }
+
+        CountingEquipmentEntity countingEquipment = countingEquipmentOpt.get();
+        setIms(countingEquipment, imsId);
+
+        CountingEquipmentDto countingEquipmentDto = save(countingEquipment);
+        return Optional.of(countingEquipmentDto);
+    }
+
+    private void setIms(CountingEquipmentEntity countingEquipment, Long imsId) {
+        ImsEntity imsEntity = new ImsEntity();
+        imsEntity.setId(imsId);
+        countingEquipment.setIms(imsEntity);
     }
 }

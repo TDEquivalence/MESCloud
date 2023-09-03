@@ -1,16 +1,22 @@
-DROP TABLE IF EXISTS factory_user CASCADE;
+DROP VIEW IF EXISTS counter_record_production_conclusion CASCADE;
+DROP TABLE IF EXISTS batch CASCADE;
+DROP TABLE IF EXISTS hit CASCADE;
+DROP TABLE IF EXISTS sample CASCADE;
 DROP TABLE IF EXISTS production_instruction CASCADE;
-DROP TABLE IF EXISTS equipment_status_record CASCADE;
-DROP TABLE IF EXISTS counter_record CASCADE;
+DROP TABLE IF EXISTS composed_production_order CASCADE;
 DROP TABLE IF EXISTS production_order CASCADE;
-DROP TABLE IF EXISTS counting_equipment CASCADE;
+DROP TABLE IF EXISTS production_order_recipe CASCADE;
 DROP TABLE IF EXISTS equipment_output CASCADE;
 DROP TABLE IF EXISTS equipment_output_alias CASCADE;
+DROP TABLE IF EXISTS counting_equipment CASCADE;
 DROP TABLE IF EXISTS section CASCADE;
-DROP TABLE IF EXISTS factory CASCADE;
-DROP TABLE IF EXISTS token CASCADE;
+DROP TABLE IF EXISTS equipment_status_record CASCADE;
+DROP TABLE IF EXISTS counter_record CASCADE;
 DROP TABLE IF EXISTS users CASCADE;
-DROP VIEW IF EXISTS counter_record_production_conclusion;
+DROP TABLE IF EXISTS token CASCADE;
+DROP TABLE IF EXISTS factory_user CASCADE;
+DROP TABLE IF EXISTS factory CASCADE;
+DROP TABLE IF EXISTS ims CASCADE;
 
 CREATE TABLE users (
   id int GENERATED ALWAYS AS IDENTITY,
@@ -64,6 +70,13 @@ CREATE TABLE section (
  FOREIGN KEY(factory_id) REFERENCES factory(id)
 );
 
+CREATE TABLE ims (
+    id int GENERATED ALWAYS AS IDENTITY,
+    code varchar(100) NOT NULL,
+
+    PRIMARY KEY(id)
+);
+
 CREATE TABLE counting_equipment (
     id int GENERATED ALWAYS AS IDENTITY,
     code varchar(20) UNIQUE NOT NULL,
@@ -71,9 +84,11 @@ CREATE TABLE counting_equipment (
     section_id int,
     equipment_status int,
     p_timer_communication_cycle int,
+    ims_id int UNIQUE,
 
     PRIMARY KEY(id),
-    FOREIGN KEY(section_id) REFERENCES section(id)
+    FOREIGN KEY(section_id) REFERENCES section(id),
+    FOREIGN KEY(ims_id) REFERENCES ims(id)
 );
 
 CREATE INDEX idx_counting_equipment_section_id ON counting_equipment (section_id);
@@ -100,9 +115,19 @@ CREATE TABLE equipment_output (
 
 CREATE INDEX idx_equipment_output_code ON equipment_output (code);
 
+
+CREATE TABLE composed_production_order (
+    id int GENERATED ALWAYS AS IDENTITY,
+    code VARCHAR(255),
+
+    PRIMARY KEY(id)
+);
+
 CREATE TABLE production_order (
     id int GENERATED ALWAYS AS IDENTITY,
     equipment_id int,
+    ims_id int,
+    composed_production_order_id int,
     code varchar(20) UNIQUE NOT NULL,
     target_amount int,
     is_equipment_enabled boolean,
@@ -115,7 +140,9 @@ CREATE TABLE production_order (
     washing_process varchar(100),
 
     PRIMARY KEY(id),
-    FOREIGN KEY(equipment_id) REFERENCES counting_equipment(id)
+    FOREIGN KEY(equipment_id) REFERENCES counting_equipment(id),
+    FOREIGN KEY(ims_id) REFERENCES ims(id),
+    FOREIGN KEY(composed_production_order_id) REFERENCES composed_production_order(id)
 );
 
 CREATE INDEX idx_production_order_code ON production_order (code);
@@ -158,6 +185,35 @@ CREATE TABLE equipment_status_record (
 
     PRIMARY KEY(id),
     FOREIGN KEY(counting_equipment_id) REFERENCES counting_equipment(id)
+);
+
+CREATE TABLE sample (
+  id int GENERATED ALWAYS AS IDENTITY,
+  composed_production_order_id INT,
+  amount INT,
+  tca_average INT,
+  reliability INT,
+  created_at date,
+  PRIMARY KEY (id),
+  FOREIGN KEY (composed_production_order_id) REFERENCES composed_production_order (id)
+);
+
+CREATE TABLE hit (
+  id int GENERATED ALWAYS AS IDENTITY,
+  sample_id INT,
+  tca FLOAT,
+  is_valid_for_reliability BOOLEAN,
+  PRIMARY KEY (id),
+  FOREIGN KEY (sample_id) REFERENCES sample (id)
+);
+
+CREATE TABLE batch (
+  id int GENERATED ALWAYS AS IDENTITY,
+  code VARCHAR,
+  composed_production_order_id INT,
+  is_approved BOOLEAN,
+  PRIMARY KEY (id),
+  FOREIGN KEY (composed_production_order_id) REFERENCES composed_production_order (id)
 );
 
 CREATE OR REPLACE VIEW counter_record_production_conclusion AS

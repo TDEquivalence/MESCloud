@@ -18,6 +18,8 @@ public class ProductionOrderEntity {
     private String code;
     @ManyToOne(fetch = FetchType.EAGER)
     private CountingEquipmentEntity equipment;
+    @ManyToOne(fetch = FetchType.EAGER)
+    private ImsEntity ims;
     private int targetAmount;
     private boolean isCompleted;
     private Date createdAt;
@@ -28,4 +30,7 @@ public class ProductionOrderEntity {
     private String gauge;
     private String category;
     private String washingProcess;
+
+    @ManyToOne
+    private ComposedProductionOrderEntity composedProductionOrder;
 }

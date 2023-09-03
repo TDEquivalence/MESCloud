@@ -1,6 +1,6 @@
 package com.tde.mescloud.service;
 
-import com.tde.mescloud.model.converter.FactoryConverter;
+import com.tde.mescloud.model.converter.FactoryConverterImpl;
 import com.tde.mescloud.model.dto.FactoryDto;
 import com.tde.mescloud.model.entity.FactoryEntity;
 import com.tde.mescloud.repository.FactoryRepository;
@@ -15,7 +15,7 @@ import java.util.List;
 public class FactoryServiceImpl implements FactoryService {
 
     private final FactoryRepository repository;
-    private final FactoryConverter converter;
+    private final FactoryConverterImpl converter;
 
     @Override
     public FactoryDto saveFactory(FactoryDto factoryDto) {

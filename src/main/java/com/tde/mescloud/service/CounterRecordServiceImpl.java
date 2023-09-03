@@ -2,7 +2,6 @@ package com.tde.mescloud.service;
 
 import com.tde.mescloud.model.converter.CounterRecordConverter;
 import com.tde.mescloud.model.dto.*;
-import com.tde.mescloud.model.dto.filter.SearchableProperty;
 import com.tde.mescloud.model.entity.CounterRecordConclusionEntity;
 import com.tde.mescloud.model.entity.CounterRecordEntity;
 import com.tde.mescloud.model.entity.EquipmentOutputEntity;
