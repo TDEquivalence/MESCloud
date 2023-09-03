@@ -12,6 +12,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -63,5 +64,11 @@ public class SampleServiceImpl implements SampleService {
     @Override
     public Optional<SampleEntity> findById(Long id) {
         return repository.findById(id);
+    }
+
+
+    @Override
+    public List<SampleDto> getAll() {
+        return converter.convertToDto(repository.findAll());
     }
 }
