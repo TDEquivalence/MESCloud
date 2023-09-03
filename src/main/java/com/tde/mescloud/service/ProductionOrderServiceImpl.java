@@ -6,8 +6,10 @@ import com.tde.mescloud.exception.MesMqttException;
 import com.tde.mescloud.model.converter.ProductionOrderConverter;
 import com.tde.mescloud.model.dto.ProductionOrderDto;
 import com.tde.mescloud.model.dto.ProductionOrderMqttDto;
+import com.tde.mescloud.model.dto.ProductionOrderSummaryDto;
 import com.tde.mescloud.model.entity.CountingEquipmentEntity;
 import com.tde.mescloud.model.entity.ProductionOrderEntity;
+import com.tde.mescloud.model.entity.ProductionOrderSummaryEntity;
 import com.tde.mescloud.protocol.MesMqttSettings;
 import com.tde.mescloud.repository.CountingEquipmentRepository;
 import com.tde.mescloud.repository.ProductionOrderRepository;
@@ -17,6 +19,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -179,5 +182,11 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         return existingEntities.stream()
                 .map(ProductionOrderEntity::getId)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ProductionOrderSummaryDto> getCompleted() {
+        List<ProductionOrderSummaryEntity> persistedProductionOrders = repository.findCompletedAndUnassociated();
+        return new ArrayList<>();
     }
 }

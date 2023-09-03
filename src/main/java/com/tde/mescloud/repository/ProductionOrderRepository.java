@@ -1,6 +1,7 @@
 package com.tde.mescloud.repository;
 
 import com.tde.mescloud.model.entity.ProductionOrderEntity;
+import com.tde.mescloud.model.entity.ProductionOrderSummaryEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -19,4 +20,6 @@ public interface ProductionOrderRepository extends JpaRepository<ProductionOrder
     Optional<ProductionOrderEntity> findActive(long equipmentId);
 
     List<ProductionOrderEntity> findByIdIn(List<Long> ids);
+
+    List<ProductionOrderSummaryEntity> findCompletedAndUnassociated();
 }
