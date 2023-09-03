@@ -27,27 +27,26 @@ public class SampleServiceImpl implements SampleService {
     private final ComposedProductionOrderConverter composedConverter;
 
     @Override
-    public Optional<SampleDto> create(RequestSampleDto requestSampleDto) {
+    public SampleDto create(RequestSampleDto requestSampleDto) {
         ComposedProductionOrderEntity composedEntity = createComposed(requestSampleDto);
+        return createSample(requestSampleDto, composedEntity);
+    }
 
-        if(composedEntity == null) {
-            return Optional.empty();
-        }
-
+    private SampleDto createSample(RequestSampleDto requestSampleDto, ComposedProductionOrderEntity composedEntity) {
         SampleDto sampleDto = new SampleDto();
         sampleDto.setAmount(requestSampleDto.getAmount());
 
         SampleEntity sampleEntity = converter.convertToEntity(sampleDto);
         sampleEntity.setComposedProductionOrder(composedEntity);
-        saveAndUpdate(sampleEntity);
 
-        return Optional.of(converter.convertToDto(sampleEntity));
+        saveAndUpdate(sampleEntity);
+        return converter.convertToDto(sampleEntity);
     }
 
     private ComposedProductionOrderEntity createComposed(RequestSampleDto requestSampleDto) {
         Optional<ComposedProductionOrderDto> composedDto = composedService.create(requestSampleDto.getProductionOrdersIds());
         if(composedDto.isEmpty()) {
-            return null;
+            throw new IllegalStateException("Composed Production Order creation error");
         }
         return composedConverter.convertToEntity(composedDto.get());
     }

@@ -9,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/sample")
@@ -20,12 +19,12 @@ public class SampleController {
 
     @PostMapping
     public ResponseEntity<SampleDto> createSample(@RequestBody RequestSampleDto requestSampleDto) {
-        Optional<SampleDto> sampleDto = sampleService.create(requestSampleDto);
-        if (sampleDto.isEmpty()) {
+        SampleDto sampleDto = sampleService.create(requestSampleDto);
+        if (sampleDto == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        return new ResponseEntity<>(sampleDto.get(), HttpStatus.OK);
+        return new ResponseEntity<>(sampleDto, HttpStatus.OK);
     }
 
     @GetMapping
