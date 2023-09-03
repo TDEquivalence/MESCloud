@@ -4,6 +4,7 @@ import com.tde.mescloud.api.mqtt.MqttClient;
 import com.tde.mescloud.constant.MqttDTOConstants;
 import com.tde.mescloud.exception.MesMqttException;
 import com.tde.mescloud.model.converter.ProductionOrderConverter;
+import com.tde.mescloud.model.converter.ProductionOrderSummaryConverter;
 import com.tde.mescloud.model.dto.ProductionOrderDto;
 import com.tde.mescloud.model.dto.ProductionOrderMqttDto;
 import com.tde.mescloud.model.dto.ProductionOrderSummaryDto;
@@ -37,6 +38,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
 
     private final ProductionOrderRepository repository;
     private final ProductionOrderConverter converter;
+    private final ProductionOrderSummaryConverter summaryConverter;
     private final CountingEquipmentRepository countingEquipmentRepository;
     private final MqttClient mqttClient;
     private final MesMqttSettings mqttSettings;
@@ -187,6 +189,6 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     @Override
     public List<ProductionOrderSummaryDto> getCompleted() {
         List<ProductionOrderSummaryEntity> persistedProductionOrders = repository.findCompletedAndUnassociated();
-        return new ArrayList<>();
+        return summaryConverter.toDto(persistedProductionOrders);
     }
 }
