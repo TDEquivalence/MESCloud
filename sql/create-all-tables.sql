@@ -1,23 +1,28 @@
-DROP VIEW IF EXISTS counter_record_production_conclusion CASCADE;
-DROP TABLE IF EXISTS batch CASCADE;
-DROP TABLE IF EXISTS hit CASCADE;
-DROP TABLE IF EXISTS sample CASCADE;
-DROP TABLE IF EXISTS production_instruction CASCADE;
-DROP TABLE IF EXISTS composed_production_order CASCADE;
-DROP TABLE IF EXISTS production_order CASCADE;
-DROP TABLE IF EXISTS production_order_recipe CASCADE;
-DROP TABLE IF EXISTS equipment_output CASCADE;
-DROP TABLE IF EXISTS equipment_output_alias CASCADE;
-DROP TABLE IF EXISTS counting_equipment CASCADE;
-DROP TABLE IF EXISTS section CASCADE;
-DROP TABLE IF EXISTS equipment_status_record CASCADE;
-DROP TABLE IF EXISTS counter_record CASCADE;
-DROP TABLE IF EXISTS users CASCADE;
-DROP TABLE IF EXISTS token CASCADE;
-DROP TABLE IF EXISTS factory_user CASCADE;
-DROP TABLE IF EXISTS factory CASCADE;
-DROP TABLE IF EXISTS ims CASCADE;
+-- Drop views
+DROP VIEW IF EXISTS production_order_summary;
+DROP VIEW IF EXISTS counter_record_production_conclusion;
 
+-- Drop tables
+DROP TABLE IF EXISTS batch;
+DROP TABLE IF EXISTS hit;
+DROP TABLE IF EXISTS sample;
+DROP TABLE IF EXISTS production_instruction;
+DROP TABLE IF EXISTS counter_record;
+DROP TABLE IF EXISTS production_order;
+DROP TABLE IF EXISTS composed_production_order;
+DROP TABLE IF EXISTS production_order_recipe;
+DROP TABLE IF EXISTS equipment_output;
+DROP TABLE IF EXISTS equipment_output_alias;
+DROP TABLE IF EXISTS equipment_status_record;
+DROP TABLE IF EXISTS counting_equipment;
+DROP TABLE IF EXISTS section;
+DROP TABLE IF EXISTS token;
+DROP TABLE IF EXISTS factory_user;
+DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS factory;
+DROP TABLE IF EXISTS ims;
+
+-- Create tables
 CREATE TABLE users (
   id int GENERATED ALWAYS AS IDENTITY,
   first_name VARCHAR(50),
@@ -227,3 +232,12 @@ FROM (
 ) AS last_counter
 JOIN counter_record cr ON last_counter.max_counter_record_id = cr.id
 JOIN production_order po ON cr.production_order_id = po.id;
+
+CREATE OR REPLACE VIEW production_order_summary AS
+SELECT po.*, COALESCE(SUM(CAST(crpc.real_value AS bigint)), 0) AS valid_amount
+FROM production_order po
+LEFT JOIN composed_production_order cpo ON po.composed_production_order_id = cpo.id
+LEFT JOIN counter_record_production_conclusion crpc ON po.id = crpc.production_order_id
+LEFT JOIN equipment_output eo ON crpc.equipment_output_id = eo.id
+WHERE po.is_completed = true AND cpo.id IS NULL AND eo.is_valid_for_production = true
+GROUP BY po.id;
