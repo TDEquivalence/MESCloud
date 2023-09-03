@@ -101,7 +101,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         Optional<CountingEquipmentEntity> countingEquipmentEntityOpt =
                 countingEquipmentRepository.findById(productionOrder.getEquipmentId());
         if (countingEquipmentEntityOpt.isEmpty()) {
-            log.warning(() -> String.format("Unable to find Equipment with id [%s]", productionOrder.getEquipmentId()));
+            log.warning(() -> String.format("Unable to create Production Order - no Equipment found with id [%s]", productionOrder.getEquipmentId()));
             return Optional.empty();
         }
 
@@ -113,6 +113,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         CountingEquipmentEntity countingEquipmentEntity = countingEquipmentEntityOpt.get();
         countingEquipmentEntity.setId(productionOrder.getEquipmentId());
         productionOrderEntity.setEquipment(countingEquipmentEntity);
+        productionOrderEntity.setIms(countingEquipmentEntity.getIms());
 
         ProductionOrderEntity persistedProductionOrder = repository.save(productionOrderEntity);
 

@@ -12,6 +12,7 @@ public class ProductionOrderDto {
     private long id;
     private long equipmentId;
     private String code;
+    private String imsCode;
     private int targetAmount;
     private Date createdAt;
 

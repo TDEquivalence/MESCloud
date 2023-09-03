@@ -126,6 +126,7 @@ CREATE TABLE composed_production_order (
 CREATE TABLE production_order (
     id int GENERATED ALWAYS AS IDENTITY,
     equipment_id int,
+    ims_id int,
     composed_production_order_id int,
     code varchar(20) UNIQUE NOT NULL,
     target_amount int,
@@ -140,6 +141,7 @@ CREATE TABLE production_order (
 
     PRIMARY KEY(id),
     FOREIGN KEY(equipment_id) REFERENCES counting_equipment(id),
+    FOREIGN KEY(ims_id) REFERENCES ims(id),
     FOREIGN KEY(composed_production_order_id) REFERENCES composed_production_order(id)
 );
 
