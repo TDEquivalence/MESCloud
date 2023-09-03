@@ -58,7 +58,6 @@ public class ImsServiceImpl implements ImsService {
 
     public Optional<ImsDto> create(ImsDto imsDto) {
 
-        //TODO: DB not null no code
         if (imsDto.getCode() == null || imsDto.getCode().length() < MIN_CODE_SIZE) {
             log.warning(String.format("Invalid IMS code: [%s]", imsDto.getCode()));
             return Optional.empty();
