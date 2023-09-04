@@ -4,7 +4,6 @@ import com.tde.mescloud.model.converter.ComposedProductionOrderConverter;
 import com.tde.mescloud.model.dto.ComposedProductionOrderDto;
 import com.tde.mescloud.model.dto.RequestComposedDto;
 import com.tde.mescloud.model.entity.ComposedProductionOrderEntity;
-import com.tde.mescloud.model.entity.ProductionOrderEntity;
 import com.tde.mescloud.repository.ComposedProductionOrderRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
@@ -25,42 +24,48 @@ public class ComposedProductionOrderServiceImpl implements ComposedProductionOrd
 
     private static final String CODE_PREFIX = "CP";
     private static final int CODE_INITIAL_VALUE = 0;
+
+
     @Override
-    public Optional<ComposedProductionOrderDto> create(RequestComposedDto productionOrderIds) {
+    public Optional<ComposedProductionOrderDto> create(RequestComposedDto requestComposedDto) {
+        return create(requestComposedDto.getProductionOrderIds());
+    }
 
-        List<Long> validProductionOrderIds = productionOrderService.findExistingIds(productionOrderIds.getProductionOrderIds());
-        if(validProductionOrderIds.isEmpty()) {
-            throw new IllegalArgumentException("Production Order Ids are not valid");
-        }
+    @Override
+    public Optional<ComposedProductionOrderDto> create(List<Long> productionOrderIds) {
 
+        List<Long> validProductionOrderIds = getValidProductionOrders(productionOrderIds);
         ComposedProductionOrderEntity composedEntity = createComposed();
 
-        for(Long id : validProductionOrderIds) {
-            Optional<ProductionOrderEntity> productionOrderEntity = productionOrderService.findById(id);
-            if(productionOrderEntity.isEmpty()) {
-                continue;
-            }
-            productionOrderEntity.get().setComposedProductionOrder(composedEntity);
-            composedEntity.getProductionOrders().add(productionOrderEntity.get());
-        }
+        setProductionOrdersWithComposed(validProductionOrderIds, composedEntity);
 
         saveAndUpdate(composedEntity);
         return Optional.of(converter.convertToDto(composedEntity));
     }
 
-    @Override
-    public Optional<ComposedProductionOrderDto> create(List<Long> productionOrderIds) {
-        RequestComposedDto requestComposedDto = new RequestComposedDto();
-        requestComposedDto.setProductionOrderIds(productionOrderIds);
-        return create(requestComposedDto);
+    private void setProductionOrdersWithComposed(List<Long> validProductionOrderIds, ComposedProductionOrderEntity composedEntity) {
+        for(Long id : validProductionOrderIds) {
+            productionOrderService.findById(id).ifPresent(productionOrderEntity -> {
+                productionOrderEntity.setComposedProductionOrder(composedEntity);
+                composedEntity.getProductionOrders().add(productionOrderEntity);
+            });
+        }
+    }
+
+    private List<Long> getValidProductionOrders(List<Long> productionOrderIds) {
+        List<Long> validProductionOrderIds = productionOrderService.findExistingIds(productionOrderIds);
+        if(validProductionOrderIds.isEmpty()) {
+            throw new IllegalArgumentException("Production Order Ids are not valid");
+        }
+
+        return validProductionOrderIds;
     }
 
     private ComposedProductionOrderEntity createComposed() {
-        ComposedProductionOrderDto composedDto = new ComposedProductionOrderDto();
+        ComposedProductionOrderEntity composedEntity = new ComposedProductionOrderEntity();
         String composedProductionCode = generateCode();
-        composedDto.setCode(composedProductionCode);
+        composedEntity.setCode(composedProductionCode);
 
-        ComposedProductionOrderEntity composedEntity = converter.convertToEntity(composedDto);
         return repository.save(composedEntity);
     }
 

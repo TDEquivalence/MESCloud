@@ -18,7 +18,7 @@ public class SampleController {
     private final SampleService sampleService;
 
     @PostMapping
-    public ResponseEntity<SampleDto> createSample(@RequestBody RequestSampleDto requestSampleDto) {
+    public ResponseEntity<SampleDto> create(@RequestBody RequestSampleDto requestSampleDto) {
         SampleDto sampleDto = sampleService.create(requestSampleDto);
         if (sampleDto == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);

@@ -33,10 +33,8 @@ public class SampleServiceImpl implements SampleService {
     }
 
     private SampleDto createSample(RequestSampleDto requestSampleDto, ComposedProductionOrderEntity composedEntity) {
-        SampleDto sampleDto = new SampleDto();
-        sampleDto.setAmount(requestSampleDto.getAmount());
-
-        SampleEntity sampleEntity = converter.convertToEntity(sampleDto);
+        SampleEntity sampleEntity = new SampleEntity();
+        sampleEntity.setAmount(requestSampleDto.getAmount());
         sampleEntity.setComposedProductionOrder(composedEntity);
 
         saveAndUpdate(sampleEntity);
