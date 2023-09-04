@@ -31,3 +31,6 @@ mes:
     protCountPlcTopic: "LOCAL/DEV/PROTOCOL_COUNT_V0/PLC"
   security:
     allowedOrigin: "http://localhost:5173"
+
+factory:
+  timeZone: "Europe/Lisbon"
