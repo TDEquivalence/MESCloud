@@ -9,4 +9,5 @@ public class EquipmentOutputDto {
     private long id;
     private String code;
     private String alias;
+    private boolean isValidForProduction;
 }

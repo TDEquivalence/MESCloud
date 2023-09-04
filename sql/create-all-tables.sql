@@ -1,23 +1,28 @@
-DROP VIEW IF EXISTS counter_record_production_conclusion CASCADE;
-DROP TABLE IF EXISTS batch CASCADE;
-DROP TABLE IF EXISTS hit CASCADE;
-DROP TABLE IF EXISTS sample CASCADE;
-DROP TABLE IF EXISTS production_instruction CASCADE;
-DROP TABLE IF EXISTS composed_production_order CASCADE;
-DROP TABLE IF EXISTS production_order CASCADE;
-DROP TABLE IF EXISTS production_order_recipe CASCADE;
-DROP TABLE IF EXISTS equipment_output CASCADE;
-DROP TABLE IF EXISTS equipment_output_alias CASCADE;
-DROP TABLE IF EXISTS counting_equipment CASCADE;
-DROP TABLE IF EXISTS section CASCADE;
-DROP TABLE IF EXISTS equipment_status_record CASCADE;
-DROP TABLE IF EXISTS counter_record CASCADE;
-DROP TABLE IF EXISTS users CASCADE;
-DROP TABLE IF EXISTS token CASCADE;
-DROP TABLE IF EXISTS factory_user CASCADE;
-DROP TABLE IF EXISTS factory CASCADE;
-DROP TABLE IF EXISTS ims CASCADE;
+-- Drop views
+DROP VIEW IF EXISTS production_order_summary;
+DROP VIEW IF EXISTS counter_record_production_conclusion;
 
+-- Drop tables
+DROP TABLE IF EXISTS batch;
+DROP TABLE IF EXISTS hit;
+DROP TABLE IF EXISTS sample;
+DROP TABLE IF EXISTS production_instruction;
+DROP TABLE IF EXISTS counter_record;
+DROP TABLE IF EXISTS production_order;
+DROP TABLE IF EXISTS composed_production_order;
+DROP TABLE IF EXISTS production_order_recipe;
+DROP TABLE IF EXISTS equipment_output;
+DROP TABLE IF EXISTS equipment_output_alias;
+DROP TABLE IF EXISTS equipment_status_record;
+DROP TABLE IF EXISTS counting_equipment;
+DROP TABLE IF EXISTS section;
+DROP TABLE IF EXISTS token;
+DROP TABLE IF EXISTS factory_user;
+DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS factory;
+DROP TABLE IF EXISTS ims;
+
+-- Create tables
 CREATE TABLE users (
   id int GENERATED ALWAYS AS IDENTITY,
   first_name VARCHAR(50),
@@ -167,6 +172,7 @@ CREATE TABLE counter_record (
     computed_value int,
     production_order_id int,
     registered_at timestamp,
+    is_valid_for_production boolean,
 
     PRIMARY KEY(id),
     FOREIGN KEY(equipment_output_id) REFERENCES equipment_output(id),
@@ -216,8 +222,9 @@ CREATE TABLE batch (
   FOREIGN KEY (composed_production_order_id) REFERENCES composed_production_order (id)
 );
 
+-- Create views
 CREATE OR REPLACE VIEW counter_record_production_conclusion AS
-SELECT cr.id, cr.equipment_output_id, cr.equipment_output_alias, cr.real_value, cr.computed_value, cr.production_order_id, cr.registered_at, po.code AS production_order_code
+SELECT cr.id, cr.equipment_output_id, cr.equipment_output_alias, cr.real_value, cr.computed_value, cr.production_order_id, cr.registered_at, cr.is_valid_for_production, po.code AS production_order_code
 FROM (
     SELECT eo.id AS equipment_output_id, cr.equipment_output_alias, po.id AS production_order_id, MAX(cr.id) AS max_counter_record_id
     FROM equipment_output eo
@@ -227,3 +234,10 @@ FROM (
 ) AS last_counter
 JOIN counter_record cr ON last_counter.max_counter_record_id = cr.id
 JOIN production_order po ON cr.production_order_id = po.id;
+
+CREATE OR REPLACE VIEW production_order_summary AS
+SELECT po.*, COALESCE(SUM(CAST(crpc.real_value AS bigint)), 0) AS valid_amount
+FROM production_order po
+LEFT JOIN counter_record_production_conclusion crpc ON po.id = crpc.production_order_id
+WHERE po.is_completed = true AND po.composed_production_order_id IS NULL AND crpc.is_valid_for_production = true
+GROUP BY po.id;
