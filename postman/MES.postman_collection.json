@@ -25,7 +25,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "DEV/MASILVA/OBO/PROTOCOL_COUNT_V0/BE",
+							"raw": "LOCAL/DEV/PROTOCOL_COUNT_V0/BE",
 							"options": {
 								"raw": {
 									"language": "text"
@@ -64,7 +64,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "DEV/MASILVA/OBO/PROTOCOL_COUNT_V0/BE",
+							"raw": "LOCAL/DEV/PROTOCOL_COUNT_V0/BE",
 							"options": {
 								"raw": {
 									"language": "text"
@@ -111,7 +111,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}:{{port}}/api/mqtt/publish?topic=DEV/MASILVA/OBO/PROTOCOL_COUNT_V0/PLC",
+							"raw": "{{url}}:{{port}}/api/mqtt/publish?topic=LOCAL/DEV/PROTOCOL_COUNT_V0/PLC",
 							"host": [
 								"{{url}}"
 							],
@@ -124,7 +124,7 @@
 							"query": [
 								{
 									"key": "topic",
-									"value": "DEV/MASILVA/OBO/PROTOCOL_COUNT_V0/PLC"
+									"value": "LOCAL/DEV/PROTOCOL_COUNT_V0/PLC"
 								}
 							]
 						}
@@ -156,7 +156,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}:{{port}}/api/mqtt/publish?topic=DEV/MASILVA/OBO/PROTOCOL_COUNT_V0/PLC",
+							"raw": "{{url}}:{{port}}/api/mqtt/publish?topic=LOCAL/DEV/PROTOCOL_COUNT_V0/PLC",
 							"host": [
 								"{{url}}"
 							],
@@ -169,7 +169,7 @@
 							"query": [
 								{
 									"key": "topic",
-									"value": "DEV/MASILVA/OBO/PROTOCOL_COUNT_V0/PLC"
+									"value": "LOCAL/DEV/PROTOCOL_COUNT_V0/PLC"
 								}
 							]
 						}
@@ -193,7 +193,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n   \"jsonType\": \"ProductionOrderInit\",\r\n   \"productionOrderCode\": \"PO2301\",\r\n   \"equipmentCode\":\"OBO001\",\r\n   \"equipmentStatus\":2,\r\n   \"counters\":[\r\n      {\r\n         \"outputCode\":\"OBO001-001\",\r\n         \"value\":250\r\n      },\r\n      {\r\n         \"outputCode\":\"OBO001-002\",\r\n         \"value\":220\r\n      }\r\n   ]\r\n}",
+							"raw": "{\r\n  \"jsonType\": \"ConfigurationResponse\",\r\n  \"equipmentCode\": \"OBO001\",\r\n  \"productionOrderCode\": \"\",\r\n  \"equipmentStatus\": 0,\r\n  \"alarmCode\": 0,\r\n  \"counters\": [\r\n    {\r\n      \"outputCode\": \"OBO001-001\",\r\n      \"value\": 0\r\n    },\r\n    {\r\n      \"outputCode\": \"OBO001-002\",\r\n      \"value\": 0\r\n    }\r\n  ]\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -201,7 +201,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}:{{port}}/api/mqtt/publish?topic=DEV/MASILVA/OBO/PROTOCOL_COUNT_V0/BE",
+							"raw": "{{url}}:{{port}}/api/mqtt/publish?topic=LOCAL/DEV/PROTOCOL_COUNT_V0/BE",
 							"host": [
 								"{{url}}"
 							],
@@ -214,7 +214,7 @@
 							"query": [
 								{
 									"key": "topic",
-									"value": "DEV/MASILVA/OBO/PROTOCOL_COUNT_V0/BE"
+									"value": "LOCAL/DEV/PROTOCOL_COUNT_V0/BE"
 								}
 							]
 						}
@@ -238,7 +238,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n   \"jsonType\": \"ProductionCount\",\r\n   \"productionOrderCode\": \"PO2301\",\r\n   \"equipmentCode\":\"OBO001\",\r\n   \"equipmentStatus\":0,\r\n   \"counters\":[\r\n      {\r\n         \"outputCode\":\"OBO001-001\",\r\n         \"value\":350\r\n      },\r\n      {\r\n         \"outputCode\":\"OBO001-002\",\r\n         \"value\":320\r\n      }\r\n   ]\r\n}",
+							"raw": "{\r\n   \"jsonType\": \"ProductionCount\",\r\n   \"productionOrderCode\": \"OBOPO2300003\",\r\n   \"equipmentCode\":\"OBO001\",\r\n   \"equipmentStatus\":0,\r\n   \"counters\":[\r\n      {\r\n         \"outputCode\":\"OBO001-001\",\r\n         \"value\":350\r\n      },\r\n      {\r\n         \"outputCode\":\"OBO001-002\",\r\n         \"value\":320\r\n      }\r\n   ]\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -246,7 +246,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}:{{port}}/api/mqtt/publish?topic=DEV/MASILVA/OBO/PROTOCOL_COUNT_V0/BE",
+							"raw": "{{url}}:{{port}}/api/mqtt/publish?topic=LOCAL/DEV/PROTOCOL_COUNT_V0/BE",
 							"host": [
 								"{{url}}"
 							],
@@ -259,7 +259,7 @@
 							"query": [
 								{
 									"key": "topic",
-									"value": "DEV/MASILVA/OBO/PROTOCOL_COUNT_V0/BE"
+									"value": "LOCAL/DEV/PROTOCOL_COUNT_V0/BE"
 								}
 							]
 						}
@@ -291,7 +291,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}:{{port}}/api/mqtt/publish?topic=DEV/MASILVA/OBO/PROTOCOL_COUNT_V0/PLC",
+							"raw": "{{url}}:{{port}}/api/mqtt/publish?topic=LOCAL/DEV/PROTOCOL_COUNT_V0/PLC",
 							"host": [
 								"{{url}}"
 							],
@@ -304,7 +304,7 @@
 							"query": [
 								{
 									"key": "topic",
-									"value": "DEV/MASILVA/OBO/PROTOCOL_COUNT_V0/PLC"
+									"value": "LOCAL/DEV/PROTOCOL_COUNT_V0/PLC"
 								}
 							]
 						}

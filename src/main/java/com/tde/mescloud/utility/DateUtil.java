@@ -1,11 +1,16 @@
 package com.tde.mescloud.utility;
 
+import lombok.extern.java.Log;
+
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
+@Log
 public class DateUtil {
 
     private DateUtil() {
@@ -31,5 +36,21 @@ public class DateUtil {
         return Instant.parse(dateAsString);
     }
 
+    public static Date getCurrentUtcDate() {
+        long currentTimeMillis = System.currentTimeMillis();
+        Date currentUtcDate = new Date(currentTimeMillis);
 
+        return currentUtcDate;
+    }
+
+    public static Date getCurrentTime(String timeZoneId) {
+        try {
+            ZoneId zoneId = ZoneId.of(timeZoneId);
+            LocalDateTime localDateTime = LocalDateTime.now(zoneId);
+            return Date.from(localDateTime.atZone(zoneId).toInstant());
+        } catch (Exception e) {
+            log.severe("Unable to provide current time based on time zone - providing local time instead");
+            return new Date();
+        }
+    }
 }

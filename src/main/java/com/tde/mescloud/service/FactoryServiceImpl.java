@@ -5,17 +5,29 @@ import com.tde.mescloud.model.dto.FactoryDto;
 import com.tde.mescloud.model.entity.FactoryEntity;
 import com.tde.mescloud.repository.FactoryRepository;
 import jakarta.persistence.EntityNotFoundException;
-import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@ConfigurationProperties(prefix = "factory")
 @Service
-@AllArgsConstructor
 public class FactoryServiceImpl implements FactoryService {
 
     private final FactoryRepository repository;
     private final FactoryConverterImpl converter;
+
+    @Getter
+    @Setter
+    private String timeZone;
+
+    public FactoryServiceImpl(FactoryRepository repository, FactoryConverterImpl converter) {
+        this.repository = repository;
+        this.converter = converter;
+    }
+
 
     @Override
     public FactoryDto saveFactory(FactoryDto factoryDto) {

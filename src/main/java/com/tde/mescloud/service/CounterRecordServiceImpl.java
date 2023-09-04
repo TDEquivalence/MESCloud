@@ -8,13 +8,13 @@ import com.tde.mescloud.model.entity.EquipmentOutputEntity;
 import com.tde.mescloud.model.entity.ProductionOrderEntity;
 import com.tde.mescloud.repository.CounterRecordRepository;
 import com.tde.mescloud.repository.ProductionOrderRepository;
+import com.tde.mescloud.utility.DateUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,8 +32,9 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     private final EquipmentOutputService equipmentOutputService;
     private final ProductionOrderService productionOrderService;
     private final ProductionOrderRepository productionOrderRepository;
-
     private final CountingEquipmentService countingEquipmentService;
+    private final FactoryService factoryService;
+
 
     @Override
     public List<CounterRecordDto> winnowConclusionRecordsKpi(KpiFilterDto filter) {
@@ -113,7 +114,7 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     private CounterRecordEntity extractCounterRecordEntity(CounterMqttDto counterDto, PlcMqttDto equipmentCountsDto) {
 
         CounterRecordEntity counterRecord = new CounterRecordEntity();
-        counterRecord.setRegisteredAt(new Date());
+        counterRecord.setRegisteredAt(DateUtil.getCurrentTime(factoryService.getTimeZone()));
         counterRecord.setRealValue(counterDto.getValue());
 
         setEquipmentOutput(counterRecord, counterDto.getOutputCode());
