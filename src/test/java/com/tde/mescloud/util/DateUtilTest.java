@@ -6,6 +6,9 @@ import org.junit.jupiter.api.Test;
 
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.TimeZone;
 
@@ -38,8 +41,10 @@ public class DateUtilTest {
 
         Instant startDate = DateUtil.convertToInstant(startDateString);
         Instant endDate = DateUtil.convertToInstant(endDateString);
+        ZonedDateTime zonedDateTime = endDate.atZone(ZoneOffset.UTC);
+        LocalDateTime localDateTime = zonedDateTime.toLocalDateTime();
 
-        int difference = DateUtil.differenceInDays(startDate, Date.from(endDate));
+        int difference = DateUtil.differenceInDays(startDate, localDateTime);
 
         // Calculate expected difference manually
         long differenceInMillis = Date.from(endDate).getTime() - Date.from(startDate).getTime();
