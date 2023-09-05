@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "counter_record")
@@ -25,6 +25,6 @@ public class CounterRecordEntity {
     @JoinColumn(name = "production_order_id")
     private ProductionOrderEntity productionOrder;
     @Temporal(TemporalType.TIMESTAMP)
-    private ZonedDateTime registeredAt;
+    private LocalDateTime registeredAt;
     private Boolean isValidForProduction;
 }
