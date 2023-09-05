@@ -13,10 +13,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @AllArgsConstructor
@@ -114,7 +111,8 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     private CounterRecordEntity extractCounterRecordEntity(CounterMqttDto counterDto, PlcMqttDto equipmentCountsDto) {
 
         CounterRecordEntity counterRecord = new CounterRecordEntity();
-        counterRecord.setRegisteredAt(DateUtil.getCurrentTime(factoryService.getTimeZone()));
+        //counterRecord.setRegisteredAt(DateUtil.getCurrentTime(factoryService.getTimeZone()));
+        counterRecord.setRegisteredAt(new Date());
         counterRecord.setRealValue(counterDto.getValue());
 
         setEquipmentOutput(counterRecord, counterDto.getOutputCode());

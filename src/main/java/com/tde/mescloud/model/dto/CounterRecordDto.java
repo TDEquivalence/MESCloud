@@ -3,7 +3,7 @@ package com.tde.mescloud.model.dto;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 
 @Getter
 @Setter
@@ -13,6 +13,6 @@ public class CounterRecordDto {
     private String productionOrderCode;
     private String equipmentOutputAlias;
     private int computedValue;
-    private LocalDateTime registeredAt;
+    private Date registeredAt;
     private boolean isValidForProduction;
 }

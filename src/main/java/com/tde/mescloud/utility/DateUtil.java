@@ -5,7 +5,6 @@ import lombok.extern.java.Log;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
 import java.util.Date;
@@ -24,10 +23,9 @@ public class DateUtil {
         return (int) differenceInDays + INCLUDE_LAST_DAY;
     }
 
-    public static int differenceInDays(Instant startDate, LocalDateTime endDate) {
-        Instant endDateAsInstant = endDate.atZone(ZoneOffset.UTC).toInstant();
-        long differenceInDays = ChronoUnit.DAYS.between(startDate, endDateAsInstant);
-        return Math.toIntExact(differenceInDays);
+    public static int differenceInDays(Instant startDate, Date endDate) {
+        long differenceInMillis = endDate.getTime() - startDate.toEpochMilli();
+        return (int) TimeUnit.MILLISECONDS.toDays(differenceInMillis);
     }
 
     public static int getCurrentYearLastTwoDigits() {
