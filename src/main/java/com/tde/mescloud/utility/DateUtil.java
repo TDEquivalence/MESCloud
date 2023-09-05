@@ -41,14 +41,8 @@ public class DateUtil {
         return new Date(currentTimeMillis);
     }
 
-    public static Date getCurrentTime(String timeZoneId) {
-        try {
-            ZoneId zoneId = ZoneId.of(timeZoneId);
-            ZonedDateTime zonedDateTime = ZonedDateTime.now(zoneId);
-            return Date.from(zonedDateTime.toInstant());
-        } catch (Exception e) {
-            log.severe("Unable to provide current time based on time zone - providing local time instead");
-            return new Date();
-        }
+    public static ZonedDateTime getCurrentTime(String timeZoneId) {
+        ZoneId zoneId = ZoneId.of(timeZoneId);
+        return ZonedDateTime.now(zoneId);
     }
 }
