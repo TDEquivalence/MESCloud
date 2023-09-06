@@ -42,8 +42,8 @@ public class SampleServiceImpl implements SampleService {
     }
 
     private ComposedProductionOrderEntity createComposed(RequestSampleDto requestSampleDto) {
-        Optional<ComposedProductionOrderDto> composedDto = composedService.create(requestSampleDto.getProductionOrdersIds());
-        if(composedDto.isEmpty()) {
+        Optional<ComposedProductionOrderDto> composedDto = composedService.create(requestSampleDto.getProductionOrderIds());
+        if (composedDto.isEmpty()) {
             throw new IllegalStateException("Composed Production Order creation error");
         }
         return composedConverter.convertToEntity(composedDto.get());

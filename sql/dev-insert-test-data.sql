@@ -26,11 +26,7 @@ VALUES
 ('OBO001', 'Máquina 1', 1, 1, 60, 1),
 ('OBO002', 'Máquina 2', 1, 1, 120, 2),
 ('OBO003', 'Máquina 3', 1, 0, 120, null),
-('OBO004', 'Máquina 4', 1, 0, 180, 3),
-('OBO005', 'Máquina 5', 1, 0, 60, null),
-('OBO006', 'Máquina 6', 1, 0, 180, null),
-('OBO007', 'Máquina 7', 1, 0, 120, null),
-('OBO008', 'Máquina 8', 1, 0, 180, null);
+('OBO004', 'Máquina 4', 1, 0, 180, 3);
 
 INSERT INTO equipment_output_alias
 (alias)
@@ -48,21 +44,15 @@ VALUES
 (3, 'OBO003-001', 1, true),
 (3, 'OBO003-002', 2, false),
 (4, 'OBO004-001', 1, true),
-(4, 'OBO004-002', 2, false),
-(5, 'OBO005-001', 1, true),
-(5, 'OBO005-002', 2, false),
-(6, 'OBO006-001', 1, true),
-(6, 'OBO006-002', 2, false),
-(7, 'OBO007-001', 1, true),
-(7, 'OBO007-002', 2, false),
-(8, 'OBO008-001', 1, true),
-(8, 'OBO008-002', 2, false);
+(4, 'OBO004-002', 2, false);
 
 INSERT INTO production_order
 (equipment_id, code, target_amount, is_equipment_enabled, is_completed, created_at, input_batch, source, gauge, category, washing_process)
 VALUES
-(1, 'OBOPO2300001', 1000, true, false, '2023-05-09', 'POIN29Z12', '2123185BP', '45 x 24', 'Flor/Ext/Sup', 'MSN140X'),
-(2, 'OBOPO2300002', 3000, true, true, '2023-05-11', 'TTON29Z12', '1166685BP', '45 x 24', 'Flor/Ext/Ope', 'MOC145X');
+(1, 'OBOPO2300001', 1000, true, false, '2023-09-03', 'POIN29Z12', '2123185BP', '45 x 24', 'Flor/Ext/Sup', 'MSN140X'),
+(2, 'OBOPO2300002', 3000, true, true, '2023-09-03', 'TTON29Z12', '1166685BP', '45 x 24', 'Flor/Ext/Ope', 'MOC145X'),
+(2, 'OBOPO2300003', 5000, true, true, '2023-09-04', 'TTON29Z12', '1166685BP', '45 x 24', 'Flor/Ext/Ope', 'MOC145X'),
+(2, 'OBOPO2300004', 2000, true, true, '2023-09-05', 'TTON29Z12', '1166685BP', '45 x 24', 'Flor/Ext/Ope', 'MOC145X');
 
 
 INSERT INTO counter_record (equipment_output_id, equipment_output_alias, real_value, computed_value, production_order_id, registered_at)

@@ -1,6 +1,7 @@
 package com.tde.mescloud.api.rest;
 
 import com.tde.mescloud.model.dto.ComposedProductionOrderDto;
+import com.tde.mescloud.model.dto.ComposedSummaryDto;
 import com.tde.mescloud.model.dto.RequestComposedDto;
 import com.tde.mescloud.service.ComposedProductionOrderService;
 import lombok.AllArgsConstructor;
@@ -32,5 +33,11 @@ public class ComposedProductionOrderController {
     public ResponseEntity<List<ComposedProductionOrderDto>> findAll() {
         List<ComposedProductionOrderDto> composedDtos = composedService.getAll();
         return new ResponseEntity<>(composedDtos, HttpStatus.OK);
+    }
+
+    @GetMapping("/hits")
+    public ResponseEntity<List<ComposedSummaryDto>> findAllWithoutHits() {
+        List<ComposedSummaryDto> composedWithoutHits = composedService.findAllWithoutHits();
+        return new ResponseEntity<>(composedWithoutHits, HttpStatus.OK);
     }
 }

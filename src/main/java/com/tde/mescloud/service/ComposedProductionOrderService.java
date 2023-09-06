@@ -1,6 +1,7 @@
 package com.tde.mescloud.service;
 
 import com.tde.mescloud.model.dto.ComposedProductionOrderDto;
+import com.tde.mescloud.model.dto.ComposedSummaryDto;
 import com.tde.mescloud.model.dto.RequestComposedDto;
 import com.tde.mescloud.model.entity.ComposedProductionOrderEntity;
 
@@ -20,4 +21,6 @@ public interface ComposedProductionOrderService {
     Optional<ComposedProductionOrderEntity> findById(Long id);
 
     List<ComposedProductionOrderDto> getAll();
+
+    List<ComposedSummaryDto> findAllWithoutHits();
 }
