@@ -12,6 +12,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,6 +37,7 @@ public class SampleServiceImpl implements SampleService {
         SampleEntity sampleEntity = new SampleEntity();
         sampleEntity.setAmount(requestSampleDto.getAmount());
         sampleEntity.setComposedProductionOrder(composedEntity);
+        sampleEntity.setCreatedAt(new Date());
 
         saveAndUpdate(sampleEntity);
         return converter.convertToDto(sampleEntity);

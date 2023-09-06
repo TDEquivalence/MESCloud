@@ -109,8 +109,8 @@ public class ComposedProductionOrderServiceImpl implements ComposedProductionOrd
     }
 
     @Override
-    public List<ComposedSummaryDto> findAllWithoutHits() {
-        List<ComposedSummaryEntity> composedWithoutHits = repository.findAllWithoutHits();
+    public List<ComposedSummaryDto> findSummarized(boolean withHits) {
+        List<ComposedSummaryEntity> composedWithoutHits = repository.findSummarized(withHits);
         return summaryConverter.toDto(composedWithoutHits);
     }
 }

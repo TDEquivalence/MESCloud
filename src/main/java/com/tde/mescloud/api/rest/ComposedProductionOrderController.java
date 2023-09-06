@@ -35,9 +35,15 @@ public class ComposedProductionOrderController {
         return new ResponseEntity<>(composedDtos, HttpStatus.OK);
     }
 
-    @GetMapping("/hits")
-    public ResponseEntity<List<ComposedSummaryDto>> findAllWithoutHits() {
-        List<ComposedSummaryDto> composedWithoutHits = composedService.findAllWithoutHits();
+    @GetMapping("/insert-hits")
+    public ResponseEntity<List<ComposedSummaryDto>> findAllToInsertHits() {
+        List<ComposedSummaryDto> composedWithoutHits = composedService.findSummarizedWithoutHits();
+        return new ResponseEntity<>(composedWithoutHits, HttpStatus.OK);
+    }
+
+    @GetMapping("/approval")
+    public ResponseEntity<List<ComposedSummaryDto>> findAllForApproval() {
+        List<ComposedSummaryDto> composedWithoutHits = composedService.findSummarizedWithHits();
         return new ResponseEntity<>(composedWithoutHits, HttpStatus.OK);
     }
 }

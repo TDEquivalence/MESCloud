@@ -22,5 +22,13 @@ public interface ComposedProductionOrderService {
 
     List<ComposedProductionOrderDto> getAll();
 
-    List<ComposedSummaryDto> findAllWithoutHits();
+    default List<ComposedSummaryDto> findSummarizedWithHits() {
+        return findSummarized(true);
+    }
+
+    default List<ComposedSummaryDto> findSummarizedWithoutHits() {
+        return findSummarized(false);
+    }
+
+    List<ComposedSummaryDto> findSummarized(boolean withHits);
 }
