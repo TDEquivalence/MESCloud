@@ -199,8 +199,8 @@ CREATE TABLE sample (
   id int GENERATED ALWAYS AS IDENTITY,
   composed_production_order_id INT,
   amount INT,
-  tca_average INT,
-  reliability INT,
+  tca_average DOUBLE PRECISION,
+  reliability DOUBLE PRECISION,
   created_at date,
   PRIMARY KEY (id),
   FOREIGN KEY (composed_production_order_id) REFERENCES composed_production_order (id)
