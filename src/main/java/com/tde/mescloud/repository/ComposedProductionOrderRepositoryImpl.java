@@ -15,9 +15,16 @@ import java.util.List;
 @Repository
 public class ComposedProductionOrderRepositoryImpl {
 
+    private static final String PROP_ID = "id";
+    private static final String PROP_COMPOSED = "composed";
+    private static final String PROP_SAMPLE = "sample";
+    private static final String PROP_COMPOSED_PO = "composedProductionOrder";
+
     private EntityManager entityManager;
 
+
     public List<ComposedSummaryEntity> findCompleted() {
+
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<ComposedSummaryEntity> query = criteriaBuilder.createQuery(ComposedSummaryEntity.class);
         Root<ComposedSummaryEntity> root = query.from(ComposedSummaryEntity.class);
@@ -34,16 +41,18 @@ public class ComposedProductionOrderRepositoryImpl {
         return entityManager.createQuery(query).getResultList();
     }
 
-    private Predicate hasAssociatedBatchPredicate(CriteriaQuery rootQuery, Root root) {
-        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+    private Predicate hasAssociatedBatchPredicate(CriteriaQuery<ComposedSummaryEntity> rootQuery,
+                                                  Root<ComposedSummaryEntity> root) {
+
         Subquery<Integer> subquery = rootQuery.subquery(Integer.class);
         Root<BatchEntity> subRoot = subquery.from(BatchEntity.class);
-        subquery.select(subRoot.get("composed").get("id"));
+        subquery.select(subRoot.get(PROP_COMPOSED).get(PROP_ID));
 
-        return root.get("id").in(subquery);
+        return root.get(PROP_ID).in(subquery);
     }
 
     public List<ComposedSummaryEntity> findSummarized(boolean withHits) {
+
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<ComposedSummaryEntity> query = criteriaBuilder.createQuery(ComposedSummaryEntity.class);
         Root<ComposedSummaryEntity> root = query.from(ComposedSummaryEntity.class);
@@ -52,16 +61,16 @@ public class ComposedProductionOrderRepositoryImpl {
         if (!withHits) {
             Subquery<Integer> subquery = query.subquery(Integer.class);
             Root<HitEntity> subRoot = subquery.from(HitEntity.class);
-            subquery.select(subRoot.get("sample").get("composedProductionOrder").get("id"));
+            subquery.select(subRoot.get(PROP_SAMPLE).get(PROP_COMPOSED_PO).get(PROP_ID));
 
-            Predicate noHitsPredicate = criteriaBuilder.not(root.get("id").in(subquery));
+            Predicate noHitsPredicate = criteriaBuilder.not(root.get(PROP_ID).in(subquery));
             predicates.add(noHitsPredicate);
         } else {
             Subquery<Integer> subquery = query.subquery(Integer.class);
             Root<HitEntity> subRoot = subquery.from(HitEntity.class);
-            subquery.select(subRoot.get("sample").get("composedProductionOrder").get("id"));
+            subquery.select(subRoot.get(PROP_SAMPLE).get(PROP_COMPOSED_PO).get(PROP_ID));
 
-            Predicate hitsPredicate = root.get("id").in(subquery);
+            Predicate hitsPredicate = root.get(PROP_ID).in(subquery);
             predicates.add(hitsPredicate);
         }
 
