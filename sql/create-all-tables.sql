@@ -245,7 +245,7 @@ WHERE po.is_completed = true AND po.composed_production_order_id IS NULL AND crp
 GROUP BY po.id;
 
 CREATE OR REPLACE VIEW composed_summary AS
-SELECT DISTINCT cpo.id, cpo.created_at, s.amount, s.reliability, po.input_batch, po.source, po.gauge, po.category, po.washing_process, h.id
+SELECT DISTINCT cpo.id, cpo.created_at, s.amount, s.reliability, po.input_batch, po.source, po.gauge, po.category, po.washing_process
 FROM composed_production_order cpo
 LEFT JOIN sample s ON cpo.id = s.composed_production_order_id
 LEFT JOIN hit h ON s.id = h.sample_id

@@ -22,4 +22,5 @@ public class ComposedSummaryEntity {
     private String gauge;
     private String category;
     private String washingProcess;
+//    private Boolean isBatchApproved;
 }

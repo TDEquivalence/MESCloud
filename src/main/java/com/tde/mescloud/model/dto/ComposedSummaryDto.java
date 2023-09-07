@@ -18,4 +18,5 @@ public class ComposedSummaryDto {
     private String gauge;
     private String category;
     private String washingProcess;
+//    private boolean isBatchApproved;
 }
