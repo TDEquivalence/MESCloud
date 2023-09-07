@@ -113,4 +113,10 @@ public class ComposedProductionOrderServiceImpl implements ComposedProductionOrd
         List<ComposedSummaryEntity> composedWithoutHits = repository.findSummarized(withHits);
         return summaryConverter.toDto(composedWithoutHits);
     }
+
+    @Override
+    public List<ComposedSummaryDto> findCompleted() {
+        List<ComposedSummaryEntity> composedCompleted = repository.findCompleted();
+        return summaryConverter.toDto(composedCompleted);
+    }
 }

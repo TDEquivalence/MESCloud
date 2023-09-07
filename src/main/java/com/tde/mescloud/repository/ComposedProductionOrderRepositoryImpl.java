@@ -1,5 +1,6 @@
 package com.tde.mescloud.repository;
 
+import com.tde.mescloud.model.entity.BatchEntity;
 import com.tde.mescloud.model.entity.ComposedSummaryEntity;
 import com.tde.mescloud.model.entity.HitEntity;
 import jakarta.persistence.EntityManager;
@@ -15,6 +16,32 @@ import java.util.List;
 public class ComposedProductionOrderRepositoryImpl {
 
     private EntityManager entityManager;
+
+    public List<ComposedSummaryEntity> findCompleted() {
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<ComposedSummaryEntity> query = criteriaBuilder.createQuery(ComposedSummaryEntity.class);
+        Root<ComposedSummaryEntity> root = query.from(ComposedSummaryEntity.class);
+
+        List<Predicate> predicates = new ArrayList<>();
+        predicates.add(hasAssociatedBatchPredicate(query, root));
+
+        List<Order> orders = new ArrayList<>();
+
+        query.select(root)
+                .where(criteriaBuilder.and(predicates.toArray(new Predicate[0])))
+                .orderBy(orders);
+
+        return entityManager.createQuery(query).getResultList();
+    }
+
+    private Predicate hasAssociatedBatchPredicate(CriteriaQuery rootQuery, Root root) {
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        Subquery<Integer> subquery = rootQuery.subquery(Integer.class);
+        Root<BatchEntity> subRoot = subquery.from(BatchEntity.class);
+        subquery.select(subRoot.get("composed").get("id"));
+
+        return root.get("id").in(subquery);
+    }
 
     public List<ComposedSummaryEntity> findSummarized(boolean withHits) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();

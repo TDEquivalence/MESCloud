@@ -31,4 +31,6 @@ public interface ComposedProductionOrderService {
     }
 
     List<ComposedSummaryDto> findSummarized(boolean withHits);
+
+    List<ComposedSummaryDto> findCompleted();
 }

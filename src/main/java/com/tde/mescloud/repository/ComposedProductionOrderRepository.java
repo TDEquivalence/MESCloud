@@ -17,4 +17,6 @@ public interface ComposedProductionOrderRepository extends JpaRepository<Compose
 
 
     List<ComposedSummaryEntity> findSummarized(boolean withHits);
+
+    List<ComposedSummaryEntity> findCompleted();
 }

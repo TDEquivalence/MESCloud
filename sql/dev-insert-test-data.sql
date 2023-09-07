@@ -55,7 +55,10 @@ VALUES
 (2, 'OBOPO2300004', 2000, true, true, '2023-09-05', 'TTON29Z12', '1166685BP', '45 x 24', 'Flor/Ext/Ope', 'MOC145X'),
 (2, 'OBOPO2300005', 400, true, true, '2023-09-06', 'TTON28U', '2235BP', '12 x 24', 'Ope', 'TAP2Z'),
 (2, 'OBOPO2300006', 500, true, true, '2023-09-06', 'TTON28U', '2235BP', '12 x 24', 'Ope', 'TAP2Z'),
-(2, 'OBOPO2300007', 1000, true, true, '2023-09-06', 'TTON28U', '2235BP', '12 x 24', 'Ope', 'TAP2Z');
+(2, 'OBOPO2300007', 1000, true, true, '2023-09-06', 'TTON28U', '2235BP', '12 x 24', 'Ope', 'TAP2Z'),
+(2, 'OBOPO2300008', 3000, true, true, '2023-09-07', 'CULA12', 'MA22BP', '12 x 36', 'Ext/Ope', 'CAL2U'),
+(2, 'OBOPO2300009', 5000, true, true, '2023-09-07', 'CULA12', 'MA22BP', '12 x 36', 'Ext/Ope', 'CAL2U'),
+(2, 'OBOPO2300010', 10000, true, true, '2023-09-07', 'CULA12', 'MA22BP', '12 x 36', 'Ext/Ope', 'CAL2U');
 
 
 INSERT INTO counter_record (equipment_output_id, equipment_output_alias, real_value, computed_value, production_order_id, registered_at)

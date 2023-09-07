@@ -46,4 +46,11 @@ public class ComposedProductionOrderController {
         List<ComposedSummaryDto> composedWithoutHits = composedService.findSummarizedWithHits();
         return new ResponseEntity<>(composedWithoutHits, HttpStatus.OK);
     }
+
+    @GetMapping("/completed")
+    public ResponseEntity<List<ComposedSummaryDto>> findCompleted() {
+        List<ComposedSummaryDto> composedCompleted = composedService.findCompleted();
+        return new ResponseEntity<>(composedCompleted, HttpStatus.OK);
+    }
+
 }
