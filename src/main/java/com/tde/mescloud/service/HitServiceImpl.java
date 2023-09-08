@@ -67,12 +67,12 @@ public class HitServiceImpl implements HitService {
 
     private void setReliability(SampleEntity sample) {
         List<HitEntity> validHitsAboveTcaLimit = repository.findValidHitsAboveTcaLimit(sample.getId(), TCA_LIMIT);
-        double reliability = calculateReliability(validHitsAboveTcaLimit.size(), sample.getAmount());
+        double reliability = calculateSampleReliability(validHitsAboveTcaLimit.size(), sample.getAmount());
         sample.setReliability(reliability);
     }
 
-    private double calculateReliability(int numOfHitsAboveTcaLimit, int sampleAmount) {
-        return 1 - (double) numOfHitsAboveTcaLimit / sampleAmount;
+    private double calculateSampleReliability(int numOfHitsAboveTcaLimit, int sampleAmount) {
+        return (1 - (double) numOfHitsAboveTcaLimit / sampleAmount) * 100;
     }
 
     private void saveHitAndSetSample(SampleEntity sample, List<HitEntity> hits) {
