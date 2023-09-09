@@ -4,6 +4,7 @@ import com.tde.mescloud.model.dto.CounterRecordWinnow;
 import com.tde.mescloud.model.dto.KpiFilterDto;
 import com.tde.mescloud.model.dto.filter.Searchable;
 import com.tde.mescloud.model.dto.filter.Sortable;
+import com.tde.mescloud.model.dto.filter.WinnowProperty;
 import com.tde.mescloud.model.entity.*;
 import jakarta.persistence.EntityGraph;
 import jakarta.persistence.EntityManager;
@@ -120,16 +121,19 @@ public class CounterRecordRepositoryImpl {
                 .getResultList();
     }
 
-    private <T> void addPredicates(Searchable<CounterRecordWinnow.Property> filter,
-                                   List<Predicate> predicates,
-                                   CriteriaBuilder criteriaBuilder,
-                                   Root<T> counterRecordRoot) {
+    private <T extends WinnowProperty> void addPredicates(Searchable<T> filter,
+                                                          List<Predicate> predicates,
+                                                          CriteriaBuilder criteriaBuilder,
+                                                          Root<?> counterRecordRoot) {
 
-        for (CounterRecordWinnow.Property counterRecordProperty : filter.getSearch().getKeys()) {
+        for (T counterRecordProperty : filter.getSearch().getKeys()) {
             Predicate predicate;
             switch (counterRecordProperty.getName()) {
                 case COMPUTED_VALUE_PROP -> {
+                    //If dataType is Integer ...
+                    //Later if pathTye = INTEGER_GREAT_OR_EQUAL
                     int computedValue = Integer.parseInt(filter.getSearch().getValue(counterRecordProperty));
+                    //predicate = criteriaBuilder.greaterThanOrEqualTo()
                     predicate = criteriaBuilder.greaterThanOrEqualTo(counterRecordRoot.get(COMPUTED_VALUE_PROP), computedValue);
                 }
                 case START_DATE_FILTER_FIELD -> {
