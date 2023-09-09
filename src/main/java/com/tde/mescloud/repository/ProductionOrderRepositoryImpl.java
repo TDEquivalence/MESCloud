@@ -18,10 +18,14 @@ public class ProductionOrderRepositoryImpl {
     private EntityManager entityManager;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     public List<ProductionOrderSummaryEntity> findCompletedAndUnassociated() {
 =======
     public List<ProductionOrderSummaryEntity> findCompletedWithoutComposed() {
 >>>>>>> 342b74d (Merge pull request #26 from TDEquivalence/feature/MES-230)
+=======
+    public List<ProductionOrderSummaryEntity> findCompletedWithoutComposed() {
+>>>>>>> development
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<ProductionOrderSummaryEntity> query = criteriaBuilder.createQuery(ProductionOrderSummaryEntity.class);
         Root<ProductionOrderSummaryEntity> root = query.from(ProductionOrderSummaryEntity.class);

@@ -1,6 +1,6 @@
 package com.tde.mescloud.model.converter;
 
-import com.tde.mescloud.model.dto.filter.SampleDto;
+import com.tde.mescloud.model.dto.SampleDto;
 import com.tde.mescloud.model.entity.SampleEntity;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;

@@ -1,11 +1,16 @@
 package com.tde.mescloud.utility;
 
+import lombok.extern.java.Log;
+
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
+@Log
 public class DateUtil {
 
     private DateUtil() {
@@ -31,5 +36,13 @@ public class DateUtil {
         return Instant.parse(dateAsString);
     }
 
+    public static Date getCurrentUtcDate() {
+        long currentTimeMillis = System.currentTimeMillis();
+        return new Date(currentTimeMillis);
+    }
 
+    public static LocalDateTime getCurrentTime(String timeZoneId) {
+        ZoneId zoneId = ZoneId.of(timeZoneId);
+        return LocalDateTime.now(zoneId);
+    }
 }

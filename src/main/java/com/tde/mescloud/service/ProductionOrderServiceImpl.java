@@ -20,7 +20,10 @@ import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 
+<<<<<<< HEAD
 import java.util.ArrayList;
+=======
+>>>>>>> development
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -188,12 +191,17 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
 
     @Override
 <<<<<<< HEAD
+<<<<<<< HEAD
     public List<ProductionOrderSummaryDto> getCompleted() {
         List<ProductionOrderSummaryEntity> persistedProductionOrders = repository.findCompletedAndUnassociated();
 =======
     public List<ProductionOrderSummaryDto> getCompletedWithoutComposed() {
         List<ProductionOrderSummaryEntity> persistedProductionOrders = repository.findCompletedWithoutComposed();
 >>>>>>> 342b74d (Merge pull request #26 from TDEquivalence/feature/MES-230)
+=======
+    public List<ProductionOrderSummaryDto> getCompletedWithoutComposed() {
+        List<ProductionOrderSummaryEntity> persistedProductionOrders = repository.findCompletedWithoutComposed();
+>>>>>>> development
         return summaryConverter.toDto(persistedProductionOrders);
     }
 }

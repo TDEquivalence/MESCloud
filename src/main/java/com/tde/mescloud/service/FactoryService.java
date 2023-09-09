@@ -18,4 +18,5 @@ public interface FactoryService {
 
     void deleteFactoryByName(String name);
 
+    String getTimeZone();
 }

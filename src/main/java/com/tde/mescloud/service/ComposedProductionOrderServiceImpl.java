@@ -1,9 +1,18 @@
 package com.tde.mescloud.service;
 
 import com.tde.mescloud.model.converter.ComposedProductionOrderConverter;
+<<<<<<< HEAD
 import com.tde.mescloud.model.dto.ComposedProductionOrderDto;
 import com.tde.mescloud.model.dto.RequestComposedDto;
 import com.tde.mescloud.model.entity.ComposedProductionOrderEntity;
+=======
+import com.tde.mescloud.model.converter.ComposedSummaryConverter;
+import com.tde.mescloud.model.dto.ComposedProductionOrderDto;
+import com.tde.mescloud.model.dto.ComposedSummaryDto;
+import com.tde.mescloud.model.dto.RequestComposedDto;
+import com.tde.mescloud.model.entity.ComposedProductionOrderEntity;
+import com.tde.mescloud.model.entity.ComposedSummaryEntity;
+>>>>>>> development
 import com.tde.mescloud.repository.ComposedProductionOrderRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
@@ -21,6 +30,10 @@ public class ComposedProductionOrderServiceImpl implements ComposedProductionOrd
     private final ComposedProductionOrderConverter converter;
 
     private final ProductionOrderService productionOrderService;
+<<<<<<< HEAD
+=======
+    private final ComposedSummaryConverter summaryConverter;
+>>>>>>> development
 
     private static final String CODE_PREFIX = "CP";
     private static final int CODE_INITIAL_VALUE = 0;
@@ -44,7 +57,11 @@ public class ComposedProductionOrderServiceImpl implements ComposedProductionOrd
     }
 
     private void setProductionOrdersWithComposed(List<Long> validProductionOrderIds, ComposedProductionOrderEntity composedEntity) {
+<<<<<<< HEAD
         for(Long id : validProductionOrderIds) {
+=======
+        for (Long id : validProductionOrderIds) {
+>>>>>>> development
             productionOrderService.findById(id).ifPresent(productionOrderEntity -> {
                 productionOrderEntity.setComposedProductionOrder(composedEntity);
                 composedEntity.getProductionOrders().add(productionOrderEntity);
@@ -54,7 +71,11 @@ public class ComposedProductionOrderServiceImpl implements ComposedProductionOrd
 
     private List<Long> getValidProductionOrders(List<Long> productionOrderIds) {
         List<Long> validProductionOrderIds = productionOrderService.findExistingIds(productionOrderIds);
+<<<<<<< HEAD
         if(validProductionOrderIds.isEmpty()) {
+=======
+        if (validProductionOrderIds.isEmpty()) {
+>>>>>>> development
             throw new IllegalArgumentException("Production Order Ids are not valid");
         }
 
@@ -103,4 +124,19 @@ public class ComposedProductionOrderServiceImpl implements ComposedProductionOrd
     public List<ComposedProductionOrderDto> getAll() {
         return converter.convertToDto(repository.findAll());
     }
+<<<<<<< HEAD
+=======
+
+    @Override
+    public List<ComposedSummaryDto> findSummarized(boolean withHits) {
+        List<ComposedSummaryEntity> composedWithoutHits = repository.findSummarized(withHits);
+        return summaryConverter.toDto(composedWithoutHits);
+    }
+
+    @Override
+    public List<ComposedSummaryDto> findCompleted() {
+        List<ComposedSummaryEntity> composedCompleted = repository.findCompleted();
+        return summaryConverter.toDto(composedCompleted);
+    }
+>>>>>>> development
 }

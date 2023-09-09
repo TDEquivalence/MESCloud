@@ -42,11 +42,7 @@ public class ProductionOrderController {
 
     @GetMapping("/completed")
     public ResponseEntity<List<ProductionOrderSummaryDto>> getCompleted() {
-<<<<<<< HEAD
-        List<ProductionOrderSummaryDto> completedOrders = service.getCompleted();
-=======
         List<ProductionOrderSummaryDto> completedOrders = service.getCompletedWithoutComposed();
->>>>>>> 342b74d (Merge pull request #26 from TDEquivalence/feature/MES-230)
         return new ResponseEntity<>(completedOrders, HttpStatus.OK);
     }
 }

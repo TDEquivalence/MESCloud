@@ -28,3 +28,6 @@ mes:
     protCountPlcTopic: ${PROT_COUNT_PLC_TOPIC}
   security:
     allowedOrigin: ${CORS_ALLOWED_ORIGIN}
+
+factory:
+  timeZone: ${FACTORY_TIMEZONE}
