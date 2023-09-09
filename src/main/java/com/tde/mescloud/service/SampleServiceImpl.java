@@ -50,13 +50,7 @@ public class SampleServiceImpl implements SampleService {
     public Optional<SampleEntity> findById(Long id) {
         return repository.findById(id);
     }
-
-    @Override
-    public Optional<SampleDto> create(RequestSampleDto requestSampleDto) {
-        return Optional.empty();
-    }
-
-
+    
     @Override
     public List<SampleDto> getAll() {
         return converter.convertToDto(repository.findAll());
