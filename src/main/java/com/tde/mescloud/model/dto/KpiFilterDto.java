@@ -8,11 +8,11 @@ import lombok.Setter;
 
 @Setter
 @Getter
-public class KpiFilterDto implements Searchable<CounterRecordWinnowDto.CounterRecordProperty> {
+public class KpiFilterDto implements Searchable<CounterRecordWinnow.Property> {
 
     private TimeMode timeMode;
     @JsonUnwrapped
-    private WinnowSearch<CounterRecordWinnowDto.CounterRecordProperty> search;
+    private WinnowSearch<CounterRecordWinnow.Property> search;
 
     public enum TimeMode {
         DAY,

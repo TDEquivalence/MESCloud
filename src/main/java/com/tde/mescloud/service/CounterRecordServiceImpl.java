@@ -39,7 +39,7 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     }
 
     @Override
-    public PaginatedCounterRecordsDto winnowConclusionRecordsPaginated(CounterRecordWinnowDto filter) {
+    public PaginatedCounterRecordsDto winnowConclusionRecordsPaginated(CounterRecordWinnow filter) {
         int requestedRecords = filter.getTake();
         filter.setTake(filter.getTake() + 1);
 
@@ -60,7 +60,7 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     }
 
     @Override
-    public PaginatedCounterRecordsDto getFilteredAndPaginated(CounterRecordWinnowDto filterDto) {
+    public PaginatedCounterRecordsDto getFilteredAndPaginated(CounterRecordWinnow filterDto) {
         int requestedRecords = filterDto.getTake();
         filterDto.setTake(filterDto.getTake() + 1);
 

@@ -9,15 +9,14 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class CounterRecordWinnowDto extends AbstractPaginatedWinnow<CounterRecordWinnowDto.CounterRecordProperty> {
+public class CounterRecordWinnow extends AbstractPaginatedWinnow<CounterRecordWinnow.Property> {
 
     private static final String DEFAULT_SORTING_VALUE = "DESCENDING";
 
     @AllArgsConstructor
     @Getter
-    public enum CounterRecordProperty implements WinnowProperty {
-        //TODO: These values are the same used in the Repo. Replace by Constants & think about defining the searchable properties
-        //through another way.
+    public enum Property implements WinnowProperty {
+
         PRODUCTION_ORDER_CODE("productionOrderCode", WinnowDataType.STRING),
         EQUIPMENT_OUTPUT_ALIAS("equipmentOutputAlias", WinnowDataType.STRING),
         EQUIPMENT_ALIAS("equipmentAlias", WinnowDataType.STRING),

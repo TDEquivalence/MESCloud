@@ -8,9 +8,9 @@ public interface CounterRecordService {
 
     List<CounterRecordDto> winnowConclusionRecordsKpi(KpiFilterDto filterDto);
 
-    PaginatedCounterRecordsDto winnowConclusionRecordsPaginated(CounterRecordWinnowDto filterDto);
+    PaginatedCounterRecordsDto winnowConclusionRecordsPaginated(CounterRecordWinnow filterDto);
 
-    PaginatedCounterRecordsDto getFilteredAndPaginated(CounterRecordWinnowDto filterDto);
+    PaginatedCounterRecordsDto getFilteredAndPaginated(CounterRecordWinnow filterDto);
 
     List<CounterRecordDto> save(PlcMqttDto equipmentCountsMqttDTO);
 

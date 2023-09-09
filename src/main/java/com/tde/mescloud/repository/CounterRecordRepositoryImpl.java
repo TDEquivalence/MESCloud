@@ -1,6 +1,6 @@
 package com.tde.mescloud.repository;
 
-import com.tde.mescloud.model.dto.CounterRecordWinnowDto;
+import com.tde.mescloud.model.dto.CounterRecordWinnow;
 import com.tde.mescloud.model.dto.KpiFilterDto;
 import com.tde.mescloud.model.dto.filter.Searchable;
 import com.tde.mescloud.model.dto.filter.Sortable;
@@ -39,7 +39,7 @@ public class CounterRecordRepositoryImpl {
     private static final String SQL_WILDCARD = "%";
 
 
-    public List<CounterRecordEntity> getFilteredAndPaginated(CounterRecordWinnowDto filterDto) {
+    public List<CounterRecordEntity> getFilteredAndPaginated(CounterRecordWinnow filterDto) {
 
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<CounterRecordEntity> query = cb.createQuery(CounterRecordEntity.class);
@@ -68,7 +68,7 @@ public class CounterRecordRepositoryImpl {
                 .getResultList();
     }
 
-    public List<CounterRecordConclusionEntity> findLastPerProductionOrder(CounterRecordWinnowDto filterDto) {
+    public List<CounterRecordConclusionEntity> findLastPerProductionOrder(CounterRecordWinnow filterDto) {
 
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<CounterRecordConclusionEntity> query = criteriaBuilder.createQuery(CounterRecordConclusionEntity.class);
@@ -121,12 +121,12 @@ public class CounterRecordRepositoryImpl {
                 .getResultList();
     }
 
-    private void addPredicates(Searchable<CounterRecordWinnowDto.CounterRecordProperty> filter,
+    private void addPredicates(Searchable<CounterRecordWinnow.Property> filter,
                                List<Predicate> predicates,
                                CriteriaBuilder criteriaBuilder,
                                Root<CounterRecordEntity> counterRecordRoot) {
 
-        for (CounterRecordWinnowDto.CounterRecordProperty counterRecordProperty : filter.getSearch().getKeys()) {
+        for (CounterRecordWinnow.Property counterRecordProperty : filter.getSearch().getKeys()) {
             Predicate predicate;
             switch (counterRecordProperty.getName()) {
                 case COMPUTED_VALUE_PROP -> {
@@ -151,12 +151,12 @@ public class CounterRecordRepositoryImpl {
         }
     }
 
-    private void addPredicatesConclusion(Searchable<CounterRecordWinnowDto.CounterRecordProperty> filter,
+    private void addPredicatesConclusion(Searchable<CounterRecordWinnow.Property> filter,
                                          List<Predicate> predicates,
                                          CriteriaBuilder criteriaBuilder,
                                          Root<CounterRecordConclusionEntity> counterRecordRoot) {
 
-        for (CounterRecordWinnowDto.CounterRecordProperty counterRecordProperty : filter.getSearch().getKeys()) {
+        for (CounterRecordWinnow.Property counterRecordProperty : filter.getSearch().getKeys()) {
             Predicate predicate;
             switch (counterRecordProperty.getName()) {
                 case COMPUTED_VALUE_PROP -> {
@@ -185,12 +185,12 @@ public class CounterRecordRepositoryImpl {
         return criteriaBuilder.like(criteriaBuilder.upper(path.as(String.class)), value.toUpperCase());
     }
 
-    private void addSortOrders(Sortable<CounterRecordWinnowDto.CounterRecordProperty> filter,
+    private void addSortOrders(Sortable<CounterRecordWinnow.Property> filter,
                                List<Order> orders,
                                CriteriaBuilder criteriaBuilder,
                                Root<CounterRecordEntity> counterRecordRoot) {
 
-        for (CounterRecordWinnowDto.CounterRecordProperty counterRecordProperty : filter.getSort().getKeys()) {
+        for (CounterRecordWinnow.Property counterRecordProperty : filter.getSort().getKeys()) {
 
             Order order = filter.getSort().isDescendingSort(counterRecordProperty) ?
                     criteriaBuilder.desc(getPath(counterRecordRoot, counterRecordProperty.getName())) :
@@ -199,12 +199,12 @@ public class CounterRecordRepositoryImpl {
         }
     }
 
-    private void addSortOrdersConclusion(Sortable<CounterRecordWinnowDto.CounterRecordProperty> filter,
+    private void addSortOrdersConclusion(Sortable<CounterRecordWinnow.Property> filter,
                                          List<Order> orders,
                                          CriteriaBuilder criteriaBuilder,
                                          Root<CounterRecordConclusionEntity> counterRecordRoot) {
 
-        for (CounterRecordWinnowDto.CounterRecordProperty counterRecordProperty : filter.getSort().getKeys()) {
+        for (CounterRecordWinnow.Property counterRecordProperty : filter.getSort().getKeys()) {
 
             Order order = filter.getSort().isDescendingSort(counterRecordProperty) ?
                     criteriaBuilder.desc(getPathConclusion(counterRecordRoot, counterRecordProperty.getName())) :
