@@ -52,5 +52,4 @@ public class ComposedProductionOrderController {
         List<ComposedSummaryDto> composedCompleted = composedService.findCompleted();
         return new ResponseEntity<>(composedCompleted, HttpStatus.OK);
     }
-
 }
