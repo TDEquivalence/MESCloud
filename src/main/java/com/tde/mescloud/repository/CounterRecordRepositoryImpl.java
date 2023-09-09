@@ -30,8 +30,8 @@ public class CounterRecordRepositoryImpl {
     private static final String PRODUCTION_ORDER_CODE_PROP = "code";
     private static final String COUNTING_EQUIPMENT_ALIAS_PROP = "alias";
 
-    private static final String DATE_START_FILTER_FIELD = "startDate";
-    private static final String DATE_END_FILTER_FIELD = "endDate";
+    private static final String START_DATE_FILTER_FIELD = "startDate";
+    private static final String END_DATE_FILTER_FIELD = "endDate";
     private static final String EQUIPMENT_ALIAS_FILTER_FIELD = "equipmentAlias";
     private static final String PRODUCTION_ORDER_CODE_FILTER_FIELD = "productionOrderCode";
 
@@ -40,7 +40,6 @@ public class CounterRecordRepositoryImpl {
 
 
     public List<CounterRecordEntity> getFilteredAndPaginated(CounterRecordWinnow filterDto) {
-
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<CounterRecordEntity> query = cb.createQuery(CounterRecordEntity.class);
         Root<CounterRecordEntity> root = query.from(CounterRecordEntity.class);
@@ -133,11 +132,11 @@ public class CounterRecordRepositoryImpl {
                     int computedValue = Integer.parseInt(filter.getSearch().getValue(counterRecordProperty));
                     predicate = criteriaBuilder.greaterThanOrEqualTo(counterRecordRoot.get(COMPUTED_VALUE_PROP), computedValue);
                 }
-                case DATE_START_FILTER_FIELD -> {
+                case START_DATE_FILTER_FIELD -> {
                     ZonedDateTime dateStart = ZonedDateTime.parse(filter.getSearch().getValue(counterRecordProperty));
                     predicate = criteriaBuilder.greaterThanOrEqualTo(counterRecordRoot.get(REGISTERED_AT_PROP), dateStart);
                 }
-                case DATE_END_FILTER_FIELD -> {
+                case END_DATE_FILTER_FIELD -> {
                     ZonedDateTime dateEnd = ZonedDateTime.parse(filter.getSearch().getValue(counterRecordProperty));
                     predicate = criteriaBuilder.lessThanOrEqualTo(counterRecordRoot.get(REGISTERED_AT_PROP), dateEnd);
                 }
@@ -163,11 +162,11 @@ public class CounterRecordRepositoryImpl {
                     int computedValue = Integer.parseInt(filter.getSearch().getValue(counterRecordProperty));
                     predicate = criteriaBuilder.greaterThanOrEqualTo(counterRecordRoot.get(COMPUTED_VALUE_PROP), computedValue);
                 }
-                case DATE_START_FILTER_FIELD -> {
+                case START_DATE_FILTER_FIELD -> {
                     ZonedDateTime dateStart = ZonedDateTime.parse(filter.getSearch().getValue(counterRecordProperty));
                     predicate = criteriaBuilder.greaterThanOrEqualTo(counterRecordRoot.get(REGISTERED_AT_PROP), dateStart);
                 }
-                case DATE_END_FILTER_FIELD -> {
+                case END_DATE_FILTER_FIELD -> {
                     ZonedDateTime dateEnd = ZonedDateTime.parse(filter.getSearch().getValue(counterRecordProperty));
                     predicate = criteriaBuilder.lessThanOrEqualTo(counterRecordRoot.get(REGISTERED_AT_PROP), dateEnd);
                 }
