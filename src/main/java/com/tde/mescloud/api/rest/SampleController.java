@@ -39,4 +39,10 @@ public class SampleController {
         List<SampleDto> sampleDtos = sampleService.getAll();
         return new ResponseEntity<>(sampleDtos, HttpStatus.OK);
     }
+
+    @GetMapping
+    public ResponseEntity<List<SampleDto>> findAll() {
+        List<SampleDto> sampleDtos = sampleService.getAll();
+        return new ResponseEntity<>(sampleDtos, HttpStatus.OK);
+    }
 }

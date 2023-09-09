@@ -16,6 +16,5 @@ public interface SampleService {
     Optional<SampleEntity> findById(Long id);
 
     Optional<SampleDto> create(RequestSampleDto requestSampleDto);
-
     List<SampleDto> getAll();
 }

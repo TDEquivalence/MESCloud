@@ -119,4 +119,9 @@ public class HitServiceImpl implements HitService {
     public List<HitDto> getAll() {
         return converter.convertToDto(repository.findAll());
     }
+
+    @Override
+    public List<HitDto> getAll() {
+        return converter.convertToDto(repository.findAll());
+    }
 }
