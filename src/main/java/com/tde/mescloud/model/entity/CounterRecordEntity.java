@@ -26,4 +26,5 @@ public class CounterRecordEntity {
     private ProductionOrderEntity productionOrder;
     @Temporal(TemporalType.TIMESTAMP)
     private Date registeredAt;
+    private Boolean isValidForProduction;
 }

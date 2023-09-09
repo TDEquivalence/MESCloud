@@ -18,4 +18,6 @@ public interface HitService {
     void delete(HitEntity hitEntity);
 
     Optional<HitEntity> findById(Long id);
+
+    List<HitDto> getAll();
 }

@@ -581,6 +581,36 @@
 								}
 							},
 							"response": []
+						},
+						{
+							"name": "ProductionOrder -> Get completed",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{jwtoken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{url}}:{{port}}/api/production-orders/completed",
+									"host": [
+										"{{url}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"production-orders",
+										"completed"
+									]
+								}
+							},
+							"response": []
 						}
 					]
 				},

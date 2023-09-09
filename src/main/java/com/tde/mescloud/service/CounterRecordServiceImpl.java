@@ -138,6 +138,7 @@ public class CounterRecordServiceImpl implements CounterRecordService {
         equipmentOutputEntity.setId(equipmentOutput.getId());
         counterRecord.setEquipmentOutput(equipmentOutputEntity);
         counterRecord.setEquipmentOutputAlias(equipmentOutput.getAlias());
+        counterRecord.setIsValidForProduction(equipmentOutput.isValidForProduction());
     }
 
     private void setProductionOrder(CounterRecordEntity counterRecord, String productionOrderCode) {
