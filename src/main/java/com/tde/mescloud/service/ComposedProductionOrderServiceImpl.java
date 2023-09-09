@@ -26,7 +26,6 @@ public class ComposedProductionOrderServiceImpl implements ComposedProductionOrd
     private final ProductionOrderService productionOrderService;
     private final ComposedSummaryConverter summaryConverter;
 
-
     private static final String CODE_PREFIX = "CP";
     private static final int CODE_INITIAL_VALUE = 0;
 
@@ -59,7 +58,6 @@ public class ComposedProductionOrderServiceImpl implements ComposedProductionOrd
 
     private List<Long> getValidProductionOrders(List<Long> productionOrderIds) {
         List<Long> validProductionOrderIds = productionOrderService.findExistingIds(productionOrderIds);
-
         if (validProductionOrderIds.isEmpty()) {
             throw new IllegalArgumentException("Production Order Ids are not valid");
         }

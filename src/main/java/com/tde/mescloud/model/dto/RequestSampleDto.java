@@ -10,6 +10,5 @@ import java.util.List;
 public class RequestSampleDto {
 
     private List<Long> productionOrderIds;
-
     private int amount;
 }

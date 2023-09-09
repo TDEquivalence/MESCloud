@@ -18,13 +18,15 @@ import java.util.Optional;
 @Log
 public class HitServiceImpl implements HitService {
 
+    public static final float TCA_LIMIT = 0.695f;
+
     private final SampleService sampleService;
     private final HitRepository repository;
     private final HitConverter converter;
 
     @Override
     public List<HitDto> create(RequestHitDto requestHitDto) {
-        if (requestHitDto.getHits().isEmpty() ||requestHitDto.getHits() == null) {
+        if (requestHitDto.getHits() == null || requestHitDto.getHits().isEmpty()) {
             throw new IllegalArgumentException("Hits list are not valid");
         }
 
@@ -56,8 +58,21 @@ public class HitServiceImpl implements HitService {
 
         saveHitAndSetSample(sample, hits);
         setTcaAverageInSample(sample, hits);
+        setReliability(sample);
+
+        sampleService.saveAndUpdate(sample);
 
         return converter.convertToDto(hits);
+    }
+
+    private void setReliability(SampleEntity sample) {
+        List<HitEntity> validHitsAboveTcaLimit = repository.findValidHitsAboveTcaLimit(sample.getId(), TCA_LIMIT);
+        double reliability = calculateSampleReliability(validHitsAboveTcaLimit.size(), sample.getAmount());
+        sample.setReliability(reliability);
+    }
+
+    private double calculateSampleReliability(int numOfHitsAboveTcaLimit, int sampleAmount) {
+        return (1 - (double) numOfHitsAboveTcaLimit / sampleAmount) * 100;
     }
 
     private void saveHitAndSetSample(SampleEntity sample, List<HitEntity> hits) {
@@ -68,14 +83,13 @@ public class HitServiceImpl implements HitService {
     }
 
     private void setTcaAverageInSample(SampleEntity sample, List<HitEntity> hits) {
-        int tcaAverage = (int) getTcaAverage(hits);
+        double tcaAverage = getTcaAverage(hits);
         sample.setTcaAverage(tcaAverage);
-        sampleService.saveAndUpdate(sample);
     }
 
-    private float getTcaAverage(List<HitEntity> hits) {
+    private double getTcaAverage(List<HitEntity> hits) {
         if (hits == null || hits.isEmpty()) {
-            return 0.0f;
+            return 0.0;
         }
 
         float tcaSum = 0;
@@ -89,7 +103,7 @@ public class HitServiceImpl implements HitService {
     private SampleEntity getSample(List<HitDto> hitList) {
         HitDto hitDto = hitList.get(0);
         Optional<SampleEntity> sample = sampleService.findById(hitDto.getSampleId());
-        if(sample.isEmpty()) {
+        if (sample.isEmpty()) {
             throw new IllegalArgumentException("Sample not found");
         }
 

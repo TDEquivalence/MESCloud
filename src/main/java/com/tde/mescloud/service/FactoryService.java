@@ -17,4 +17,6 @@ public interface FactoryService {
     void deleteFactoryById(Long id);
 
     void deleteFactoryByName(String name);
+
+    String getTimeZone();
 }

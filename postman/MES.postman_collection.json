@@ -193,7 +193,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n   \"jsonType\": \"ProductionOrderInit\",\r\n   \"productionOrderCode\": \"PO2301\",\r\n   \"equipmentCode\":\"OBO001\",\r\n   \"equipmentStatus\":2,\r\n   \"counters\":[\r\n      {\r\n         \"outputCode\":\"OBO001-001\",\r\n         \"value\":250\r\n      },\r\n      {\r\n         \"outputCode\":\"OBO001-002\",\r\n         \"value\":220\r\n      }\r\n   ]\r\n}",
+							"raw": "{\r\n  \"jsonType\": \"ConfigurationResponse\",\r\n  \"equipmentCode\": \"OBO001\",\r\n  \"productionOrderCode\": \"\",\r\n  \"equipmentStatus\": 0,\r\n  \"alarmCode\": 0,\r\n  \"counters\": [\r\n    {\r\n      \"outputCode\": \"OBO001-001\",\r\n      \"value\": 0\r\n    },\r\n    {\r\n      \"outputCode\": \"OBO001-002\",\r\n      \"value\": 0\r\n    }\r\n  ]\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -238,7 +238,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n   \"jsonType\": \"ProductionCount\",\r\n   \"productionOrderCode\": \"PO2301\",\r\n   \"equipmentCode\":\"OBO001\",\r\n   \"equipmentStatus\":0,\r\n   \"counters\":[\r\n      {\r\n         \"outputCode\":\"OBO001-001\",\r\n         \"value\":350\r\n      },\r\n      {\r\n         \"outputCode\":\"OBO001-002\",\r\n         \"value\":320\r\n      }\r\n   ]\r\n}",
+							"raw": "{\r\n   \"jsonType\": \"ProductionCount\",\r\n   \"productionOrderCode\": \"OBOPO2300003\",\r\n   \"equipmentCode\":\"OBO001\",\r\n   \"equipmentStatus\":0,\r\n   \"counters\":[\r\n      {\r\n         \"outputCode\":\"OBO001-001\",\r\n         \"value\":350\r\n      },\r\n      {\r\n         \"outputCode\":\"OBO001-002\",\r\n         \"value\":320\r\n      }\r\n   ]\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -447,7 +447,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"skip\": 0,\r\n    \"take\": 15,\r\n    \"searchValueByName\": {\r\n        \"endDate\": \"2023-08-19T23:59:59.999Z\",\r\n        \"startDate\": \"2023-08-15T00:00:00.000Z\"\r\n    },\r\n    \"sortValueByName\": {}\r\n}",
+									"raw": "{\r\n    \"skip\": 0,\r\n    \"take\": 15,\r\n    \"searchValueByName\": {\r\n        \"endDate\": \"2023-08-19T23:59:59.999Z\",\r\n        \"startDate\": \"2023-09-06T00:00:00.000Z\"\r\n    },\r\n    \"sortValueByName\": {}\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -486,7 +486,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"take\": 10,\r\n    \"skip\": 0,\r\n    \"searchValueByName\": {\r\n        \"startDate\": \"2023-08-15T00:00:00.000Z\",\r\n        \"endDate\": \"2023-08-18T23:59:59.000Z\",\r\n        \"equipmentAlias\": \"Máquina 1\"\r\n    },\r\n    \"sortValueByName\": {\r\n        \"computedValue\": \"ASC\"\r\n    }\r\n}",
+									"raw": "{\r\n    \"take\": 10,\r\n    \"skip\": 0,\r\n    \"searchValueByName\": {\r\n        \"startDate\": \"2023-08-14T00:00:00.000Z\",\r\n        \"endDate\": \"2023-09-06T23:59:59.000Z\"\r\n    },\r\n    \"sortValueByName\": {\r\n        \"computedValue\": \"ASC\"\r\n    }\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -787,6 +787,292 @@
 										"api",
 										"kpi",
 										"equipment-counts"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "ComposedProductionOrder",
+					"item": [
+						{
+							"name": "Composed -> Find All",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{jwtoken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/api/composed-production-order",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"composed-production-order"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Composed -> Create",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{jwtoken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"productionOrderIds\": [2, 3, 4]\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8080/api/composed-production-order",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"composed-production-order"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Composed -> Create Sample",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{jwtoken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"productionOrderIds\": [5, 6, 7],\r\n    \"amount\": 120\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8080/api/sample",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"sample"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Composed -> Find All NO Hits",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{jwtoken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/api/composed-production-order/insert-hits",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"composed-production-order",
+										"insert-hits"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Composed -> Find All WITH hits",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{jwtoken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/api/composed-production-order/approval",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"composed-production-order",
+										"approval"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Composed -> Find Completed",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{jwtoken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/api/composed-production-order/completed",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"composed-production-order",
+										"completed"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Hit",
+					"item": [
+						{
+							"name": "Hit -> Create",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{jwtoken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"hits\": [\r\n        {\r\n            \"sampleId\": 2,\r\n            \"tca\": 0.3982,\r\n            \"isValidForReliability\": true\r\n        },\r\n        {\r\n            \"sampleId\": 2,\r\n            \"tca\": 0.3182,\r\n            \"isValidForReliability\": true\r\n        },\r\n                {\r\n            \"sampleId\": 2,\r\n            \"tca\": 0.7282,\r\n            \"isValidForReliability\": true\r\n        }\r\n    ]\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8080/api/hit",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"hit"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Batch",
+					"item": [
+						{
+							"name": "Batch -> Create",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{jwtoken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"composedId\": 3,\r\n  \"batch\": {\r\n    \"code\": \"BATCH_001\",\r\n    \"isApproved\": true\r\n  }\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8080/api/batch",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"batch"
 									]
 								}
 							},

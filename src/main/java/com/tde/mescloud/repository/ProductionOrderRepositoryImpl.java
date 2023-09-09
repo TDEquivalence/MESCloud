@@ -11,8 +11,8 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-@Repository
 @AllArgsConstructor
+@Repository
 public class ProductionOrderRepositoryImpl {
 
     private EntityManager entityManager;

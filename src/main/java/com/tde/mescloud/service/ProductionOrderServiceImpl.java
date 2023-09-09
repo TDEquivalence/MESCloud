@@ -186,12 +186,6 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     }
 
     @Override
-    public List<ProductionOrderSummaryDto> getCompleted() {
-        List<ProductionOrderSummaryEntity> persistedProductionOrders = repository.findCompletedAndUnassociated();
-        return summaryConverter.toDto(persistedProductionOrders);
-    }
-
-    @Override
     public List<ProductionOrderSummaryDto> getCompletedWithoutComposed() {
         List<ProductionOrderSummaryEntity> persistedProductionOrders = repository.findCompletedWithoutComposed();
         return summaryConverter.toDto(persistedProductionOrders);

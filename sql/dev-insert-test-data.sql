@@ -26,11 +26,7 @@ VALUES
 ('OBO001', 'Máquina 1', 1, 1, 60, 1),
 ('OBO002', 'Máquina 2', 1, 1, 120, 2),
 ('OBO003', 'Máquina 3', 1, 0, 120, null),
-('OBO004', 'Máquina 4', 1, 0, 180, 3),
-('OBO005', 'Máquina 5', 1, 0, 60, null),
-('OBO006', 'Máquina 6', 1, 0, 180, null),
-('OBO007', 'Máquina 7', 1, 0, 120, null),
-('OBO008', 'Máquina 8', 1, 0, 180, null);
+('OBO004', 'Máquina 4', 1, 0, 180, 3);
 
 INSERT INTO equipment_output_alias
 (alias)

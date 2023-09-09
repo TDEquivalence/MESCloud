@@ -12,6 +12,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,25 +29,25 @@ public class SampleServiceImpl implements SampleService {
 
     @Override
     public SampleDto create(RequestSampleDto requestSampleDto) {
-        ComposedProductionOrderEntity composed = createComposed(requestSampleDto);
-        return createSample(requestSampleDto, composed);
+        ComposedProductionOrderEntity composedEntity = createComposed(requestSampleDto);
+        return createSample(requestSampleDto, composedEntity);
     }
 
     private SampleDto createSample(RequestSampleDto requestSampleDto, ComposedProductionOrderEntity composedEntity) {
         SampleEntity sampleEntity = new SampleEntity();
         sampleEntity.setAmount(requestSampleDto.getAmount());
         sampleEntity.setComposedProductionOrder(composedEntity);
-        saveAndUpdate(sampleEntity);
+        sampleEntity.setCreatedAt(new Date());
 
+        saveAndUpdate(sampleEntity);
         return converter.convertToDto(sampleEntity);
     }
 
     private ComposedProductionOrderEntity createComposed(RequestSampleDto requestSampleDto) {
         Optional<ComposedProductionOrderDto> composedDto = composedService.create(requestSampleDto.getProductionOrderIds());
-        if(composedDto.isEmpty()) {
-            return null;
+        if (composedDto.isEmpty()) {
+            throw new IllegalStateException("Composed Production Order creation error");
         }
-
         return composedConverter.convertToEntity(composedDto.get());
     }
 
@@ -63,6 +64,7 @@ public class SampleServiceImpl implements SampleService {
     public Optional<SampleEntity> findById(Long id) {
         return repository.findById(id);
     }
+
 
     @Override
     public List<SampleDto> getAll() {
