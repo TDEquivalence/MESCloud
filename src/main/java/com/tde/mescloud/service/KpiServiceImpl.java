@@ -1,7 +1,7 @@
 package com.tde.mescloud.service;
 
 import com.tde.mescloud.model.dto.CounterRecordDto;
-import com.tde.mescloud.model.dto.CounterRecordFilterDto;
+import com.tde.mescloud.model.dto.CounterRecordWinnowDto;
 import com.tde.mescloud.model.dto.CountingEquipmentKpiDto;
 import com.tde.mescloud.model.dto.KpiFilterDto;
 import com.tde.mescloud.utility.DateUtil;
@@ -31,8 +31,8 @@ public class KpiServiceImpl implements KpiService {
 
         Map<String, CountingEquipmentKpiDto> equipmentKpiByEquipmentAlias = new LinkedHashMap<>();
 
-        Instant startDate = getPropertyAsInstant(kpiFilter, CounterRecordFilterDto.CounterRecordProperty.START_DATE);
-        Instant endDate = getPropertyAsInstant(kpiFilter, CounterRecordFilterDto.CounterRecordProperty.END_DATE);
+        Instant startDate = getPropertyAsInstant(kpiFilter, CounterRecordWinnowDto.CounterRecordProperty.START_DATE);
+        Instant endDate = getPropertyAsInstant(kpiFilter, CounterRecordWinnowDto.CounterRecordProperty.END_DATE);
         //TODO: TimeMode should be applied here
         final int spanInDays = DateUtil.spanInDays(startDate, endDate);
 
@@ -51,7 +51,7 @@ public class KpiServiceImpl implements KpiService {
     }
 
     //TODO: This should be a filter behavior
-    private Instant getPropertyAsInstant(KpiFilterDto filter, CounterRecordFilterDto.CounterRecordProperty counterRecordProperty) {
+    private Instant getPropertyAsInstant(KpiFilterDto filter, CounterRecordWinnowDto.CounterRecordProperty counterRecordProperty) {
         return DateUtil.convertToInstant(filter.getSearch().getValue(counterRecordProperty));
     }
 }

@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class FilterSearch<T extends SearchableProperty> {
+public class WinnowSearch<T extends WinnowProperty> {
 
     @JsonProperty("searchValueByName")
     private Map<T, String> searchValueByName;

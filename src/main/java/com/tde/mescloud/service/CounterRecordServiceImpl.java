@@ -8,7 +8,6 @@ import com.tde.mescloud.model.entity.EquipmentOutputEntity;
 import com.tde.mescloud.model.entity.ProductionOrderEntity;
 import com.tde.mescloud.repository.CounterRecordRepository;
 import com.tde.mescloud.repository.ProductionOrderRepository;
-import com.tde.mescloud.utility.DateUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
@@ -40,7 +39,7 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     }
 
     @Override
-    public PaginatedCounterRecordsDto winnowConclusionRecordsPaginated(CounterRecordFilterDto filter) {
+    public PaginatedCounterRecordsDto winnowConclusionRecordsPaginated(CounterRecordWinnowDto filter) {
         int requestedRecords = filter.getTake();
         filter.setTake(filter.getTake() + 1);
 
@@ -61,7 +60,7 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     }
 
     @Override
-    public PaginatedCounterRecordsDto getFilteredAndPaginated(CounterRecordFilterDto filterDto) {
+    public PaginatedCounterRecordsDto getFilteredAndPaginated(CounterRecordWinnowDto filterDto) {
         int requestedRecords = filterDto.getTake();
         filterDto.setTake(filterDto.getTake() + 1);
 

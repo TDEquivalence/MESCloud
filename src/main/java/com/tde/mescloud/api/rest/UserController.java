@@ -29,6 +29,11 @@ public class UserController {
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
+//    @PostMapping("/winnow")
+//    public ResponseEntity<List<UserDto>> winnow(UserWinnowDto winnow) {
+//        return new ResponseEntity<>(null, HttpStatus.OK);
+//    }
+
     @PostMapping("/update")
     public ResponseEntity<UserDto> updateUser(@RequestBody UserDto user) throws UserNotFoundException {
         UserDto userDto = userService.updateUser(user);

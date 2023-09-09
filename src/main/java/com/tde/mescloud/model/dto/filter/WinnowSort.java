@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class FilterSort<T extends SearchableProperty> {
+public class WinnowSort<T extends WinnowProperty> {
 
     private static final String ASCENDING = "ASC";
     private static final String DESCENDING = "DESC";

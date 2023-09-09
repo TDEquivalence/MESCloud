@@ -1,6 +1,6 @@
 package com.tde.mescloud.model.dto.filter;
 
-public interface Searchable<T extends SearchableProperty> {
+public interface Searchable<T extends WinnowProperty> {
 
-    FilterSearch<T> getSearch();
+    WinnowSearch<T> getSearch();
 }
