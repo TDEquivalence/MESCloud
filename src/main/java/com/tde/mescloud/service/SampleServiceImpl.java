@@ -12,6 +12,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -29,6 +30,7 @@ public class SampleServiceImpl implements SampleService {
     public Optional<SampleDto> create(RequestSampleDto requestSampleDto) {
         ComposedProductionOrderEntity composedEntity = createComposed(requestSampleDto);
 
+<<<<<<< HEAD
         if(composedEntity == null) {
             return Optional.empty();
         }
@@ -37,6 +39,11 @@ public class SampleServiceImpl implements SampleService {
         sampleDto.setAmount(requestSampleDto.getAmount());
 
         SampleEntity sampleEntity = converter.convertToEntity(sampleDto);
+=======
+    private SampleDto createSample(RequestSampleDto requestSampleDto, ComposedProductionOrderEntity composedEntity) {
+        SampleEntity sampleEntity = new SampleEntity();
+        sampleEntity.setAmount(requestSampleDto.getAmount());
+>>>>>>> 721d0ac (Merge branch 'development' into bug/MES-238)
         sampleEntity.setComposedProductionOrder(composedEntity);
         saveAndUpdate(sampleEntity);
 
@@ -63,5 +70,11 @@ public class SampleServiceImpl implements SampleService {
     @Override
     public Optional<SampleEntity> findById(Long id) {
         return repository.findById(id);
+    }
+
+
+    @Override
+    public List<SampleDto> getAll() {
+        return converter.convertToDto(repository.findAll());
     }
 }

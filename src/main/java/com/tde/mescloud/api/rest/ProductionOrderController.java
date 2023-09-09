@@ -21,7 +21,7 @@ public class ProductionOrderController {
 
     @PostMapping
     public ResponseEntity<ProductionOrderDto> create(@RequestBody ProductionOrderDto requestProductionOrder) {
-        Optional<ProductionOrderDto> productionOrderOpt = productionOrderService.create(requestProductionOrder);
+        Optional<ProductionOrderDto> productionOrderOpt = service.create(requestProductionOrder);
         if (productionOrderOpt.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
