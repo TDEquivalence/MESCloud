@@ -110,7 +110,7 @@ public class ComposedProductionOrderServiceImpl implements ComposedProductionOrd
 
     @Override
     public List<ComposedSummaryDto> findSummarized(boolean withHits) {
-        List<ComposedSummaryEntity> composedWithoutHits = repository.findSummarized(withHits);
+        List<ComposedSummaryEntity> composedWithoutHits = repository.getOpenComposedSummaries(withHits);
         return summaryConverter.toDto(composedWithoutHits);
     }
 
