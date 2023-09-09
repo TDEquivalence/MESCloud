@@ -21,7 +21,7 @@ public class ProductionOrderController {
 
     @PostMapping
     public ResponseEntity<ProductionOrderDto> create(@RequestBody ProductionOrderDto requestProductionOrder) {
-        Optional<ProductionOrderDto> productionOrderOpt = productionOrderService.create(requestProductionOrder);
+        Optional<ProductionOrderDto> productionOrderOpt = service.create(requestProductionOrder);
         if (productionOrderOpt.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -42,7 +42,11 @@ public class ProductionOrderController {
 
     @GetMapping("/completed")
     public ResponseEntity<List<ProductionOrderSummaryDto>> getCompleted() {
+<<<<<<< HEAD
+        List<ProductionOrderSummaryDto> completedOrders = service.getCompleted();
+=======
         List<ProductionOrderSummaryDto> completedOrders = service.getCompletedWithoutComposed();
+>>>>>>> 342b74d (Merge pull request #26 from TDEquivalence/feature/MES-230)
         return new ResponseEntity<>(completedOrders, HttpStatus.OK);
     }
 }

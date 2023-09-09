@@ -1,22 +1,6 @@
-DROP VIEW IF EXISTS counter_record_production_conclusion CASCADE;
-DROP TABLE IF EXISTS batch CASCADE;
-DROP TABLE IF EXISTS hit CASCADE;
-DROP TABLE IF EXISTS sample CASCADE;
-DROP TABLE IF EXISTS production_instruction CASCADE;
-DROP TABLE IF EXISTS composed_production_order CASCADE;
-DROP TABLE IF EXISTS production_order CASCADE;
-DROP TABLE IF EXISTS production_order_recipe CASCADE;
-DROP TABLE IF EXISTS equipment_output CASCADE;
-DROP TABLE IF EXISTS equipment_output_alias CASCADE;
-DROP TABLE IF EXISTS counting_equipment CASCADE;
-DROP TABLE IF EXISTS section CASCADE;
-DROP TABLE IF EXISTS equipment_status_record CASCADE;
-DROP TABLE IF EXISTS counter_record CASCADE;
-DROP TABLE IF EXISTS users CASCADE;
-DROP TABLE IF EXISTS token CASCADE;
-DROP TABLE IF EXISTS factory_user CASCADE;
-DROP TABLE IF EXISTS factory CASCADE;
-DROP TABLE IF EXISTS ims CASCADE;
+-- Drop views
+DROP VIEW IF EXISTS production_order_summary;
+DROP VIEW IF EXISTS counter_record_production_conclusion;
 
 -- Drop tables
 DROP TABLE IF EXISTS batch;
@@ -238,6 +222,7 @@ CREATE TABLE batch (
   FOREIGN KEY (composed_production_order_id) REFERENCES composed_production_order (id)
 );
 
+-- Create views
 CREATE OR REPLACE VIEW counter_record_production_conclusion AS
 SELECT cr.id, cr.equipment_output_id, cr.equipment_output_alias, cr.real_value, cr.computed_value, cr.production_order_id, cr.registered_at, cr.is_valid_for_production, po.code AS production_order_code
 FROM (
@@ -256,16 +241,3 @@ FROM production_order po
 LEFT JOIN counter_record_production_conclusion crpc ON po.id = crpc.production_order_id
 WHERE po.is_completed = true AND po.composed_production_order_id IS NULL AND crpc.is_valid_for_production = true
 GROUP BY po.id;
-
-CREATE OR REPLACE VIEW composed_summary AS
-SELECT DISTINCT
-	cpo.id, cpo.created_at,
-	s.amount, s.reliability,
-	po.input_batch, po.source, po.gauge, po.category, po.washing_process,
-	b.id AS batch_id, b.code AS batch_code, b.is_approved AS is_batch_approved
-FROM composed_production_order cpo
-LEFT JOIN sample s ON cpo.id = s.composed_production_order_id
-LEFT JOIN hit h ON s.id = h.sample_id
-LEFT JOIN production_order po ON cpo.id = po.composed_production_order_id
-LEFT JOIN batch b ON cpo.id = b.composed_production_order_id;
-
