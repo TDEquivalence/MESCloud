@@ -128,28 +128,31 @@ public class CounterRecordRepositoryImpl {
 
         for (T counterRecordProperty : filter.getSearch().getKeys()) {
             Predicate predicate;
-            switch (counterRecordProperty.getName()) {
-                case COMPUTED_VALUE_PROP -> {
-                    //If dataType is Integer ...
-                    //Later if pathTye = INTEGER_GREAT_OR_EQUAL
+
+            switch (counterRecordProperty.getDataTypeOperation()) {
+
+                case INTEGER_GREATER_OR_EQUAL -> {
                     int computedValue = Integer.parseInt(filter.getSearch().getValue(counterRecordProperty));
-                    //predicate = criteriaBuilder.greaterThanOrEqualTo()
                     predicate = criteriaBuilder.greaterThanOrEqualTo(counterRecordRoot.get(COMPUTED_VALUE_PROP), computedValue);
                 }
-                case START_DATE_FILTER_FIELD -> {
+
+                case DATE_GREATER_OR_EQUAL -> {
                     ZonedDateTime dateStart = ZonedDateTime.parse(filter.getSearch().getValue(counterRecordProperty));
                     predicate = criteriaBuilder.greaterThanOrEqualTo(counterRecordRoot.get(REGISTERED_AT_PROP), dateStart);
                 }
-                case END_DATE_FILTER_FIELD -> {
+
+                case DATE_LESS_OR_EQUAL -> {
                     ZonedDateTime dateEnd = ZonedDateTime.parse(filter.getSearch().getValue(counterRecordProperty));
                     predicate = criteriaBuilder.lessThanOrEqualTo(counterRecordRoot.get(REGISTERED_AT_PROP), dateEnd);
                 }
+
                 default -> {
                     Path<?> path = getPath(counterRecordRoot, counterRecordProperty.getName());
                     String value = filter.getSearch().getValue(counterRecordProperty).toUpperCase();
                     predicate = createLikePredicate(path, value, criteriaBuilder);
                 }
             }
+
             predicates.add(predicate);
         }
     }
@@ -158,12 +161,12 @@ public class CounterRecordRepositoryImpl {
         return criteriaBuilder.like(criteriaBuilder.upper(path.as(String.class)), value.toUpperCase());
     }
 
-    private <T> void addSortOrders(Sortable<CounterRecordWinnow.Property> filter,
-                                   List<Order> orders,
-                                   CriteriaBuilder criteriaBuilder,
-                                   Root<T> counterRecordRoot) {
+    private <T extends WinnowProperty> void addSortOrders(Sortable<T> filter,
+                                                          List<Order> orders,
+                                                          CriteriaBuilder criteriaBuilder,
+                                                          Root<?> counterRecordRoot) {
 
-        for (CounterRecordWinnow.Property counterRecordProperty : filter.getSort().getKeys()) {
+        for (T counterRecordProperty : filter.getSort().getKeys()) {
 
             Order order = filter.getSort().isDescendingSort(counterRecordProperty) ?
                     criteriaBuilder.desc(getPath(counterRecordRoot, counterRecordProperty.getName())) :
@@ -172,22 +175,22 @@ public class CounterRecordRepositoryImpl {
         }
     }
 
-    private <T> Path<?> getPath(Root<T> counterRecordRoot, String property) {
+    private <T> Path<?> getPath(Root<T> root, String property) {
         switch (property) {
             case EQUIPMENT_ALIAS_FILTER_FIELD -> {
                 Join<T, EquipmentOutputEntity> equipmentOutputJoin =
-                        counterRecordRoot.join(EQUIPMENT_OUTPUT_PROP);
+                        root.join(EQUIPMENT_OUTPUT_PROP);
                 Join<EquipmentOutputEntity, CountingEquipmentEntity> countingEquipmentJoin =
                         equipmentOutputJoin.join(COUNTING_EQUIPMENT_PROP);
                 return countingEquipmentJoin.get(COUNTING_EQUIPMENT_ALIAS_PROP);
             }
             case PRODUCTION_ORDER_CODE_FILTER_FIELD -> {
                 Join<T, ProductionOrderEntity> productionOrderJoin =
-                        counterRecordRoot.join(PRODUCTION_ORDER_PROP);
+                        root.join(PRODUCTION_ORDER_PROP);
                 return productionOrderJoin.get(PRODUCTION_ORDER_CODE_PROP);
             }
             default -> {
-                return counterRecordRoot.get(property);
+                return root.get(property);
             }
         }
     }

@@ -7,5 +7,5 @@ public interface WinnowProperty {
     @JsonValue
     String getName();
 
-    WinnowDataType getDataType();
+    WinnowDataTypeOperation getDataTypeOperation();
 }
