@@ -4,12 +4,10 @@ import com.tde.mescloud.model.entity.ProductionOrderEntity;
 import com.tde.mescloud.model.entity.ProductionOrderSummaryEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 
-@Repository
 public interface ProductionOrderRepository extends JpaRepository<ProductionOrderEntity, Long> {
 
     Optional<ProductionOrderEntity> findByCode(String equipmentOutputCode);

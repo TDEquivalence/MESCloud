@@ -70,7 +70,7 @@ public class FactoryServiceImpl implements FactoryService {
             throw new EntityNotFoundException("Factory with name " + name + " not found.");
         }
     }
-    
+
     private void validateFactoryDto(FactoryDto factoryDto) {
         if (factoryDto == null) {
             throw new IllegalArgumentException("FactoryDto cannot be null.");

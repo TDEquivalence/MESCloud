@@ -11,8 +11,8 @@ import org.springframework.stereotype.Repository;
 import java.util.ArrayList;
 import java.util.List;
 
-@AllArgsConstructor
 @Repository
+@AllArgsConstructor
 public class ComposedProductionOrderRepositoryImpl {
 
     private static final String PROP_ID = "id";

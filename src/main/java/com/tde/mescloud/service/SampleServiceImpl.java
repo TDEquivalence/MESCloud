@@ -4,7 +4,7 @@ import com.tde.mescloud.model.converter.ComposedProductionOrderConverter;
 import com.tde.mescloud.model.converter.SampleConverter;
 import com.tde.mescloud.model.dto.ComposedProductionOrderDto;
 import com.tde.mescloud.model.dto.RequestSampleDto;
-import com.tde.mescloud.model.dto.filter.SampleDto;
+import com.tde.mescloud.model.dto.SampleDto;
 import com.tde.mescloud.model.entity.ComposedProductionOrderEntity;
 import com.tde.mescloud.model.entity.SampleEntity;
 import com.tde.mescloud.repository.SampleRepository;
@@ -27,31 +27,22 @@ public class SampleServiceImpl implements SampleService {
     private final ComposedProductionOrderConverter composedConverter;
 
     @Override
-    public Optional<SampleDto> create(RequestSampleDto requestSampleDto) {
-        ComposedProductionOrderEntity composedEntity = createComposed(requestSampleDto);
+    public SampleDto create(RequestSampleDto requestSampleDto) {
+        ComposedProductionOrderEntity composed = createComposed(requestSampleDto);
+        return createSample(requestSampleDto, composed);
+    }
 
-<<<<<<< HEAD
-        if(composedEntity == null) {
-            return Optional.empty();
-        }
-
-        SampleDto sampleDto = new SampleDto();
-        sampleDto.setAmount(requestSampleDto.getAmount());
-
-        SampleEntity sampleEntity = converter.convertToEntity(sampleDto);
-=======
     private SampleDto createSample(RequestSampleDto requestSampleDto, ComposedProductionOrderEntity composedEntity) {
         SampleEntity sampleEntity = new SampleEntity();
         sampleEntity.setAmount(requestSampleDto.getAmount());
->>>>>>> 721d0ac (Merge branch 'development' into bug/MES-238)
         sampleEntity.setComposedProductionOrder(composedEntity);
         saveAndUpdate(sampleEntity);
 
-        return Optional.of(converter.convertToDto(sampleEntity));
+        return converter.convertToDto(sampleEntity);
     }
 
     private ComposedProductionOrderEntity createComposed(RequestSampleDto requestSampleDto) {
-        Optional<ComposedProductionOrderDto> composedDto = composedService.create(requestSampleDto.getProductionOrdersIds());
+        Optional<ComposedProductionOrderDto> composedDto = composedService.create(requestSampleDto.getProductionOrderIds());
         if(composedDto.isEmpty()) {
             return null;
         }
@@ -72,7 +63,7 @@ public class SampleServiceImpl implements SampleService {
     public Optional<SampleEntity> findById(Long id) {
         return repository.findById(id);
     }
-    
+
     @Override
     public List<SampleDto> getAll() {
         return converter.convertToDto(repository.findAll());
