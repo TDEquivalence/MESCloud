@@ -12,6 +12,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,14 +37,15 @@ public class SampleServiceImpl implements SampleService {
         SampleEntity sampleEntity = new SampleEntity();
         sampleEntity.setAmount(requestSampleDto.getAmount());
         sampleEntity.setComposedProductionOrder(composedEntity);
+        sampleEntity.setCreatedAt(new Date());
 
         saveAndUpdate(sampleEntity);
         return converter.convertToDto(sampleEntity);
     }
 
     private ComposedProductionOrderEntity createComposed(RequestSampleDto requestSampleDto) {
-        Optional<ComposedProductionOrderDto> composedDto = composedService.create(requestSampleDto.getProductionOrdersIds());
-        if(composedDto.isEmpty()) {
+        Optional<ComposedProductionOrderDto> composedDto = composedService.create(requestSampleDto.getProductionOrderIds());
+        if (composedDto.isEmpty()) {
             throw new IllegalStateException("Composed Production Order creation error");
         }
         return composedConverter.convertToEntity(composedDto.get());

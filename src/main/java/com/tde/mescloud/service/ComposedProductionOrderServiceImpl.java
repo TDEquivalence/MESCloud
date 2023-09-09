@@ -1,9 +1,12 @@
 package com.tde.mescloud.service;
 
 import com.tde.mescloud.model.converter.ComposedProductionOrderConverter;
+import com.tde.mescloud.model.converter.ComposedSummaryConverter;
 import com.tde.mescloud.model.dto.ComposedProductionOrderDto;
+import com.tde.mescloud.model.dto.ComposedSummaryDto;
 import com.tde.mescloud.model.dto.RequestComposedDto;
 import com.tde.mescloud.model.entity.ComposedProductionOrderEntity;
+import com.tde.mescloud.model.entity.ComposedSummaryEntity;
 import com.tde.mescloud.repository.ComposedProductionOrderRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
@@ -21,6 +24,7 @@ public class ComposedProductionOrderServiceImpl implements ComposedProductionOrd
     private final ComposedProductionOrderConverter converter;
 
     private final ProductionOrderService productionOrderService;
+    private final ComposedSummaryConverter summaryConverter;
 
     private static final String CODE_PREFIX = "CP";
     private static final int CODE_INITIAL_VALUE = 0;
@@ -44,7 +48,7 @@ public class ComposedProductionOrderServiceImpl implements ComposedProductionOrd
     }
 
     private void setProductionOrdersWithComposed(List<Long> validProductionOrderIds, ComposedProductionOrderEntity composedEntity) {
-        for(Long id : validProductionOrderIds) {
+        for (Long id : validProductionOrderIds) {
             productionOrderService.findById(id).ifPresent(productionOrderEntity -> {
                 productionOrderEntity.setComposedProductionOrder(composedEntity);
                 composedEntity.getProductionOrders().add(productionOrderEntity);
@@ -54,7 +58,7 @@ public class ComposedProductionOrderServiceImpl implements ComposedProductionOrd
 
     private List<Long> getValidProductionOrders(List<Long> productionOrderIds) {
         List<Long> validProductionOrderIds = productionOrderService.findExistingIds(productionOrderIds);
-        if(validProductionOrderIds.isEmpty()) {
+        if (validProductionOrderIds.isEmpty()) {
             throw new IllegalArgumentException("Production Order Ids are not valid");
         }
 
@@ -102,5 +106,17 @@ public class ComposedProductionOrderServiceImpl implements ComposedProductionOrd
     @Override
     public List<ComposedProductionOrderDto> getAll() {
         return converter.convertToDto(repository.findAll());
+    }
+
+    @Override
+    public List<ComposedSummaryDto> findSummarized(boolean withHits) {
+        List<ComposedSummaryEntity> composedWithoutHits = repository.findSummarized(withHits);
+        return summaryConverter.toDto(composedWithoutHits);
+    }
+
+    @Override
+    public List<ComposedSummaryDto> findCompleted() {
+        List<ComposedSummaryEntity> composedCompleted = repository.findCompleted();
+        return summaryConverter.toDto(composedCompleted);
     }
 }

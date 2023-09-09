@@ -17,6 +17,7 @@ public class BatchEntity {
 
     @OneToOne
     @JoinColumn(name = "composed_production_order_id")
+    //TODO: Make it consonant with sample entity: either composed or composedProductionOrder on both
     private ComposedProductionOrderEntity composed;
 
     private Boolean isApproved;
