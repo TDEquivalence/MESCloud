@@ -74,10 +74,10 @@ public class CounterRecordRepositoryImpl {
         Root<CounterRecordConclusionEntity> root = query.from(CounterRecordConclusionEntity.class);
 
         List<Predicate> predicates = new ArrayList<>();
-        addPredicatesConclusion(filterDto, predicates, criteriaBuilder, root);
+        addPredicates(filterDto, predicates, criteriaBuilder, root);
 
         List<Order> orders = new ArrayList<>();
-        addSortOrdersConclusion(filterDto, orders, criteriaBuilder, root);
+        addSortOrders(filterDto, orders, criteriaBuilder, root);
         Order newestOrder = criteriaBuilder.desc(root.get(ID_PROP));
         orders.add(newestOrder);
 
@@ -101,7 +101,7 @@ public class CounterRecordRepositoryImpl {
         Root<CounterRecordConclusionEntity> root = query.from(CounterRecordConclusionEntity.class);
 
         List<Predicate> predicates = new ArrayList<>();
-        addPredicatesConclusion(filterDto, predicates, criteriaBuilder, root);
+        addPredicates(filterDto, predicates, criteriaBuilder, root);
 
         List<Order> orders = new ArrayList<>();
         //TODO: Implement sort
@@ -120,10 +120,10 @@ public class CounterRecordRepositoryImpl {
                 .getResultList();
     }
 
-    private void addPredicates(Searchable<CounterRecordWinnow.Property> filter,
-                               List<Predicate> predicates,
-                               CriteriaBuilder criteriaBuilder,
-                               Root<CounterRecordEntity> counterRecordRoot) {
+    private <T> void addPredicates(Searchable<CounterRecordWinnow.Property> filter,
+                                   List<Predicate> predicates,
+                                   CriteriaBuilder criteriaBuilder,
+                                   Root<T> counterRecordRoot) {
 
         for (CounterRecordWinnow.Property counterRecordProperty : filter.getSearch().getKeys()) {
             Predicate predicate;
@@ -150,44 +150,14 @@ public class CounterRecordRepositoryImpl {
         }
     }
 
-    private void addPredicatesConclusion(Searchable<CounterRecordWinnow.Property> filter,
-                                         List<Predicate> predicates,
-                                         CriteriaBuilder criteriaBuilder,
-                                         Root<CounterRecordConclusionEntity> counterRecordRoot) {
-
-        for (CounterRecordWinnow.Property counterRecordProperty : filter.getSearch().getKeys()) {
-            Predicate predicate;
-            switch (counterRecordProperty.getName()) {
-                case COMPUTED_VALUE_PROP -> {
-                    int computedValue = Integer.parseInt(filter.getSearch().getValue(counterRecordProperty));
-                    predicate = criteriaBuilder.greaterThanOrEqualTo(counterRecordRoot.get(COMPUTED_VALUE_PROP), computedValue);
-                }
-                case START_DATE_FILTER_FIELD -> {
-                    ZonedDateTime dateStart = ZonedDateTime.parse(filter.getSearch().getValue(counterRecordProperty));
-                    predicate = criteriaBuilder.greaterThanOrEqualTo(counterRecordRoot.get(REGISTERED_AT_PROP), dateStart);
-                }
-                case END_DATE_FILTER_FIELD -> {
-                    ZonedDateTime dateEnd = ZonedDateTime.parse(filter.getSearch().getValue(counterRecordProperty));
-                    predicate = criteriaBuilder.lessThanOrEqualTo(counterRecordRoot.get(REGISTERED_AT_PROP), dateEnd);
-                }
-                default -> {
-                    Path<?> path = getPathConclusion(counterRecordRoot, counterRecordProperty.getName());
-                    String value = filter.getSearch().getValue(counterRecordProperty).toUpperCase();
-                    predicate = createLikePredicate(path, value, criteriaBuilder);
-                }
-            }
-            predicates.add(predicate);
-        }
-    }
-
     private Predicate createLikePredicate(Path<?> path, String value, CriteriaBuilder criteriaBuilder) {
         return criteriaBuilder.like(criteriaBuilder.upper(path.as(String.class)), value.toUpperCase());
     }
 
-    private void addSortOrders(Sortable<CounterRecordWinnow.Property> filter,
-                               List<Order> orders,
-                               CriteriaBuilder criteriaBuilder,
-                               Root<CounterRecordEntity> counterRecordRoot) {
+    private <T> void addSortOrders(Sortable<CounterRecordWinnow.Property> filter,
+                                   List<Order> orders,
+                                   CriteriaBuilder criteriaBuilder,
+                                   Root<T> counterRecordRoot) {
 
         for (CounterRecordWinnow.Property counterRecordProperty : filter.getSort().getKeys()) {
 
@@ -198,51 +168,17 @@ public class CounterRecordRepositoryImpl {
         }
     }
 
-    private void addSortOrdersConclusion(Sortable<CounterRecordWinnow.Property> filter,
-                                         List<Order> orders,
-                                         CriteriaBuilder criteriaBuilder,
-                                         Root<CounterRecordConclusionEntity> counterRecordRoot) {
-
-        for (CounterRecordWinnow.Property counterRecordProperty : filter.getSort().getKeys()) {
-
-            Order order = filter.getSort().isDescendingSort(counterRecordProperty) ?
-                    criteriaBuilder.desc(getPathConclusion(counterRecordRoot, counterRecordProperty.getName())) :
-                    criteriaBuilder.asc(getPathConclusion(counterRecordRoot, counterRecordProperty.getName()));
-            orders.add(order);
-        }
-    }
-
-    private Path<?> getPath(Root<CounterRecordEntity> counterRecordRoot, String property) {
+    private <T> Path<?> getPath(Root<T> counterRecordRoot, String property) {
         switch (property) {
             case EQUIPMENT_ALIAS_FILTER_FIELD -> {
-                Join<CounterRecordEntity, EquipmentOutputEntity> equipmentOutputJoin =
+                Join<T, EquipmentOutputEntity> equipmentOutputJoin =
                         counterRecordRoot.join(EQUIPMENT_OUTPUT_PROP);
                 Join<EquipmentOutputEntity, CountingEquipmentEntity> countingEquipmentJoin =
                         equipmentOutputJoin.join(COUNTING_EQUIPMENT_PROP);
                 return countingEquipmentJoin.get(COUNTING_EQUIPMENT_ALIAS_PROP);
             }
             case PRODUCTION_ORDER_CODE_FILTER_FIELD -> {
-                Join<CounterRecordEntity, ProductionOrderEntity> productionOrderJoin =
-                        counterRecordRoot.join(PRODUCTION_ORDER_PROP);
-                return productionOrderJoin.get(PRODUCTION_ORDER_CODE_PROP);
-            }
-            default -> {
-                return counterRecordRoot.get(property);
-            }
-        }
-    }
-
-    private Path<?> getPathConclusion(Root<CounterRecordConclusionEntity> counterRecordRoot, String property) {
-        switch (property) {
-            case EQUIPMENT_ALIAS_FILTER_FIELD -> {
-                Join<CounterRecordConclusionEntity, EquipmentOutputEntity> equipmentOutputJoin =
-                        counterRecordRoot.join(EQUIPMENT_OUTPUT_PROP);
-                Join<EquipmentOutputEntity, CountingEquipmentEntity> countingEquipmentJoin =
-                        equipmentOutputJoin.join(COUNTING_EQUIPMENT_PROP);
-                return countingEquipmentJoin.get(COUNTING_EQUIPMENT_ALIAS_PROP);
-            }
-            case PRODUCTION_ORDER_CODE_FILTER_FIELD -> {
-                Join<CounterRecordConclusionEntity, ProductionOrderEntity> productionOrderJoin =
+                Join<T, ProductionOrderEntity> productionOrderJoin =
                         counterRecordRoot.join(PRODUCTION_ORDER_PROP);
                 return productionOrderJoin.get(PRODUCTION_ORDER_CODE_PROP);
             }
