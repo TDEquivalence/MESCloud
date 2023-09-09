@@ -9,6 +9,7 @@ import java.util.List;
 @Setter
 public class RequestSampleDto {
 
-    private List<Long> productionOrdersIds;
+    private List<Long> productionOrderIds;
+
     private int amount;
 }

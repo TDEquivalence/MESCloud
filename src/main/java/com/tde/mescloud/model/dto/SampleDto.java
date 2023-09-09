@@ -9,6 +9,6 @@ public class SampleDto {
 
     private Long id;
     private int amount;
-    private double tcaAverage;
-    private double reliability;
+    private int tcaAverage;
+    private int reliability;
 }

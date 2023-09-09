@@ -1,7 +1,6 @@
 package com.tde.mescloud.model.converter;
 
 import com.tde.mescloud.model.dto.EquipmentOutputDto;
-import com.tde.mescloud.model.entity.EquipmentOutputAliasEntity;
 import com.tde.mescloud.model.entity.EquipmentOutputEntity;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
@@ -20,16 +19,4 @@ public class EquipmentOutputConverterImpl implements EquipmentOutputConverter {
     public EquipmentOutputDto toDto(EquipmentOutputEntity entity) {
         return modelMapper.map(entity, EquipmentOutputDto.class);
     }
-
-    /*
-     EquipmentOutputDto equipmentOutputDto = new EquipmentOutputDto();
-        equipmentOutputDto.setId(entity.getId());
-        equipmentOutputDto.setCode(entity.getCode());
-
-        if (entity.getAlias() != null) {
-            equipmentOutputDto.setAlias(entity.getAlias().getAlias());
-        }
-
-        return equipmentOutputDto;
-     */
 }

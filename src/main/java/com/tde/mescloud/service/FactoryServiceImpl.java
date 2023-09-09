@@ -5,8 +5,7 @@ import com.tde.mescloud.model.dto.FactoryDto;
 import com.tde.mescloud.model.entity.FactoryEntity;
 import com.tde.mescloud.repository.FactoryRepository;
 import jakarta.persistence.EntityNotFoundException;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.AllArgsConstructor;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Service;
 
@@ -14,10 +13,12 @@ import java.util.List;
 
 @ConfigurationProperties(prefix = "factory")
 @Service
+@AllArgsConstructor
 public class FactoryServiceImpl implements FactoryService {
 
     private final FactoryRepository repository;
     private final FactoryConverterImpl converter;
+
 
     @Override
     public FactoryDto saveFactory(FactoryDto factoryDto) {
@@ -69,7 +70,7 @@ public class FactoryServiceImpl implements FactoryService {
             throw new EntityNotFoundException("Factory with name " + name + " not found.");
         }
     }
-
+    
     private void validateFactoryDto(FactoryDto factoryDto) {
         if (factoryDto == null) {
             throw new IllegalArgumentException("FactoryDto cannot be null.");

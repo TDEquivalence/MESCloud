@@ -27,9 +27,7 @@ public interface ProductionOrderService {
 
     List<Long> findExistingIds(List<Long> ids);
 
-<<<<<<< HEAD
     List<ProductionOrderSummaryDto> getCompleted();
-=======
+
     List<ProductionOrderSummaryDto> getCompletedWithoutComposed();
->>>>>>> 342b74d (Merge pull request #26 from TDEquivalence/feature/MES-230)
 }

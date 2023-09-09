@@ -124,6 +124,7 @@ CREATE INDEX idx_equipment_output_code ON equipment_output (code);
 CREATE TABLE composed_production_order (
     id int GENERATED ALWAYS AS IDENTITY,
     code VARCHAR(255),
+    created_at date,
 
     PRIMARY KEY(id)
 );
@@ -197,8 +198,8 @@ CREATE TABLE sample (
   id int GENERATED ALWAYS AS IDENTITY,
   composed_production_order_id INT,
   amount INT,
-  tca_average INT,
-  reliability INT,
+  tca_average DOUBLE PRECISION,
+  reliability DOUBLE PRECISION,
   created_at date,
   PRIMARY KEY (id),
   FOREIGN KEY (composed_production_order_id) REFERENCES composed_production_order (id)
@@ -241,3 +242,16 @@ FROM production_order po
 LEFT JOIN counter_record_production_conclusion crpc ON po.id = crpc.production_order_id
 WHERE po.is_completed = true AND po.composed_production_order_id IS NULL AND crpc.is_valid_for_production = true
 GROUP BY po.id;
+GROUP BY po.id;
+
+CREATE OR REPLACE VIEW composed_summary AS
+SELECT DISTINCT
+	cpo.id, cpo.created_at,
+	s.amount, s.reliability,
+	po.input_batch, po.source, po.gauge, po.category, po.washing_process,
+	b.id AS batch_id, b.code AS batch_code, b.is_approved AS is_batch_approved
+FROM composed_production_order cpo
+LEFT JOIN sample s ON cpo.id = s.composed_production_order_id
+LEFT JOIN hit h ON s.id = h.sample_id
+LEFT JOIN production_order po ON cpo.id = po.composed_production_order_id
+LEFT JOIN batch b ON cpo.id = b.composed_production_order_id;

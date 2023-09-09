@@ -55,6 +55,7 @@ public class SampleServiceImpl implements SampleService {
         if(composedDto.isEmpty()) {
             return null;
         }
+
         return composedConverter.convertToEntity(composedDto.get());
     }
 

@@ -24,9 +24,9 @@ public class SampleEntity {
 
     private int amount;
 
-    private int tcaAverage;
+    private double tcaAverage;
 
-    private int reliability;
+    private double reliability;
 
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
