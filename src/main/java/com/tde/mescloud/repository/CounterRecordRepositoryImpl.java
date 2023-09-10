@@ -2,17 +2,14 @@ package com.tde.mescloud.repository;
 
 import com.tde.mescloud.model.dto.CounterRecordWinnow;
 import com.tde.mescloud.model.dto.KpiFilterDto;
-import com.tde.mescloud.model.dto.filter.Searchable;
-import com.tde.mescloud.model.dto.filter.Sortable;
-import com.tde.mescloud.model.dto.filter.WinnowProperty;
 import com.tde.mescloud.model.entity.*;
+import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityGraph;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.*;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
 
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -115,27 +112,20 @@ public class CounterRecordRepositoryImpl extends AbstractWinnowRepositoryImpl {
     }
 
     @Override
-    protected <T> Path<?> getPath(Root<T> root, String property) {
+    protected <T> void populatePathByJointProperty() {
 
-        switch (property) {
+        pathByJointProperty.put(CounterRecordWinnow.Property.EQUIPMENT_ALIAS.getEntityProperty(),
+                r -> {
+                    Join<T, EquipmentOutputEntity> equipmentOutputJoin = r.join(EQUIPMENT_OUTPUT_PROP);
+                    Join<EquipmentOutputEntity, CountingEquipmentEntity> countingEquipmentJoin =
+                            equipmentOutputJoin.join(COUNTING_EQUIPMENT_PROP);
+                    return countingEquipmentJoin.get(COUNTING_EQUIPMENT_ALIAS_PROP);
+                });
 
-            case EQUIPMENT_ALIAS_FILTER_FIELD -> {
-                Join<T, EquipmentOutputEntity> equipmentOutputJoin =
-                        root.join(EQUIPMENT_OUTPUT_PROP);
-                Join<EquipmentOutputEntity, CountingEquipmentEntity> countingEquipmentJoin =
-                        equipmentOutputJoin.join(COUNTING_EQUIPMENT_PROP);
-                return countingEquipmentJoin.get(COUNTING_EQUIPMENT_ALIAS_PROP);
-            }
-
-            case PRODUCTION_ORDER_CODE_FILTER_FIELD -> {
-                Join<T, ProductionOrderEntity> productionOrderJoin =
-                        root.join(PRODUCTION_ORDER_PROP);
-                return productionOrderJoin.get(PRODUCTION_ORDER_CODE_PROP);
-            }
-
-            default -> {
-                return super.getPath(root, property);
-            }
-        }
+        pathByJointProperty.put(CounterRecordWinnow.Property.PRODUCTION_ORDER_CODE.getEntityProperty(),
+                r -> {
+                    Join<T, ProductionOrderEntity> productionOrderJoin = r.join(PRODUCTION_ORDER_PROP);
+                    return productionOrderJoin.get(PRODUCTION_ORDER_CODE_PROP);
+                });
     }
 }

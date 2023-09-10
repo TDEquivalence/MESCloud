@@ -3,16 +3,25 @@ package com.tde.mescloud.repository;
 import com.tde.mescloud.model.dto.filter.Searchable;
 import com.tde.mescloud.model.dto.filter.Sortable;
 import com.tde.mescloud.model.dto.filter.WinnowProperty;
+import jakarta.annotation.PostConstruct;
 import jakarta.persistence.criteria.*;
 
 import java.time.ZonedDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 
 public abstract class AbstractWinnowRepositoryImpl {
 
     public static final String JAKARTA_FETCHGRAPH = "jakarta.persistence.fetchgraph";
     public static final String SQL_WILDCARD = "%";
 
+    protected Map<String, Function<Root<?>, Path<?>>> pathByJointProperty = new HashMap<>();
+
+    @PostConstruct
+    protected <T> void populatePathByJointProperty() {
+    }
 
     protected <T extends WinnowProperty> void addPredicates(Searchable<T> filter,
                                                             List<Predicate> predicates,
@@ -69,6 +78,11 @@ public abstract class AbstractWinnowRepositoryImpl {
     }
 
     protected <T> Path<?> getPath(Root<T> root, String property) {
+
+        if (pathByJointProperty.containsKey(property)) {
+            return pathByJointProperty.get(property).apply(root);
+        }
+
         return root.get(property);
     }
 }
