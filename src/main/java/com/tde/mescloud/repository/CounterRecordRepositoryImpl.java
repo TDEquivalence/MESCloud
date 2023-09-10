@@ -3,21 +3,15 @@ package com.tde.mescloud.repository;
 import com.tde.mescloud.model.dto.CounterRecordWinnow;
 import com.tde.mescloud.model.dto.KpiFilterDto;
 import com.tde.mescloud.model.entity.*;
-import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityGraph;
-import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.*;
-import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Repository
-@AllArgsConstructor
-public class CounterRecordRepositoryImpl extends AbstractWinnowRepositoryImpl {
-
-    private EntityManager entityManager;
+public class CounterRecordRepositoryImpl extends AbstractWinnowRepository {
 
     private static final String ID_PROP = "id";
     private static final String EQUIPMENT_OUTPUT_PROP = "equipmentOutput";
@@ -25,9 +19,6 @@ public class CounterRecordRepositoryImpl extends AbstractWinnowRepositoryImpl {
     private static final String COUNTING_EQUIPMENT_PROP = "countingEquipment";
     private static final String PRODUCTION_ORDER_CODE_PROP = "code";
     private static final String COUNTING_EQUIPMENT_ALIAS_PROP = "alias";
-
-    private static final String EQUIPMENT_ALIAS_FILTER_FIELD = "equipmentAlias";
-    private static final String PRODUCTION_ORDER_CODE_FILTER_FIELD = "productionOrderCode";
 
 
     public List<CounterRecordEntity> getFilteredAndPaginated(CounterRecordWinnow filterDto) {

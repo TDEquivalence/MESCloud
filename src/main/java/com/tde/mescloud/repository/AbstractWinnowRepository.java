@@ -4,7 +4,9 @@ import com.tde.mescloud.model.dto.filter.Searchable;
 import com.tde.mescloud.model.dto.filter.Sortable;
 import com.tde.mescloud.model.dto.filter.WinnowProperty;
 import jakarta.annotation.PostConstruct;
+import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.*;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.ZonedDateTime;
 import java.util.HashMap;
@@ -12,11 +14,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-public abstract class AbstractWinnowRepositoryImpl {
+public abstract class AbstractWinnowRepository {
 
     public static final String JAKARTA_FETCHGRAPH = "jakarta.persistence.fetchgraph";
     public static final String SQL_WILDCARD = "%";
 
+    @Autowired
+    protected EntityManager entityManager;
     protected Map<String, Function<Root<?>, Path<?>>> pathByJointProperty = new HashMap<>();
 
     @PostConstruct
