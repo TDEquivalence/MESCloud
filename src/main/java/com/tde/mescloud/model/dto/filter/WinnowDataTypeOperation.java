@@ -9,5 +9,8 @@ public enum WinnowDataTypeOperation {
     INTEGER_GREATER_OR_EQUAL,
     INTEGER_GREATER,
     INTEGER_EQUAL,
-    STRING;
+    STRING_EQUAL,
+    STRING_CONTAINS,
+    STRING_START,
+    STRING_END;
 }

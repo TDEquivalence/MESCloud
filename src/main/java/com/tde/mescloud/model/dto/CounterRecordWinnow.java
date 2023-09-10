@@ -17,14 +17,15 @@ public class CounterRecordWinnow extends AbstractPaginatedWinnow<CounterRecordWi
     @Getter
     public enum Property implements WinnowProperty {
 
-        PRODUCTION_ORDER_CODE("productionOrderCode", WinnowDataTypeOperation.STRING),
-        EQUIPMENT_OUTPUT_ALIAS("equipmentOutputAlias", WinnowDataTypeOperation.STRING),
-        EQUIPMENT_ALIAS("equipmentAlias", WinnowDataTypeOperation.STRING),
-        AMOUNT("computedValue", WinnowDataTypeOperation.INTEGER_GREATER_OR_EQUAL),
-        START_DATE("startDate", WinnowDataTypeOperation.DATE_GREATER_OR_EQUAL),
-        END_DATE("endDate", WinnowDataTypeOperation.DATE_LESS_OR_EQUAL);
+        PRODUCTION_ORDER_CODE("productionOrderCode", "productionOrderCode", WinnowDataTypeOperation.STRING_EQUAL),
+        EQUIPMENT_OUTPUT_ALIAS("equipmentOutputAlias", "equipmentOutputAlias", WinnowDataTypeOperation.STRING_EQUAL),
+        EQUIPMENT_ALIAS("equipmentAlias", "equipmentAlias", WinnowDataTypeOperation.STRING_EQUAL),
+        AMOUNT("computedValue", "computedValue", WinnowDataTypeOperation.INTEGER_GREATER_OR_EQUAL),
+        START_DATE("startDate", "registeredAt", WinnowDataTypeOperation.DATE_GREATER_OR_EQUAL),
+        END_DATE("endDate", "registeredAt", WinnowDataTypeOperation.DATE_LESS_OR_EQUAL);
 
         private final String name;
+        private final String entityProperty;
         private final WinnowDataTypeOperation dataTypeOperation;
     }
 }
