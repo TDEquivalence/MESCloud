@@ -17,5 +17,5 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
 
     UserEntity findUserById(Long id);
 
-    List<UserEntity> findAll(UserWinnow winnow);
+    List<UserEntity> findAllWithWinnow(UserWinnow winnow);
 }

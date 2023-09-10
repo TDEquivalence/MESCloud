@@ -32,7 +32,7 @@ public class UserService {
     }
 
     public List<UserDto> getAllUsers(UserWinnow winnow) {
-        List<UserEntity> userEntityList = userRepository.findAll(winnow);
+        List<UserEntity> userEntityList = userRepository.findAllWithWinnow(winnow);
         return mapper.convertToDto(userEntityList);
     }
 

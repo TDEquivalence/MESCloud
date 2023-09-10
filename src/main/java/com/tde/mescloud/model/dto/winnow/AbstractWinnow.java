@@ -6,7 +6,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public abstract class AbstractWinnow<T extends WinnowProperty> implements Searchable<T>, Sortable<T> {
+public abstract class AbstractWinnow<T extends WinnowProperty> implements Winnow<T> {
 
     @JsonUnwrapped
     private WinnowSearch<T> search;

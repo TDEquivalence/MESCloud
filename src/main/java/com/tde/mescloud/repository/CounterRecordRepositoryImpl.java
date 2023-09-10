@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Repository
-public class CounterRecordRepositoryImpl extends AbstractWinnowRepository {
+public class CounterRecordRepositoryImpl extends AbstractWinnowRepository<CounterRecordWinnow.Property, CounterRecordEntity> {
 
     private static final String ID_PROP = "id";
     private static final String EQUIPMENT_OUTPUT_PROP = "equipmentOutput";
