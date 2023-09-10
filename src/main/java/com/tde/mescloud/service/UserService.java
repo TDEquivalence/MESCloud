@@ -26,6 +26,11 @@ public class UserService {
         return mapper.convertToDto(userEntity);
     }
 
+    public List<UserDto> getAllUsers() {
+        List<UserEntity> userEntityList = userRepository.findAll();
+        return mapper.convertToDto(userEntityList);
+    }
+
     public List<UserDto> getAllUsers(UserWinnow winnow) {
         List<UserEntity> userEntityList = userRepository.findAll(winnow);
         return mapper.convertToDto(userEntityList);
