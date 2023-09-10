@@ -1,6 +1,7 @@
 package com.tde.mescloud.api.rest;
 
 import com.tde.mescloud.model.dto.UserDto;
+import com.tde.mescloud.model.dto.UserWinnow;
 import com.tde.mescloud.security.exception.UserNotFoundException;
 import com.tde.mescloud.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -23,16 +24,11 @@ public class UserController {
         return new ResponseEntity<>(userDto, HttpStatus.OK);
     }
 
-    @GetMapping("/all")
-    public ResponseEntity<List<UserDto>> getAllUsers() {
-        List<UserDto> users = userService.getAllUsers();
+    @PostMapping("/winnow")
+    public ResponseEntity<List<UserDto>> getAllUsers(@RequestBody UserWinnow winnow) {
+        List<UserDto> users = userService.getAllUsers(winnow);
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
-
-//    @PostMapping("/winnow")
-//    public ResponseEntity<List<UserDto>> winnow(UserWinnowDto winnow) {
-//        return new ResponseEntity<>(null, HttpStatus.OK);
-//    }
 
     @PostMapping("/update")
     public ResponseEntity<UserDto> updateUser(@RequestBody UserDto user) throws UserNotFoundException {

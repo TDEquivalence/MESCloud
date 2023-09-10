@@ -1,10 +1,11 @@
 package com.tde.mescloud.service;
 
+import com.tde.mescloud.model.dto.UserWinnow;
 import com.tde.mescloud.model.entity.UserEntity;
 import com.tde.mescloud.security.exception.UserNotFoundException;
 import com.tde.mescloud.security.mapper.EntityDtoMapper;
 import com.tde.mescloud.model.dto.UserDto;
-import com.tde.mescloud.security.repository.UserRepository;
+import com.tde.mescloud.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -25,15 +26,15 @@ public class UserService {
         return mapper.convertToDto(userEntity);
     }
 
-    public List<UserDto> getAllUsers() {
-        List<UserEntity> userEntityList = userRepository.findAll();
+    public List<UserDto> getAllUsers(UserWinnow winnow) {
+        List<UserEntity> userEntityList = userRepository.findAll(winnow);
         return mapper.convertToDto(userEntityList);
     }
 
     public UserDto updateUser(UserDto userDto) throws UserNotFoundException {
         UserEntity dbUserEntity = userRepository.findUserByUsername(userDto.getUsername());
 
-        if(dbUserEntity == null) {
+        if (dbUserEntity == null) {
             throw new UserNotFoundException(USER_NOT_FOUND_BY_USERNAME);
         }
         dbUserEntity = UserEntity.builder()

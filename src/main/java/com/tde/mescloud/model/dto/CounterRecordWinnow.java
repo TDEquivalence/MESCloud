@@ -10,9 +10,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class CounterRecordWinnow extends AbstractPaginatedWinnow<CounterRecordWinnow.Property> {
-
-    private static final String DEFAULT_SORTING_VALUE = "DESCENDING";
-
+    
     @AllArgsConstructor
     @Getter
     public enum Property implements WinnowProperty {

@@ -32,6 +32,10 @@ public abstract class AbstractWinnowRepository {
                                                             CriteriaBuilder criteriaBuilder,
                                                             Root<?> counterRecordRoot) {
 
+        if (filter.getSearch() == null) {
+            return;
+        }
+
         for (T searchProperty : filter.getSearch().getKeys()) {
             Predicate predicate;
 
@@ -71,6 +75,10 @@ public abstract class AbstractWinnowRepository {
                                                             List<Order> orders,
                                                             CriteriaBuilder criteriaBuilder,
                                                             Root<?> counterRecordRoot) {
+
+        if (filter.getSort() == null) {
+            return;
+        }
 
         for (T sortProperty : filter.getSort().getKeys()) {
 
