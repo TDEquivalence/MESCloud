@@ -27,13 +27,13 @@ public class UserController {
     //TODO: remove /all to follow REST specifications
     @GetMapping("/all")
     public ResponseEntity<List<UserDto>> getAllUsers() {
-        List<UserDto> users = userService.getAllUsers();
+        List<UserDto> users = userService.getWinnowedUsers();
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
     @PostMapping("/winnow")
-    public ResponseEntity<List<UserDto>> getAllUsers(@RequestBody UserWinnow winnow) {
-        List<UserDto> users = userService.getAllUsers(winnow);
+    public ResponseEntity<List<UserDto>> getWinnowedUsers(@RequestBody UserWinnow winnow) {
+        List<UserDto> users = userService.getWinnowedUsers(winnow);
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
 

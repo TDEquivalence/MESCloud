@@ -26,13 +26,13 @@ public class UserService {
         return mapper.convertToDto(userEntity);
     }
 
-    public List<UserDto> getAllUsers() {
+    public List<UserDto> getWinnowedUsers() {
         List<UserEntity> userEntityList = userRepository.findAll();
         return mapper.convertToDto(userEntityList);
     }
 
-    public List<UserDto> getAllUsers(UserWinnow winnow) {
-        List<UserEntity> userEntityList = userRepository.findAllWithWinnow(winnow);
+    public List<UserDto> getWinnowedUsers(UserWinnow winnow) {
+        List<UserEntity> userEntityList = userRepository.getWinnowedUsers(winnow);
         return mapper.convertToDto(userEntityList);
     }
 

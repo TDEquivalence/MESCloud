@@ -10,7 +10,7 @@ import java.util.List;
 public class UserRepositoryImpl extends AbstractWinnowRepository<UserWinnow.Property, UserEntity> {
 
 
-    public List<UserEntity> findAllWithWinnow(UserWinnow winnow) {
+    public List<UserEntity> getWinnowedUsers(UserWinnow winnow) {
         return super.findAllWithWinnow(winnow, UserEntity.class);
     }
 }
