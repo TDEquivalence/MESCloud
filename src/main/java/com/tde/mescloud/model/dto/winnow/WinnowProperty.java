@@ -1,4 +1,4 @@
-package com.tde.mescloud.model.dto.filter;
+package com.tde.mescloud.model.dto.winnow;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 

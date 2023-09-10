@@ -1,8 +1,8 @@
 package com.tde.mescloud.repository;
 
-import com.tde.mescloud.model.dto.filter.Searchable;
-import com.tde.mescloud.model.dto.filter.Sortable;
-import com.tde.mescloud.model.dto.filter.WinnowProperty;
+import com.tde.mescloud.model.dto.winnow.Searchable;
+import com.tde.mescloud.model.dto.winnow.Sortable;
+import com.tde.mescloud.model.dto.winnow.WinnowProperty;
 import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.*;

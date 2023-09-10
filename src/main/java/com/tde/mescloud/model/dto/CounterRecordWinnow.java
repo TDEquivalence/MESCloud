@@ -1,8 +1,8 @@
 package com.tde.mescloud.model.dto;
 
-import com.tde.mescloud.model.dto.filter.AbstractPaginatedWinnow;
-import com.tde.mescloud.model.dto.filter.WinnowDataTypeOperation;
-import com.tde.mescloud.model.dto.filter.WinnowProperty;
+import com.tde.mescloud.model.dto.winnow.AbstractPaginatedWinnow;
+import com.tde.mescloud.model.dto.winnow.WinnowDataTypeOperation;
+import com.tde.mescloud.model.dto.winnow.WinnowProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
