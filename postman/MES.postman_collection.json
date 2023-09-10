@@ -424,6 +424,52 @@
 								}
 							},
 							"response": []
+						},
+						{
+							"name": "Find all w/ winnow",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{jwtoken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "",
+										"type": "text",
+										"disabled": true
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"searchValueByName\": {\r\n        \"role\": \"ADMIN\"\r\n    }\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}:{{port}}/api/user/winnow",
+									"host": [
+										"{{url}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"user",
+										"winnow"
+									]
+								}
+							},
+							"response": []
 						}
 					]
 				},
@@ -486,7 +532,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"take\": 10,\r\n    \"skip\": 0,\r\n    \"searchValueByName\": {\r\n        \"startDate\": \"2023-08-14T00:00:00.000Z\",\r\n        \"endDate\": \"2023-09-06T23:59:59.000Z\"\r\n    },\r\n    \"sortValueByName\": {\r\n        \"computedValue\": \"ASC\"\r\n    }\r\n}",
+									"raw": "{\r\n    \"take\": 10,\r\n    \"skip\": 0,\r\n    \"searchValueByName\": {\r\n        \"startDate\": \"2023-08-14T00:00:00.000Z\",\r\n        \"endDate\": \"2023-09-09T23:59:59.000Z\"\r\n    },\r\n    \"sortValueByName\": {\r\n        \"computedValue\": \"ASC\"\r\n    }\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -933,7 +979,7 @@
 							"response": []
 						},
 						{
-							"name": "Composed -> Find All WITH hits",
+							"name": "Composed -> Find All WITH hits !complete",
 							"request": {
 								"auth": {
 									"type": "bearer",
