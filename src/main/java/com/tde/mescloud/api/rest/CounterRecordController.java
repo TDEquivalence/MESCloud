@@ -1,6 +1,6 @@
 package com.tde.mescloud.api.rest;
 
-import com.tde.mescloud.model.dto.CounterRecordFilterDto;
+import com.tde.mescloud.model.dto.CounterRecordFilter;
 import com.tde.mescloud.model.dto.PaginatedCounterRecordsDto;
 import com.tde.mescloud.service.CounterRecordService;
 import lombok.AllArgsConstructor;
@@ -20,14 +20,14 @@ CounterRecordController {
     private final CounterRecordService service;
 
     @PostMapping("/filter")
-    public ResponseEntity<PaginatedCounterRecordsDto> getFilteredAndPaginated(@RequestBody CounterRecordFilterDto filter) {
+    public ResponseEntity<PaginatedCounterRecordsDto> getFilteredAndPaginated(@RequestBody CounterRecordFilter filter) {
         PaginatedCounterRecordsDto paginatedCounterRecords = service.getFilteredAndPaginated(filter);
         return new ResponseEntity<>(paginatedCounterRecords, HttpStatus.OK);
     }
 
     @PostMapping("/completion")
-    public ResponseEntity<PaginatedCounterRecordsDto> getLastPerProductionOrder(@RequestBody CounterRecordFilterDto filter) {
-        PaginatedCounterRecordsDto paginatedCounterRecords = service.winnowConclusionRecordsPaginated(filter);
+    public ResponseEntity<PaginatedCounterRecordsDto> getLastPerProductionOrder(@RequestBody CounterRecordFilter filter) {
+        PaginatedCounterRecordsDto paginatedCounterRecords = service.filterConclusionRecordsPaginated(filter);
         return new ResponseEntity<>(paginatedCounterRecords, HttpStatus.OK);
     }
 }

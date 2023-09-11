@@ -6,11 +6,11 @@ import java.util.List;
 
 public interface CounterRecordService {
 
-    List<CounterRecordDto> winnowConclusionRecordsKpi(KpiFilterDto filterDto);
+    List<CounterRecordDto> filterConclusionRecordsKpi(KpiFilterDto filterDto);
 
-    PaginatedCounterRecordsDto winnowConclusionRecordsPaginated(CounterRecordFilterDto filterDto);
+    PaginatedCounterRecordsDto filterConclusionRecordsPaginated(CounterRecordFilter filterDto);
 
-    PaginatedCounterRecordsDto getFilteredAndPaginated(CounterRecordFilterDto filterDto);
+    PaginatedCounterRecordsDto getFilteredAndPaginated(CounterRecordFilter filterDto);
 
     List<CounterRecordDto> save(PlcMqttDto equipmentCountsMqttDTO);
 

@@ -16,7 +16,7 @@ public interface ComposedProductionOrderRepository extends JpaRepository<Compose
     Optional<String> findLastMaxCode();
 
 
-    List<ComposedSummaryEntity> findSummarized(boolean withHits);
+    List<ComposedSummaryEntity> getOpenComposedSummaries(boolean withHits);
 
     List<ComposedSummaryEntity> findCompleted();
 }
