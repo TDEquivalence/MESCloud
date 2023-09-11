@@ -1,4 +1,4 @@
-package com.tde.mescloud.model.dto.winnow;
+package com.tde.mescloud.model.winnow;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class WinnowSort<T extends WinnowProperty> {
+public class FilterSort<T extends FilterProperty> {
 
     private static final String ASCENDING = "ASC";
     private static final String DESCENDING = "DESC";

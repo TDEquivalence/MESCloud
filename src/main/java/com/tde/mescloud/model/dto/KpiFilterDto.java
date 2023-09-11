@@ -1,8 +1,8 @@
 package com.tde.mescloud.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
-import com.tde.mescloud.model.dto.winnow.WinnowSearch;
-import com.tde.mescloud.model.dto.winnow.Searchable;
+import com.tde.mescloud.model.winnow.FilterSearch;
+import com.tde.mescloud.model.winnow.Searchable;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,7 +12,7 @@ public class KpiFilterDto implements Searchable<CounterRecordWinnow.Property> {
 
     private TimeMode timeMode;
     @JsonUnwrapped
-    private WinnowSearch<CounterRecordWinnow.Property> search;
+    private FilterSearch<CounterRecordWinnow.Property> search;
 
     public enum TimeMode {
         DAY,

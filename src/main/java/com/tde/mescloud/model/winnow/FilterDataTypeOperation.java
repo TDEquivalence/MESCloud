@@ -1,6 +1,6 @@
-package com.tde.mescloud.model.dto.winnow;
+package com.tde.mescloud.model.winnow;
 
-public enum WinnowDataTypeOperation {
+public enum FilterDataTypeOperation {
 
     BOOLEAN,
     DATE_GREATER_OR_EQUAL,

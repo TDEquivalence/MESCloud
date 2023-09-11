@@ -1,9 +1,9 @@
 package com.tde.mescloud.repository;
 
-import com.tde.mescloud.model.dto.winnow.Searchable;
-import com.tde.mescloud.model.dto.winnow.Sortable;
-import com.tde.mescloud.model.dto.winnow.Winnow;
-import com.tde.mescloud.model.dto.winnow.WinnowProperty;
+import com.tde.mescloud.model.winnow.Searchable;
+import com.tde.mescloud.model.winnow.Sortable;
+import com.tde.mescloud.model.winnow.Filter;
+import com.tde.mescloud.model.winnow.FilterProperty;
 import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.*;
@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-public abstract class AbstractWinnowRepository<W extends WinnowProperty, E> {
+public abstract class AbstractWinnowRepository<W extends FilterProperty, E> {
 
     public static final String JAKARTA_FETCHGRAPH = "jakarta.persistence.fetchgraph";
     public static final String SQL_WILDCARD = "%";
@@ -26,7 +26,7 @@ public abstract class AbstractWinnowRepository<W extends WinnowProperty, E> {
     protected Map<String, Function<Root<?>, Path<?>>> pathByJointProperty = new HashMap<>();
 
 
-    public List<E> findAllWithWinnow(Winnow<W> winnow, Class<E> entityClass) {
+    public List<E> findAllWithWinnow(Filter<W> winnow, Class<E> entityClass) {
 
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<E> query = criteriaBuilder.createQuery(entityClass);
@@ -50,7 +50,7 @@ public abstract class AbstractWinnowRepository<W extends WinnowProperty, E> {
     protected <T> void populatePathByJointProperty() {
     }
 
-    protected <T extends WinnowProperty> void addPredicates(Searchable<T> filter,
+    protected <T extends FilterProperty> void addPredicates(Searchable<T> filter,
                                                             List<Predicate> predicates,
                                                             CriteriaBuilder criteriaBuilder,
                                                             Root<?> counterRecordRoot) {
@@ -94,7 +94,7 @@ public abstract class AbstractWinnowRepository<W extends WinnowProperty, E> {
         return criteriaBuilder.like(criteriaBuilder.upper(path.as(String.class)), value.toUpperCase());
     }
 
-    protected <T extends WinnowProperty> void addSortOrders(Sortable<T> filter,
+    protected <T extends FilterProperty> void addSortOrders(Sortable<T> filter,
                                                             List<Order> orders,
                                                             CriteriaBuilder criteriaBuilder,
                                                             Root<?> counterRecordRoot) {

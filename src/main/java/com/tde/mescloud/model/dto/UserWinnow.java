@@ -1,24 +1,24 @@
 package com.tde.mescloud.model.dto;
 
-import com.tde.mescloud.model.dto.winnow.AbstractWinnow;
-import com.tde.mescloud.model.dto.winnow.WinnowDataTypeOperation;
-import com.tde.mescloud.model.dto.winnow.WinnowProperty;
+import com.tde.mescloud.model.winnow.AbstractFilter;
+import com.tde.mescloud.model.winnow.FilterDataTypeOperation;
+import com.tde.mescloud.model.winnow.FilterProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-public class UserWinnow extends AbstractWinnow<UserWinnow.Property> {
+public class UserWinnow extends AbstractFilter<UserWinnow.Property> {
 
     @AllArgsConstructor
     @Getter
-    public enum Property implements WinnowProperty {
+    public enum Property implements FilterProperty {
 
-        FIRST_NAME("firstName", "firstName", WinnowDataTypeOperation.STRING_EQUAL),
-        LAST_NAME("lastName", "lastName", WinnowDataTypeOperation.STRING_EQUAL),
-        EMAIL("email", "email", WinnowDataTypeOperation.STRING_EQUAL),
-        ROLE("role", "role", WinnowDataTypeOperation.STRING_EQUAL);
+        FIRST_NAME("firstName", "firstName", FilterDataTypeOperation.STRING_EQUAL),
+        LAST_NAME("lastName", "lastName", FilterDataTypeOperation.STRING_EQUAL),
+        EMAIL("email", "email", FilterDataTypeOperation.STRING_EQUAL),
+        ROLE("role", "role", FilterDataTypeOperation.STRING_EQUAL);
 
         private final String name;
         private final String entityProperty;
-        private final WinnowDataTypeOperation dataTypeOperation;
+        private final FilterDataTypeOperation dataTypeOperation;
     }
 }

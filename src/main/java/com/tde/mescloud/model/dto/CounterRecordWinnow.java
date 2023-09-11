@@ -1,29 +1,29 @@
 package com.tde.mescloud.model.dto;
 
-import com.tde.mescloud.model.dto.winnow.AbstractPaginatedWinnow;
-import com.tde.mescloud.model.dto.winnow.WinnowDataTypeOperation;
-import com.tde.mescloud.model.dto.winnow.WinnowProperty;
+import com.tde.mescloud.model.winnow.AbstractPaginatedFilter;
+import com.tde.mescloud.model.winnow.FilterDataTypeOperation;
+import com.tde.mescloud.model.winnow.FilterProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class CounterRecordWinnow extends AbstractPaginatedWinnow<CounterRecordWinnow.Property> {
-    
+public class CounterRecordWinnow extends AbstractPaginatedFilter<CounterRecordWinnow.Property> {
+
     @AllArgsConstructor
     @Getter
-    public enum Property implements WinnowProperty {
+    public enum Property implements FilterProperty {
 
-        PRODUCTION_ORDER_CODE("productionOrderCode", "productionOrderCode", WinnowDataTypeOperation.STRING_EQUAL),
-        EQUIPMENT_OUTPUT_ALIAS("equipmentOutputAlias", "equipmentOutputAlias", WinnowDataTypeOperation.STRING_EQUAL),
-        EQUIPMENT_ALIAS("equipmentAlias", "equipmentAlias", WinnowDataTypeOperation.STRING_EQUAL),
-        AMOUNT("computedValue", "computedValue", WinnowDataTypeOperation.INTEGER_GREATER_OR_EQUAL),
-        START_DATE("startDate", "registeredAt", WinnowDataTypeOperation.DATE_GREATER_OR_EQUAL),
-        END_DATE("endDate", "registeredAt", WinnowDataTypeOperation.DATE_LESS_OR_EQUAL);
+        PRODUCTION_ORDER_CODE("productionOrderCode", "productionOrderCode", FilterDataTypeOperation.STRING_EQUAL),
+        EQUIPMENT_OUTPUT_ALIAS("equipmentOutputAlias", "equipmentOutputAlias", FilterDataTypeOperation.STRING_EQUAL),
+        EQUIPMENT_ALIAS("equipmentAlias", "equipmentAlias", FilterDataTypeOperation.STRING_EQUAL),
+        AMOUNT("computedValue", "computedValue", FilterDataTypeOperation.INTEGER_GREATER_OR_EQUAL),
+        START_DATE("startDate", "registeredAt", FilterDataTypeOperation.DATE_GREATER_OR_EQUAL),
+        END_DATE("endDate", "registeredAt", FilterDataTypeOperation.DATE_LESS_OR_EQUAL);
 
         private final String name;
         private final String entityProperty;
-        private final WinnowDataTypeOperation dataTypeOperation;
+        private final FilterDataTypeOperation dataTypeOperation;
     }
 }
