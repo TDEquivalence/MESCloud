@@ -1,6 +1,6 @@
 package com.tde.mescloud.repository;
 
-import com.tde.mescloud.model.dto.UserWinnow;
+import com.tde.mescloud.model.dto.UserFilter;
 import com.tde.mescloud.model.entity.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -17,5 +17,5 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
 
     UserEntity findUserById(Long id);
 
-    List<UserEntity> getWinnowedUsers(UserWinnow winnow);
+    List<UserEntity> getFilteredUsers(UserFilter filter);
 }

@@ -426,7 +426,7 @@
 							"response": []
 						},
 						{
-							"name": "Find all w/ winnow",
+							"name": "Find all w/ filter",
 							"request": {
 								"auth": {
 									"type": "bearer",
@@ -457,7 +457,7 @@
 									}
 								},
 								"url": {
-									"raw": "{{url}}:{{port}}/api/user/winnow",
+									"raw": "{{url}}:{{port}}/api/user/filter",
 									"host": [
 										"{{url}}"
 									],
@@ -465,7 +465,7 @@
 									"path": [
 										"api",
 										"user",
-										"winnow"
+										"filter"
 									]
 								}
 							},

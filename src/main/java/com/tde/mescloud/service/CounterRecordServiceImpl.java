@@ -33,13 +33,13 @@ public class CounterRecordServiceImpl implements CounterRecordService {
 
 
     @Override
-    public List<CounterRecordDto> winnowConclusionRecordsKpi(KpiFilterDto filter) {
+    public List<CounterRecordDto> filterConclusionRecordsKpi(KpiFilterDto filter) {
         List<CounterRecordConclusionEntity> counterRecordConclusionEntities = repository.findLastPerProductionOrder(filter);
         return converter.conclusionViewToDto(counterRecordConclusionEntities);
     }
 
     @Override
-    public PaginatedCounterRecordsDto winnowConclusionRecordsPaginated(CounterRecordWinnow filter) {
+    public PaginatedCounterRecordsDto filterConclusionRecordsPaginated(CounterRecordFilter filter) {
         int requestedRecords = filter.getTake();
         filter.setTake(filter.getTake() + 1);
 
@@ -60,7 +60,7 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     }
 
     @Override
-    public PaginatedCounterRecordsDto getFilteredAndPaginated(CounterRecordWinnow filterDto) {
+    public PaginatedCounterRecordsDto getFilteredAndPaginated(CounterRecordFilter filterDto) {
         int requestedRecords = filterDto.getTake();
         filterDto.setTake(filterDto.getTake() + 1);
 

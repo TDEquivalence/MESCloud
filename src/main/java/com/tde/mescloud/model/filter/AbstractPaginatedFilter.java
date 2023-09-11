@@ -1,4 +1,4 @@
-package com.tde.mescloud.model.winnow;
+package com.tde.mescloud.model.filter;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -1,15 +1,15 @@
 package com.tde.mescloud.model.dto;
 
-import com.tde.mescloud.model.winnow.AbstractPaginatedFilter;
-import com.tde.mescloud.model.winnow.FilterDataTypeOperation;
-import com.tde.mescloud.model.winnow.FilterProperty;
+import com.tde.mescloud.model.filter.AbstractPaginatedFilter;
+import com.tde.mescloud.model.filter.FilterDataTypeOperation;
+import com.tde.mescloud.model.filter.FilterProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class CounterRecordWinnow extends AbstractPaginatedFilter<CounterRecordWinnow.Property> {
+public class CounterRecordFilter extends AbstractPaginatedFilter<CounterRecordFilter.Property> {
 
     @AllArgsConstructor
     @Getter

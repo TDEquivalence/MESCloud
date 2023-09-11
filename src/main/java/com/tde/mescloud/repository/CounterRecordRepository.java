@@ -1,6 +1,6 @@
 package com.tde.mescloud.repository;
 
-import com.tde.mescloud.model.dto.CounterRecordWinnow;
+import com.tde.mescloud.model.dto.CounterRecordFilter;
 import com.tde.mescloud.model.dto.KpiFilterDto;
 import com.tde.mescloud.model.entity.CounterRecordConclusionEntity;
 import com.tde.mescloud.model.entity.CounterRecordEntity;
@@ -18,10 +18,10 @@ public interface CounterRecordRepository extends CrudRepository<CounterRecordEnt
     @Query(value = "SELECT * FROM counter_record cr WHERE (cr.production_order_id = :productionOrderId) LIMIT 1", nativeQuery = true)
     Optional<CounterRecordEntity> findLastByProductionOrderId(Long productionOrderId);
 
-    List<CounterRecordConclusionEntity> findLastPerProductionOrder(CounterRecordWinnow filterDto);
+    List<CounterRecordConclusionEntity> findLastPerProductionOrder(CounterRecordFilter filterDto);
 
     List<CounterRecordConclusionEntity> findLastPerProductionOrder(KpiFilterDto filterDto);
 
     //    @EntityGraph(attributePaths = { "equipmentOutput", "equipmentOutput.countingEquipment", "productionOrder" })
-    List<CounterRecordEntity> getFilteredAndPaginated(CounterRecordWinnow filterDto);
+    List<CounterRecordEntity> getFilteredAndPaginated(CounterRecordFilter filterDto);
 }

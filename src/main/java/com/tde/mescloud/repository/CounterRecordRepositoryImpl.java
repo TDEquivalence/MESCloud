@@ -1,6 +1,6 @@
 package com.tde.mescloud.repository;
 
-import com.tde.mescloud.model.dto.CounterRecordWinnow;
+import com.tde.mescloud.model.dto.CounterRecordFilter;
 import com.tde.mescloud.model.dto.KpiFilterDto;
 import com.tde.mescloud.model.entity.*;
 import jakarta.persistence.EntityGraph;
@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Repository
-public class CounterRecordRepositoryImpl extends AbstractWinnowRepository<CounterRecordWinnow.Property, CounterRecordEntity> {
+public class CounterRecordRepositoryImpl extends AbstractFilterRepository<CounterRecordFilter.Property, CounterRecordEntity> {
 
     private static final String ID_PROP = "id";
     private static final String EQUIPMENT_OUTPUT_PROP = "equipmentOutput";
@@ -21,7 +21,7 @@ public class CounterRecordRepositoryImpl extends AbstractWinnowRepository<Counte
     private static final String COUNTING_EQUIPMENT_ALIAS_PROP = "alias";
 
 
-    public List<CounterRecordEntity> getFilteredAndPaginated(CounterRecordWinnow filterDto) {
+    public List<CounterRecordEntity> getFilteredAndPaginated(CounterRecordFilter filterDto) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<CounterRecordEntity> query = cb.createQuery(CounterRecordEntity.class);
         Root<CounterRecordEntity> root = query.from(CounterRecordEntity.class);
@@ -49,7 +49,7 @@ public class CounterRecordRepositoryImpl extends AbstractWinnowRepository<Counte
                 .getResultList();
     }
 
-    public List<CounterRecordConclusionEntity> findLastPerProductionOrder(CounterRecordWinnow filterDto) {
+    public List<CounterRecordConclusionEntity> findLastPerProductionOrder(CounterRecordFilter filterDto) {
 
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<CounterRecordConclusionEntity> query = criteriaBuilder.createQuery(CounterRecordConclusionEntity.class);
@@ -105,7 +105,7 @@ public class CounterRecordRepositoryImpl extends AbstractWinnowRepository<Counte
     @Override
     protected <T> void populatePathByJointProperty() {
 
-        pathByJointProperty.put(CounterRecordWinnow.Property.EQUIPMENT_ALIAS.getEntityProperty(),
+        pathByJointProperty.put(CounterRecordFilter.Property.EQUIPMENT_ALIAS.getEntityProperty(),
                 r -> {
                     Join<T, EquipmentOutputEntity> equipmentOutputJoin = r.join(EQUIPMENT_OUTPUT_PROP);
                     Join<EquipmentOutputEntity, CountingEquipmentEntity> countingEquipmentJoin =
@@ -113,7 +113,7 @@ public class CounterRecordRepositoryImpl extends AbstractWinnowRepository<Counte
                     return countingEquipmentJoin.get(COUNTING_EQUIPMENT_ALIAS_PROP);
                 });
 
-        pathByJointProperty.put(CounterRecordWinnow.Property.PRODUCTION_ORDER_CODE.getEntityProperty(),
+        pathByJointProperty.put(CounterRecordFilter.Property.PRODUCTION_ORDER_CODE.getEntityProperty(),
                 r -> {
                     Join<T, ProductionOrderEntity> productionOrderJoin = r.join(PRODUCTION_ORDER_PROP);
                     return productionOrderJoin.get(PRODUCTION_ORDER_CODE_PROP);

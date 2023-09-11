@@ -1,12 +1,12 @@
 package com.tde.mescloud.model.dto;
 
-import com.tde.mescloud.model.winnow.AbstractFilter;
-import com.tde.mescloud.model.winnow.FilterDataTypeOperation;
-import com.tde.mescloud.model.winnow.FilterProperty;
+import com.tde.mescloud.model.filter.AbstractFilter;
+import com.tde.mescloud.model.filter.FilterDataTypeOperation;
+import com.tde.mescloud.model.filter.FilterProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-public class UserWinnow extends AbstractFilter<UserWinnow.Property> {
+public class UserFilter extends AbstractFilter<UserFilter.Property> {
 
     @AllArgsConstructor
     @Getter

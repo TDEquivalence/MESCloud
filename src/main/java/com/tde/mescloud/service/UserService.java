@@ -1,6 +1,6 @@
 package com.tde.mescloud.service;
 
-import com.tde.mescloud.model.dto.UserWinnow;
+import com.tde.mescloud.model.dto.UserFilter;
 import com.tde.mescloud.model.entity.UserEntity;
 import com.tde.mescloud.security.exception.UserNotFoundException;
 import com.tde.mescloud.security.mapper.EntityDtoMapper;
@@ -26,13 +26,13 @@ public class UserService {
         return mapper.convertToDto(userEntity);
     }
 
-    public List<UserDto> getWinnowedUsers() {
+    public List<UserDto> getFilteredUsers() {
         List<UserEntity> userEntityList = userRepository.findAll();
         return mapper.convertToDto(userEntityList);
     }
 
-    public List<UserDto> getWinnowedUsers(UserWinnow winnow) {
-        List<UserEntity> userEntityList = userRepository.getWinnowedUsers(winnow);
+    public List<UserDto> getFilteredUsers(UserFilter filter) {
+        List<UserEntity> userEntityList = userRepository.getFilteredUsers(filter);
         return mapper.convertToDto(userEntityList);
     }
 
