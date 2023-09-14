@@ -25,6 +25,8 @@ public interface ProductionOrderService {
 
     Optional<ProductionOrderEntity> findById(Long id);
 
+    Optional<ProductionOrderDto> findDtoById(Long id);
+
     List<Long> findExistingIds(List<Long> ids);
 
     List<ProductionOrderSummaryDto> getCompletedWithoutComposed();
