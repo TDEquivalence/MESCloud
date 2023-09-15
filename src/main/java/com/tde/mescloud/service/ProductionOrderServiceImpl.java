@@ -180,11 +180,11 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     @Override
     public Optional<ProductionOrderDto> findDtoById(Long id) {
         Optional<ProductionOrderEntity> entity = repository.findById(id);
-        if(entity.isPresent()) {
-            ProductionOrderDto dto = converter.toDto(entity.get());
-            return Optional.of(dto);
+        if(entity.isEmpty()) {
+            return Optional.empty();
         }
-        return Optional.empty();
+        ProductionOrderDto dto = converter.toDto(entity.get());
+        return Optional.of(dto);
     }
 
     public List<Long> findExistingIds(List<Long> ids) {

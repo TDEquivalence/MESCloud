@@ -14,6 +14,7 @@ import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -102,15 +103,21 @@ public class ComposedProductionOrderServiceImpl implements ComposedProductionOrd
         List<ProductionOrderDto> productionOrderDtos = getProductionOrderDtos(productionOrderIds);
         ProductionOrderDto firstProductionOrder = productionOrderDtos.get(0);
 
-        return productionOrderDtos.stream().allMatch(order ->
+        return productionOrderDtos.stream().skip(1).allMatch(order ->
                 propertiesAreEqual(order, firstProductionOrder)
         );
     }
 
     private boolean propertiesAreEqual(ProductionOrderDto orderToCompare, ProductionOrderDto order) {
-        return orderToCompare.getInputBatch().equals(order.getInputBatch()) &&
-                orderToCompare.getGauge().equals(order.getGauge()) &&
-                orderToCompare.getWashingProcess().equals(order.getWashingProcess());
+        if (orderToCompare == null || order == null) {
+            return false;
+        }
+
+        boolean inputBatchEqual = Objects.equals(orderToCompare.getInputBatch(), order.getInputBatch());
+        boolean gaugeEqual = Objects.equals(orderToCompare.getGauge(), order.getGauge());
+        boolean washingProcessEqual = Objects.equals(orderToCompare.getWashingProcess(), order.getWashingProcess());
+
+        return inputBatchEqual && gaugeEqual && washingProcessEqual;
     }
 
     private List<ProductionOrderDto> getProductionOrderDtos(List<Long> productionOrderIds) {
