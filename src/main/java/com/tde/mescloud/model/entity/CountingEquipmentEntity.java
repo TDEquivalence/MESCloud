@@ -30,7 +30,7 @@ public class CountingEquipmentEntity {
     List<ProductionOrderEntity> productionOrders;
 
     private double equipmentEffectiveness;
-    private double theoreticalProduction;
+    private int theoreticalProduction;
     private double availability;
     private double performance;
     private double quality;
