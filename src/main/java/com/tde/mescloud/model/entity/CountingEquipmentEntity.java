@@ -18,8 +18,8 @@ public class CountingEquipmentEntity {
     private String alias;
     @ManyToOne
     private SectionEntity section;
-    private int equipmentStatus;
-    private int pTimerCommunicationCycle;
+    private Integer equipmentStatus;
+    private Integer pTimerCommunicationCycle;
     @OneToOne(orphanRemoval = false, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "ims_id", referencedColumnName = "id")
     private ImsEntity ims;
@@ -29,9 +29,9 @@ public class CountingEquipmentEntity {
     @OneToMany(mappedBy = "equipment", fetch = FetchType.LAZY)
     List<ProductionOrderEntity> productionOrders;
 
-    private double equipmentEffectiveness;
-    private int theoreticalProduction;
-    private double availability;
-    private double performance;
-    private double quality;
+    private Double equipmentEffectiveness;
+    private Integer theoreticalProduction;
+    private Double availability;
+    private Double performance;
+    private Double quality;
 }
