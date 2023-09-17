@@ -11,7 +11,7 @@ public class RequestConfigurationDto {
 
     private long id;
     private String alias;
-    private int pTimerComunicationCycle;
+    private int pTimerCommunicationCycle;
 
     private List<EquipmentOutputDto> outputs;
     private ImsDto imsDto;
