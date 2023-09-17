@@ -177,6 +177,16 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         return repository.findById(id);
     }
 
+    @Override
+    public Optional<ProductionOrderDto> findDtoById(Long id) {
+        Optional<ProductionOrderEntity> entity = repository.findById(id);
+        if(entity.isEmpty()) {
+            return Optional.empty();
+        }
+        ProductionOrderDto dto = converter.toDto(entity.get());
+        return Optional.of(dto);
+    }
+
     public List<Long> findExistingIds(List<Long> ids) {
         List<ProductionOrderEntity> existingEntities = repository.findByIdIn(ids);
 

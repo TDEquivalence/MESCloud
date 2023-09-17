@@ -4,6 +4,7 @@ import com.tde.mescloud.model.converter.ComposedProductionOrderConverter;
 import com.tde.mescloud.model.converter.ComposedSummaryConverter;
 import com.tde.mescloud.model.dto.ComposedProductionOrderDto;
 import com.tde.mescloud.model.dto.ComposedSummaryDto;
+import com.tde.mescloud.model.dto.ProductionOrderDto;
 import com.tde.mescloud.model.dto.RequestComposedDto;
 import com.tde.mescloud.model.entity.ComposedProductionOrderEntity;
 import com.tde.mescloud.model.entity.ComposedSummaryEntity;
@@ -13,6 +14,7 @@ import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -39,6 +41,9 @@ public class ComposedProductionOrderServiceImpl implements ComposedProductionOrd
     public Optional<ComposedProductionOrderDto> create(List<Long> productionOrderIds) {
 
         List<Long> validProductionOrderIds = getValidProductionOrders(productionOrderIds);
+        if(!haveSameProperties(productionOrderIds)) {
+            throw new IllegalArgumentException("Production order list doesn't have same properties");
+        }
         ComposedProductionOrderEntity composedEntity = createComposed();
 
         setProductionOrdersWithComposed(validProductionOrderIds, composedEntity);
@@ -86,6 +91,40 @@ public class ComposedProductionOrderServiceImpl implements ComposedProductionOrd
         } else {
             return incrementAndGenerateCode(CODE_INITIAL_VALUE);
         }
+    }
+
+
+    private boolean haveSameProperties(List<Long> productionOrderIds) {
+        if (productionOrderIds.isEmpty()) {
+            return false;
+        }
+
+        List<ProductionOrderDto> productionOrderDtos = getProductionOrderDtos(productionOrderIds);
+        ProductionOrderDto firstProductionOrder = productionOrderDtos.get(0);
+
+        return productionOrderDtos.stream().skip(1).allMatch(order ->
+                propertiesAreEqual(order, firstProductionOrder)
+        );
+    }
+
+    private boolean propertiesAreEqual(ProductionOrderDto orderToCompare, ProductionOrderDto order) {
+        if (orderToCompare == null || order == null) {
+            return false;
+        }
+
+        boolean inputBatchEqual = Objects.equals(orderToCompare.getInputBatch(), order.getInputBatch());
+        boolean gaugeEqual = Objects.equals(orderToCompare.getGauge(), order.getGauge());
+        boolean washingProcessEqual = Objects.equals(orderToCompare.getWashingProcess(), order.getWashingProcess());
+
+        return inputBatchEqual && gaugeEqual && washingProcessEqual;
+    }
+
+    private List<ProductionOrderDto> getProductionOrderDtos(List<Long> productionOrderIds) {
+        return productionOrderIds.stream()
+                .map(productionOrderService::findDtoById)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .toList();
     }
 
     @Override
