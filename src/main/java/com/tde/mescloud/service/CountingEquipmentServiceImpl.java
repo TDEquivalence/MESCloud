@@ -1,8 +1,14 @@
 package com.tde.mescloud.service;
 
 import com.tde.mescloud.model.converter.CountingEquipmentConverter;
+import com.tde.mescloud.model.converter.EquipmentOutputConverter;
+import com.tde.mescloud.model.converter.ImsConverter;
 import com.tde.mescloud.model.dto.CountingEquipmentDto;
+import com.tde.mescloud.model.dto.EquipmentOutputDto;
+import com.tde.mescloud.model.dto.ImsDto;
+import com.tde.mescloud.model.dto.RequestConfigurationDto;
 import com.tde.mescloud.model.entity.CountingEquipmentEntity;
+import com.tde.mescloud.model.entity.EquipmentOutputEntity;
 import com.tde.mescloud.model.entity.ImsEntity;
 import com.tde.mescloud.repository.CountingEquipmentRepository;
 import lombok.AllArgsConstructor;
@@ -21,6 +27,9 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
     private CountingEquipmentRepository repository;
     private CountingEquipmentConverter converter;
     private ImsService imsService;
+
+    private EquipmentOutputConverter equipmentOutputConverter;
+    private ImsConverter imsConverter;
 
     @Override
     public List<CountingEquipmentDto> findAllWithLastProductionOrder() {
@@ -131,9 +140,63 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
         return Optional.of(countingEquipmentDto);
     }
 
+    @Override
+    public CountingEquipmentDto setConfiguration(RequestConfigurationDto request) {
+        if (containsNullProperty(request)) {
+            throw new IllegalArgumentException("Counting equipment configuration is incomplete. All properties (alias, outputs, and imsCode) must be specified.");
+        }
+
+        CountingEquipmentEntity entity = updateEquipmentConfiguration(request);
+
+        repository.save(entity);
+        return converter.convertToDto(entity);
+    }
+
+    private boolean containsNullProperty(RequestConfigurationDto countingEquipmentDto) {
+        return countingEquipmentDto.getAlias() == null ||
+                countingEquipmentDto.getOutputs() == null ||
+                countingEquipmentDto.getImsDto() == null;
+    }
+
+    private CountingEquipmentEntity updateEquipmentConfiguration(RequestConfigurationDto request) {
+        Optional<CountingEquipmentEntity> countingEquipmentEntity = repository.findById(request.getId());
+
+        if (countingEquipmentEntity.isEmpty()) {
+            throw new IllegalArgumentException("Counting Equipment id doesn't exist.");
+        }
+
+        countingEquipmentEntity.get().setAlias(request.getAlias());
+        countingEquipmentEntity.get().setOutputs(getEquipmentOutput(request.getOutputs()));
+        countingEquipmentEntity.get().setPTimerCommunicationCycle(request.getPTimerCommunicationCycle());
+        countingEquipmentEntity.get().setIms(getIms(request.getImsDto()));
+
+        countingEquipmentEntity.get().setEquipmentEffectiveness(request.getEquipmentEffectiveness());
+        countingEquipmentEntity.get().setTheoreticalProduction(request.getTheoreticalProduction());
+        countingEquipmentEntity.get().setAvailability(request.getAvailability());
+        countingEquipmentEntity.get().setPerformance(request.getPerformance());
+        countingEquipmentEntity.get().setQuality(request.getQuality());
+
+        ensureMinimumPTimer(countingEquipmentEntity.get());
+        return countingEquipmentEntity.get();
+    }
+
+    private void ensureMinimumPTimer(CountingEquipmentEntity countingEquipmentEntity) {
+        int minPTimer = 10;
+        int currentPTimer = countingEquipmentEntity.getPTimerCommunicationCycle();
+        countingEquipmentEntity.setPTimerCommunicationCycle(Math.max(minPTimer, currentPTimer));
+    }
+
     private void setIms(CountingEquipmentEntity countingEquipment, Long imsId) {
         ImsEntity imsEntity = new ImsEntity();
         imsEntity.setId(imsId);
         countingEquipment.setIms(imsEntity);
+    }
+
+    private List<EquipmentOutputEntity> getEquipmentOutput(List<EquipmentOutputDto> equipmentOutputDtos) {
+        return equipmentOutputConverter.convertToEntity(equipmentOutputDtos);
+    }
+
+    private ImsEntity getIms(ImsDto dto) {
+        return imsConverter.toEntity(dto);
     }
 }

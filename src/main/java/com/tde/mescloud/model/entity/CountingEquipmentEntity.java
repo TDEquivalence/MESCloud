@@ -29,9 +29,9 @@ public class CountingEquipmentEntity {
     @OneToMany(mappedBy = "equipment", fetch = FetchType.LAZY)
     List<ProductionOrderEntity> productionOrders;
 
-    private double equipmentEffectiveness;
-    private int theoreticalProduction;
-    private double availability;
-    private double performance;
-    private double quality;
+    private Double equipmentEffectiveness;
+    private Integer theoreticalProduction;
+    private Double availability;
+    private Double performance;
+    private Double quality;
 }

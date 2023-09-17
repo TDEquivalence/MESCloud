@@ -1,6 +1,7 @@
 package com.tde.mescloud.api.rest;
 
 import com.tde.mescloud.model.dto.CountingEquipmentDto;
+import com.tde.mescloud.model.dto.RequestConfigurationDto;
 import com.tde.mescloud.service.CountingEquipmentService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -41,5 +42,15 @@ public class CountingEquipmentController {
         }
 
         return new ResponseEntity<>(updatedIms.get(), HttpStatus.OK);
+    }
+
+    @PostMapping("/configuration")
+    public ResponseEntity<CountingEquipmentDto> setConfiguration(@RequestBody RequestConfigurationDto request) {
+        CountingEquipmentDto countingEquipment = service.setConfiguration(request);
+        if (countingEquipment == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        return new ResponseEntity<>(countingEquipment, HttpStatus.OK);
     }
 }

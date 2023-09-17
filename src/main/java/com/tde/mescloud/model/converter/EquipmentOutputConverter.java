@@ -20,4 +20,8 @@ public interface EquipmentOutputConverter {
 
         return dtos;
     }
+
+    public EquipmentOutputEntity convertToEntity(EquipmentOutputDto equipmentOutputDto);
+
+    public List<EquipmentOutputEntity> convertToEntity(List<EquipmentOutputDto> equipmentOutputDtoList);
 }
