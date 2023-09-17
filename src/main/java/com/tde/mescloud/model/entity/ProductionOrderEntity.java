@@ -23,6 +23,8 @@ public class ProductionOrderEntity {
     private int targetAmount;
     private boolean isCompleted;
     private Date createdAt;
+    private Date completedAt;
+
     @OneToMany(mappedBy = "productionOrder")
     private List<ProductionInstructionEntity> productionInstructions;
     private String inputBatch;
