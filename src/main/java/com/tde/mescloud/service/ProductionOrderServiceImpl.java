@@ -23,7 +23,6 @@ import org.springframework.stereotype.Service;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -180,7 +179,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     @Override
     public Optional<ProductionOrderDto> findDtoById(Long id) {
         Optional<ProductionOrderEntity> entity = repository.findById(id);
-        if(entity.isEmpty()) {
+        if (entity.isEmpty()) {
             return Optional.empty();
         }
         ProductionOrderDto dto = converter.toDto(entity.get());
@@ -192,7 +191,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
 
         return existingEntities.stream()
                 .map(ProductionOrderEntity::getId)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
