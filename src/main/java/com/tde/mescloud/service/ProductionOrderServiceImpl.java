@@ -17,6 +17,7 @@ import com.tde.mescloud.repository.ProductionOrderRepository;
 import com.tde.mescloud.utility.DateUtil;
 import com.tde.mescloud.utility.LockUtil;
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 
@@ -182,7 +183,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
 
         return existingEntities.stream()
                 .map(ProductionOrderEntity::getId)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
