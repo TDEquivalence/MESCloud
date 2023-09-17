@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
-//@ExtendWith(MockitoExtension.class)
+//@ExtendWith(MockitoExtension.class) - JUnit5 annotation
 @RunWith(MockitoJUnitRunner.class)
 class ProductionOrderServiceTest {
 
