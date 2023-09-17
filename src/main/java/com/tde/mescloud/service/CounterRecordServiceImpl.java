@@ -136,7 +136,7 @@ public class CounterRecordServiceImpl implements CounterRecordService {
         EquipmentOutputEntity equipmentOutputEntity = new EquipmentOutputEntity();
         equipmentOutputEntity.setId(equipmentOutput.getId());
         counterRecord.setEquipmentOutput(equipmentOutputEntity);
-        counterRecord.setEquipmentOutputAlias(equipmentOutput.getAlias());
+        counterRecord.setEquipmentOutputAlias(equipmentOutput.getAlias().getAlias());
         counterRecord.setIsValidForProduction(equipmentOutput.isValidForProduction());
     }
 

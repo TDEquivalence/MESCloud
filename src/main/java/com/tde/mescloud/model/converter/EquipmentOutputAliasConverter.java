@@ -6,4 +6,6 @@ import com.tde.mescloud.model.entity.EquipmentOutputAliasEntity;
 public interface EquipmentOutputAliasConverter {
 
     EquipmentOutputAliasDto toDto(EquipmentOutputAliasEntity entity);
+
+    EquipmentOutputAliasEntity toEntity(EquipmentOutputAliasDto dto);
 }

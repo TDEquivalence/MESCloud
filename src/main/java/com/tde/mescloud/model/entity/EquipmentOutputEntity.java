@@ -15,8 +15,10 @@ public class EquipmentOutputEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private CountingEquipmentEntity countingEquipment;
     private String code;
-    @ManyToOne(fetch = FetchType.EAGER)
+
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "equipment_output_alias_id")
     private EquipmentOutputAliasEntity alias;
+
     private boolean isValidForProduction;
 }

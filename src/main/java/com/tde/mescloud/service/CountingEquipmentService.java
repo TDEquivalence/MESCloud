@@ -23,5 +23,5 @@ public interface CountingEquipmentService {
 
     Optional<CountingEquipmentDto> updateIms(Long equipmentId, Long imsId);
 
-    CountingEquipmentDto setConfiguration(RequestConfigurationDto request);
+    CountingEquipmentDto setConfiguration(long equipmentId, RequestConfigurationDto request);
 }

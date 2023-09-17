@@ -44,9 +44,9 @@ public class CountingEquipmentController {
         return new ResponseEntity<>(updatedIms.get(), HttpStatus.OK);
     }
 
-    @PostMapping("/configuration")
-    public ResponseEntity<CountingEquipmentDto> setConfiguration(@RequestBody RequestConfigurationDto request) {
-        CountingEquipmentDto countingEquipment = service.setConfiguration(request);
+    @PostMapping("/{equipmentId}/configuration")
+    public ResponseEntity<CountingEquipmentDto> setConfiguration(@PathVariable long equipmentId, @RequestBody RequestConfigurationDto request) {
+        CountingEquipmentDto countingEquipment = service.setConfiguration(equipmentId, request);
         if (countingEquipment == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }

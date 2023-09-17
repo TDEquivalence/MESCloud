@@ -1,11 +1,7 @@
 package com.tde.mescloud.service;
 
 import com.tde.mescloud.model.converter.CountingEquipmentConverter;
-import com.tde.mescloud.model.converter.EquipmentOutputConverter;
-import com.tde.mescloud.model.converter.ImsConverter;
 import com.tde.mescloud.model.dto.CountingEquipmentDto;
-import com.tde.mescloud.model.dto.EquipmentOutputDto;
-import com.tde.mescloud.model.dto.ImsDto;
 import com.tde.mescloud.model.dto.RequestConfigurationDto;
 import com.tde.mescloud.model.entity.CountingEquipmentEntity;
 import com.tde.mescloud.model.entity.EquipmentOutputEntity;
@@ -17,7 +13,10 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -140,13 +139,12 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
     }
 
     @Override
-    public CountingEquipmentDto setConfiguration(RequestConfigurationDto request) {
+    public CountingEquipmentDto setConfiguration(long equipmentId, RequestConfigurationDto request) {
         if (containsNullProperty(request)) {
             throw new IllegalArgumentException("Counting equipment configuration is incomplete. All properties (alias, outputs, and imsCode) must be specified.");
         }
 
-        CountingEquipmentEntity entity = updateEquipmentConfiguration(request);
-
+        CountingEquipmentEntity entity = updateEquipmentConfiguration(equipmentId, request);
         repository.save(entity);
         return converter.convertToDto(entity);
     }
@@ -157,27 +155,56 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
                 countingEquipmentDto.getImsDto() == null;
     }
 
-    private CountingEquipmentEntity updateEquipmentConfiguration(RequestConfigurationDto request) {
-        CountingEquipmentEntity countingEquipment = converter.convertToEntity(request);
-        ensureMinimumPTimer(countingEquipment);
+    private CountingEquipmentEntity updateEquipmentConfiguration(long equipmentId, RequestConfigurationDto request) {
+        CountingEquipmentEntity countingEquipmentConfig = converter.convertToEntity(request);
+        ensureMinimumPTimer(countingEquipmentConfig);
 
-        Optional<CountingEquipmentEntity> countingEquipmentDb = repository.findById(request.getId());
+        CountingEquipmentEntity countingEquipmentEntity = findCountingEquipmentById(equipmentId);
 
-        if(countingEquipmentDb.isEmpty()) {
-            throw new IllegalArgumentException("Counting equipment id doesn't exist.");
+        return updateFrom(countingEquipmentEntity, countingEquipmentConfig);
+    }
+
+    private CountingEquipmentEntity findCountingEquipmentById(long equipmentId) {
+        Optional<CountingEquipmentEntity> countingEquipmentDb = repository.findById(equipmentId);
+        return countingEquipmentDb.orElseThrow(() -> new IllegalArgumentException("Counting equipment id doesn't exist."));
+    }
+
+    private CountingEquipmentEntity updateFrom(CountingEquipmentEntity toUpdate, CountingEquipmentEntity updateFrom) {
+        toUpdate.setAlias(updateFrom.getAlias());
+        toUpdate.setPTimerCommunicationCycle(updateFrom.getPTimerCommunicationCycle());
+        toUpdate.setEquipmentEffectiveness(updateFrom.getEquipmentEffectiveness());
+        toUpdate.setTheoreticalProduction(updateFrom.getTheoreticalProduction());
+        toUpdate.setAvailability(updateFrom.getAvailability());
+        toUpdate.setPerformance(updateFrom.getPerformance());
+        toUpdate.setQuality(updateFrom.getQuality());
+        updateOutputs(toUpdate, updateFrom);
+        updateIms(toUpdate, updateFrom);
+
+        return toUpdate;
+    }
+
+    private void updateOutputs(CountingEquipmentEntity toUpdate, CountingEquipmentEntity updateFrom) {
+        List<EquipmentOutputEntity> equipmentOutputToUpdate = toUpdate.getOutputs();
+        List<EquipmentOutputEntity> equipmentOutputUpdateFrom = updateFrom.getOutputs();
+
+        Map<String, EquipmentOutputEntity> equipmentOutputUpdateFromMap = equipmentOutputUpdateFrom.stream()
+                .collect(Collectors.toMap(EquipmentOutputEntity::getCode, Function.identity()));
+
+        equipmentOutputToUpdate.forEach(outputToUpdate -> {
+            EquipmentOutputEntity outputUpdateFrom = equipmentOutputUpdateFromMap.get(outputToUpdate.getCode());
+            if (outputUpdateFrom != null) {
+                outputToUpdate.setAlias(outputUpdateFrom.getAlias());
+            }
+        });
+    }
+
+    private void updateIms(CountingEquipmentEntity toUpdate, CountingEquipmentEntity updateFrom) {
+        if(toUpdate.getIms() != null) {
+            ImsEntity equipmentOutputToUpdate = toUpdate.getIms();
+            ImsEntity equipmentOutputUpdateFrom = updateFrom.getIms();
+            equipmentOutputToUpdate.setCode(equipmentOutputUpdateFrom.getCode());
         }
-
-        countingEquipmentDb.get().setAlias(countingEquipment.getAlias());
-        countingEquipmentDb.get().setPTimerCommunicationCycle(countingEquipment.getPTimerCommunicationCycle());
-        countingEquipmentDb.get().setOutputs(countingEquipment.getOutputs());
-        countingEquipmentDb.get().setIms(countingEquipment.getIms());
-        countingEquipmentDb.get().setEquipmentEffectiveness(countingEquipment.getEquipmentEffectiveness());
-        countingEquipmentDb.get().setTheoreticalProduction(countingEquipment.getTheoreticalProduction());
-        countingEquipmentDb.get().setAvailability(countingEquipment.getAvailability());
-        countingEquipmentDb.get().setPerformance(countingEquipment.getPerformance());
-        countingEquipmentDb.get().setQuality(countingEquipment.getQuality());
-
-        return countingEquipmentDb.get();
+        toUpdate.setIms(updateFrom.getIms());
     }
 
     private void ensureMinimumPTimer(CountingEquipmentEntity countingEquipmentEntity) {

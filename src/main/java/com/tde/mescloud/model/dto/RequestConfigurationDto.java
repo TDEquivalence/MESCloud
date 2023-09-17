@@ -1,5 +1,6 @@
 package com.tde.mescloud.model.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,8 +10,9 @@ import java.util.List;
 @Setter
 public class RequestConfigurationDto {
 
-    private long id;
     private String alias;
+
+    @JsonProperty("pTimerCommunicationCycle")
     private int pTimerCommunicationCycle;
 
     private List<EquipmentOutputDto> outputs;
