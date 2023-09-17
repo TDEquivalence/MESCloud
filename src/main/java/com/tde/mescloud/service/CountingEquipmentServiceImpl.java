@@ -159,25 +159,26 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
     }
 
     private CountingEquipmentEntity updateEquipmentConfiguration(RequestConfigurationDto request) {
-        Optional<CountingEquipmentEntity> countingEquipmentEntity = repository.findById(request.getId());
+        CountingEquipmentEntity countingEquipment = converter.convertToEntity(request);
+        ensureMinimumPTimer(countingEquipment);
 
-        if (countingEquipmentEntity.isEmpty()) {
-            throw new IllegalArgumentException("Counting Equipment id doesn't exist.");
+        Optional<CountingEquipmentEntity> countingEquipmentDb = repository.findById(request.getId());
+
+        if(countingEquipmentDb.isEmpty()) {
+            throw new IllegalArgumentException("Counting equipment id doesn't exist.");
         }
 
-        countingEquipmentEntity.get().setAlias(request.getAlias());
-        countingEquipmentEntity.get().setOutputs(getEquipmentOutput(request.getOutputs()));
-        countingEquipmentEntity.get().setPTimerCommunicationCycle(request.getPTimerCommunicationCycle());
-        countingEquipmentEntity.get().setIms(getIms(request.getImsDto()));
+        countingEquipmentDb.get().setAlias(countingEquipment.getAlias());
+        countingEquipmentDb.get().setPTimerCommunicationCycle(countingEquipment.getPTimerCommunicationCycle());
+        countingEquipmentDb.get().setOutputs(countingEquipment.getOutputs());
+        countingEquipmentDb.get().setIms(countingEquipment.getIms());
+        countingEquipmentDb.get().setEquipmentEffectiveness(countingEquipment.getEquipmentEffectiveness());
+        countingEquipmentDb.get().setTheoreticalProduction(countingEquipment.getTheoreticalProduction());
+        countingEquipmentDb.get().setAvailability(countingEquipment.getAvailability());
+        countingEquipmentDb.get().setPerformance(countingEquipment.getPerformance());
+        countingEquipmentDb.get().setQuality(countingEquipment.getQuality());
 
-        countingEquipmentEntity.get().setEquipmentEffectiveness(request.getEquipmentEffectiveness());
-        countingEquipmentEntity.get().setTheoreticalProduction(request.getTheoreticalProduction());
-        countingEquipmentEntity.get().setAvailability(request.getAvailability());
-        countingEquipmentEntity.get().setPerformance(request.getPerformance());
-        countingEquipmentEntity.get().setQuality(request.getQuality());
-
-        ensureMinimumPTimer(countingEquipmentEntity.get());
-        return countingEquipmentEntity.get();
+        return countingEquipmentDb.get();
     }
 
     private void ensureMinimumPTimer(CountingEquipmentEntity countingEquipmentEntity) {
@@ -190,13 +191,5 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
         ImsEntity imsEntity = new ImsEntity();
         imsEntity.setId(imsId);
         countingEquipment.setIms(imsEntity);
-    }
-
-    private List<EquipmentOutputEntity> getEquipmentOutput(List<EquipmentOutputDto> equipmentOutputDtos) {
-        return equipmentOutputConverter.convertToEntity(equipmentOutputDtos);
-    }
-
-    private ImsEntity getIms(ImsDto dto) {
-        return imsConverter.toEntity(dto);
     }
 }
