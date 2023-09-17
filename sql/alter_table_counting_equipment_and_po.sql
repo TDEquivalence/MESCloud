@@ -1,5 +1,5 @@
 ALTER TABLE counting_equipment
-ADD COLUMN equipmentEffectiveness DOUBLE PRECISION,
+ADD COLUMN equipment_effectiveness DOUBLE PRECISION,
 ADD COLUMN availability DOUBLE PRECISION,
 ADD COLUMN performance DOUBLE PRECISION,
 ADD COLUMN quality DOUBLE PRECISION;
