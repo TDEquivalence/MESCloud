@@ -91,6 +91,11 @@ CREATE TABLE counting_equipment (
     equipment_status int,
     p_timer_communication_cycle int,
     ims_id int UNIQUE,
+    equipment_effectiveness DOUBLE PRECISION,
+    theoretical_production INTEGER;
+    availability DOUBLE PRECISION,
+    performance DOUBLE PRECISION,
+    quality DOUBLE PRECISION;
 
     PRIMARY KEY(id),
     FOREIGN KEY(section_id) REFERENCES section(id),
@@ -140,6 +145,7 @@ CREATE TABLE production_order (
     is_equipment_enabled boolean,
     is_completed boolean,
     created_at date,
+    completed_at DATE,
     input_batch varchar(100),
     source varchar(100),
     gauge varchar(100),

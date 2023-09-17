@@ -14,6 +14,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.Optional;
 
 @Service
@@ -77,6 +78,7 @@ public class ProductionOrderConclusionProcess extends AbstractMesProtocolProcess
 
         ProductionOrderEntity productionOrderEntity = productionOrderEntityOpt.get();
         productionOrderEntity.setCompleted(true);
+        productionOrderEntity.setCompletedAt(new Date());
         repository.save(productionOrderEntity);
 
 //        log.info("ProductionOrderConclusionProcess - releasing lock");
