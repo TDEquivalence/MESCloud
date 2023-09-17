@@ -24,12 +24,11 @@ import java.util.Optional;
 @Log
 public class CountingEquipmentServiceImpl implements CountingEquipmentService {
 
+    private final int MIN_PTIMER = 10;
+
     private CountingEquipmentRepository repository;
     private CountingEquipmentConverter converter;
     private ImsService imsService;
-
-    private EquipmentOutputConverter equipmentOutputConverter;
-    private ImsConverter imsConverter;
 
     @Override
     public List<CountingEquipmentDto> findAllWithLastProductionOrder() {
@@ -182,9 +181,8 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
     }
 
     private void ensureMinimumPTimer(CountingEquipmentEntity countingEquipmentEntity) {
-        int minPTimer = 10;
         int currentPTimer = countingEquipmentEntity.getPTimerCommunicationCycle();
-        countingEquipmentEntity.setPTimerCommunicationCycle(Math.max(minPTimer, currentPTimer));
+        countingEquipmentEntity.setPTimerCommunicationCycle(Math.max(MIN_PTIMER, currentPTimer));
     }
 
     private void setIms(CountingEquipmentEntity countingEquipment, Long imsId) {
