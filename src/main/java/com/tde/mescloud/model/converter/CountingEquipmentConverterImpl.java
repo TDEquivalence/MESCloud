@@ -1,6 +1,7 @@
 package com.tde.mescloud.model.converter;
 
 import com.tde.mescloud.model.dto.CountingEquipmentDto;
+import com.tde.mescloud.model.dto.RequestConfigurationDto;
 import com.tde.mescloud.model.entity.CountingEquipmentEntity;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
@@ -31,5 +32,9 @@ public class CountingEquipmentConverterImpl implements CountingEquipmentConverte
 
     public List<CountingEquipmentEntity> convertToEntity(List<CountingEquipmentDto> countingEquipments) {
         return countingEquipments.stream().map(this::convertToEntity).toList();
+    }
+
+    public CountingEquipmentEntity convertToEntity(RequestConfigurationDto request) {
+        return (request == null) ? null : mapper.map(request, CountingEquipmentEntity.class);
     }
 }

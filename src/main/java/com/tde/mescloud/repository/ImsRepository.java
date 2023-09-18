@@ -6,4 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ImsRepository extends JpaRepository<ImsEntity, Long> {
+
+    ImsEntity findByCode(String code);
 }
