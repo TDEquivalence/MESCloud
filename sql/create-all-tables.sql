@@ -78,7 +78,7 @@ CREATE TABLE section (
 
 CREATE TABLE ims (
     id int GENERATED ALWAYS AS IDENTITY,
-    code varchar(100) NOT NULL,
+    code varchar(100) NOT NULL UNIQUE,
 
     PRIMARY KEY(id)
 );
