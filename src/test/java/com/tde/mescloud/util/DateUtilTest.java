@@ -9,7 +9,7 @@ import java.time.Instant;
 import java.util.Date;
 import java.util.TimeZone;
 
-public class DateUtilTest {
+class DateUtilTest {
 
     private static final SimpleDateFormat ISO_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
     private static final TimeZone UTC_TIME_ZONE = TimeZone.getTimeZone("UTC");
@@ -19,7 +19,7 @@ public class DateUtilTest {
     }
 
     @Test
-    public void testSpanInDays() {
+    void testSpanInDays() {
         String startDateString = "2023-08-26T00:00:00.000Z";
         String endDateString = "2023-08-27T23:59:59.999Z";
 
@@ -32,7 +32,7 @@ public class DateUtilTest {
     }
 
     @Test
-    public void testDifferenceInDays() {
+    void testDifferenceInDays() {
         String startDateString = "2023-08-26T00:00:00.000Z";
         String endDateString = "2023-08-27T23:59:59.999Z";
 
