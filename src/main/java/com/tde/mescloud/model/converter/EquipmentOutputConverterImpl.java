@@ -1,9 +1,7 @@
 package com.tde.mescloud.model.converter;
 
 import com.tde.mescloud.model.dto.EquipmentOutputDto;
-import com.tde.mescloud.model.dto.SampleDto;
 import com.tde.mescloud.model.entity.EquipmentOutputEntity;
-import com.tde.mescloud.model.entity.SampleEntity;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.modelmapper.ModelMapper;

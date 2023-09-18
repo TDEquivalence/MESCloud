@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 @Log
 public class CountingEquipmentServiceImpl implements CountingEquipmentService {
 
-    private final int MIN_PTIMER = 10;
+    private static final int MIN_P_TIMER = 10;
 
     private CountingEquipmentRepository repository;
     private CountingEquipmentConverter converter;
@@ -218,7 +218,7 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
 
     private void ensureMinimumPTimer(CountingEquipmentEntity countingEquipmentEntity) {
         int currentPTimer = countingEquipmentEntity.getPTimerCommunicationCycle();
-        countingEquipmentEntity.setPTimerCommunicationCycle(Math.max(MIN_PTIMER, currentPTimer));
+        countingEquipmentEntity.setPTimerCommunicationCycle(Math.max(MIN_P_TIMER, currentPTimer));
     }
 
     private void setIms(CountingEquipmentEntity countingEquipment, Long imsId) {

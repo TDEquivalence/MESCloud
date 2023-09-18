@@ -76,7 +76,7 @@ public class ComposedProductionOrderRepositoryImpl {
 
         Subquery<Integer> batchSubquery = query.subquery(Integer.class);
         Root<BatchEntity> batchRoot = batchSubquery.from(BatchEntity.class);
-        batchSubquery.select(batchRoot.get("composed").get(PROP_ID));
+        batchSubquery.select(batchRoot.get(PROP_COMPOSED).get(PROP_ID));
 
         Predicate noBatchPredicate = criteriaBuilder.not(root.get(PROP_ID).in(batchSubquery));
         predicates.add(noBatchPredicate);
