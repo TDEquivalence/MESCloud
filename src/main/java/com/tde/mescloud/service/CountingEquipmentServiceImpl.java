@@ -199,17 +199,20 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
     }
 
     private void updateIms(CountingEquipmentEntity toUpdate, CountingEquipmentEntity updateFrom) {
-        ImsEntity imsDb = imsService.findByCode(updateFrom.getCode());
+        String imsCodeToUpdateFrom = updateFrom.getIms().getCode();
+        ImsEntity imsDb = imsService.findByCode(imsCodeToUpdateFrom);
 
         if (imsDb != null) {
             toUpdate.setIms(imsDb);
         }
 
         if (updateFrom.getIms() != null && imsDb == null) {
-            toUpdate.getIms().setCode(updateFrom.getCode());
+            toUpdate.getIms().setCode(imsCodeToUpdateFrom);
         }
 
-        toUpdate.setIms(updateFrom.getIms());
+        if (toUpdate.getIms() == null) {
+            toUpdate.setIms(updateFrom.getIms());
+        }
     }
 
 
