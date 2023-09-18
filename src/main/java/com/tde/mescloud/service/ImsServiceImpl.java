@@ -40,6 +40,11 @@ public class ImsServiceImpl implements ImsService {
     }
 
     @Override
+    public ImsEntity findByCode(String code) {
+        return repository.findByCode(code);
+    }
+
+    @Override
     public boolean isValidAndFree(Long imsId) {
         Optional<ImsEntity> imsEntityOpt = repository.findById(imsId);
         if (imsEntityOpt.isEmpty()) {
