@@ -7,11 +7,11 @@ import java.util.List;
 
 public interface SampleConverter {
 
-    public SampleDto convertToDto(SampleEntity sampleEntity);
+    SampleDto convertToDto(SampleEntity sampleEntity);
 
-    public SampleEntity convertToEntity(SampleDto sampleDto);
+    SampleEntity convertToEntity(SampleDto sampleDto);
 
-    public List<SampleDto> convertToDto(List<SampleEntity> sampleEntityList);
+    List<SampleDto> convertToDto(List<SampleEntity> sampleEntityList);
 
-    public List<SampleEntity> convertToEntity(List<SampleDto> sampleDtoList);
+    List<SampleEntity> convertToEntity(List<SampleDto> sampleDtoList);
 }

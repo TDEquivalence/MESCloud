@@ -1,15 +1,15 @@
 package com.tde.mescloud.api.rest;
 
 import com.tde.mescloud.model.dto.CounterRecordFilter;
+import com.tde.mescloud.model.dto.CounterRecordSimplDto;
 import com.tde.mescloud.model.dto.PaginatedCounterRecordsDto;
 import com.tde.mescloud.service.CounterRecordService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/counter-records")
@@ -29,5 +29,11 @@ CounterRecordController {
     public ResponseEntity<PaginatedCounterRecordsDto> getLastPerProductionOrder(@RequestBody CounterRecordFilter filter) {
         PaginatedCounterRecordsDto paginatedCounterRecords = service.filterConclusionRecordsPaginated(filter);
         return new ResponseEntity<>(paginatedCounterRecords, HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}/get-max-valid")
+    public ResponseEntity<List<CounterRecordSimplDto>> findById(@PathVariable long id) {
+        List<CounterRecordSimplDto> list = service.maxValid(id);
+        return new ResponseEntity<>(list, HttpStatus.OK);
     }
 }
