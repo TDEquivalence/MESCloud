@@ -27,7 +27,7 @@ public interface CounterRecordRepository extends CrudRepository<CounterRecordEnt
     List<CounterRecordEntity> getFilteredAndPaginated(CounterRecordFilter filterDto);
 
     @Query(
-            value = "SELECT cr.* " +
+            value = "SELECT cr.*, cr.production_order_id AS production_order_id_alias, cr.equipment_output_id AS equipment_output_id_alias " +
                     "FROM counter_record cr " +
                     "INNER JOIN equipment_output eo ON cr.equipment_output_id = eo.id " +
                     "WHERE eo.counting_equipment_id = :countingEquipmentId " +
