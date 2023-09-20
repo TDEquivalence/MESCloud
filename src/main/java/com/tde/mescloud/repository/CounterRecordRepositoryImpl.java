@@ -120,40 +120,4 @@ public class CounterRecordRepositoryImpl extends AbstractFilterRepository<Counte
                     return productionOrderJoin.get(PRODUCTION_ORDER_CODE_PROP);
                 });
     }
-
-    public List<CounterRecordEntity> getAllMaxValidCounterRecordByEquipmentId(Long countingEquipmentId) {
-        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<CounterRecordEntity> criteriaQuery = criteriaBuilder.createQuery(CounterRecordEntity.class);
-        Root<CounterRecordEntity> counterRecordRoot = criteriaQuery.from(CounterRecordEntity.class);
-        criteriaQuery.select(counterRecordRoot);
-
-        Join<CounterRecordEntity, EquipmentOutputEntity> equipmentOutputJoin = counterRecordRoot.join("equipmentOutput");
-        Join<EquipmentOutputEntity, CountingEquipmentEntity> countingEquipmentJoin = equipmentOutputJoin.join("countingEquipment");
-
-        Predicate conditions = criteriaBuilder.and(
-                criteriaBuilder.equal(countingEquipmentJoin.get("id"), countingEquipmentId),
-                criteriaBuilder.isTrue(counterRecordRoot.get("isValidForProduction"))
-        );
-
-        Subquery<Integer> maxComputedValueSubquery = criteriaQuery.subquery(Integer.class);
-        Root<CounterRecordEntity> maxComputedValueSubqueryRoot = maxComputedValueSubquery.from(CounterRecordEntity.class);
-        maxComputedValueSubquery.select(criteriaBuilder.max(maxComputedValueSubqueryRoot.get("computedValue")));
-        maxComputedValueSubquery.where(
-                criteriaBuilder.equal(maxComputedValueSubqueryRoot.get("equipmentOutput"), equipmentOutputJoin),
-                criteriaBuilder.equal(maxComputedValueSubqueryRoot.get("productionOrder"), counterRecordRoot.get("productionOrder"))
-        );
-
-        Predicate countCondition = criteriaBuilder.greaterThanOrEqualTo(
-                maxComputedValueSubquery,
-                criteriaBuilder.literal(1) // Compare with the constant value 1
-        );
-
-        conditions = criteriaBuilder.and(conditions, countCondition);
-
-        criteriaQuery.where(conditions);
-
-        TypedQuery<CounterRecordEntity> query = entityManager.createQuery(criteriaQuery);
-        return query.getResultList();
-    }
-
 }

@@ -26,21 +26,19 @@ public interface CounterRecordRepository extends CrudRepository<CounterRecordEnt
     //    @EntityGraph(attributePaths = { "equipmentOutput", "equipmentOutput.countingEquipment", "productionOrder" })
     List<CounterRecordEntity> getFilteredAndPaginated(CounterRecordFilter filterDto);
 
-    //    @Query(nativeQuery = true, value =
-//            "SELECT cr.*, cr.production_order_id AS production_order_id_alias, cr.equipment_output_id AS equipment_output_id_alias " +
-//                    "FROM counter_record cr " +
-//                    "INNER JOIN equipment_output eo ON cr.equipment_output_id = eo.id " +
-//                    "INNER JOIN counting_equipment ce ON eo.counting_equipment_id = ce.id " +
-//                    "WHERE eo.counting_equipment_id = :countingEquipmentId " +
-//                    "AND cr.is_valid_for_production = true " +
-//                    "AND cr.computed_value = ( " +
-//                    "    SELECT MAX(cr2.computed_value) " +
-//                    "    FROM counter_record cr2 " +
-//                    "    WHERE cr2.equipment_output_id = eo.id " +
-//                    "    AND cr2.production_order_id = cr.production_order_id " +
-//                    "    HAVING COUNT(cr2.id) > 1" +
-//                    ")")
+    @Query("SELECT cr " +
+            "FROM CounterRecordEntity cr " +
+            "INNER JOIN EquipmentOutputEntity eo ON cr.equipmentOutput.id = eo.id " +
+            "INNER JOIN CountingEquipmentEntity ce ON eo.countingEquipment.id = ce.id " +
+            "WHERE ce.id = :countingEquipmentId " +
+            "AND cr.isValidForProduction = true " +
+            "AND cr.id = (SELECT MAX(cr2.id) " +
+            "            FROM CounterRecordEntity cr2 " +
+            "            WHERE cr2.equipmentOutput.id = cr.equipmentOutput.id " +
+            "            AND cr2.computedValue = cr.computedValue " +
+            "            AND cr2.productionOrder.id = cr.productionOrder.id)")
     List<CounterRecordEntity> getAllMaxValidCounterRecordByEquipmentId(@Param("countingEquipmentId") Long countingEquipmentId);
+
 
     @Query(nativeQuery = true, value =
             "SELECT SUM(cr.computed_value) AS total_computed_value " +
