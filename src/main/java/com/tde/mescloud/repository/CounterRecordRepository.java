@@ -38,6 +38,8 @@ public interface CounterRecordRepository extends CrudRepository<CounterRecordEnt
                     "    SELECT MAX(cr2.computed_value) " +
                     "    FROM counter_record cr2 " +
                     "    WHERE cr2.equipment_output_id = eo.id " +
+                    "    AND cr2.production_order_id = cr.production_order_id " +
+                    "    HAVING COUNT(cr2.id) > 1" +
                     ")")
     List<CounterRecordEntity> getAllMaxValidCounterRecordByEquipmentId(@Param("countingEquipmentId") Long countingEquipmentId);
 
@@ -49,10 +51,11 @@ public interface CounterRecordRepository extends CrudRepository<CounterRecordEnt
                     "WHERE eo.is_valid_for_production = true " +
                     "AND eo.counting_equipment_id = :countingEquipmentId " +
                     "AND cr.is_valid_for_production = true " +
-                    "AND cr.computed_value = ( " +
-                    "    SELECT MAX(cr2.computed_value) " +
+                    "AND (cr.production_order_id, cr.equipment_output_id, cr.computed_value) IN ( " +
+                    "    SELECT cr2.production_order_id, cr2.equipment_output_id, MAX(cr2.computed_value) " +
                     "    FROM counter_record cr2 " +
                     "    WHERE cr2.equipment_output_id = eo.id " +
+                    "    GROUP BY cr2.production_order_id, cr2.equipment_output_id" +
                     ")")
     Integer getCounterRecordsComputedValueSum(@Param("countingEquipmentId") Long countingEquipmentId);
 }
