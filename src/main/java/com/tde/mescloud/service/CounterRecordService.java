@@ -1,7 +1,6 @@
 package com.tde.mescloud.service;
 
 import com.tde.mescloud.model.dto.*;
-import com.tde.mescloud.model.entity.CounterRecordEntity;
 
 import java.util.List;
 
@@ -21,5 +20,5 @@ public interface CounterRecordService {
 
     List<CounterRecordSimplDto> getMaxCounterRecordsValid(Long equipmentId);
 
-    Integer getCounterRecordsComputedValueSum(Long equipmentId);
+    Integer getSumComputedValue(Long equipmentId);
 }

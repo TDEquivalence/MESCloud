@@ -26,26 +26,28 @@ public interface CounterRecordRepository extends CrudRepository<CounterRecordEnt
     //    @EntityGraph(attributePaths = { "equipmentOutput", "equipmentOutput.countingEquipment", "productionOrder" })
     List<CounterRecordEntity> getFilteredAndPaginated(CounterRecordFilter filterDto);
 
-    @Query(
-            value = "SELECT cr.*, cr.production_order_id AS production_order_id_alias, cr.equipment_output_id AS equipment_output_id_alias " +
+    @Query(nativeQuery = true, value =
+            "SELECT cr.*, cr.production_order_id AS production_order_id_alias, cr.equipment_output_id AS equipment_output_id_alias " +
                     "FROM counter_record cr " +
                     "INNER JOIN equipment_output eo ON cr.equipment_output_id = eo.id " +
+                    "INNER JOIN counting_equipment ce ON eo.counting_equipment_id = ce.id " +
                     "WHERE eo.counting_equipment_id = :countingEquipmentId " +
                     "AND cr.is_valid_for_production = true " +
+                    "AND eo.is_valid_for_production = true " +
                     "AND cr.computed_value = ( " +
                     "    SELECT MAX(cr2.computed_value) " +
                     "    FROM counter_record cr2 " +
                     "    WHERE cr2.equipment_output_id = eo.id " +
-                    ")",
-            nativeQuery = true
-    )
+                    ")")
     List<CounterRecordEntity> getAllMaxValidCounterRecordByEquipmentId(@Param("countingEquipmentId") Long countingEquipmentId);
 
     @Query(nativeQuery = true, value =
             "SELECT SUM(cr.computed_value) AS total_computed_value " +
                     "FROM counter_record cr " +
                     "INNER JOIN equipment_output eo ON cr.equipment_output_id = eo.id " +
-                    "WHERE eo.counting_equipment_id = :countingEquipmentId " +
+                    "INNER JOIN counting_equipment ce ON eo.counting_equipment_id = ce.id " +
+                    "WHERE eo.is_valid_for_production = true " +
+                    "AND eo.counting_equipment_id = :countingEquipmentId " +
                     "AND cr.is_valid_for_production = true " +
                     "AND cr.computed_value = ( " +
                     "    SELECT MAX(cr2.computed_value) " +

@@ -39,7 +39,7 @@ CounterRecordController {
 
     @GetMapping("/{id}/get-sum-valid")
     public ResponseEntity<Integer> getSumComputedValue(@PathVariable long id) {
-        Integer sumComputedValue = service.getCounterRecordsComputedValueSum(id);
+        Integer sumComputedValue = service.getSumComputedValue(id);
         return new ResponseEntity<>(sumComputedValue, HttpStatus.OK);
     }
 }

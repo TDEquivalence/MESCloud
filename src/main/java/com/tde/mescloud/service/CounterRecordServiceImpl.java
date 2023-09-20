@@ -212,7 +212,7 @@ public class CounterRecordServiceImpl implements CounterRecordService {
         return converter.convertToDto(list);
     }
 
-    public Integer getCounterRecordsComputedValueSum(Long equipmentId) {
+    public Integer getSumComputedValue(Long equipmentId) {
         return repository.getCounterRecordsComputedValueSum(equipmentId);
     }
 }
