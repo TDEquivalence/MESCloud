@@ -167,6 +167,11 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     }
 
     @Override
+    public List<ProductionOrderEntity> saveAndUpdateAll(List<ProductionOrderEntity> productionOrder) {
+        return repository.saveAll(productionOrder);
+    }
+
+    @Override
     public void delete(ProductionOrderEntity productionOrder) {
         repository.delete(productionOrder);
     }
@@ -198,5 +203,21 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     public List<ProductionOrderSummaryDto> getCompletedWithoutComposed() {
         List<ProductionOrderSummaryEntity> persistedProductionOrders = repository.findCompletedWithoutComposed();
         return summaryConverter.toDto(persistedProductionOrders);
+    }
+
+    @Override
+    public void setProductionOrderApproval(Long composedOrderId) {
+
+        List<ProductionOrderEntity> productionOrders = repository.findByComposedProductionOrderId(composedOrderId);
+
+        if (productionOrders == null || productionOrders.isEmpty()) {
+            return;
+        }
+
+        for (ProductionOrderEntity productionOrder : productionOrders) {
+            productionOrder.setIsApproved(true);
+        }
+
+        saveAndUpdateAll(productionOrders);
     }
 }

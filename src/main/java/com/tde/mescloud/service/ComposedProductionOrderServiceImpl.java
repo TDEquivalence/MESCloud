@@ -158,4 +158,20 @@ public class ComposedProductionOrderServiceImpl implements ComposedProductionOrd
         List<ComposedSummaryEntity> composedCompleted = repository.findCompleted();
         return summaryConverter.toDto(composedCompleted);
     }
+
+    @Override
+    public void setProductionOrderApproval(ComposedProductionOrderEntity composed) {
+        if (composed == null) {
+            return;
+        }
+
+        Long composedId = composed.getId();
+
+        Optional<ComposedProductionOrderEntity> composedEntityOptional = repository.findById(composedId);
+        if (composedEntityOptional.isEmpty()) {
+            return;
+        }
+
+        productionOrderService.setProductionOrderApproval(composedId);
+    }
 }

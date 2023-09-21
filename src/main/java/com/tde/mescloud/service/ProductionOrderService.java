@@ -21,6 +21,8 @@ public interface ProductionOrderService {
 
     ProductionOrderEntity saveAndUpdate(ProductionOrderEntity productionOrder);
 
+    List<ProductionOrderEntity> saveAndUpdateAll(List<ProductionOrderEntity> productionOrders);
+
     void delete(ProductionOrderEntity productionOrder);
 
     Optional<ProductionOrderEntity> findById(Long id);
@@ -30,4 +32,6 @@ public interface ProductionOrderService {
     List<Long> findExistingIds(List<Long> ids);
 
     List<ProductionOrderSummaryDto> getCompletedWithoutComposed();
+
+    void setProductionOrderApproval(Long composedOrderId);
 }

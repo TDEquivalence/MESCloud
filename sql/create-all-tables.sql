@@ -151,6 +151,7 @@ CREATE TABLE production_order (
     gauge varchar(100),
     category varchar(100),
     washing_process varchar(100),
+    is_approved boolean,
 
     PRIMARY KEY(id),
     FOREIGN KEY(equipment_id) REFERENCES counting_equipment(id),
@@ -178,6 +179,7 @@ CREATE TABLE counter_record (
     equipment_output_alias varchar(100),
     real_value int,
     computed_value int,
+    increment int,
     production_order_id int,
     registered_at timestamp,
     is_valid_for_production boolean,

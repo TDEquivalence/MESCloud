@@ -27,6 +27,7 @@ public class BatchServiceImpl implements BatchService {
     public BatchDto create(RequestBatchDto requestBatch) {
         BatchEntity batch = createBatch(requestBatch);
         BatchEntity savedBatch = saveAndUpdate(batch);
+        setProductionOrderApproval(savedBatch);
         return converter.toDto(savedBatch);
     }
 
@@ -43,6 +44,19 @@ public class BatchServiceImpl implements BatchService {
         }
         return composedOpt.get();
     }
+
+    private void setProductionOrderApproval(BatchEntity batch) {
+        if (batch == null || !Boolean.TRUE.equals(batch.getIsApproved())) {
+            return;
+        }
+
+        if (batch.getComposed() == null) {
+            return;
+        }
+
+        composedService.setProductionOrderApproval(batch.getComposed());
+    }
+
 
     @Override
     public BatchEntity saveAndUpdate(BatchEntity batch) {
