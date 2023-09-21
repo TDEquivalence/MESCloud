@@ -95,7 +95,7 @@ CREATE TABLE counting_equipment (
     theoretical_production INTEGER,
     availability DOUBLE PRECISION,
     performance DOUBLE PRECISION,
-    quality DOUBLE PRECISION;
+    quality DOUBLE PRECISION,
 
     PRIMARY KEY(id),
     FOREIGN KEY(section_id) REFERENCES section(id),
@@ -263,4 +263,3 @@ LEFT JOIN sample s ON cpo.id = s.composed_production_order_id
 LEFT JOIN hit h ON s.id = h.sample_id
 LEFT JOIN production_order po ON cpo.id = po.composed_production_order_id
 LEFT JOIN batch b ON cpo.id = b.composed_production_order_id;
-
