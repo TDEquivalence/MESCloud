@@ -39,18 +39,5 @@ public interface CounterRecordRepository extends CrudRepository<CounterRecordEnt
                     ")",
             nativeQuery = true
     )
-    List<CounterRecordEntity> getAllMaxValidCounterRecordByEquipmentId(@Param("countingEquipmentId") Long countingEquipmentId);
-
-    @Query(nativeQuery = true, value =
-            "SELECT SUM(cr.computed_value) AS total_computed_value " +
-                    "FROM counter_record cr " +
-                    "INNER JOIN equipment_output eo ON cr.equipment_output_id = eo.id " +
-                    "WHERE eo.counting_equipment_id = :countingEquipmentId " +
-                    "AND cr.is_valid_for_production = true " +
-                    "AND cr.computed_value = ( " +
-                    "    SELECT MAX(cr2.computed_value) " +
-                    "    FROM counter_record cr2 " +
-                    "    WHERE cr2.equipment_output_id = eo.id " +
-                    ")")
-    Integer getCounterRecordsComputedValueSum(@Param("countingEquipmentId") Long countingEquipmentId);
+    List<CounterRecordEntity> findAllMaxValidCounterRecordByEquipmentId(@Param("countingEquipmentId") Long countingEquipmentId);
 }

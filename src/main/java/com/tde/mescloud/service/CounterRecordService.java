@@ -19,7 +19,5 @@ public interface CounterRecordService {
 
     boolean areValidContinuationCounts(String productionOrderCode);
 
-    List<CounterRecordSimplDto> getMaxCounterRecordsValid(Long equipmentId);
-
-    Integer getCounterRecordsComputedValueSum(Long equipmentId);
+    List<CounterRecordSimplDto> maxValid(Long equipmentId);
 }

@@ -32,14 +32,8 @@ CounterRecordController {
     }
 
     @GetMapping("/{id}/get-max-valid")
-    public ResponseEntity<List<CounterRecordSimplDto>> getMaxCounterRecordsValid(@PathVariable long id) {
-        List<CounterRecordSimplDto> list = service.getMaxCounterRecordsValid(id);
+    public ResponseEntity<List<CounterRecordSimplDto>> findById(@PathVariable long id) {
+        List<CounterRecordSimplDto> list = service.maxValid(id);
         return new ResponseEntity<>(list, HttpStatus.OK);
-    }
-
-    @GetMapping("/{id}/get-sum-valid")
-    public ResponseEntity<Integer> getSumComputedValue(@PathVariable long id) {
-        Integer sumComputedValue = service.getCounterRecordsComputedValueSum(id);
-        return new ResponseEntity<>(sumComputedValue, HttpStatus.OK);
     }
 }

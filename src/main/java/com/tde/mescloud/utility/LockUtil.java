@@ -4,38 +4,21 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.stereotype.Component;
 
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.CountDownLatch;
 
 @Setter
 @Getter
 @Component
 public class LockUtil {
 
-    private final ReentrantLock lock = new ReentrantLock();
-    private final Condition executeCondition = lock.newCondition();
-    private boolean isExecutionComplete = false;
+    private final CountDownLatch latch = new CountDownLatch(1);
 
     public void waitForExecute() throws InterruptedException {
-        lock.lock();
-        try {
-            while (!isExecutionComplete) {
-                executeCondition.await();
-            }
-            isExecutionComplete = false; // Reset the flag for the next round of execution
-        } finally {
-            lock.unlock();
-        }
+        latch.await();
     }
 
     public void signalExecute() {
-        lock.lock();
-        try {
-            isExecutionComplete = true;
-            executeCondition.signal();
-        } finally {
-            lock.unlock();
-        }
+        latch.countDown();
     }
 
 }
