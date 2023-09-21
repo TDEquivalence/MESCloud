@@ -92,7 +92,7 @@ CREATE TABLE counting_equipment (
     p_timer_communication_cycle int,
     ims_id int UNIQUE,
     equipment_effectiveness DOUBLE PRECISION,
-    theoretical_production INTEGER;
+    theoretical_production INTEGER,
     availability DOUBLE PRECISION,
     performance DOUBLE PRECISION,
     quality DOUBLE PRECISION;
