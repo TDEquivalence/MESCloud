@@ -1,7 +1,6 @@
 package com.tde.mescloud.model.converter;
 
 import com.tde.mescloud.model.dto.CounterRecordDto;
-import com.tde.mescloud.model.dto.CounterRecordSimplDto;
 import com.tde.mescloud.model.entity.CounterRecordConclusionEntity;
 import com.tde.mescloud.model.entity.CounterRecordEntity;
 
@@ -26,11 +25,11 @@ public interface CounterRecordConverter {
         return dtos;
     }
 
-    CounterRecordSimplDto convertToDto(CounterRecordEntity entity);
+    CounterRecordDto convertToDto(CounterRecordEntity entity);
 
-    CounterRecordEntity convertToEntity(CounterRecordSimplDto dto);
+    CounterRecordEntity convertToEntity(CounterRecordDto dto);
 
-    List<CounterRecordSimplDto> convertToDto(List<CounterRecordEntity> entityList);
+    List<CounterRecordDto> convertToDto(List<CounterRecordEntity> entityList);
 
-    List<CounterRecordEntity> convertToEntity(List<CounterRecordSimplDto> dtoList);
+    List<CounterRecordEntity> convertToEntity(List<CounterRecordDto> dtoList);
 }

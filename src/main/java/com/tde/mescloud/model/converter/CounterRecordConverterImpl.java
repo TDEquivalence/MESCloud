@@ -1,7 +1,6 @@
 package com.tde.mescloud.model.converter;
 
 import com.tde.mescloud.model.dto.CounterRecordDto;
-import com.tde.mescloud.model.dto.CounterRecordSimplDto;
 import com.tde.mescloud.model.entity.CounterRecordConclusionEntity;
 import com.tde.mescloud.model.entity.CounterRecordEntity;
 import lombok.AllArgsConstructor;
@@ -37,22 +36,22 @@ public class CounterRecordConverterImpl implements CounterRecordConverter {
     }
 
     @Override
-    public CounterRecordSimplDto convertToDto(CounterRecordEntity entity) {
-        return mapper.map(entity, CounterRecordSimplDto.class);
+    public CounterRecordDto convertToDto(CounterRecordEntity entity) {
+        return mapper.map(entity, CounterRecordDto.class);
     }
 
     @Override
-    public CounterRecordEntity convertToEntity(CounterRecordSimplDto dto) {
+    public CounterRecordEntity convertToEntity(CounterRecordDto dto) {
         return (dto == null) ? null : mapper.map(dto, CounterRecordEntity.class);
     }
 
     @Override
-    public List<CounterRecordSimplDto> convertToDto(List<CounterRecordEntity> entityList) {
+    public List<CounterRecordDto> convertToDto(List<CounterRecordEntity> entityList) {
         return entityList.stream().map(this::convertToDto).toList();
     }
 
     @Override
-    public List<CounterRecordEntity> convertToEntity(List<CounterRecordSimplDto> dtoList) {
+    public List<CounterRecordEntity> convertToEntity(List<CounterRecordDto> dtoList) {
         return dtoList.stream().map(this::convertToEntity).toList();
     }
 }
