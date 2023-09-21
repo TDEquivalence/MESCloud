@@ -4,7 +4,6 @@ import com.tde.mescloud.model.dto.CounterRecordFilter;
 import com.tde.mescloud.model.dto.KpiFilterDto;
 import com.tde.mescloud.model.entity.*;
 import jakarta.persistence.EntityGraph;
-import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
 import org.springframework.stereotype.Repository;
 
