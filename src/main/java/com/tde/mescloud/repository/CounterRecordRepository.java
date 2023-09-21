@@ -26,17 +26,25 @@ public interface CounterRecordRepository extends CrudRepository<CounterRecordEnt
     //    @EntityGraph(attributePaths = { "equipmentOutput", "equipmentOutput.countingEquipment", "productionOrder" })
     List<CounterRecordEntity> getFilteredAndPaginated(CounterRecordFilter filterDto);
 
-    @Query("SELECT cr " +
-            "FROM CounterRecordEntity cr " +
-            "INNER JOIN EquipmentOutputEntity eo ON cr.equipmentOutput.id = eo.id " +
-            "INNER JOIN CountingEquipmentEntity ce ON eo.countingEquipment.id = ce.id " +
-            "WHERE ce.id = :countingEquipmentId " +
-            "AND cr.isValidForProduction = true " +
-            "AND cr.id = (SELECT MAX(cr2.id) " +
-            "            FROM CounterRecordEntity cr2 " +
-            "            WHERE cr2.equipmentOutput.id = cr.equipmentOutput.id " +
-            "            AND cr2.computedValue = cr.computedValue " +
-            "            AND cr2.productionOrder.id = cr.productionOrder.id)")
+    @Query(nativeQuery = true, value =
+            "SELECT cr.*," +
+                    "       cr.production_order_id AS production_order_id_alias," +
+                    "       cr.equipment_output_id AS equipment_output_id_alias " +
+                    "FROM counter_record cr " +
+                    "INNER JOIN equipment_output eo ON cr.equipment_output_id = eo.id " +
+                    "INNER JOIN counting_equipment ce ON eo.counting_equipment_id = ce.id " +
+                    "WHERE ce.id = :countingEquipmentId " +
+                    "  AND cr.is_valid_for_production = true " +
+                    "  AND (cr.equipment_output_id, cr.production_order_id, cr.computed_value, cr.id) IN (" +
+                    "    SELECT equipment_output_id," +
+                    "           production_order_id," +
+                    "           MAX(computed_value)," +
+                    "           MAX(id) " +
+                    "    FROM counter_record " +
+                    "    WHERE ce.id = :countingEquipmentId " +
+                    "      AND is_valid_for_production = true " +
+                    "    GROUP BY equipment_output_id, production_order_id" +
+                    ")")
     List<CounterRecordEntity> getAllMaxValidCounterRecordByEquipmentId(@Param("countingEquipmentId") Long countingEquipmentId);
 
 
