@@ -213,4 +213,14 @@ public class CounterRecordServiceImpl implements CounterRecordService {
         return productionOrderOpt.isPresent() &&
                 repository.findLastByProductionOrderId(productionOrderOpt.get().getId()).isPresent();
     }
+
+    @Override
+    public Integer calculateIncrement(Long countingEquipmentId) {
+        return repository.calculateIncrement(countingEquipmentId);
+    }
+
+    @Override
+    public Integer calculateIncrementWithApprovedPO(Long countingEquipmentId) {
+        return repository.calculateIncrementWithApprovedPO(countingEquipmentId);
+    }
 }

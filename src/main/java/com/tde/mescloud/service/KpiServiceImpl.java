@@ -54,4 +54,16 @@ public class KpiServiceImpl implements KpiService {
     private Instant getPropertyAsInstant(KpiFilterDto filter, CounterRecordFilter.Property counterRecordProperty) {
         return DateUtil.convertToInstant(filter.getSearch().getValue(counterRecordProperty));
     }
+
+    @Override
+    public Integer computeEquipmentQualityId(Long equipmentId, KpiFilterDto kpiFilter) {
+        Integer totalIncrement = counterRecordService.calculateIncrement(equipmentId);
+        Integer totalIncrementWithApprovedPO = counterRecordService.calculateIncrementWithApprovedPO(equipmentId);
+
+        if (totalIncrementWithApprovedPO == null) {
+            return 0;
+        }
+
+        return totalIncrement / totalIncrementWithApprovedPO;
+    }
 }

@@ -6,4 +6,6 @@ import com.tde.mescloud.model.dto.KpiFilterDto;
 public interface KpiService {
 
     CountingEquipmentKpiDto[] computeEquipmentKpi(KpiFilterDto filter);
+
+    Integer computeEquipmentQualityId(Long equipmentId, KpiFilterDto kpiFilter);
 }

@@ -26,7 +26,7 @@ public interface CounterRecordRepository extends CrudRepository<CounterRecordEnt
     //    @EntityGraph(attributePaths = { "equipmentOutput", "equipmentOutput.countingEquipment", "productionOrder" })
     List<CounterRecordEntity> getFilteredAndPaginated(CounterRecordFilter filterDto);
 
-    @Query(value = "SELECT SUM(total_increment) AS total_increment " +
+    /*@Query(value = "SELECT SUM(total_increment) AS total_increment " +
             "FROM ( " +
             "    SELECT " +
             "        cr.production_order_id, " +
@@ -41,10 +41,10 @@ public interface CounterRecordRepository extends CrudRepository<CounterRecordEnt
             "        AND cr.production_order_id IS NOT NULL " +
             "    GROUP BY " +
             "        cr.production_order_id " +
-            ") AS subquery", nativeQuery = true)
-    Integer calculateIncrementByCountingEquipmentId(Long countingEquipmentId);
+            ") AS subquery", nativeQuery = true)*/
+    Integer calculateIncrement(Long countingEquipmentId);
 
-    @Query(value = "SELECT SUM(total_increment) AS total_increment " +
+    /*@Query(value = "SELECT SUM(total_increment) AS total_increment " +
             "FROM ( " +
             "    SELECT " +
             "        cr.production_order_id, " +
@@ -62,6 +62,6 @@ public interface CounterRecordRepository extends CrudRepository<CounterRecordEnt
             "        AND po.is_approved = true " +  // Include this condition
             "    GROUP BY " +
             "        cr.production_order_id " +
-            ") AS subquery", nativeQuery = true)
-    Integer calculateIncrementWithProductionOrderApprovedByEquipmentId(@Param("countingEquipmentId") Long countingEquipmentId);
+            ") AS subquery", nativeQuery = true)*/
+    Integer calculateIncrementWithApprovedPO(@Param("countingEquipmentId") Long countingEquipmentId);
 }
