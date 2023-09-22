@@ -6,7 +6,6 @@ import com.tde.mescloud.model.entity.CounterRecordConclusionEntity;
 import com.tde.mescloud.model.entity.CounterRecordEntity;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
-import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,19 +24,4 @@ public interface CounterRecordRepository extends CrudRepository<CounterRecordEnt
 
     //    @EntityGraph(attributePaths = { "equipmentOutput", "equipmentOutput.countingEquipment", "productionOrder" })
     List<CounterRecordEntity> getFilteredAndPaginated(CounterRecordFilter filterDto);
-
-    @Query(
-            value = "SELECT cr.*, cr.production_order_id AS production_order_id_alias, cr.equipment_output_id AS equipment_output_id_alias " +
-                    "FROM counter_record cr " +
-                    "INNER JOIN equipment_output eo ON cr.equipment_output_id = eo.id " +
-                    "WHERE eo.counting_equipment_id = :countingEquipmentId " +
-                    "AND cr.is_valid_for_production = true " +
-                    "AND cr.computed_value = ( " +
-                    "    SELECT MAX(cr2.computed_value) " +
-                    "    FROM counter_record cr2 " +
-                    "    WHERE cr2.equipment_output_id = eo.id " +
-                    ")",
-            nativeQuery = true
-    )
-    List<CounterRecordEntity> findAllMaxValidCounterRecordByEquipmentId(@Param("countingEquipmentId") Long countingEquipmentId);
 }

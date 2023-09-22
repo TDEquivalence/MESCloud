@@ -206,9 +206,4 @@ public class CounterRecordServiceImpl implements CounterRecordService {
         return productionOrderOpt.isPresent() &&
                 repository.findLastByProductionOrderId(productionOrderOpt.get().getId()).isPresent();
     }
-
-    public List<CounterRecordSimplDto> maxValid(Long equipmentId) {
-        List<CounterRecordEntity> list = repository.findAllMaxValidCounterRecordByEquipmentId(equipmentId);
-        return converter.convertToDto(list);
-    }
 }
