@@ -22,8 +22,8 @@ public class KpiController {
     }
 
     @GetMapping("{equipmentId}/quality")
-    public ResponseEntity<Integer> getQuality(@PathVariable Long equipmentId) {
-        Integer quality = kpiService.computeEquipmentQualityId(equipmentId, null);
+    public ResponseEntity<Double> getQuality(@PathVariable Long equipmentId) {
+        Double quality = kpiService.computeEquipmentQualityId(equipmentId, null);
         return new ResponseEntity<>(quality, HttpStatus.OK);
     }
 }

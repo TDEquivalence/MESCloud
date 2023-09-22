@@ -7,5 +7,5 @@ public interface KpiService {
 
     CountingEquipmentKpiDto[] computeEquipmentKpi(KpiFilterDto filter);
 
-    Integer computeEquipmentQualityId(Long equipmentId, KpiFilterDto kpiFilter);
+    Double computeEquipmentQualityId(Long equipmentId, KpiFilterDto kpiFilter);
 }

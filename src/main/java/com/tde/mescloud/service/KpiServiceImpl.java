@@ -56,14 +56,15 @@ public class KpiServiceImpl implements KpiService {
     }
 
     @Override
-    public Integer computeEquipmentQualityId(Long equipmentId, KpiFilterDto kpiFilter) {
+    public Double computeEquipmentQualityId(Long equipmentId, KpiFilterDto kpiFilter) {
         Integer totalIncrement = counterRecordService.calculateIncrement(equipmentId);
         Integer totalIncrementWithApprovedPO = counterRecordService.calculateIncrementWithApprovedPO(equipmentId);
 
-        if (totalIncrementWithApprovedPO == null) {
-            return 0;
+        if (totalIncrementWithApprovedPO == null || totalIncrement == null || totalIncrement == 0) {
+            return 0.0; // Return 0.0 in case of division by zero or if totalIncrementWithApprovedPO is null.
         }
 
-        return totalIncrement / totalIncrementWithApprovedPO;
+        return (double) totalIncrementWithApprovedPO / totalIncrement;
     }
+
 }
