@@ -188,7 +188,7 @@ public class CounterRecordRepositoryImpl extends AbstractFilterRepository<Counte
         Predicate conditions = cb.and(
                 cb.isTrue(crRoot.get("isValidForProduction")),
                 cb.equal(countingEquipmentJoin.get("id"), countingEquipmentId),
-                cb.isNotNull(poJoin.get("isApproved"))
+                cb.isTrue(poJoin.get("isApproved"))
         );
 
         Predicate startDate = cb.greaterThanOrEqualTo(crRoot.get("registeredAt"), startDateFilter);
