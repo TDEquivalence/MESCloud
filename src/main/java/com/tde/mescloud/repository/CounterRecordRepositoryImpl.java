@@ -166,15 +166,22 @@ public class CounterRecordRepositoryImpl extends AbstractFilterRepository<Counte
         return incrementByPO;
     }
 
-    public Integer calculateIncrementWithApprovedPO(Long countingEquipmentId, Date startDateFilter, Date endDateFilter) {
+    public Integer calculateIncrementWithApprovedPO(Long countingEquipmentId,  Date startDateFilter, Date endDateFilter) {
+        Map<Long, Integer> incrementWithApprovedPO = calculateIncrementWithApprovedProductionOrder(countingEquipmentId, startDateFilter, endDateFilter);
+
+        return incrementWithApprovedPO.values().stream().mapToInt(Integer::intValue).sum();
+    }
+
+    private Map<Long, Integer> calculateIncrementWithApprovedProductionOrder(Long countingEquipmentId, Date startDateFilter, Date endDateFilter) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-        CriteriaQuery<Integer> query = cb.createQuery(Integer.class);
+        CriteriaQuery<Tuple> query = cb.createTupleQuery();
 
         Root<CounterRecordEntity> crRoot = query.from(CounterRecordEntity.class);
         Join<CounterRecordEntity, EquipmentOutputEntity> eoJoin = crRoot.join("equipmentOutput", JoinType.INNER);
         Join<EquipmentOutputEntity, CountingEquipmentEntity> countingEquipmentJoin = eoJoin.join("countingEquipment", JoinType.INNER);
         Join<CounterRecordEntity, ProductionOrderEntity> poJoin = crRoot.join("productionOrder", JoinType.INNER);
 
+        Expression<Long> productionOrderId = poJoin.get("id");
         Expression<Integer> sumIncrement = cb.sum(crRoot.get("increment"));
 
         List<Predicate> predicateList = new ArrayList<>();
@@ -190,10 +197,20 @@ public class CounterRecordRepositoryImpl extends AbstractFilterRepository<Counte
         predicateList.add(startDate);
         predicateList.add(endDate);
 
-        query.select(sumIncrement)
+        query.multiselect(productionOrderId, sumIncrement)
                 .where(cb.and(predicateList.toArray(new Predicate[0])))
-                .groupBy(poJoin.get("id"));
+                .groupBy(productionOrderId);
 
-        return entityManager.createQuery(query).getSingleResult();
+        List<Tuple> result = entityManager.createQuery(query).getResultList();
+
+        Map<Long, Integer> incrementByPO = new HashMap<>();
+        for (Tuple tuple : result) {
+            Long productionOrderIdValue = tuple.get(productionOrderId);
+            Integer totalIncrement = tuple.get(sumIncrement);
+            incrementByPO.put(productionOrderIdValue, totalIncrement);
+        }
+
+        return incrementByPO;
     }
+
 }
