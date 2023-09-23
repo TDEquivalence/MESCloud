@@ -1,9 +1,6 @@
 package com.tde.mescloud.service;
 
-import com.tde.mescloud.model.dto.CounterRecordDto;
-import com.tde.mescloud.model.dto.CounterRecordFilter;
-import com.tde.mescloud.model.dto.CountingEquipmentKpiDto;
-import com.tde.mescloud.model.dto.KpiFilterDto;
+import com.tde.mescloud.model.dto.*;
 import com.tde.mescloud.utility.DateUtil;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -56,12 +53,12 @@ public class KpiServiceImpl implements KpiService {
     }
 
     @Override
-    public Double computeEquipmentQualityId(Long equipmentId, KpiFilterDto kpiFilter) {
-        Integer totalIncrement = counterRecordService.calculateIncrement(equipmentId);
-        Integer totalIncrementWithApprovedPO = counterRecordService.calculateIncrementWithApprovedPO(equipmentId);
+    public Double computeEquipmentQuality(Long equipmentId, RequestKpiDto requestKpiDto) {
+        Integer totalIncrement = counterRecordService.calculateIncrement(equipmentId, requestKpiDto.getStartDate(), requestKpiDto.getEndDate());
+        Integer totalIncrementWithApprovedPO = counterRecordService.calculateIncrementWithApprovedPO(equipmentId, requestKpiDto.getStartDate(), requestKpiDto.getEndDate());
 
         if (totalIncrementWithApprovedPO == null || totalIncrement == null || totalIncrement == 0) {
-            return 0.0; // Return 0.0 in case of division by zero or if totalIncrementWithApprovedPO is null.
+            return 0.0;
         }
 
         return (double) totalIncrementWithApprovedPO / totalIncrement;

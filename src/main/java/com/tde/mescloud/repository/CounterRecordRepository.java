@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,42 +27,7 @@ public interface CounterRecordRepository extends CrudRepository<CounterRecordEnt
     //    @EntityGraph(attributePaths = { "equipmentOutput", "equipmentOutput.countingEquipment", "productionOrder" })
     List<CounterRecordEntity> getFilteredAndPaginated(CounterRecordFilter filterDto);
 
-    /*@Query(value = "SELECT SUM(total_increment) AS total_increment " +
-            "FROM ( " +
-            "    SELECT " +
-            "        cr.production_order_id, " +
-            "        SUM(cr.increment) AS total_increment " +
-            "    FROM " +
-            "        equipment_output eo " +
-            "    JOIN " +
-            "        counter_record cr ON eo.id = cr.equipment_output_id " +
-            "    WHERE " +
-            "        eo.is_valid_for_production = true " +
-            "        AND eo.counting_equipment_id = :countingEquipmentId " + // Use the parameter here
-            "        AND cr.production_order_id IS NOT NULL " +
-            "    GROUP BY " +
-            "        cr.production_order_id " +
-            ") AS subquery", nativeQuery = true)*/
-    Integer calculateIncrement(Long countingEquipmentId);
+    Integer calculateIncrement(Long countingEquipmentId, Date startDateFilter, Date endDateFilter);
 
-    /*@Query(value = "SELECT SUM(total_increment) AS total_increment " +
-            "FROM ( " +
-            "    SELECT " +
-            "        cr.production_order_id, " +
-            "        SUM(cr.increment) AS total_increment " +
-            "    FROM " +
-            "        equipment_output eo " +
-            "    JOIN " +
-            "        counter_record cr ON eo.id = cr.equipment_output_id " +
-            "    JOIN " +
-            "        production_order po ON cr.production_order_id = po.id " +
-            "    WHERE " +
-            "        eo.is_valid_for_production = true " +
-            "        AND eo.counting_equipment_id = :countingEquipmentId " + // Use the parameter here
-            "        AND cr.production_order_id IS NOT NULL " +
-            "        AND po.is_approved = true " +  // Include this condition
-            "    GROUP BY " +
-            "        cr.production_order_id " +
-            ") AS subquery", nativeQuery = true)*/
-    Integer calculateIncrementWithApprovedPO(@Param("countingEquipmentId") Long countingEquipmentId);
+    Integer calculateIncrementWithApprovedPO(Long countingEquipmentId, Date startDateFilter, Date endDateFilter);
 }

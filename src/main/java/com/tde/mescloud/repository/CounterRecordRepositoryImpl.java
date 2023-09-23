@@ -8,10 +8,7 @@ import jakarta.persistence.Tuple;
 import jakarta.persistence.criteria.*;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Repository
 public class CounterRecordRepositoryImpl extends AbstractFilterRepository<CounterRecordFilter.Property, CounterRecordEntity> {
@@ -123,17 +120,14 @@ public class CounterRecordRepositoryImpl extends AbstractFilterRepository<Counte
                 });
     }
 
-    public Integer calculateIncrement(Long countingEquipmentId) {
-        Map<Long, Integer> incrementByPO = calculateIncrementByPO(countingEquipmentId);
+    public Integer calculateIncrement(Long countingEquipmentId,  Date startDateFilter, Date endDateFilter) {
+        Map<Long, Integer> incrementByPO = calculateIncrementByPO(countingEquipmentId, startDateFilter, endDateFilter);
 
-        // Calculate the total increment by summing up the values
-        int totalIncrement = incrementByPO.values().stream().mapToInt(Integer::intValue).sum();
-
-        return totalIncrement;
+        return incrementByPO.values().stream().mapToInt(Integer::intValue).sum();
     }
 
 
-    public Map<Long, Integer> calculateIncrementByPO(Long countingEquipmentId) {
+    public Map<Long, Integer> calculateIncrementByPO(Long countingEquipmentId, Date startDateFilter, Date endDateFilter) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Tuple> query = cb.createTupleQuery();
 
@@ -142,23 +136,26 @@ public class CounterRecordRepositoryImpl extends AbstractFilterRepository<Counte
         Join<EquipmentOutputEntity, CountingEquipmentEntity> countingEquipmentJoin = eoJoin.join("countingEquipment", JoinType.INNER);
         Join<CounterRecordEntity, ProductionOrderEntity> poJoin = crRoot.join("productionOrder", JoinType.INNER);
 
-        // Define the selection for SUM(cr.increment) grouped by production order
         Expression<Integer> sumIncrementByPO = cb.sum(crRoot.get("increment"));
 
-        // Define the WHERE clause conditions
+        List<Predicate> predicateList = new ArrayList<>();
         Predicate conditions = cb.and(
-                cb.isTrue(eoJoin.get("isValidForProduction")),
+                cb.isTrue(crRoot.get("isValidForProduction")),
                 cb.equal(countingEquipmentJoin.get("id"), countingEquipmentId)
         );
 
-        // Specify the grouping by production order
+        Predicate startDate = cb.greaterThanOrEqualTo(crRoot.get("registeredAt"), startDateFilter);
+        Predicate endDate = cb.lessThanOrEqualTo(crRoot.get("registeredAt"), endDateFilter);
+        predicateList.add(conditions);
+        predicateList.add(startDate);
+        predicateList.add(endDate);
+
         query.multiselect(poJoin.get("id"), sumIncrementByPO)
-                .where(conditions)
+                .where(cb.and(predicateList.toArray(new Predicate[0])))
                 .groupBy(poJoin.get("id"));
 
         List<Tuple> result = entityManager.createQuery(query).getResultList();
 
-        // Convert the result into a map for easier processing
         Map<Long, Integer> incrementByPO = new HashMap<>();
         for (Tuple tuple : result) {
             Long productionOrderId = tuple.get(poJoin.get("id"));
@@ -169,9 +166,7 @@ public class CounterRecordRepositoryImpl extends AbstractFilterRepository<Counte
         return incrementByPO;
     }
 
-
-
-    public Integer calculateIncrementWithApprovedPO(Long countingEquipmentId) {
+    public Integer calculateIncrementWithApprovedPO(Long countingEquipmentId, Date startDateFilter, Date endDateFilter) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Integer> query = cb.createQuery(Integer.class);
 
@@ -180,22 +175,25 @@ public class CounterRecordRepositoryImpl extends AbstractFilterRepository<Counte
         Join<EquipmentOutputEntity, CountingEquipmentEntity> countingEquipmentJoin = eoJoin.join("countingEquipment", JoinType.INNER);
         Join<CounterRecordEntity, ProductionOrderEntity> poJoin = crRoot.join("productionOrder", JoinType.INNER);
 
-        // Define the selection for SUM(cr.increment)
         Expression<Integer> sumIncrement = cb.sum(crRoot.get("increment"));
 
-        // Define the WHERE clause conditions
+        List<Predicate> predicateList = new ArrayList<>();
         Predicate conditions = cb.and(
-                cb.isTrue(eoJoin.get("isValidForProduction")),
+                cb.isTrue(crRoot.get("isValidForProduction")),
                 cb.equal(countingEquipmentJoin.get("id"), countingEquipmentId),
                 cb.isNotNull(poJoin.get("isApproved"))
         );
 
-        // Specify the grouping
+        Predicate startDate = cb.greaterThanOrEqualTo(crRoot.get("registeredAt"), startDateFilter);
+        Predicate endDate = cb.lessThanOrEqualTo(crRoot.get("registeredAt"), endDateFilter);
+        predicateList.add(conditions);
+        predicateList.add(startDate);
+        predicateList.add(endDate);
+
         query.select(sumIncrement)
-                .where(conditions)
+                .where(cb.and(predicateList.toArray(new Predicate[0])))
                 .groupBy(poJoin.get("id"));
 
-        // Execute the query
         return entityManager.createQuery(query).getSingleResult();
     }
 }

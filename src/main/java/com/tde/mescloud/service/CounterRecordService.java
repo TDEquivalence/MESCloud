@@ -1,8 +1,8 @@
 package com.tde.mescloud.service;
 
 import com.tde.mescloud.model.dto.*;
-import org.springframework.data.repository.query.Param;
 
+import java.util.Date;
 import java.util.List;
 
 public interface CounterRecordService {
@@ -19,7 +19,7 @@ public interface CounterRecordService {
 
     boolean areValidContinuationCounts(String productionOrderCode);
 
-    Integer calculateIncrement(Long countingEquipmentId);
+    Integer calculateIncrement(Long countingEquipmentId, Date startDateFilter, Date endDateFilter);
 
-    Integer calculateIncrementWithApprovedPO(@Param("countingEquipmentId") Long countingEquipmentId);
+    Integer calculateIncrementWithApprovedPO(Long countingEquipmentId, Date startDateFilter, Date endDateFilter);
 }

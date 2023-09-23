@@ -215,12 +215,12 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     }
 
     @Override
-    public Integer calculateIncrement(Long countingEquipmentId) {
-        return repository.calculateIncrement(countingEquipmentId);
+    public Integer calculateIncrement(Long countingEquipmentId, Date startDateFilter, Date endDateFilter) {
+        return repository.calculateIncrement(countingEquipmentId, startDateFilter, endDateFilter);
     }
 
     @Override
-    public Integer calculateIncrementWithApprovedPO(Long countingEquipmentId) {
-        return repository.calculateIncrementWithApprovedPO(countingEquipmentId);
+    public Integer calculateIncrementWithApprovedPO(Long countingEquipmentId, Date startDateFilter, Date endDateFilter) {
+        return repository.calculateIncrementWithApprovedPO(countingEquipmentId, startDateFilter, endDateFilter);
     }
 }

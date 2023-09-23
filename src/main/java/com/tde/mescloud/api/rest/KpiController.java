@@ -2,6 +2,7 @@ package com.tde.mescloud.api.rest;
 
 import com.tde.mescloud.model.dto.CountingEquipmentKpiDto;
 import com.tde.mescloud.model.dto.KpiFilterDto;
+import com.tde.mescloud.model.dto.RequestKpiDto;
 import com.tde.mescloud.service.KpiService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,9 +22,11 @@ public class KpiController {
         return new ResponseEntity<>(countingEquipmentKpiDto, HttpStatus.OK);
     }
 
-    @GetMapping("{equipmentId}/quality")
-    public ResponseEntity<Double> getQuality(@PathVariable Long equipmentId) {
-        Double quality = kpiService.computeEquipmentQualityId(equipmentId, null);
-        return new ResponseEntity<>(quality, HttpStatus.OK);
+    @PostMapping("/{equipmentId}/quality")
+    public ResponseEntity<Double> getQuality(
+            @PathVariable Long equipmentId, @RequestBody RequestKpiDto requestKpiDto) {
+
+        Double quality = kpiService.computeEquipmentQuality(equipmentId, requestKpiDto);
+        return ResponseEntity.ok(quality);
     }
 }
