@@ -21,12 +21,4 @@ public class KpiController {
         CountingEquipmentKpiDto[] countingEquipmentKpiDto = kpiService.computeEquipmentKpi(filter);
         return new ResponseEntity<>(countingEquipmentKpiDto, HttpStatus.OK);
     }
-
-    @PostMapping("/{equipmentId}/quality")
-    public ResponseEntity<Double> getQuality(
-            @PathVariable Long equipmentId, @RequestBody RequestKpiDto requestKpiDto) {
-
-        Double quality = kpiService.computeEquipmentQuality(equipmentId, requestKpiDto);
-        return ResponseEntity.ok(quality);
-    }
 }
