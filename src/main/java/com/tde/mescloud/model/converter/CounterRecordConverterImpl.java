@@ -34,24 +34,4 @@ public class CounterRecordConverterImpl implements CounterRecordConverter {
         dto.setValidForProduction(entity.getEquipmentOutput().isValidForProduction());
         return dto;
     }
-
-    @Override
-    public CounterRecordDto convertToDto(CounterRecordEntity entity) {
-        return mapper.map(entity, CounterRecordDto.class);
-    }
-
-    @Override
-    public CounterRecordEntity convertToEntity(CounterRecordDto dto) {
-        return (dto == null) ? null : mapper.map(dto, CounterRecordEntity.class);
-    }
-
-    @Override
-    public List<CounterRecordDto> convertToDto(List<CounterRecordEntity> entityList) {
-        return entityList.stream().map(this::convertToDto).toList();
-    }
-
-    @Override
-    public List<CounterRecordEntity> convertToEntity(List<CounterRecordDto> dtoList) {
-        return dtoList.stream().map(this::convertToEntity).toList();
-    }
 }

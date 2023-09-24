@@ -19,6 +19,9 @@ public class CounterRecordRepositoryImpl extends AbstractFilterRepository<Counte
     private static final String COUNTING_EQUIPMENT_PROP = "countingEquipment";
     private static final String PRODUCTION_ORDER_CODE_PROP = "code";
     private static final String COUNTING_EQUIPMENT_ALIAS_PROP = "alias";
+    private static final String REGISTERED_AT_PROP = "registeredAt";
+    private static final String IS_VALID_FOR_PRODUCTION_PROP = "isValidForProduction";
+    private static final String INCREMENT_PROP = "increment";
 
 
     public List<CounterRecordEntity> getFilteredAndPaginated(CounterRecordFilter filterDto) {
@@ -132,20 +135,20 @@ public class CounterRecordRepositoryImpl extends AbstractFilterRepository<Counte
         CriteriaQuery<Tuple> query = cb.createTupleQuery();
 
         Root<CounterRecordEntity> crRoot = query.from(CounterRecordEntity.class);
-        Join<CounterRecordEntity, EquipmentOutputEntity> eoJoin = crRoot.join("equipmentOutput", JoinType.INNER);
-        Join<EquipmentOutputEntity, CountingEquipmentEntity> countingEquipmentJoin = eoJoin.join("countingEquipment", JoinType.INNER);
-        Join<CounterRecordEntity, ProductionOrderEntity> poJoin = crRoot.join("productionOrder", JoinType.INNER);
+        Join<CounterRecordEntity, EquipmentOutputEntity> eoJoin = crRoot.join(EQUIPMENT_OUTPUT_PROP, JoinType.INNER);
+        Join<EquipmentOutputEntity, CountingEquipmentEntity> countingEquipmentJoin = eoJoin.join(COUNTING_EQUIPMENT_PROP, JoinType.INNER);
+        Join<CounterRecordEntity, ProductionOrderEntity> poJoin = crRoot.join(EQUIPMENT_OUTPUT_PROP, JoinType.INNER);
 
-        Expression<Integer> sumIncrementByPO = cb.sum(crRoot.get("increment"));
+        Expression<Integer> sumIncrementByPO = cb.sum(crRoot.get(INCREMENT_PROP));
 
         List<Predicate> predicateList = new ArrayList<>();
         Predicate conditions = cb.and(
-                cb.isTrue(crRoot.get("isValidForProduction")),
+                cb.isTrue(crRoot.get(IS_VALID_FOR_PRODUCTION_PROP)),
                 cb.equal(countingEquipmentJoin.get("id"), countingEquipmentId)
         );
 
-        Predicate startDate = cb.greaterThanOrEqualTo(crRoot.get("registeredAt"), startDateFilter);
-        Predicate endDate = cb.lessThanOrEqualTo(crRoot.get("registeredAt"), endDateFilter);
+        Predicate startDate = cb.greaterThanOrEqualTo(crRoot.get(REGISTERED_AT_PROP), startDateFilter);
+        Predicate endDate = cb.lessThanOrEqualTo(crRoot.get(REGISTERED_AT_PROP), endDateFilter);
         predicateList.add(conditions);
         predicateList.add(startDate);
         predicateList.add(endDate);
@@ -177,22 +180,22 @@ public class CounterRecordRepositoryImpl extends AbstractFilterRepository<Counte
         CriteriaQuery<Tuple> query = cb.createTupleQuery();
 
         Root<CounterRecordEntity> crRoot = query.from(CounterRecordEntity.class);
-        Join<CounterRecordEntity, EquipmentOutputEntity> eoJoin = crRoot.join("equipmentOutput", JoinType.INNER);
-        Join<EquipmentOutputEntity, CountingEquipmentEntity> countingEquipmentJoin = eoJoin.join("countingEquipment", JoinType.INNER);
-        Join<CounterRecordEntity, ProductionOrderEntity> poJoin = crRoot.join("productionOrder", JoinType.INNER);
+        Join<CounterRecordEntity, EquipmentOutputEntity> eoJoin = crRoot.join(EQUIPMENT_OUTPUT_PROP, JoinType.INNER);
+        Join<EquipmentOutputEntity, CountingEquipmentEntity> countingEquipmentJoin = eoJoin.join(COUNTING_EQUIPMENT_PROP, JoinType.INNER);
+        Join<CounterRecordEntity, ProductionOrderEntity> poJoin = crRoot.join(PRODUCTION_ORDER_PROP, JoinType.INNER);
 
         Expression<Long> productionOrderId = poJoin.get("id");
-        Expression<Integer> sumIncrement = cb.sum(crRoot.get("increment"));
+        Expression<Integer> sumIncrement = cb.sum(crRoot.get(INCREMENT_PROP));
 
         List<Predicate> predicateList = new ArrayList<>();
         Predicate conditions = cb.and(
-                cb.isTrue(crRoot.get("isValidForProduction")),
+                cb.isTrue(crRoot.get(IS_VALID_FOR_PRODUCTION_PROP)),
                 cb.equal(countingEquipmentJoin.get("id"), countingEquipmentId),
                 cb.isTrue(poJoin.get("isApproved"))
         );
 
-        Predicate startDate = cb.greaterThanOrEqualTo(crRoot.get("registeredAt"), startDateFilter);
-        Predicate endDate = cb.lessThanOrEqualTo(crRoot.get("registeredAt"), endDateFilter);
+        Predicate startDate = cb.greaterThanOrEqualTo(crRoot.get(REGISTERED_AT_PROP), startDateFilter);
+        Predicate endDate = cb.lessThanOrEqualTo(crRoot.get(REGISTERED_AT_PROP), endDateFilter);
         predicateList.add(conditions);
         predicateList.add(startDate);
         predicateList.add(endDate);

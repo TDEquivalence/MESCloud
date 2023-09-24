@@ -24,12 +24,4 @@ public interface CounterRecordConverter {
         entities.forEach(entity -> dtos.add(conclusionViewToDto(entity)));
         return dtos;
     }
-
-    CounterRecordDto convertToDto(CounterRecordEntity entity);
-
-    CounterRecordEntity convertToEntity(CounterRecordDto dto);
-
-    List<CounterRecordDto> convertToDto(List<CounterRecordEntity> entityList);
-
-    List<CounterRecordEntity> convertToEntity(List<CounterRecordDto> dtoList);
 }
