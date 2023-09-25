@@ -12,11 +12,14 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Logger;
 
 @Service
 @AllArgsConstructor
 @Log
 public class BatchServiceImpl implements BatchService {
+
+    private static final Logger logger = Logger.getLogger(BatchServiceImpl.class.getName());
 
     private final BatchRepository repository;
     private final BatchConverter converter;
@@ -46,16 +49,21 @@ public class BatchServiceImpl implements BatchService {
     }
 
     private void setProductionOrderApproval(BatchEntity batch) {
-        if (batch == null || !Boolean.TRUE.equals(batch.getIsApproved())) {
-            return;
-        }
+        try {
+            if (batch == null || !Boolean.TRUE.equals(batch.getIsApproved())) {
+                throw new IllegalArgumentException("Invalid batch or not approved");
+            }
 
-        if (batch.getComposed() == null) {
-            return;
-        }
+            if (batch.getComposed() == null) {
+                throw new IllegalArgumentException("Composed batch is null");
+            }
 
-        composedService.setProductionOrderApproval(batch.getComposed());
+            composedService.setProductionOrderApproval(batch.getComposed());
+        } catch (IllegalArgumentException e) {
+            logger.warning("Production Order Approval failed: " + e.getMessage());
+        }
     }
+
 
 
     @Override

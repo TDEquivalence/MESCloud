@@ -23,11 +23,15 @@ import org.springframework.stereotype.Service;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Logger;
 
 @Service
 @AllArgsConstructor
 @Log
 public class ProductionOrderServiceImpl implements ProductionOrderService {
+
+    private static final java.util.logging.Logger logger = Logger.getLogger(ProductionOrderServiceImpl.class.getName());
+
 
     private static final String OBO_SECTION_PREFIX = "OBO";
     private static final String CODE_PREFIX = "PO";
@@ -207,17 +211,21 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
 
     @Override
     public void setProductionOrderApproval(Long composedOrderId) {
+        try {
+            List<ProductionOrderEntity> productionOrders = repository.findByComposedProductionOrderId(composedOrderId);
 
-        List<ProductionOrderEntity> productionOrders = repository.findByComposedProductionOrderId(composedOrderId);
+            if (productionOrders == null || productionOrders.isEmpty()) {
+                logger.warning("No production orders found for composed order ID: " + composedOrderId);
+                return;
+            }
 
-        if (productionOrders == null || productionOrders.isEmpty()) {
-            return;
+            for (ProductionOrderEntity productionOrder : productionOrders) {
+                productionOrder.setIsApproved(true);
+            }
+
+            saveAndUpdateAll(productionOrders);
+        } catch (Exception e) {
+            logger.warning("Error in setProductionOrderApproval: " + e.getMessage());
         }
-
-        for (ProductionOrderEntity productionOrder : productionOrders) {
-            productionOrder.setIsApproved(true);
-        }
-
-        saveAndUpdateAll(productionOrders);
     }
 }

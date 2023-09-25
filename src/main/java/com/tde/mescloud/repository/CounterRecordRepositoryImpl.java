@@ -147,7 +147,7 @@ public class CounterRecordRepositoryImpl extends AbstractFilterRepository<Counte
                 cb.equal(countingEquipmentJoin.get("id"), countingEquipmentId)
         );
 
-        Predicate startDate = cb.greaterThanOrEqualTo(crRoot.get(REGISTERED_AT_PROP), startDateFilter);
+        Predicate startDate = cb.greaterThan(crRoot.get(REGISTERED_AT_PROP), startDateFilter);
         Predicate endDate = cb.lessThanOrEqualTo(crRoot.get(REGISTERED_AT_PROP), endDateFilter);
         predicateList.add(conditions);
         predicateList.add(startDate);
@@ -194,7 +194,7 @@ public class CounterRecordRepositoryImpl extends AbstractFilterRepository<Counte
                 cb.isTrue(poJoin.get("isApproved"))
         );
 
-        Predicate startDate = cb.greaterThanOrEqualTo(crRoot.get(REGISTERED_AT_PROP), startDateFilter);
+        Predicate startDate = cb.greaterThan(crRoot.get(REGISTERED_AT_PROP), startDateFilter);
         Predicate endDate = cb.lessThanOrEqualTo(crRoot.get(REGISTERED_AT_PROP), endDateFilter);
         predicateList.add(conditions);
         predicateList.add(startDate);
