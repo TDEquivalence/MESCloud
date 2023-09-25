@@ -9,6 +9,7 @@ public enum FilterDataTypeOperation {
     INTEGER_GREATER_OR_EQUAL,
     INTEGER_GREATER,
     INTEGER_EQUAL,
+    NONE,
     STRING_EQUAL,
     STRING_CONTAINS,
     STRING_START,

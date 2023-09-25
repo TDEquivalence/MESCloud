@@ -12,6 +12,11 @@ public interface CountingEquipmentRepository extends CrudRepository<CountingEqui
 
     Optional<CountingEquipmentEntity> findByCode(String code);
 
+    @Query("SELECT ce FROM counting_equipment ce LEFT JOIN FETCH ce.equipmentStatusRecords esr " +
+            "WHERE ce.code = :code " +
+            "AND (esr IS NULL OR esr.id = (SELECT MAX(esr2.id) FROM ce.equipmentStatusRecords esr2))")
+    Optional<CountingEquipmentEntity> findByCodeWithLastStatusRecord(@Param("code") String code);
+
     @Query("SELECT ce FROM counting_equipment ce " +
             "LEFT JOIN FETCH ce.productionOrders po " +
             "WHERE ce.id = :id AND (po IS NULL OR po.id = (SELECT MAX(p.id) FROM production_order p WHERE p.equipment = ce)) " +

@@ -1,9 +1,9 @@
 package com.tde.mescloud.repository;
 
-import com.tde.mescloud.model.filter.Searchable;
-import com.tde.mescloud.model.filter.Sortable;
 import com.tde.mescloud.model.filter.Filter;
 import com.tde.mescloud.model.filter.FilterProperty;
+import com.tde.mescloud.model.filter.Searchable;
+import com.tde.mescloud.model.filter.Sortable;
 import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.*;

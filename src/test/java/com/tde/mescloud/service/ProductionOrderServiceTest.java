@@ -9,7 +9,9 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -64,5 +66,33 @@ class ProductionOrderServiceTest {
         List<Long> result = productionOrderService.findExistingIds(inputIds);
 
         assertEquals(expectedIds, result);
+    }
+
+    @Test
+    void testCalculateActiveTime() {
+
+        Long equipmentId = 1L;
+        Date startDate = new Date();
+        Date endDate = new Date(System.currentTimeMillis() + (3 * 24 * 60 * 60 * 1000)); // 3 days later
+
+        ProductionOrderEntity order1 = new ProductionOrderEntity();
+        order1.setCreatedAt(new Date(System.currentTimeMillis() - 2 * 24 * 60 * 60 * 1000)); // 2 days before startDate
+        order1.setCompletedAt(new Date(System.currentTimeMillis() - 1 * 24 * 60 * 60 * 1000));  // 1 day before endDate
+
+        ProductionOrderEntity order2 = new ProductionOrderEntity();
+        order2.setCreatedAt(new Date(System.currentTimeMillis() - 24 * 60 * 60 * 1000));  // 1 day before startDate
+        order2.setCompletedAt(new Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000)); // 1 day after Order 1
+
+        List<ProductionOrderEntity> productionOrders = new ArrayList<>();
+        productionOrders.add(order1);
+        productionOrders.add(order2);
+
+        when(productionOrderRepository.findByEquipmentAndPeriod(equipmentId, startDate, endDate))
+                .thenReturn(productionOrders);
+
+        Long activeTime = productionOrderService.calculateScheduledTimeInSeconds(equipmentId, startDate, endDate);
+
+        long expectedActiveTimeSeconds = 24 * 60 * 60; // 1 day (Order 1) + 1 day (Order 2)
+        assertEquals(expectedActiveTimeSeconds, activeTime);
     }
 }
