@@ -172,11 +172,7 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
     private CountingEquipmentEntity updateFrom(CountingEquipmentEntity toUpdate, CountingEquipmentEntity updateFrom) {
         toUpdate.setAlias(updateFrom.getAlias());
         toUpdate.setPTimerCommunicationCycle(updateFrom.getPTimerCommunicationCycle());
-        toUpdate.setEquipmentEffectiveness(updateFrom.getEquipmentEffectiveness());
         toUpdate.setTheoreticalProduction(updateFrom.getTheoreticalProduction());
-        toUpdate.setAvailability(updateFrom.getAvailability());
-        toUpdate.setPerformance(updateFrom.getPerformance());
-        toUpdate.setQuality(updateFrom.getQuality());
         updateOutputs(toUpdate, updateFrom);
         updateIms(toUpdate, updateFrom);
 

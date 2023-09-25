@@ -4,11 +4,11 @@ import com.tde.mescloud.model.dto.CounterRecordFilter;
 import com.tde.mescloud.model.dto.KpiFilterDto;
 import com.tde.mescloud.model.entity.*;
 import jakarta.persistence.EntityGraph;
+import jakarta.persistence.Tuple;
 import jakarta.persistence.criteria.*;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Repository
 public class CounterRecordRepositoryImpl extends AbstractFilterRepository<CounterRecordFilter.Property, CounterRecordEntity> {
@@ -19,6 +19,9 @@ public class CounterRecordRepositoryImpl extends AbstractFilterRepository<Counte
     private static final String COUNTING_EQUIPMENT_PROP = "countingEquipment";
     private static final String PRODUCTION_ORDER_CODE_PROP = "code";
     private static final String COUNTING_EQUIPMENT_ALIAS_PROP = "alias";
+    private static final String REGISTERED_AT_PROP = "registeredAt";
+    private static final String IS_VALID_FOR_PRODUCTION_PROP = "isValidForProduction";
+    private static final String INCREMENT_PROP = "increment";
 
 
     public List<CounterRecordEntity> getFilteredAndPaginated(CounterRecordFilter filterDto) {
@@ -119,4 +122,98 @@ public class CounterRecordRepositoryImpl extends AbstractFilterRepository<Counte
                     return productionOrderJoin.get(PRODUCTION_ORDER_CODE_PROP);
                 });
     }
+
+    public Integer calculateIncrement(Long countingEquipmentId,  Date startDateFilter, Date endDateFilter) {
+        Map<Long, Integer> incrementByPO = calculateIncrementByPO(countingEquipmentId, startDateFilter, endDateFilter);
+
+        return incrementByPO.values().stream().mapToInt(Integer::intValue).sum();
+    }
+
+
+    public Map<Long, Integer> calculateIncrementByPO(Long countingEquipmentId, Date startDateFilter, Date endDateFilter) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Tuple> query = cb.createTupleQuery();
+
+        Root<CounterRecordEntity> crRoot = query.from(CounterRecordEntity.class);
+        Join<CounterRecordEntity, EquipmentOutputEntity> eoJoin = crRoot.join(EQUIPMENT_OUTPUT_PROP, JoinType.INNER);
+        Join<EquipmentOutputEntity, CountingEquipmentEntity> countingEquipmentJoin = eoJoin.join(COUNTING_EQUIPMENT_PROP, JoinType.INNER);
+        Join<CounterRecordEntity, ProductionOrderEntity> poJoin = crRoot.join(EQUIPMENT_OUTPUT_PROP, JoinType.INNER);
+
+        Expression<Integer> sumIncrementByPO = cb.sum(crRoot.get(INCREMENT_PROP));
+
+        List<Predicate> predicateList = new ArrayList<>();
+        Predicate conditions = cb.and(
+                cb.isTrue(crRoot.get(IS_VALID_FOR_PRODUCTION_PROP)),
+                cb.equal(countingEquipmentJoin.get("id"), countingEquipmentId)
+        );
+
+        Predicate startDate = cb.greaterThan(crRoot.get(REGISTERED_AT_PROP), startDateFilter);
+        Predicate endDate = cb.lessThanOrEqualTo(crRoot.get(REGISTERED_AT_PROP), endDateFilter);
+        predicateList.add(conditions);
+        predicateList.add(startDate);
+        predicateList.add(endDate);
+
+        query.multiselect(poJoin.get("id"), sumIncrementByPO)
+                .where(cb.and(predicateList.toArray(new Predicate[0])))
+                .groupBy(poJoin.get("id"));
+
+        List<Tuple> result = entityManager.createQuery(query).getResultList();
+
+        Map<Long, Integer> incrementByPO = new HashMap<>();
+        for (Tuple tuple : result) {
+            Long productionOrderId = tuple.get(poJoin.get("id"));
+            Integer totalIncrement = tuple.get(sumIncrementByPO);
+            incrementByPO.put(productionOrderId, totalIncrement);
+        }
+
+        return incrementByPO;
+    }
+
+    public Integer calculateIncrementWithApprovedPO(Long countingEquipmentId,  Date startDateFilter, Date endDateFilter) {
+        Map<Long, Integer> incrementWithApprovedPO = calculateIncrementWithApprovedProductionOrder(countingEquipmentId, startDateFilter, endDateFilter);
+
+        return incrementWithApprovedPO.values().stream().mapToInt(Integer::intValue).sum();
+    }
+
+    private Map<Long, Integer> calculateIncrementWithApprovedProductionOrder(Long countingEquipmentId, Date startDateFilter, Date endDateFilter) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Tuple> query = cb.createTupleQuery();
+
+        Root<CounterRecordEntity> crRoot = query.from(CounterRecordEntity.class);
+        Join<CounterRecordEntity, EquipmentOutputEntity> eoJoin = crRoot.join(EQUIPMENT_OUTPUT_PROP, JoinType.INNER);
+        Join<EquipmentOutputEntity, CountingEquipmentEntity> countingEquipmentJoin = eoJoin.join(COUNTING_EQUIPMENT_PROP, JoinType.INNER);
+        Join<CounterRecordEntity, ProductionOrderEntity> poJoin = crRoot.join(PRODUCTION_ORDER_PROP, JoinType.INNER);
+
+        Expression<Long> productionOrderId = poJoin.get("id");
+        Expression<Integer> sumIncrement = cb.sum(crRoot.get(INCREMENT_PROP));
+
+        List<Predicate> predicateList = new ArrayList<>();
+        Predicate conditions = cb.and(
+                cb.isTrue(crRoot.get(IS_VALID_FOR_PRODUCTION_PROP)),
+                cb.equal(countingEquipmentJoin.get("id"), countingEquipmentId),
+                cb.isTrue(poJoin.get("isApproved"))
+        );
+
+        Predicate startDate = cb.greaterThan(crRoot.get(REGISTERED_AT_PROP), startDateFilter);
+        Predicate endDate = cb.lessThanOrEqualTo(crRoot.get(REGISTERED_AT_PROP), endDateFilter);
+        predicateList.add(conditions);
+        predicateList.add(startDate);
+        predicateList.add(endDate);
+
+        query.multiselect(productionOrderId, sumIncrement)
+                .where(cb.and(predicateList.toArray(new Predicate[0])))
+                .groupBy(productionOrderId);
+
+        List<Tuple> result = entityManager.createQuery(query).getResultList();
+
+        Map<Long, Integer> incrementByPO = new HashMap<>();
+        for (Tuple tuple : result) {
+            Long productionOrderIdValue = tuple.get(productionOrderId);
+            Integer totalIncrement = tuple.get(sumIncrement);
+            incrementByPO.put(productionOrderIdValue, totalIncrement);
+        }
+
+        return incrementByPO;
+    }
+
 }

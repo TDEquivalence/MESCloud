@@ -117,6 +117,7 @@ public class CounterRecordServiceImpl implements CounterRecordService {
         setEquipmentOutput(counterRecord, counterDto.getOutputCode());
         setProductionOrder(counterRecord, equipmentCountsDto.getProductionOrderCode());
 
+        //TODO: we have to check if this validation is correct, considering we can have counter records without PO.s
         if (counterRecord.getProductionOrder() != null) {
             setComputedValue(counterRecord);
         }
@@ -162,6 +163,8 @@ public class CounterRecordServiceImpl implements CounterRecordService {
         }
 
         int computedValue = calculateComputedValue(lastPersistedCountOpt.get(), receivedCount);
+        int increment = computedValueIncrement(lastPersistedCountOpt.get(), receivedCount);
+        receivedCount.setIncrement(increment);
         receivedCount.setComputedValue(computedValue);
     }
 
@@ -191,8 +194,12 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     }
 
     private int defaultCalculateComputedValue(CounterRecordEntity lastPersistedCount, CounterRecordEntity receivedCount) {
-        int computedValueIncrement = receivedCount.getRealValue() - lastPersistedCount.getRealValue();
+        int computedValueIncrement = computedValueIncrement(lastPersistedCount, receivedCount);
         return lastPersistedCount.getComputedValue() + computedValueIncrement;
+    }
+
+    private int computedValueIncrement(CounterRecordEntity lastPersistedCount, CounterRecordEntity receivedCount) {
+        return receivedCount.getRealValue() - lastPersistedCount.getRealValue();
     }
 
     public boolean areValidInitialCounts(String productionOrderCode) {
@@ -205,5 +212,15 @@ public class CounterRecordServiceImpl implements CounterRecordService {
         Optional<ProductionOrderEntity> productionOrderOpt = productionOrderRepository.findByCode(productionOrderCode);
         return productionOrderOpt.isPresent() &&
                 repository.findLastByProductionOrderId(productionOrderOpt.get().getId()).isPresent();
+    }
+
+    @Override
+    public Integer calculateIncrement(Long countingEquipmentId, Date startDateFilter, Date endDateFilter) {
+        return repository.calculateIncrement(countingEquipmentId, startDateFilter, endDateFilter);
+    }
+
+    @Override
+    public Integer calculateIncrementWithApprovedPO(Long countingEquipmentId, Date startDateFilter, Date endDateFilter) {
+        return repository.calculateIncrementWithApprovedPO(countingEquipmentId, startDateFilter, endDateFilter);
     }
 }

@@ -32,6 +32,7 @@ public class ProductionOrderEntity {
     private String gauge;
     private String category;
     private String washingProcess;
+    private Boolean isApproved;
 
     @ManyToOne
     private ComposedProductionOrderEntity composedProductionOrder;

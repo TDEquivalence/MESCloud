@@ -9,6 +9,7 @@ import com.tde.mescloud.model.dto.RequestComposedDto;
 import com.tde.mescloud.model.entity.ComposedProductionOrderEntity;
 import com.tde.mescloud.model.entity.ComposedSummaryEntity;
 import com.tde.mescloud.repository.ComposedProductionOrderRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
@@ -16,11 +17,14 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.logging.Logger;
 
 @Service
 @AllArgsConstructor
 @Log
 public class ComposedProductionOrderServiceImpl implements ComposedProductionOrderService {
+
+    private static final java.util.logging.Logger logger = Logger.getLogger(ComposedProductionOrderServiceImpl.class.getName());
 
     private final ComposedProductionOrderRepository repository;
     private final ComposedProductionOrderConverter converter;
@@ -157,5 +161,25 @@ public class ComposedProductionOrderServiceImpl implements ComposedProductionOrd
     public List<ComposedSummaryDto> findCompleted() {
         List<ComposedSummaryEntity> composedCompleted = repository.findCompleted();
         return summaryConverter.toDto(composedCompleted);
+    }
+
+    @Override
+    public void setProductionOrderApproval(ComposedProductionOrderEntity composed) {
+        try {
+            if (composed == null) {
+                throw new IllegalArgumentException("ComposedProductionOrderEntity is null");
+            }
+
+            Long composedId = composed.getId();
+
+            Optional<ComposedProductionOrderEntity> composedEntityOptional = repository.findById(composedId);
+            if (composedEntityOptional.isEmpty()) {
+                throw new EntityNotFoundException("ComposedProductionOrderEntity not found with ID: " + composedId);
+            }
+
+            productionOrderService.setProductionOrderApproval(composedId);
+        } catch (IllegalArgumentException | EntityNotFoundException e) {
+            logger.warning("Error in setProductionOrderApproval: " + e.getMessage());
+        }
     }
 }

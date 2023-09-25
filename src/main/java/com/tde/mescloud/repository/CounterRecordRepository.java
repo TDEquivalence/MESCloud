@@ -7,6 +7,7 @@ import com.tde.mescloud.model.entity.CounterRecordEntity;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,4 +25,8 @@ public interface CounterRecordRepository extends CrudRepository<CounterRecordEnt
 
     //    @EntityGraph(attributePaths = { "equipmentOutput", "equipmentOutput.countingEquipment", "productionOrder" })
     List<CounterRecordEntity> getFilteredAndPaginated(CounterRecordFilter filterDto);
+
+    Integer calculateIncrement(Long countingEquipmentId, Date startDateFilter, Date endDateFilter);
+
+    Integer calculateIncrementWithApprovedPO(Long countingEquipmentId, Date startDateFilter, Date endDateFilter);
 }

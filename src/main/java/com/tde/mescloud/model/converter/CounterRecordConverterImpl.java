@@ -1,7 +1,6 @@
 package com.tde.mescloud.model.converter;
 
 import com.tde.mescloud.model.dto.CounterRecordDto;
-import com.tde.mescloud.model.dto.CounterRecordSimplDto;
 import com.tde.mescloud.model.entity.CounterRecordConclusionEntity;
 import com.tde.mescloud.model.entity.CounterRecordEntity;
 import lombok.AllArgsConstructor;
@@ -34,25 +33,5 @@ public class CounterRecordConverterImpl implements CounterRecordConverter {
         dto.setEquipmentAlias(entity.getEquipmentOutput().getCountingEquipment().getAlias());
         dto.setValidForProduction(entity.getEquipmentOutput().isValidForProduction());
         return dto;
-    }
-
-    @Override
-    public CounterRecordSimplDto convertToDto(CounterRecordEntity entity) {
-        return mapper.map(entity, CounterRecordSimplDto.class);
-    }
-
-    @Override
-    public CounterRecordEntity convertToEntity(CounterRecordSimplDto dto) {
-        return (dto == null) ? null : mapper.map(dto, CounterRecordEntity.class);
-    }
-
-    @Override
-    public List<CounterRecordSimplDto> convertToDto(List<CounterRecordEntity> entityList) {
-        return entityList.stream().map(this::convertToDto).toList();
-    }
-
-    @Override
-    public List<CounterRecordEntity> convertToEntity(List<CounterRecordSimplDto> dtoList) {
-        return dtoList.stream().map(this::convertToEntity).toList();
     }
 }

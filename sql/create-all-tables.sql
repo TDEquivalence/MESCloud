@@ -92,10 +92,10 @@ CREATE TABLE counting_equipment (
     p_timer_communication_cycle int,
     ims_id int UNIQUE,
     equipment_effectiveness DOUBLE PRECISION,
-    theoretical_production INTEGER;
+    theoretical_production INTEGER,
     availability DOUBLE PRECISION,
     performance DOUBLE PRECISION,
-    quality DOUBLE PRECISION;
+    quality DOUBLE PRECISION,
 
     PRIMARY KEY(id),
     FOREIGN KEY(section_id) REFERENCES section(id),
@@ -151,6 +151,7 @@ CREATE TABLE production_order (
     gauge varchar(100),
     category varchar(100),
     washing_process varchar(100),
+    is_approved boolean,
 
     PRIMARY KEY(id),
     FOREIGN KEY(equipment_id) REFERENCES counting_equipment(id),
@@ -178,6 +179,7 @@ CREATE TABLE counter_record (
     equipment_output_alias varchar(100),
     real_value int,
     computed_value int,
+    increment int,
     production_order_id int,
     registered_at timestamp,
     is_valid_for_production boolean,
@@ -261,4 +263,3 @@ LEFT JOIN sample s ON cpo.id = s.composed_production_order_id
 LEFT JOIN hit h ON s.id = h.sample_id
 LEFT JOIN production_order po ON cpo.id = po.composed_production_order_id
 LEFT JOIN batch b ON cpo.id = b.composed_production_order_id;
-
