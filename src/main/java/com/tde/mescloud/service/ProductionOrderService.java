@@ -33,5 +33,5 @@ public interface ProductionOrderService {
 
     List<ProductionOrderSummaryDto> getCompletedWithoutComposed();
 
-    void setProductionOrderApproval(Long composedOrderId);
+    void setProductionOrderApproval(Long composedOrderId, boolean isApproved);
 }

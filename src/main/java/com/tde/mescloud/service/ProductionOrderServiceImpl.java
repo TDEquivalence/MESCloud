@@ -210,7 +210,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     }
 
     @Override
-    public void setProductionOrderApproval(Long composedOrderId) {
+    public void setProductionOrderApproval(Long composedOrderId, boolean isApproved) {
         try {
             List<ProductionOrderEntity> productionOrders = repository.findByComposedProductionOrderId(composedOrderId);
 
@@ -220,7 +220,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
             }
 
             for (ProductionOrderEntity productionOrder : productionOrders) {
-                productionOrder.setIsApproved(true);
+                productionOrder.setIsApproved(isApproved);
             }
 
             saveAndUpdateAll(productionOrders);

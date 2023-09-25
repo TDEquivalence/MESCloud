@@ -34,5 +34,5 @@ public interface ComposedProductionOrderService {
 
     List<ComposedSummaryDto> findCompleted();
 
-    void setProductionOrderApproval(ComposedProductionOrderEntity composed);
+    void setProductionOrderApproval(ComposedProductionOrderEntity composed, boolean isApproved);
 }

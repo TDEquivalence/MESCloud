@@ -58,7 +58,7 @@ public class BatchServiceImpl implements BatchService {
                 throw new IllegalArgumentException("Composed batch is null");
             }
 
-            composedService.setProductionOrderApproval(batch.getComposed());
+            composedService.setProductionOrderApproval(batch.getComposed(), batch.getIsApproved());
         } catch (IllegalArgumentException e) {
             logger.warning("Production Order Approval failed: " + e.getMessage());
         }

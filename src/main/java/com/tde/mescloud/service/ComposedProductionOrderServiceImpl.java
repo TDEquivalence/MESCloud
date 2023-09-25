@@ -164,7 +164,7 @@ public class ComposedProductionOrderServiceImpl implements ComposedProductionOrd
     }
 
     @Override
-    public void setProductionOrderApproval(ComposedProductionOrderEntity composed) {
+    public void setProductionOrderApproval(ComposedProductionOrderEntity composed, boolean isApproved) {
         try {
             if (composed == null) {
                 throw new IllegalArgumentException("ComposedProductionOrderEntity is null");
@@ -177,7 +177,7 @@ public class ComposedProductionOrderServiceImpl implements ComposedProductionOrd
                 throw new EntityNotFoundException("ComposedProductionOrderEntity not found with ID: " + composedId);
             }
 
-            productionOrderService.setProductionOrderApproval(composedId);
+            productionOrderService.setProductionOrderApproval(composedId, isApproved);
         } catch (IllegalArgumentException | EntityNotFoundException e) {
             logger.warning("Error in setProductionOrderApproval: " + e.getMessage());
         }
