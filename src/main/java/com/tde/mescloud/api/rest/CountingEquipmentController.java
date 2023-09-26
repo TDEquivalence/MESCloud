@@ -1,8 +1,12 @@
 package com.tde.mescloud.api.rest;
 
+import com.tde.mescloud.exception.ActiveProductionOrderException;
+import com.tde.mescloud.exception.IncompleteConfigurationException;
 import com.tde.mescloud.model.dto.CountingEquipmentDto;
+import com.tde.mescloud.model.dto.RequestConfigurationDto;
 import com.tde.mescloud.service.CountingEquipmentService;
 import lombok.AllArgsConstructor;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -41,5 +45,22 @@ public class CountingEquipmentController {
         }
 
         return new ResponseEntity<>(updatedIms.get(), HttpStatus.OK);
+    }
+
+    @PutMapping("/{equipmentId}/configuration")
+    public ResponseEntity<CountingEquipmentDto> updateConfiguration(@PathVariable long equipmentId,
+                                                                    @RequestBody RequestConfigurationDto request) {
+        try {
+
+            CountingEquipmentDto countingEquipment = service.updateConfiguration(equipmentId, request);
+            return new ResponseEntity<>(countingEquipment, HttpStatus.OK);
+
+        } catch (IncompleteConfigurationException e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        } catch (EmptyResultDataAccessException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (ActiveProductionOrderException e) {
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        }
     }
 }

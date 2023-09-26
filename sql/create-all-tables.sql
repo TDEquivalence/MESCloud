@@ -78,7 +78,7 @@ CREATE TABLE section (
 
 CREATE TABLE ims (
     id int GENERATED ALWAYS AS IDENTITY,
-    code varchar(100) NOT NULL,
+    code varchar(100) NOT NULL UNIQUE,
 
     PRIMARY KEY(id)
 );
@@ -91,6 +91,11 @@ CREATE TABLE counting_equipment (
     equipment_status int,
     p_timer_communication_cycle int,
     ims_id int UNIQUE,
+    equipment_effectiveness DOUBLE PRECISION,
+    theoretical_production INTEGER,
+    availability DOUBLE PRECISION,
+    performance DOUBLE PRECISION,
+    quality DOUBLE PRECISION,
 
     PRIMARY KEY(id),
     FOREIGN KEY(section_id) REFERENCES section(id),
@@ -140,11 +145,13 @@ CREATE TABLE production_order (
     is_equipment_enabled boolean,
     is_completed boolean,
     created_at date,
+    completed_at DATE,
     input_batch varchar(100),
     source varchar(100),
     gauge varchar(100),
     category varchar(100),
     washing_process varchar(100),
+    is_approved boolean,
 
     PRIMARY KEY(id),
     FOREIGN KEY(equipment_id) REFERENCES counting_equipment(id),
@@ -172,6 +179,7 @@ CREATE TABLE counter_record (
     equipment_output_alias varchar(100),
     real_value int,
     computed_value int,
+    increment int,
     production_order_id int,
     registered_at timestamp,
     is_valid_for_production boolean,
@@ -187,9 +195,9 @@ CREATE INDEX idx_counter_record_registered_at ON counter_record (registered_at);
 
 CREATE TABLE equipment_status_record (
     id int GENERATED ALWAYS AS IDENTITY,
-    counting_equipment_id int,
-    equipment_status int,
-    registered_at date,
+    counting_equipment_id int NOT NULL,
+    equipment_status int NOT NULL,
+    registered_at timestamp NOT NULL,
 
     PRIMARY KEY(id),
     FOREIGN KEY(counting_equipment_id) REFERENCES counting_equipment(id)
@@ -255,4 +263,3 @@ LEFT JOIN sample s ON cpo.id = s.composed_production_order_id
 LEFT JOIN hit h ON s.id = h.sample_id
 LEFT JOIN production_order po ON cpo.id = po.composed_production_order_id
 LEFT JOIN batch b ON cpo.id = b.composed_production_order_id;
-

@@ -9,7 +9,7 @@ import com.tde.mescloud.security.model.auth.RegisterRequest;
 import com.tde.mescloud.security.model.token.TokenEntity;
 import com.tde.mescloud.security.model.token.TokenType;
 import com.tde.mescloud.security.repository.TokenRepository;
-import com.tde.mescloud.security.repository.UserRepository;
+import com.tde.mescloud.repository.UserRepository;
 import com.tde.mescloud.security.role.Role;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
@@ -22,7 +22,6 @@ import org.springframework.stereotype.Service;
 import java.util.Date;
 import java.util.List;
 
-import static com.tde.mescloud.security.constant.SecurityConstant.TOKEN_PREFIX;
 import static com.tde.mescloud.security.constant.UserServiceImpConstant.USERNAME_ALREADY_EXISTS;
 
 @Service
@@ -79,7 +78,7 @@ public class AuthenticationService {
 
     private void validateUsername(RegisterRequest request) throws UsernameExistException {
         UserEntity userEntity = userRepository.findUserByUsername(request.getUsername());
-        if(userEntity != null) {
+        if (userEntity != null) {
             throw new UsernameExistException(USERNAME_ALREADY_EXISTS);
         }
     }
@@ -123,7 +122,7 @@ public class AuthenticationService {
 
     private void revokeAllUserTokens(UserEntity user) {
         List<TokenEntity> validUserTokens = tokenRepository.findAllValidTokenByUser(user.getId());
-        if(validUserTokens.isEmpty()) {
+        if (validUserTokens.isEmpty()) {
             return;
         }
         validUserTokens.forEach(token -> {
@@ -135,7 +134,7 @@ public class AuthenticationService {
 
     private void removeLastInvalidUserTokens(UserEntity user) {
         List<TokenEntity> invalidUserTokens = tokenRepository.findAllInvalidTokenByUser(user.getId());
-        if(!invalidUserTokens.isEmpty()) {
+        if (!invalidUserTokens.isEmpty()) {
             invalidUserTokens.forEach(tokenRepository::delete);
         }
     }

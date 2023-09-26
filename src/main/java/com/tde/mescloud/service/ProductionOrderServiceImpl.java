@@ -20,10 +20,10 @@ import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -168,6 +168,11 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     }
 
     @Override
+    public List<ProductionOrderEntity> saveAndUpdateAll(List<ProductionOrderEntity> productionOrder) {
+        return repository.saveAll(productionOrder);
+    }
+
+    @Override
     public void delete(ProductionOrderEntity productionOrder) {
         repository.delete(productionOrder);
     }
@@ -177,17 +182,80 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         return repository.findById(id);
     }
 
+    @Override
+    public Optional<ProductionOrderDto> findDtoById(Long id) {
+        Optional<ProductionOrderEntity> entity = repository.findById(id);
+        if (entity.isEmpty()) {
+            return Optional.empty();
+        }
+        ProductionOrderDto dto = converter.toDto(entity.get());
+        return Optional.of(dto);
+    }
+
     public List<Long> findExistingIds(List<Long> ids) {
         List<ProductionOrderEntity> existingEntities = repository.findByIdIn(ids);
 
         return existingEntities.stream()
                 .map(ProductionOrderEntity::getId)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
     public List<ProductionOrderSummaryDto> getCompletedWithoutComposed() {
         List<ProductionOrderSummaryEntity> persistedProductionOrders = repository.findCompletedWithoutComposed();
         return summaryConverter.toDto(persistedProductionOrders);
+    }
+
+    @Override
+    public void setProductionOrderApproval(Long composedOrderId, boolean isApproved) {
+        try {
+            List<ProductionOrderEntity> productionOrders = repository.findByComposedProductionOrderId(composedOrderId);
+
+            if (productionOrders == null || productionOrders.isEmpty()) {
+                log.warning("No production orders found for composed order ID: " + composedOrderId);
+                return;
+            }
+
+            for (ProductionOrderEntity productionOrder : productionOrders) {
+                productionOrder.setIsApproved(isApproved);
+            }
+
+            saveAndUpdateAll(productionOrders);
+        } catch (Exception e) {
+            log.warning("Error in setProductionOrderApproval: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public List<ProductionOrderDto> findByEquipmentAndPeriod(Long equipmentId, Date startDate, Date endDate) {
+        List<ProductionOrderEntity> productionOrders = repository.findByEquipmentAndPeriod(equipmentId, startDate, endDate);
+        return converter.toDto(productionOrders);
+    }
+
+    @Override
+    public Long calculateScheduledTimeInSeconds(Long equipmentId, Date startDate, Date endDate) {
+
+        List<ProductionOrderEntity> productionOrders = repository.findByEquipmentAndPeriod(equipmentId, startDate, endDate);
+        Duration totalActiveTime = Duration.ZERO;
+        for (ProductionOrderEntity productionOrder : productionOrders) {
+
+            Duration productionOrderActiveTime = calculateScheduledTime(productionOrder, startDate, endDate);
+            totalActiveTime = totalActiveTime.plus(productionOrderActiveTime);
+        }
+
+        return totalActiveTime.getSeconds();
+    }
+
+    private Duration calculateScheduledTime(ProductionOrderEntity productionOrder, Date startDate, Date endDate) {
+        Date createdAt = productionOrder.getCreatedAt();
+        Date completedAt = productionOrder.getCompletedAt();
+
+        startDate = (startDate.before(createdAt)) ? createdAt : startDate;
+        endDate = (endDate.before(createdAt)) ? createdAt : endDate;
+        endDate = (completedAt != null && completedAt.before(endDate)) ? completedAt : endDate;
+
+        long durationInMillisenconds = Math.max(0, endDate.getTime() - startDate.getTime());
+
+        return Duration.ofMillis(durationInMillisenconds);
     }
 }

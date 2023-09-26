@@ -20,12 +20,32 @@ public class CountingEquipmentEntity {
     private SectionEntity section;
     private int equipmentStatus;
     private int pTimerCommunicationCycle;
-    @OneToOne(orphanRemoval = false, cascade = CascadeType.PERSIST)
+    @OneToOne(
+            fetch = FetchType.EAGER,
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE},
+            orphanRemoval = false
+    )
     @JoinColumn(name = "ims_id", referencedColumnName = "id")
     private ImsEntity ims;
 
-    @OneToMany(mappedBy = "countingEquipment", fetch = FetchType.EAGER)
-    List<EquipmentOutputEntity> outputs;
+    @OneToMany(
+            mappedBy = "countingEquipment",
+            fetch = FetchType.EAGER,
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE},
+            orphanRemoval = false
+    )
+    private List<EquipmentOutputEntity> outputs;
+
     @OneToMany(mappedBy = "equipment", fetch = FetchType.LAZY)
     List<ProductionOrderEntity> productionOrders;
+
+    @OneToMany(mappedBy = "countingEquipment", fetch = FetchType.LAZY)
+    List<EquipmentStatusRecordEntity> equipmentStatusRecords;
+
+    private Integer theoreticalProduction;
+
+    private Double overallEquipmentEffectivenessTarget;
+    private Double availabilityTarget;
+    private Double performanceTarget;
+    private Double qualityTarget;
 }

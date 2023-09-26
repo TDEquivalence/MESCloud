@@ -8,11 +8,11 @@ import com.tde.mescloud.model.entity.EquipmentOutputEntity;
 import com.tde.mescloud.model.entity.ProductionOrderEntity;
 import com.tde.mescloud.repository.CounterRecordRepository;
 import com.tde.mescloud.repository.ProductionOrderRepository;
-import com.tde.mescloud.utility.DateUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
 import java.util.*;
 
 @Service
@@ -34,13 +34,13 @@ public class CounterRecordServiceImpl implements CounterRecordService {
 
 
     @Override
-    public List<CounterRecordDto> winnowConclusionRecordsKpi(KpiFilterDto filter) {
+    public List<CounterRecordDto> filterConclusionRecordsKpi(KpiFilterDto filter) {
         List<CounterRecordConclusionEntity> counterRecordConclusionEntities = repository.findLastPerProductionOrder(filter);
         return converter.conclusionViewToDto(counterRecordConclusionEntities);
     }
 
     @Override
-    public PaginatedCounterRecordsDto winnowConclusionRecordsPaginated(CounterRecordFilterDto filter) {
+    public PaginatedCounterRecordsDto filterConclusionRecordsPaginated(CounterRecordFilter filter) {
         int requestedRecords = filter.getTake();
         filter.setTake(filter.getTake() + 1);
 
@@ -61,7 +61,7 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     }
 
     @Override
-    public PaginatedCounterRecordsDto getFilteredAndPaginated(CounterRecordFilterDto filterDto) {
+    public PaginatedCounterRecordsDto getFilteredAndPaginated(CounterRecordFilter filterDto) {
         int requestedRecords = filterDto.getTake();
         filterDto.setTake(filterDto.getTake() + 1);
 
@@ -118,6 +118,7 @@ public class CounterRecordServiceImpl implements CounterRecordService {
         setEquipmentOutput(counterRecord, counterDto.getOutputCode());
         setProductionOrder(counterRecord, equipmentCountsDto.getProductionOrderCode());
 
+        //TODO: we have to check if this validation is correct, considering we can have counter records without PO.s
         if (counterRecord.getProductionOrder() != null) {
             setComputedValue(counterRecord);
         }
@@ -137,7 +138,7 @@ public class CounterRecordServiceImpl implements CounterRecordService {
         EquipmentOutputEntity equipmentOutputEntity = new EquipmentOutputEntity();
         equipmentOutputEntity.setId(equipmentOutput.getId());
         counterRecord.setEquipmentOutput(equipmentOutputEntity);
-        counterRecord.setEquipmentOutputAlias(equipmentOutput.getAlias());
+        counterRecord.setEquipmentOutputAlias(equipmentOutput.getAlias().getAlias());
         counterRecord.setIsValidForProduction(equipmentOutput.isValidForProduction());
     }
 
@@ -163,6 +164,8 @@ public class CounterRecordServiceImpl implements CounterRecordService {
         }
 
         int computedValue = calculateComputedValue(lastPersistedCountOpt.get(), receivedCount);
+        int increment = computedValueIncrement(lastPersistedCountOpt.get(), receivedCount);
+        receivedCount.setIncrement(increment);
         receivedCount.setComputedValue(computedValue);
     }
 
@@ -192,8 +195,12 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     }
 
     private int defaultCalculateComputedValue(CounterRecordEntity lastPersistedCount, CounterRecordEntity receivedCount) {
-        int computedValueIncrement = receivedCount.getRealValue() - lastPersistedCount.getRealValue();
+        int computedValueIncrement = computedValueIncrement(lastPersistedCount, receivedCount);
         return lastPersistedCount.getComputedValue() + computedValueIncrement;
+    }
+
+    private int computedValueIncrement(CounterRecordEntity lastPersistedCount, CounterRecordEntity receivedCount) {
+        return receivedCount.getRealValue() - lastPersistedCount.getRealValue();
     }
 
     public boolean areValidInitialCounts(String productionOrderCode) {
@@ -206,5 +213,15 @@ public class CounterRecordServiceImpl implements CounterRecordService {
         Optional<ProductionOrderEntity> productionOrderOpt = productionOrderRepository.findByCode(productionOrderCode);
         return productionOrderOpt.isPresent() &&
                 repository.findLastByProductionOrderId(productionOrderOpt.get().getId()).isPresent();
+    }
+
+    @Override
+    public Integer sumValidCounterIncrement(Long countingEquipmentId, Timestamp startDateFilter, Timestamp endDateFilter) {
+        return repository.sumValidCounterIncrement(countingEquipmentId, startDateFilter, endDateFilter);
+    }
+
+    @Override
+    public Integer sumCounterIncrement(Long countingEquipmentId, Timestamp startDateFilter, Timestamp endDateFilter) {
+        return repository.sumCounterIncrement(countingEquipmentId, startDateFilter, endDateFilter);
     }
 }

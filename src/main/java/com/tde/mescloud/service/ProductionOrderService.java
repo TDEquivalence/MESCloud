@@ -4,6 +4,7 @@ import com.tde.mescloud.model.dto.ProductionOrderDto;
 import com.tde.mescloud.model.dto.ProductionOrderSummaryDto;
 import com.tde.mescloud.model.entity.ProductionOrderEntity;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,11 +22,21 @@ public interface ProductionOrderService {
 
     ProductionOrderEntity saveAndUpdate(ProductionOrderEntity productionOrder);
 
+    List<ProductionOrderEntity> saveAndUpdateAll(List<ProductionOrderEntity> productionOrders);
+
     void delete(ProductionOrderEntity productionOrder);
 
     Optional<ProductionOrderEntity> findById(Long id);
 
+    Optional<ProductionOrderDto> findDtoById(Long id);
+
     List<Long> findExistingIds(List<Long> ids);
 
     List<ProductionOrderSummaryDto> getCompletedWithoutComposed();
+
+    void setProductionOrderApproval(Long composedOrderId, boolean isApproved);
+
+    Long calculateScheduledTimeInSeconds(Long equipmentId, Date startDate, Date endDate);
+
+    List<ProductionOrderDto> findByEquipmentAndPeriod(Long equipmentId, Date startDate, Date endDate);
 }

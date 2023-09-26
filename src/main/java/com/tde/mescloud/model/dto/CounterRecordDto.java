@@ -11,6 +11,7 @@ public class CounterRecordDto {
     private long id;
     private String equipmentAlias;
     private String productionOrderCode;
+    private int equipmentOutputId;
     private String equipmentOutputAlias;
     private int computedValue;
     private Date registeredAt;

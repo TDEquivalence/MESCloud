@@ -23,6 +23,8 @@ public class ProductionOrderEntity {
     private int targetAmount;
     private boolean isCompleted;
     private Date createdAt;
+    private Date completedAt;
+
     @OneToMany(mappedBy = "productionOrder")
     private List<ProductionInstructionEntity> productionInstructions;
     private String inputBatch;
@@ -30,6 +32,7 @@ public class ProductionOrderEntity {
     private String gauge;
     private String category;
     private String washingProcess;
+    private Boolean isApproved;
 
     @ManyToOne
     private ComposedProductionOrderEntity composedProductionOrder;

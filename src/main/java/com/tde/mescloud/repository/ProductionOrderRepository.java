@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,4 +23,12 @@ public interface ProductionOrderRepository extends JpaRepository<ProductionOrder
     List<ProductionOrderEntity> findByIdIn(List<Long> ids);
 
     List<ProductionOrderSummaryEntity> findCompletedWithoutComposed();
+
+    List<ProductionOrderEntity> findByComposedProductionOrderId(Long composedProductionOrderId);
+
+    @Query("SELECT p FROM production_order p " +
+            "WHERE p.completedAt > :startDate " +
+            "AND p.createdAt < :endDate " +
+            "AND (p.equipment.id = :equipmentId)")
+    List<ProductionOrderEntity> findByEquipmentAndPeriod(Long equipmentId, Date startDate, Date endDate);
 }

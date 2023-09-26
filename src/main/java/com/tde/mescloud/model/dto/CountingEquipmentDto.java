@@ -18,4 +18,10 @@ public class CountingEquipmentDto {
     private int pTimerCommunicationCycle;
     private List<EquipmentOutputDto> outputs;
     private String imsCode;
+
+    private Integer theoreticalProduction;
+    private Double overallEquipmentEffectivenessTarget;
+    private Double availabilityTarget;
+    private Double performanceTarget;
+    private Double qualityTarget;
 }

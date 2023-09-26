@@ -51,7 +51,7 @@ public class ComposedProductionOrderRepositoryImpl {
         return root.get(PROP_ID).in(subquery);
     }
 
-    public List<ComposedSummaryEntity> findSummarized(boolean withHits) {
+    public List<ComposedSummaryEntity> getOpenComposedSummaries(boolean withHits) {
 
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<ComposedSummaryEntity> query = criteriaBuilder.createQuery(ComposedSummaryEntity.class);
@@ -73,6 +73,13 @@ public class ComposedProductionOrderRepositoryImpl {
             Predicate hitsPredicate = root.get(PROP_ID).in(subquery);
             predicates.add(hitsPredicate);
         }
+
+        Subquery<Integer> batchSubquery = query.subquery(Integer.class);
+        Root<BatchEntity> batchRoot = batchSubquery.from(BatchEntity.class);
+        batchSubquery.select(batchRoot.get(PROP_COMPOSED).get(PROP_ID));
+
+        Predicate noBatchPredicate = criteriaBuilder.not(root.get(PROP_ID).in(batchSubquery));
+        predicates.add(noBatchPredicate);
 
         List<Order> orders = new ArrayList<>();
 

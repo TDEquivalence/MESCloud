@@ -1,4 +1,4 @@
-package com.tde.mescloud.model.dto.filter;
+package com.tde.mescloud.model.filter;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class FilterSort<T extends SearchableProperty> {
+public class FilterSort<T extends FilterProperty> {
 
     private static final String ASCENDING = "ASC";
     private static final String DESCENDING = "DESC";

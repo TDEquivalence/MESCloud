@@ -29,8 +29,7 @@ public class ProductionOrderController {
         return new ResponseEntity<>(productionOrderOpt.get(), HttpStatus.OK);
     }
 
-    //TODO: Change to PutMapping
-    @PostMapping("{countingEquipmentId}/complete")
+    @PutMapping("{countingEquipmentId}/complete")
     public ResponseEntity<ProductionOrderDto> complete(@PathVariable long countingEquipmentId) {
         Optional<ProductionOrderDto> productionOrderOpt = service.complete(countingEquipmentId);
         if (productionOrderOpt.isEmpty()) {

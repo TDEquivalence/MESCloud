@@ -1,46 +1,31 @@
 package com.tde.mescloud.repository;
 
-import com.tde.mescloud.model.dto.CounterRecordFilterDto;
+import com.tde.mescloud.model.dto.CounterRecordFilter;
 import com.tde.mescloud.model.dto.KpiFilterDto;
-import com.tde.mescloud.model.dto.filter.Searchable;
-import com.tde.mescloud.model.dto.filter.Sortable;
 import com.tde.mescloud.model.entity.*;
 import jakarta.persistence.EntityGraph;
-import jakarta.persistence.EntityManager;
+import jakarta.persistence.Tuple;
 import jakarta.persistence.criteria.*;
-import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
 
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.sql.Timestamp;
+import java.util.*;
 
-@AllArgsConstructor
 @Repository
-public class CounterRecordRepositoryImpl {
-
-    private EntityManager entityManager;
+public class CounterRecordRepositoryImpl extends AbstractFilterRepository<CounterRecordFilter.Property, CounterRecordEntity> {
 
     private static final String ID_PROP = "id";
-    private static final String REGISTERED_AT_PROP = "registeredAt";
-    private static final String COMPUTED_VALUE_PROP = "computedValue";
     private static final String EQUIPMENT_OUTPUT_PROP = "equipmentOutput";
     private static final String PRODUCTION_ORDER_PROP = "productionOrder";
     private static final String COUNTING_EQUIPMENT_PROP = "countingEquipment";
     private static final String PRODUCTION_ORDER_CODE_PROP = "code";
     private static final String COUNTING_EQUIPMENT_ALIAS_PROP = "alias";
-
-    private static final String DATE_START_FILTER_FIELD = "startDate";
-    private static final String DATE_END_FILTER_FIELD = "endDate";
-    private static final String EQUIPMENT_ALIAS_FILTER_FIELD = "equipmentAlias";
-    private static final String PRODUCTION_ORDER_CODE_FILTER_FIELD = "productionOrderCode";
-
-    private static final String JAKARTA_FETCHGRAPH = "jakarta.persistence.fetchgraph";
-    private static final String SQL_WILDCARD = "%";
+    private static final String REGISTERED_AT_PROP = "registeredAt";
+    private static final String IS_VALID_FOR_PRODUCTION_PROP = "isValidForProduction";
+    private static final String INCREMENT_PROP = "increment";
 
 
-    public List<CounterRecordEntity> getFilteredAndPaginated(CounterRecordFilterDto filterDto) {
-
+    public List<CounterRecordEntity> getFilteredAndPaginated(CounterRecordFilter filterDto) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<CounterRecordEntity> query = cb.createQuery(CounterRecordEntity.class);
         Root<CounterRecordEntity> root = query.from(CounterRecordEntity.class);
@@ -68,17 +53,17 @@ public class CounterRecordRepositoryImpl {
                 .getResultList();
     }
 
-    public List<CounterRecordConclusionEntity> findLastPerProductionOrder(CounterRecordFilterDto filterDto) {
+    public List<CounterRecordConclusionEntity> findLastPerProductionOrder(CounterRecordFilter filterDto) {
 
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<CounterRecordConclusionEntity> query = criteriaBuilder.createQuery(CounterRecordConclusionEntity.class);
         Root<CounterRecordConclusionEntity> root = query.from(CounterRecordConclusionEntity.class);
 
         List<Predicate> predicates = new ArrayList<>();
-        addPredicatesConclusion(filterDto, predicates, criteriaBuilder, root);
+        addPredicates(filterDto, predicates, criteriaBuilder, root);
 
         List<Order> orders = new ArrayList<>();
-        addSortOrdersConclusion(filterDto, orders, criteriaBuilder, root);
+        addSortOrders(filterDto, orders, criteriaBuilder, root);
         Order newestOrder = criteriaBuilder.desc(root.get(ID_PROP));
         orders.add(newestOrder);
 
@@ -102,7 +87,7 @@ public class CounterRecordRepositoryImpl {
         Root<CounterRecordConclusionEntity> root = query.from(CounterRecordConclusionEntity.class);
 
         List<Predicate> predicates = new ArrayList<>();
-        addPredicatesConclusion(filterDto, predicates, criteriaBuilder, root);
+        addPredicates(filterDto, predicates, criteriaBuilder, root);
 
         List<Order> orders = new ArrayList<>();
         //TODO: Implement sort
@@ -121,135 +106,135 @@ public class CounterRecordRepositoryImpl {
                 .getResultList();
     }
 
-    private void addPredicates(Searchable<CounterRecordFilterDto.CounterRecordProperty> filter,
-                               List<Predicate> predicates,
-                               CriteriaBuilder criteriaBuilder,
-                               Root<CounterRecordEntity> counterRecordRoot) {
+    @Override
+    protected <T> void populatePathByJointProperty() {
 
-        for (CounterRecordFilterDto.CounterRecordProperty counterRecordProperty : filter.getSearch().getKeys()) {
-            Predicate predicate;
-            switch (counterRecordProperty.getPropertyName()) {
-                case COMPUTED_VALUE_PROP -> {
-                    int computedValue = Integer.parseInt(filter.getSearch().getValue(counterRecordProperty));
-                    predicate = criteriaBuilder.greaterThanOrEqualTo(counterRecordRoot.get(COMPUTED_VALUE_PROP), computedValue);
-                }
-                case DATE_START_FILTER_FIELD -> {
-                    ZonedDateTime dateStart = ZonedDateTime.parse(filter.getSearch().getValue(counterRecordProperty));
-                    predicate = criteriaBuilder.greaterThanOrEqualTo(counterRecordRoot.get(REGISTERED_AT_PROP), dateStart);
-                }
-                case DATE_END_FILTER_FIELD -> {
-                    ZonedDateTime dateEnd = ZonedDateTime.parse(filter.getSearch().getValue(counterRecordProperty));
-                    predicate = criteriaBuilder.lessThanOrEqualTo(counterRecordRoot.get(REGISTERED_AT_PROP), dateEnd);
-                }
-                default -> {
-                    Path<?> path = getPath(counterRecordRoot, counterRecordProperty.getPropertyName());
-                    String value = filter.getSearch().getValue(counterRecordProperty).toUpperCase();
-                    predicate = createLikePredicate(path, value, criteriaBuilder);
-                }
-            }
-            predicates.add(predicate);
+        pathByJointProperty.put(CounterRecordFilter.Property.EQUIPMENT_ALIAS.getEntityProperty(),
+                r -> {
+                    Join<T, EquipmentOutputEntity> equipmentOutputJoin = r.join(EQUIPMENT_OUTPUT_PROP);
+                    Join<EquipmentOutputEntity, CountingEquipmentEntity> countingEquipmentJoin =
+                            equipmentOutputJoin.join(COUNTING_EQUIPMENT_PROP);
+                    return countingEquipmentJoin.get(COUNTING_EQUIPMENT_ALIAS_PROP);
+                });
+
+        pathByJointProperty.put(CounterRecordFilter.Property.PRODUCTION_ORDER_CODE.getEntityProperty(),
+                r -> {
+                    Join<T, ProductionOrderEntity> productionOrderJoin = r.join(PRODUCTION_ORDER_PROP);
+                    return productionOrderJoin.get(PRODUCTION_ORDER_CODE_PROP);
+                });
+    }
+
+    public Integer sumCounterIncrement(Long countingEquipmentId, Timestamp startDateFilter, Timestamp endDateFilter) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Integer> query = cb.createQuery(Integer.class);
+
+        Root<CounterRecordEntity> crRoot = query.from(CounterRecordEntity.class);
+        Join<CounterRecordEntity, EquipmentOutputEntity> eoJoin = crRoot.join(EQUIPMENT_OUTPUT_PROP, JoinType.INNER);
+        Join<EquipmentOutputEntity, CountingEquipmentEntity> countingEquipmentJoin = eoJoin.join(COUNTING_EQUIPMENT_PROP, JoinType.INNER);
+
+        Expression<Integer> sumIncrement = cb.sum(crRoot.get(INCREMENT_PROP));
+
+        List<Predicate> predicateList = new ArrayList<>();
+        predicateList.add(cb.equal(countingEquipmentJoin.get("id"), countingEquipmentId));
+        predicateList.add(cb.greaterThan(crRoot.get(REGISTERED_AT_PROP), startDateFilter));
+        predicateList.add(cb.lessThanOrEqualTo(crRoot.get(REGISTERED_AT_PROP), endDateFilter));
+
+        query.select(sumIncrement).where(predicateList.toArray(new Predicate[0]));
+
+        return entityManager.createQuery(query).getSingleResult();
+    }
+
+    public Integer sumValidCounterIncrement(Long countingEquipmentId, Timestamp startDateFilter, Timestamp endDateFilter) {
+        Map<Long, Integer> incrementByPO = sumValidCounterIncrementByPO(countingEquipmentId, startDateFilter, endDateFilter);
+
+        return incrementByPO.values().stream().mapToInt(Integer::intValue).sum();
+    }
+
+
+    public Map<Long, Integer> sumValidCounterIncrementByPO(Long countingEquipmentId, Timestamp startDateFilter, Timestamp endDateFilter) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Tuple> query = cb.createTupleQuery();
+
+        Root<CounterRecordEntity> crRoot = query.from(CounterRecordEntity.class);
+        Join<CounterRecordEntity, EquipmentOutputEntity> eoJoin = crRoot.join(EQUIPMENT_OUTPUT_PROP, JoinType.INNER);
+        Join<EquipmentOutputEntity, CountingEquipmentEntity> countingEquipmentJoin = eoJoin.join(COUNTING_EQUIPMENT_PROP, JoinType.INNER);
+        Join<CounterRecordEntity, ProductionOrderEntity> poJoin = crRoot.join(EQUIPMENT_OUTPUT_PROP, JoinType.INNER);
+
+        Expression<Integer> sumIncrementByPO = cb.sum(crRoot.get(INCREMENT_PROP));
+
+        List<Predicate> predicateList = new ArrayList<>();
+        Predicate conditions = cb.and(
+                cb.isTrue(crRoot.get(IS_VALID_FOR_PRODUCTION_PROP)),
+                cb.equal(countingEquipmentJoin.get("id"), countingEquipmentId)
+        );
+
+        Predicate startDate = cb.greaterThan(crRoot.get(REGISTERED_AT_PROP), startDateFilter);
+        Predicate endDate = cb.lessThanOrEqualTo(crRoot.get(REGISTERED_AT_PROP), endDateFilter);
+        predicateList.add(conditions);
+        predicateList.add(startDate);
+        predicateList.add(endDate);
+
+        query.multiselect(poJoin.get("id"), sumIncrementByPO)
+                .where(cb.and(predicateList.toArray(new Predicate[0])))
+                .groupBy(poJoin.get("id"));
+
+        List<Tuple> result = entityManager.createQuery(query).getResultList();
+
+        Map<Long, Integer> incrementByPO = new HashMap<>();
+        for (Tuple tuple : result) {
+            Long productionOrderId = tuple.get(poJoin.get("id"));
+            Integer totalIncrement = tuple.get(sumIncrementByPO);
+            incrementByPO.put(productionOrderId, totalIncrement);
         }
+
+        return incrementByPO;
     }
 
-    private void addPredicatesConclusion(Searchable<CounterRecordFilterDto.CounterRecordProperty> filter,
-                                         List<Predicate> predicates,
-                                         CriteriaBuilder criteriaBuilder,
-                                         Root<CounterRecordConclusionEntity> counterRecordRoot) {
+    public Integer sumValidCounterIncrementForApprovedPO(Long countingEquipmentId, Timestamp startDateFilter, Timestamp endDateFilter) {
+        Map<Long, Integer> incrementWithApprovedPO = sumValidCounterIncrementWithApprovedPO(countingEquipmentId, startDateFilter, endDateFilter);
 
-        for (CounterRecordFilterDto.CounterRecordProperty counterRecordProperty : filter.getSearch().getKeys()) {
-            Predicate predicate;
-            switch (counterRecordProperty.getPropertyName()) {
-                case COMPUTED_VALUE_PROP -> {
-                    int computedValue = Integer.parseInt(filter.getSearch().getValue(counterRecordProperty));
-                    predicate = criteriaBuilder.greaterThanOrEqualTo(counterRecordRoot.get(COMPUTED_VALUE_PROP), computedValue);
-                }
-                case DATE_START_FILTER_FIELD -> {
-                    ZonedDateTime dateStart = ZonedDateTime.parse(filter.getSearch().getValue(counterRecordProperty));
-                    predicate = criteriaBuilder.greaterThanOrEqualTo(counterRecordRoot.get(REGISTERED_AT_PROP), dateStart);
-                }
-                case DATE_END_FILTER_FIELD -> {
-                    ZonedDateTime dateEnd = ZonedDateTime.parse(filter.getSearch().getValue(counterRecordProperty));
-                    predicate = criteriaBuilder.lessThanOrEqualTo(counterRecordRoot.get(REGISTERED_AT_PROP), dateEnd);
-                }
-                default -> {
-                    Path<?> path = getPathConclusion(counterRecordRoot, counterRecordProperty.getPropertyName());
-                    String value = filter.getSearch().getValue(counterRecordProperty).toUpperCase();
-                    predicate = createLikePredicate(path, value, criteriaBuilder);
-                }
-            }
-            predicates.add(predicate);
+        return incrementWithApprovedPO.values().stream().mapToInt(Integer::intValue).sum();
+    }
+
+    private Map<Long, Integer> sumValidCounterIncrementWithApprovedPO(Long countingEquipmentId, Timestamp startDateFilter, Timestamp endDateFilter) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Tuple> query = cb.createTupleQuery();
+
+        Root<CounterRecordEntity> crRoot = query.from(CounterRecordEntity.class);
+        Join<CounterRecordEntity, EquipmentOutputEntity> eoJoin = crRoot.join(EQUIPMENT_OUTPUT_PROP, JoinType.INNER);
+        Join<EquipmentOutputEntity, CountingEquipmentEntity> countingEquipmentJoin = eoJoin.join(COUNTING_EQUIPMENT_PROP, JoinType.INNER);
+        Join<CounterRecordEntity, ProductionOrderEntity> poJoin = crRoot.join(PRODUCTION_ORDER_PROP, JoinType.INNER);
+
+        Expression<Long> productionOrderId = poJoin.get("id");
+        Expression<Integer> sumIncrement = cb.sum(crRoot.get(INCREMENT_PROP));
+
+        List<Predicate> predicateList = new ArrayList<>();
+        Predicate conditions = cb.and(
+                cb.isTrue(crRoot.get(IS_VALID_FOR_PRODUCTION_PROP)),
+                cb.equal(countingEquipmentJoin.get("id"), countingEquipmentId),
+                cb.isTrue(poJoin.get("isApproved"))
+        );
+
+        Predicate startDate = cb.greaterThan(crRoot.get(REGISTERED_AT_PROP), startDateFilter);
+        Predicate endDate = cb.lessThanOrEqualTo(crRoot.get(REGISTERED_AT_PROP), endDateFilter);
+        predicateList.add(conditions);
+        predicateList.add(startDate);
+        predicateList.add(endDate);
+
+        query.multiselect(productionOrderId, sumIncrement)
+                .where(cb.and(predicateList.toArray(new Predicate[0])))
+                .groupBy(productionOrderId);
+
+        List<Tuple> result = entityManager.createQuery(query).getResultList();
+
+        Map<Long, Integer> incrementByPO = new HashMap<>();
+        for (Tuple tuple : result) {
+            Long productionOrderIdValue = tuple.get(productionOrderId);
+            Integer totalIncrement = tuple.get(sumIncrement);
+            incrementByPO.put(productionOrderIdValue, totalIncrement);
         }
+
+        return incrementByPO;
     }
 
-    private Predicate createLikePredicate(Path<?> path, String value, CriteriaBuilder criteriaBuilder) {
-        return criteriaBuilder.like(criteriaBuilder.upper(path.as(String.class)), value.toUpperCase());
-    }
-
-    private void addSortOrders(Sortable<CounterRecordFilterDto.CounterRecordProperty> filter,
-                               List<Order> orders,
-                               CriteriaBuilder criteriaBuilder,
-                               Root<CounterRecordEntity> counterRecordRoot) {
-
-        for (CounterRecordFilterDto.CounterRecordProperty counterRecordProperty : filter.getSort().getKeys()) {
-
-            Order order = filter.getSort().isDescendingSort(counterRecordProperty) ?
-                    criteriaBuilder.desc(getPath(counterRecordRoot, counterRecordProperty.getPropertyName())) :
-                    criteriaBuilder.asc(getPath(counterRecordRoot, counterRecordProperty.getPropertyName()));
-            orders.add(order);
-        }
-    }
-
-    private void addSortOrdersConclusion(Sortable<CounterRecordFilterDto.CounterRecordProperty> filter,
-                                         List<Order> orders,
-                                         CriteriaBuilder criteriaBuilder,
-                                         Root<CounterRecordConclusionEntity> counterRecordRoot) {
-
-        for (CounterRecordFilterDto.CounterRecordProperty counterRecordProperty : filter.getSort().getKeys()) {
-
-            Order order = filter.getSort().isDescendingSort(counterRecordProperty) ?
-                    criteriaBuilder.desc(getPathConclusion(counterRecordRoot, counterRecordProperty.getPropertyName())) :
-                    criteriaBuilder.asc(getPathConclusion(counterRecordRoot, counterRecordProperty.getPropertyName()));
-            orders.add(order);
-        }
-    }
-
-    private Path<?> getPath(Root<CounterRecordEntity> counterRecordRoot, String property) {
-        switch (property) {
-            case EQUIPMENT_ALIAS_FILTER_FIELD -> {
-                Join<CounterRecordEntity, EquipmentOutputEntity> equipmentOutputJoin =
-                        counterRecordRoot.join(EQUIPMENT_OUTPUT_PROP);
-                Join<EquipmentOutputEntity, CountingEquipmentEntity> countingEquipmentJoin =
-                        equipmentOutputJoin.join(COUNTING_EQUIPMENT_PROP);
-                return countingEquipmentJoin.get(COUNTING_EQUIPMENT_ALIAS_PROP);
-            }
-            case PRODUCTION_ORDER_CODE_FILTER_FIELD -> {
-                Join<CounterRecordEntity, ProductionOrderEntity> productionOrderJoin =
-                        counterRecordRoot.join(PRODUCTION_ORDER_PROP);
-                return productionOrderJoin.get(PRODUCTION_ORDER_CODE_PROP);
-            }
-            default -> {
-                return counterRecordRoot.get(property);
-            }
-        }
-    }
-
-    private Path<?> getPathConclusion(Root<CounterRecordConclusionEntity> counterRecordRoot, String property) {
-        switch (property) {
-            case EQUIPMENT_ALIAS_FILTER_FIELD -> {
-                Join<CounterRecordConclusionEntity, EquipmentOutputEntity> equipmentOutputJoin =
-                        counterRecordRoot.join(EQUIPMENT_OUTPUT_PROP);
-                Join<EquipmentOutputEntity, CountingEquipmentEntity> countingEquipmentJoin =
-                        equipmentOutputJoin.join(COUNTING_EQUIPMENT_PROP);
-                return countingEquipmentJoin.get(COUNTING_EQUIPMENT_ALIAS_PROP);
-            }
-            case PRODUCTION_ORDER_CODE_FILTER_FIELD -> {
-                Join<CounterRecordConclusionEntity, ProductionOrderEntity> productionOrderJoin =
-                        counterRecordRoot.join(PRODUCTION_ORDER_PROP);
-                return productionOrderJoin.get(PRODUCTION_ORDER_CODE_PROP);
-            }
-            default -> {
-                return counterRecordRoot.get(property);
-            }
-        }
-    }
 }

@@ -33,4 +33,6 @@ public interface ComposedProductionOrderService {
     List<ComposedSummaryDto> findSummarized(boolean withHits);
 
     List<ComposedSummaryDto> findCompleted();
+
+    void setProductionOrderApproval(ComposedProductionOrderEntity composed, boolean isApproved);
 }

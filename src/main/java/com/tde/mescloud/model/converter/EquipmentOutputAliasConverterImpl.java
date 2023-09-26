@@ -18,4 +18,9 @@ public class EquipmentOutputAliasConverterImpl implements EquipmentOutputAliasCo
     public EquipmentOutputAliasDto toDto(EquipmentOutputAliasEntity entity) {
         return modelMapper.map(entity, EquipmentOutputAliasDto.class);
     }
+
+    @Override
+    public EquipmentOutputAliasEntity toEntity(EquipmentOutputAliasDto dto) {
+        return modelMapper.map(dto, EquipmentOutputAliasEntity.class);
+    }
 }
