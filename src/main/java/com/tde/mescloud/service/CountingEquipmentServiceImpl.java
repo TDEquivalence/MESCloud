@@ -28,6 +28,7 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
     private CountingEquipmentRepository repository;
     private CountingEquipmentConverter converter;
     private ImsService imsService;
+    private EquipmentStatusRecordService statusRecordService;
 
     @Override
     public List<CountingEquipmentDto> findAllWithLastProductionOrder() {
@@ -104,7 +105,8 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
 
     @Override
     public Optional<CountingEquipmentDto> updateEquipmentStatus(String equipmentCode, int equipmentStatus) {
-        Optional<CountingEquipmentEntity> countingEquipmentOpt = repository.findByCode(equipmentCode);
+
+        Optional<CountingEquipmentEntity> countingEquipmentOpt = repository.findByCodeWithLastStatusRecord(equipmentCode);
         if (countingEquipmentOpt.isEmpty()) {
             log.warning(() -> String.format("No Counting Equipment was found with the code [%s]", equipmentCode));
             return Optional.empty();
@@ -114,8 +116,18 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
         countingEquipment.setEquipmentStatus(equipmentStatus);
         CountingEquipmentEntity updatedCountingEquipment = repository.save(countingEquipment);
 
+        //TODO: Refactor
+        if (hasStatusChanged(countingEquipment, equipmentStatus)) {
+            statusRecordService.save(countingEquipment.getId(), equipmentStatus);
+        }
+
         CountingEquipmentDto updatedCountingEquipmentDto = converter.convertToDto(updatedCountingEquipment);
         return Optional.of(updatedCountingEquipmentDto);
+    }
+
+    private boolean hasStatusChanged(CountingEquipmentEntity countingEquipment, int equipmentStatus) {
+        return countingEquipment.getEquipmentStatusRecords().isEmpty() ||
+                countingEquipment.getEquipmentStatusRecords().get(0).getEquipmentStatus().getStatus() != equipmentStatus;
     }
 
     @Override

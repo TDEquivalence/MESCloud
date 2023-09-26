@@ -35,6 +35,4 @@ public class EquipmentOutputConverterImpl implements EquipmentOutputConverter {
     public List<EquipmentOutputEntity> convertToEntity(List<EquipmentOutputDto> equipmentOutputDtoList) {
         return equipmentOutputDtoList.stream().map(this::convertToEntity).toList();
     }
-
-
 }

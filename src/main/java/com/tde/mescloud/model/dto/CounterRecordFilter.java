@@ -11,16 +11,31 @@ import lombok.Setter;
 @Setter
 public class CounterRecordFilter extends AbstractPaginatedFilter<CounterRecordFilter.Property> {
 
+    private static final String REGISTERED_AT_PROP = "registeredAt";
+
     @AllArgsConstructor
     @Getter
     public enum Property implements FilterProperty {
 
-        PRODUCTION_ORDER_CODE("productionOrderCode", "productionOrderCode", FilterDataTypeOperation.STRING_EQUAL),
-        EQUIPMENT_OUTPUT_ALIAS("equipmentOutputAlias", "equipmentOutputAlias", FilterDataTypeOperation.STRING_EQUAL),
-        EQUIPMENT_ALIAS("equipmentAlias", "equipmentAlias", FilterDataTypeOperation.STRING_EQUAL),
-        AMOUNT("computedValue", "computedValue", FilterDataTypeOperation.INTEGER_GREATER_OR_EQUAL),
-        START_DATE("startDate", "registeredAt", FilterDataTypeOperation.DATE_GREATER_OR_EQUAL),
-        END_DATE("endDate", "registeredAt", FilterDataTypeOperation.DATE_LESS_OR_EQUAL);
+        REGISTERED_AT(REGISTERED_AT_PROP),
+        PRODUCTION_ORDER_CODE("productionOrderCode", FilterDataTypeOperation.STRING_EQUAL),
+        EQUIPMENT_OUTPUT_ALIAS("equipmentOutputAlias", FilterDataTypeOperation.STRING_EQUAL),
+        EQUIPMENT_ALIAS("equipmentAlias", FilterDataTypeOperation.STRING_EQUAL),
+        AMOUNT("computedValue", FilterDataTypeOperation.INTEGER_GREATER_OR_EQUAL),
+        START_DATE("startDate", REGISTERED_AT_PROP, FilterDataTypeOperation.DATE_GREATER_OR_EQUAL),
+        END_DATE("endDate", REGISTERED_AT_PROP, FilterDataTypeOperation.DATE_LESS_OR_EQUAL);
+
+        Property(String name, FilterDataTypeOperation dataTypeOperation) {
+            this.name = name;
+            this.entityProperty = name;
+            this.dataTypeOperation = dataTypeOperation;
+        }
+
+        Property(String name) {
+            this.name = name;
+            this.entityProperty = name;
+            this.dataTypeOperation = FilterDataTypeOperation.NONE;
+        }
 
         private final String name;
         private final String entityProperty;

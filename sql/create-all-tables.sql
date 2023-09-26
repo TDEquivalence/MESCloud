@@ -195,9 +195,9 @@ CREATE INDEX idx_counter_record_registered_at ON counter_record (registered_at);
 
 CREATE TABLE equipment_status_record (
     id int GENERATED ALWAYS AS IDENTITY,
-    counting_equipment_id int,
-    equipment_status int,
-    registered_at date,
+    counting_equipment_id int NOT NULL,
+    equipment_status int NOT NULL,
+    registered_at timestamp NOT NULL,
 
     PRIMARY KEY(id),
     FOREIGN KEY(counting_equipment_id) REFERENCES counting_equipment(id)

@@ -20,18 +20,15 @@ import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.logging.Logger;
 
 @Service
 @AllArgsConstructor
 @Log
 public class ProductionOrderServiceImpl implements ProductionOrderService {
-
-    private static final java.util.logging.Logger logger = Logger.getLogger(ProductionOrderServiceImpl.class.getName());
-
 
     private static final String OBO_SECTION_PREFIX = "OBO";
     private static final String CODE_PREFIX = "PO";
@@ -215,7 +212,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
             List<ProductionOrderEntity> productionOrders = repository.findByComposedProductionOrderId(composedOrderId);
 
             if (productionOrders == null || productionOrders.isEmpty()) {
-                logger.warning("No production orders found for composed order ID: " + composedOrderId);
+                log.warning("No production orders found for composed order ID: " + composedOrderId);
                 return;
             }
 
@@ -225,7 +222,40 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
 
             saveAndUpdateAll(productionOrders);
         } catch (Exception e) {
-            logger.warning("Error in setProductionOrderApproval: " + e.getMessage());
+            log.warning("Error in setProductionOrderApproval: " + e.getMessage());
         }
+    }
+
+    @Override
+    public List<ProductionOrderDto> findByEquipmentAndPeriod(Long equipmentId, Date startDate, Date endDate) {
+        List<ProductionOrderEntity> productionOrders = repository.findByEquipmentAndPeriod(equipmentId, startDate, endDate);
+        return converter.toDto(productionOrders);
+    }
+
+    @Override
+    public Long calculateScheduledTimeInSeconds(Long equipmentId, Date startDate, Date endDate) {
+
+        List<ProductionOrderEntity> productionOrders = repository.findByEquipmentAndPeriod(equipmentId, startDate, endDate);
+        Duration totalActiveTime = Duration.ZERO;
+        for (ProductionOrderEntity productionOrder : productionOrders) {
+
+            Duration productionOrderActiveTime = calculateScheduledTime(productionOrder, startDate, endDate);
+            totalActiveTime = totalActiveTime.plus(productionOrderActiveTime);
+        }
+
+        return totalActiveTime.getSeconds();
+    }
+
+    private Duration calculateScheduledTime(ProductionOrderEntity productionOrder, Date startDate, Date endDate) {
+        Date createdAt = productionOrder.getCreatedAt();
+        Date completedAt = productionOrder.getCompletedAt();
+
+        startDate = (startDate.before(createdAt)) ? createdAt : startDate;
+        endDate = (endDate.before(createdAt)) ? createdAt : endDate;
+        endDate = (completedAt != null && completedAt.before(endDate)) ? completedAt : endDate;
+
+        long durationInMillisenconds = Math.max(0, endDate.getTime() - startDate.getTime());
+
+        return Duration.ofMillis(durationInMillisenconds);
     }
 }
