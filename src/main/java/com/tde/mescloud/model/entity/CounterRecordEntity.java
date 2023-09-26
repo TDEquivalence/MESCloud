@@ -21,7 +21,7 @@ public class CounterRecordEntity {
     private String equipmentOutputAlias;
     private int realValue;
     private int computedValue;
-    private int increment;
+    private Integer increment;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "production_order_id")
     private ProductionOrderEntity productionOrder;
