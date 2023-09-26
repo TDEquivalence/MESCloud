@@ -44,7 +44,7 @@ public class CountingEquipmentEntity {
 
     private Integer theoreticalProduction;
 
-    private Double equipmentOverallEffectivenessTarget;
+    private Double overallEquipmentEffectivenessTarget;
     private Double availabilityTarget;
     private Double performanceTarget;
     private Double qualityTarget;
