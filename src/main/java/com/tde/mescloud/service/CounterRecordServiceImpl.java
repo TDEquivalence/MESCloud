@@ -12,6 +12,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
 import java.util.*;
 
 @Service
@@ -215,12 +216,12 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     }
 
     @Override
-    public Integer calculateIncrement(Long countingEquipmentId, Date startDateFilter, Date endDateFilter) {
-        return repository.calculateIncrement(countingEquipmentId, startDateFilter, endDateFilter);
+    public Integer sumValidCounterIncrement(Long countingEquipmentId, Timestamp startDateFilter, Timestamp endDateFilter) {
+        return repository.sumValidCounterIncrement(countingEquipmentId, startDateFilter, endDateFilter);
     }
 
     @Override
-    public Integer calculateIncrementWithApprovedPO(Long countingEquipmentId, Date startDateFilter, Date endDateFilter) {
-        return repository.calculateIncrementWithApprovedPO(countingEquipmentId, startDateFilter, endDateFilter);
+    public Integer sumCounterIncrement(Long countingEquipmentId, Timestamp startDateFilter, Timestamp endDateFilter) {
+        return repository.sumCounterIncrement(countingEquipmentId, startDateFilter, endDateFilter);
     }
 }

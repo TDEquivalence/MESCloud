@@ -76,7 +76,7 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
             log.warning(() -> String.format("No Counting Equipment found for id: [%s]", id));
             return Optional.empty();
         }
-        
+
         CountingEquipmentEntity countingEquipment = countingEquipmentOpt.get();
         if (countingEquipment.getOutputs().isEmpty()) {
             log.warning(() -> String.format("No Counting Equipment found for id: [%s]", id));
@@ -208,6 +208,10 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
         toUpdate.setAlias(updateFrom.getAlias());
         toUpdate.setPTimerCommunicationCycle(updateFrom.getPTimerCommunicationCycle());
         toUpdate.setTheoreticalProduction(updateFrom.getTheoreticalProduction());
+        toUpdate.setQualityTarget(updateFrom.getQualityTarget());
+        toUpdate.setPerformanceTarget(updateFrom.getPerformanceTarget());
+        toUpdate.setAvailabilityTarget(updateFrom.getAvailabilityTarget());
+        toUpdate.setEquipmentOverallEffectivenessTarget(updateFrom.getEquipmentOverallEffectivenessTarget());
         updateOutputs(toUpdate, updateFrom);
         updateIms(toUpdate, updateFrom);
     }

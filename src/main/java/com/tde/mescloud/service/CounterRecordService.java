@@ -2,6 +2,7 @@ package com.tde.mescloud.service;
 
 import com.tde.mescloud.model.dto.*;
 
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 
@@ -19,7 +20,7 @@ public interface CounterRecordService {
 
     boolean areValidContinuationCounts(String productionOrderCode);
 
-    Integer calculateIncrement(Long countingEquipmentId, Date startDateFilter, Date endDateFilter);
+    Integer sumValidCounterIncrement(Long countingEquipmentId, Timestamp startDateFilter, Timestamp endDateFilter);
 
-    Integer calculateIncrementWithApprovedPO(Long countingEquipmentId, Date startDateFilter, Date endDateFilter);
+    Integer sumCounterIncrement(Long countingEquipmentId, Timestamp startDateFilter, Timestamp endDateFilter);
 }

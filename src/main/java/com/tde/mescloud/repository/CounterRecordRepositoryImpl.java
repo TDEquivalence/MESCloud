@@ -8,6 +8,7 @@ import jakarta.persistence.Tuple;
 import jakarta.persistence.criteria.*;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Timestamp;
 import java.util.*;
 
 @Repository
@@ -123,14 +124,34 @@ public class CounterRecordRepositoryImpl extends AbstractFilterRepository<Counte
                 });
     }
 
-    public Integer calculateIncrement(Long countingEquipmentId,  Date startDateFilter, Date endDateFilter) {
-        Map<Long, Integer> incrementByPO = calculateIncrementByPO(countingEquipmentId, startDateFilter, endDateFilter);
+    public Integer sumCounterIncrement(Long countingEquipmentId, Timestamp startDateFilter, Timestamp endDateFilter) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Integer> query = cb.createQuery(Integer.class);
+
+        Root<CounterRecordEntity> crRoot = query.from(CounterRecordEntity.class);
+        Join<CounterRecordEntity, EquipmentOutputEntity> eoJoin = crRoot.join(EQUIPMENT_OUTPUT_PROP, JoinType.INNER);
+        Join<EquipmentOutputEntity, CountingEquipmentEntity> countingEquipmentJoin = eoJoin.join(COUNTING_EQUIPMENT_PROP, JoinType.INNER);
+
+        Expression<Integer> sumIncrement = cb.sum(crRoot.get(INCREMENT_PROP));
+
+        List<Predicate> predicateList = new ArrayList<>();
+        predicateList.add(cb.equal(countingEquipmentJoin.get("id"), countingEquipmentId));
+        predicateList.add(cb.greaterThan(crRoot.get(REGISTERED_AT_PROP), startDateFilter));
+        predicateList.add(cb.lessThanOrEqualTo(crRoot.get(REGISTERED_AT_PROP), endDateFilter));
+
+        query.select(sumIncrement).where(predicateList.toArray(new Predicate[0]));
+
+        return entityManager.createQuery(query).getSingleResult();
+    }
+
+    public Integer sumValidCounterIncrement(Long countingEquipmentId, Timestamp startDateFilter, Timestamp endDateFilter) {
+        Map<Long, Integer> incrementByPO = sumValidCounterIncrementByPO(countingEquipmentId, startDateFilter, endDateFilter);
 
         return incrementByPO.values().stream().mapToInt(Integer::intValue).sum();
     }
 
 
-    public Map<Long, Integer> calculateIncrementByPO(Long countingEquipmentId, Date startDateFilter, Date endDateFilter) {
+    public Map<Long, Integer> sumValidCounterIncrementByPO(Long countingEquipmentId, Timestamp startDateFilter, Timestamp endDateFilter) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Tuple> query = cb.createTupleQuery();
 
@@ -169,13 +190,13 @@ public class CounterRecordRepositoryImpl extends AbstractFilterRepository<Counte
         return incrementByPO;
     }
 
-    public Integer calculateIncrementWithApprovedPO(Long countingEquipmentId,  Date startDateFilter, Date endDateFilter) {
-        Map<Long, Integer> incrementWithApprovedPO = calculateIncrementWithApprovedProductionOrder(countingEquipmentId, startDateFilter, endDateFilter);
+    public Integer sumValidCounterIncrementForApprovedPO(Long countingEquipmentId, Timestamp startDateFilter, Timestamp endDateFilter) {
+        Map<Long, Integer> incrementWithApprovedPO = sumValidCounterIncrementWithApprovedPO(countingEquipmentId, startDateFilter, endDateFilter);
 
         return incrementWithApprovedPO.values().stream().mapToInt(Integer::intValue).sum();
     }
 
-    private Map<Long, Integer> calculateIncrementWithApprovedProductionOrder(Long countingEquipmentId, Date startDateFilter, Date endDateFilter) {
+    private Map<Long, Integer> sumValidCounterIncrementWithApprovedPO(Long countingEquipmentId, Timestamp startDateFilter, Timestamp endDateFilter) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Tuple> query = cb.createTupleQuery();
 

@@ -19,9 +19,9 @@ public class CountingEquipmentDto {
     private List<EquipmentOutputDto> outputs;
     private String imsCode;
 
-    private Double equipmentEffectiveness;
     private Integer theoreticalProduction;
-    private Double availability;
-    private Double performance;
-    private Double quality;
+    private Double overallEquipmentEffectivenessTarget;
+    private Double availabilityTarget;
+    private Double performanceTarget;
+    private Double qualityTarget;
 }
