@@ -34,7 +34,6 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
     private EquipmentStatusRecordService statusRecordService;
     private ProductionOrderService productionOrderService;
 
-
     @Override
     public List<CountingEquipmentDto> findAllWithLastProductionOrder() {
         List<CountingEquipmentEntity> persistedCountingEquipments = repository.findAllWithLastProductionOrder();
@@ -125,6 +124,7 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
         CountingEquipmentEntity countingEquipment = countingEquipmentOpt.get();
         countingEquipment.setEquipmentStatus(equipmentStatus);
         CountingEquipmentEntity updatedCountingEquipment = repository.save(countingEquipment);
+        //TODO: Refactor
 
         if (hasStatusChanged(countingEquipment, equipmentStatus)) {
             statusRecordService.save(countingEquipment.getId(), equipmentStatus);
