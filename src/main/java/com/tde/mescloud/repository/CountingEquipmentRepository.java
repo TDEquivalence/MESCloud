@@ -21,7 +21,7 @@ public interface CountingEquipmentRepository extends CrudRepository<CountingEqui
             "LEFT JOIN FETCH ce.productionOrders po " +
             "WHERE ce.id = :id AND (po IS NULL OR po.id = (SELECT MAX(p.id) FROM production_order p WHERE p.equipment = ce)) " +
             "ORDER BY ce.id")
-    CountingEquipmentEntity findByIdWithActiveProductionOrder(@Param("id") Long id);
+    Optional<CountingEquipmentEntity> findByIdWithActiveProductionOrder(@Param("id") Long id);
 
     @Query("SELECT ce FROM counting_equipment ce " +
             "LEFT JOIN FETCH ce.productionOrders po " +
