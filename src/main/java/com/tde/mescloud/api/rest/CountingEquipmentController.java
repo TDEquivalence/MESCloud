@@ -1,9 +1,12 @@
 package com.tde.mescloud.api.rest;
 
+import com.tde.mescloud.exception.ActiveProductionOrderException;
+import com.tde.mescloud.exception.IncompleteConfigurationException;
 import com.tde.mescloud.model.dto.CountingEquipmentDto;
 import com.tde.mescloud.model.dto.RequestConfigurationDto;
 import com.tde.mescloud.service.CountingEquipmentService;
 import lombok.AllArgsConstructor;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -44,13 +47,20 @@ public class CountingEquipmentController {
         return new ResponseEntity<>(updatedIms.get(), HttpStatus.OK);
     }
 
-    @PostMapping("/{equipmentId}/configuration")
-    public ResponseEntity<CountingEquipmentDto> setConfiguration(@PathVariable long equipmentId, @RequestBody RequestConfigurationDto request) {
-        CountingEquipmentDto countingEquipment = service.setConfiguration(equipmentId, request);
-        if (countingEquipment == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+    @PutMapping("/{equipmentId}/configuration")
+    public ResponseEntity<CountingEquipmentDto> updateConfiguration(@PathVariable long equipmentId,
+                                                                    @RequestBody RequestConfigurationDto request) {
+        try {
 
-        return new ResponseEntity<>(countingEquipment, HttpStatus.OK);
+            CountingEquipmentDto countingEquipment = service.updateConfiguration(equipmentId, request);
+            return new ResponseEntity<>(countingEquipment, HttpStatus.OK);
+
+        } catch (IncompleteConfigurationException e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        } catch (EmptyResultDataAccessException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (ActiveProductionOrderException e) {
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        }
     }
 }

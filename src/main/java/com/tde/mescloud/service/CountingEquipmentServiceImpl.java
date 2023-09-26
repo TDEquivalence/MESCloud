@@ -1,5 +1,7 @@
 package com.tde.mescloud.service;
 
+import com.tde.mescloud.exception.ActiveProductionOrderException;
+import com.tde.mescloud.exception.IncompleteConfigurationException;
 import com.tde.mescloud.model.converter.CountingEquipmentConverter;
 import com.tde.mescloud.model.dto.CountingEquipmentDto;
 import com.tde.mescloud.model.dto.RequestConfigurationDto;
@@ -9,6 +11,7 @@ import com.tde.mescloud.model.entity.ImsEntity;
 import com.tde.mescloud.repository.CountingEquipmentRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -29,6 +32,8 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
     private CountingEquipmentConverter converter;
     private ImsService imsService;
     private EquipmentStatusRecordService statusRecordService;
+    private ProductionOrderService productionOrderService;
+
 
     @Override
     public List<CountingEquipmentDto> findAllWithLastProductionOrder() {
@@ -67,8 +72,13 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
 
     @Override
     public Optional<CountingEquipmentDto> findById(long id) {
-
-        CountingEquipmentEntity countingEquipment = repository.findByIdWithActiveProductionOrder(id);
+        Optional<CountingEquipmentEntity> countingEquipmentOpt = repository.findByIdWithActiveProductionOrder(id);
+        if (countingEquipmentOpt.isEmpty()) {
+            log.warning(() -> String.format("No Counting Equipment found for id: [%s]", id));
+            return Optional.empty();
+        }
+        
+        CountingEquipmentEntity countingEquipment = countingEquipmentOpt.get();
         if (countingEquipment.getOutputs().isEmpty()) {
             log.warning(() -> String.format("No Counting Equipment found for id: [%s]", id));
             return Optional.empty();
@@ -116,7 +126,6 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
         countingEquipment.setEquipmentStatus(equipmentStatus);
         CountingEquipmentEntity updatedCountingEquipment = repository.save(countingEquipment);
 
-        //TODO: Refactor
         if (hasStatusChanged(countingEquipment, equipmentStatus)) {
             statusRecordService.save(countingEquipment.getId(), equipmentStatus);
         }
@@ -151,14 +160,30 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
     }
 
     @Override
-    public CountingEquipmentDto setConfiguration(long equipmentId, RequestConfigurationDto request) {
+    public CountingEquipmentDto updateConfiguration(long equipmentId, RequestConfigurationDto request)
+            throws IncompleteConfigurationException, EmptyResultDataAccessException, ActiveProductionOrderException {
+
         if (containsNullProperty(request)) {
-            throw new IllegalArgumentException("Counting equipment configuration is incomplete. All properties (alias, outputs, and imsCode) must be specified.");
+            throw new IncompleteConfigurationException("Counting equipment configuration is incomplete. All properties (alias, outputs, and imsCode) must be specified.");
         }
 
-        CountingEquipmentEntity entity = updateEquipmentConfiguration(equipmentId, request);
-        repository.save(entity);
-        return converter.convertToDto(entity);
+        Optional<CountingEquipmentEntity> countingEquipmentOpt = repository.findByIdWithActiveProductionOrder(equipmentId);
+        if (countingEquipmentOpt.isEmpty()) {
+            String msg = String.format("Counting equipment with id [%s] does not exist.", equipmentId);
+            log.warning(msg);
+            throw new EmptyResultDataAccessException(msg, 1);
+        }
+
+        CountingEquipmentEntity countingEquipment = countingEquipmentOpt.get();
+        if (hasActiveProductionOrder(countingEquipment)) {
+            String msg = String.format("Updating equipment configuration failed: equipment with id [%s] has an active production order", equipmentId);
+            log.info(msg);
+            throw new ActiveProductionOrderException(msg);
+        }
+
+        updateEquipmentConfiguration(countingEquipment, request);
+        repository.save(countingEquipment);
+        return converter.convertToDto(countingEquipment);
     }
 
     private boolean containsNullProperty(RequestConfigurationDto countingEquipmentDto) {
@@ -167,28 +192,24 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
                 countingEquipmentDto.getImsDto() == null;
     }
 
-    private CountingEquipmentEntity updateEquipmentConfiguration(long equipmentId, RequestConfigurationDto request) {
+    private boolean hasActiveProductionOrder(CountingEquipmentEntity countingEquipment) {
+        return !countingEquipment.getProductionOrders().isEmpty() &&
+                !countingEquipment.getProductionOrders().get(0).isCompleted();
+    }
+
+    private void updateEquipmentConfiguration(CountingEquipmentEntity persistedEquipment, RequestConfigurationDto request) {
         CountingEquipmentEntity countingEquipmentConfig = converter.convertToEntity(request);
         ensureMinimumPTimer(countingEquipmentConfig);
 
-        CountingEquipmentEntity countingEquipmentEntity = findCountingEquipmentById(equipmentId);
-
-        return updateFrom(countingEquipmentEntity, countingEquipmentConfig);
+        updateFrom(persistedEquipment, countingEquipmentConfig);
     }
 
-    private CountingEquipmentEntity findCountingEquipmentById(long equipmentId) {
-        Optional<CountingEquipmentEntity> countingEquipmentDb = repository.findById(equipmentId);
-        return countingEquipmentDb.orElseThrow(() -> new IllegalArgumentException("Counting equipment id doesn't exist."));
-    }
-
-    private CountingEquipmentEntity updateFrom(CountingEquipmentEntity toUpdate, CountingEquipmentEntity updateFrom) {
+    private void updateFrom(CountingEquipmentEntity toUpdate, CountingEquipmentEntity updateFrom) {
         toUpdate.setAlias(updateFrom.getAlias());
         toUpdate.setPTimerCommunicationCycle(updateFrom.getPTimerCommunicationCycle());
         toUpdate.setTheoreticalProduction(updateFrom.getTheoreticalProduction());
         updateOutputs(toUpdate, updateFrom);
         updateIms(toUpdate, updateFrom);
-
-        return toUpdate;
     }
 
     private void updateOutputs(CountingEquipmentEntity toUpdate, CountingEquipmentEntity updateFrom) {
