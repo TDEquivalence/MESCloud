@@ -88,6 +88,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
             log.severe(() -> String.format("Unable to publish Order Completion to PLC for equipment [%s]", equipmentId));
         }
 
+        System.out.print("PRODUCTION ORDER IMPL!");
         try {
             lock.waitForExecute();
         } catch (InterruptedException e) {

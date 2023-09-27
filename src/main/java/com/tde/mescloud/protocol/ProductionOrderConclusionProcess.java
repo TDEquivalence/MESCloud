@@ -43,7 +43,12 @@ public class ProductionOrderConclusionProcess extends AbstractMesProtocolProcess
         equipmentService.updateEquipmentStatus(equipmentCounts.getEquipmentCode(), equipmentCounts.getEquipmentStatus());
         counterRecordService.save(equipmentCounts);
 
-        executeProductionOrderConclusion(equipmentCounts.getProductionOrderCode(), equipmentCounts.getEquipmentCode());
+        ProductionOrderEntity productionOrder = getProductionOrderByCode(equipmentCounts.getEquipmentCode());
+        if (productionOrder == null) {
+            throw new IllegalStateException("Production order not found for equipment code: " + equipmentCounts.getEquipmentCode());
+        }
+
+        executeProductionOrderConclusion(productionOrder, equipmentCounts.getEquipmentCode());
     }
 
     @Override
@@ -51,15 +56,9 @@ public class ProductionOrderConclusionProcess extends AbstractMesProtocolProcess
         return MqttDTOConstants.PRODUCTION_ORDER_CONCLUSION_RESPONSE_DTO_NAME;
     }
 
-    public void executeProductionOrderConclusion(String productionOrderCode, String equipmentCode) {
+    public void executeProductionOrderConclusion(ProductionOrderEntity productionOrder, String equipmentCode) {
 
-        Optional<ProductionOrderEntity> productionOrderEntityOpt = repository.findByCode(productionOrderCode);
-        if (productionOrderEntityOpt.isEmpty()) {
-            log.warning(() -> String.format("No Production Order found for an Equipment with code [%s]", productionOrderCode));
-            return;
-        }
-
-        if (!productionOrderEntityOpt.get().isCompleted()) {
+        if (!productionOrder.isCompleted()) {
             try {
                 Thread.sleep(THREAD_SLEEP_DURATION);
                 ProductionOrderMqttDto productionOrderMqttDto = new ProductionOrderMqttDto();
@@ -76,13 +75,22 @@ public class ProductionOrderConclusionProcess extends AbstractMesProtocolProcess
             }
         }
 
-        ProductionOrderEntity productionOrderEntity = productionOrderEntityOpt.get();
-        productionOrderEntity.setCompleted(true);
-        productionOrderEntity.setCompletedAt(new Date());
-        repository.save(productionOrderEntity);
+        try {
+            productionOrder.setCompleted(true);
+            productionOrder.setCompletedAt(new Date());
+            repository.save(productionOrder);
+        } finally {
+            lock.signalExecute(); // Release the lock in a finally block to ensure it's always released
+        }
+    }
 
-//        log.info("ProductionOrderConclusionProcess - releasing lock");
-        lock.signalExecute();
-//        log.info("ProductionOrderConclusionProcess - signal executed");
+    private ProductionOrderEntity getProductionOrderByCode(String code) {
+        Optional<ProductionOrderEntity> productionOrderEntityOpt = repository.findByCode(code);
+        if (productionOrderEntityOpt.isEmpty()) {
+            log.warning(() -> String.format("No Production Order found for an Equipment with code [%s]", code));
+            return null;
+        }
+
+        return productionOrderEntityOpt.get();
     }
 }
