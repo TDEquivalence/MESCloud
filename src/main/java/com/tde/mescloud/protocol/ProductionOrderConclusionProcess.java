@@ -53,7 +53,7 @@ public class ProductionOrderConclusionProcess extends AbstractMesProtocolProcess
             throw new IllegalStateException("Production order not found for equipment code: " + equipmentCounts.getEquipmentCode());
         }
 
-        executeProductionOrderConclusion(productionOrder, equipmentCounts.getEquipmentCode());
+        executeProductionOrderConclusion(equipmentCounts.getProductionOrderCode(), equipmentCounts.getEquipmentCode());
     }
 
     @Override
@@ -61,22 +61,26 @@ public class ProductionOrderConclusionProcess extends AbstractMesProtocolProcess
         return MqttDTOConstants.PRODUCTION_ORDER_CONCLUSION_RESPONSE_DTO_NAME;
     }
 
-    public void executeProductionOrderConclusion(ProductionOrderEntity productionOrder, String equipmentCode) {
+    public void executeProductionOrderConclusion(String productionOrderCode, String equipmentCode) {
+        Optional<ProductionOrderEntity> productionOrderOpt = repository.findByCode(productionOrderCode);
+
+        if (productionOrderOpt.isEmpty()) {
+            log.warning(() -> String.format("No Production Order found for Equipment with code [%s]", productionOrderCode));
+            return; // No need to continue if no production order is found.
+        }
+
+        ProductionOrderEntity productionOrder = productionOrderOpt.get();
 
         if (!productionOrder.isCompleted()) {
             try {
                 Thread.sleep(THREAD_SLEEP_DURATION);
-                ProductionOrderMqttDto productionOrderMqttDto = new ProductionOrderMqttDto();
-                productionOrderMqttDto.setJsonType(MqttDTOConstants.PRODUCTION_ORDER_DTO_NAME);
-                productionOrderMqttDto.setEquipmentEnabled(false);
-                productionOrderMqttDto.setProductionOrderCode("");
-                productionOrderMqttDto.setTargetAmount(0);
-                productionOrderMqttDto.setEquipmentCode(equipmentCode);
+                ProductionOrderMqttDto productionOrderMqttDto = createProductionOrderMqttDto(equipmentCode);
                 mqttClient.publish(mqttSettings.getProtCountPlcTopic(), productionOrderMqttDto);
-            } catch (MesMqttException | InterruptedException e) {
-                log.severe(() -> String.format("Unable to publish Order Completion to PLC for equipment with code [%s]", equipmentCode));
+            } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
-                e.printStackTrace();
+                log.severe(() -> String.format("Unable to publish Order Completion to PLC for equipment with code [%s]", equipmentCode));
+            } catch (Exception e) {
+                log.severe("An unexpected error occurred during MQTT publication: " + e.getMessage());
             }
         }
 
@@ -85,11 +89,22 @@ public class ProductionOrderConclusionProcess extends AbstractMesProtocolProcess
             productionOrder.setCompletedAt(new Date());
             repository.save(productionOrder);
         } catch (DataAccessException e) {
-            logger.error("DataAccessException caught while saving production order", e);
+            log.severe("DataAccessException caught while saving production order " + e.getMessage());
         } finally {
             lock.signalExecute();
         }
     }
+
+    private ProductionOrderMqttDto createProductionOrderMqttDto(String equipmentCode) {
+        ProductionOrderMqttDto productionOrderMqttDto = new ProductionOrderMqttDto();
+        productionOrderMqttDto.setJsonType(MqttDTOConstants.PRODUCTION_ORDER_DTO_NAME);
+        productionOrderMqttDto.setEquipmentEnabled(false);
+        productionOrderMqttDto.setProductionOrderCode("");
+        productionOrderMqttDto.setTargetAmount(0);
+        productionOrderMqttDto.setEquipmentCode(equipmentCode);
+        return productionOrderMqttDto;
+    }
+
 
     private ProductionOrderEntity getProductionOrderByCode(String code) {
         Optional<ProductionOrderEntity> productionOrderEntityOpt = repository.findByCode(code);
