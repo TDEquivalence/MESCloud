@@ -41,7 +41,6 @@ public class ProductionOrderConclusionProcess extends AbstractMesProtocolProcess
         }
 
         equipmentService.updateEquipmentStatus(equipmentCounts.getEquipmentCode(), equipmentCounts.getEquipmentStatus());
-        equipmentCounts.setProductionOrderCode(null);
         counterRecordService.save(equipmentCounts);
 
         executeProductionOrderConclusion(equipmentCounts.getProductionOrderCode(), equipmentCounts.getEquipmentCode());
