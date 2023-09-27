@@ -12,6 +12,9 @@ import com.tde.mescloud.service.CountingEquipmentService;
 import com.tde.mescloud.utility.LockUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -21,6 +24,8 @@ import java.util.Optional;
 @Log
 @AllArgsConstructor
 public class ProductionOrderConclusionProcess extends AbstractMesProtocolProcess<PlcMqttDto> {
+
+    private static final Logger logger = LoggerFactory.getLogger(ProductionOrderConclusionProcess.class);
 
     private static final int THREAD_SLEEP_DURATION = 500;
 
@@ -79,8 +84,10 @@ public class ProductionOrderConclusionProcess extends AbstractMesProtocolProcess
             productionOrder.setCompleted(true);
             productionOrder.setCompletedAt(new Date());
             repository.save(productionOrder);
+        } catch (DataAccessException e) {
+            logger.error("DataAccessException caught while saving production order", e);
         } finally {
-            lock.signalExecute(); // Release the lock in a finally block to ensure it's always released
+            lock.signalExecute();
         }
     }
 
