@@ -95,7 +95,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
             e.printStackTrace();
         }
 
-        ProductionOrderDto productionOrder = converter.toDto(productionOrderEntityOpt.get());
+        ProductionOrderDto productionOrder = new ProductionOrderDto();
         return Optional.of(productionOrder);
     }
 
