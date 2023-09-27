@@ -7,6 +7,7 @@ import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
 
@@ -50,6 +51,30 @@ public class KpiServiceImpl implements KpiService {
 
         return equipmentKpiByEquipmentAlias.values()
                 .toArray(new CountingEquipmentKpiDto[equipmentKpiByEquipmentAlias.size()]);
+    }
+
+    @Override
+    public List<EquipmentKpiAggregatorDto> getEquipmentKpiAggregatorPerDay(Long equipmentId, RequestKpiDto kpiRequest) {
+
+        final Instant startDate = kpiRequest.getStartDate().toInstant();
+        final Instant endDate = kpiRequest.getEndDate().toInstant();
+
+        final int spanInDays = DateUtil.spanInDays(startDate, endDate);
+        List<EquipmentKpiAggregatorDto> equipmentKpiAggregators = new ArrayList<>();
+
+        for (int i = 0; i <= spanInDays; i++) {
+            Instant dailyStartDate = startDate.plus(Duration.ofDays(i));
+            Instant dailyEndDate = dailyStartDate.plus(Duration.ofHours(23).plusMinutes(59));
+
+            RequestKpiDto dailyRequest = new RequestKpiDto();
+            dailyRequest.setStartDate(Timestamp.from(dailyStartDate));
+            dailyRequest.setEndDate(Timestamp.from(dailyEndDate));
+
+            EquipmentKpiAggregatorDto aggregator = getEquipmentKpiAggregator(equipmentId, dailyRequest);
+            equipmentKpiAggregators.add(aggregator);
+        }
+
+        return equipmentKpiAggregators;
     }
 
     //TODO: This should be a filter behavior
