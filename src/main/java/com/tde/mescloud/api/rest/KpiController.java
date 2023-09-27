@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 
 @RestController
@@ -34,11 +35,23 @@ public class KpiController {
         return new ResponseEntity<>(kpiAvailabilityDto, HttpStatus.OK);
     }
 
-    @GetMapping("/{equipmentId}")
-    public ResponseEntity<EquipmentKpiAggregatorDto> getEquipmentKpiAggregator(@RequestParam long equipmentId, @RequestBody RequestKpiDto filter) {
+    @PostMapping("/{equipmentId}/aggregator")
+    public ResponseEntity<EquipmentKpiAggregatorDto> getEquipmentKpiAggregator(@RequestParam long equipmentId,
+                                                                               @RequestBody RequestKpiDto filter) {
         try {
             EquipmentKpiAggregatorDto kpiAggregatorDto = kpiService.getEquipmentKpiAggregator(equipmentId, filter);
             return new ResponseEntity<>(kpiAggregatorDto, HttpStatus.OK);
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping("/{equipmentId}/daily-aggregator")
+    public ResponseEntity<List<EquipmentKpiAggregatorDto>> getEquipmentKpiAggregatorPerDay(@RequestParam long equipmentId,
+                                                                                           @RequestBody RequestKpiDto filter) {
+        try {
+            List<EquipmentKpiAggregatorDto> kpiAggregatorsDto = kpiService.getEquipmentKpiAggregatorPerDay(equipmentId, filter);
+            return new ResponseEntity<>(kpiAggregatorsDto, HttpStatus.OK);
         } catch (NoSuchElementException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
