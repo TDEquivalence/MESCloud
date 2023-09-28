@@ -47,9 +47,9 @@ public class ProductionOrderConclusionProcess extends AbstractMesProtocolProcess
         equipmentService.updateEquipmentStatus(equipmentCounts.getEquipmentCode(), equipmentCounts.getEquipmentStatus());
         counterRecordService.save(equipmentCounts);
 
-        ProductionOrderEntity productionOrder = getProductionOrderByCode(equipmentCounts.getEquipmentCode());
+        ProductionOrderEntity productionOrder = getProductionOrderByCode(equipmentCounts.getProductionOrderCode());
         if (productionOrder == null) {
-            throw new IllegalStateException("Production order not found for equipment code: " + equipmentCounts.getEquipmentCode());
+            throw new IllegalStateException("Production order code: " + equipmentCounts.getProductionOrderCode() + "not found for equipment code: " + equipmentCounts.getEquipmentCode());
         }
 
         executeProductionOrderConclusion(equipmentCounts.getProductionOrderCode(), equipmentCounts.getEquipmentCode());
