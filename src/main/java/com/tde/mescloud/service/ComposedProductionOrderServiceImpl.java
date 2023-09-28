@@ -1,7 +1,6 @@
 package com.tde.mescloud.service;
 
-import com.tde.mescloud.model.converter.ComposedProductionOrderConverter;
-import com.tde.mescloud.model.converter.ComposedSummaryConverter;
+import com.tde.mescloud.model.converter.GenericConverter;
 import com.tde.mescloud.model.dto.ComposedProductionOrderDto;
 import com.tde.mescloud.model.dto.ComposedSummaryDto;
 import com.tde.mescloud.model.dto.ProductionOrderDto;
@@ -27,10 +26,10 @@ public class ComposedProductionOrderServiceImpl implements ComposedProductionOrd
     private static final java.util.logging.Logger logger = Logger.getLogger(ComposedProductionOrderServiceImpl.class.getName());
 
     private final ComposedProductionOrderRepository repository;
-    private final ComposedProductionOrderConverter converter;
+    private final GenericConverter<ComposedProductionOrderEntity, ComposedProductionOrderDto> converter;
 
     private final ProductionOrderService productionOrderService;
-    private final ComposedSummaryConverter summaryConverter;
+    private final GenericConverter<ComposedSummaryEntity, ComposedSummaryDto> summaryConverter;
 
     private static final String CODE_PREFIX = "CP";
     private static final int CODE_INITIAL_VALUE = 0;
@@ -45,7 +44,7 @@ public class ComposedProductionOrderServiceImpl implements ComposedProductionOrd
     public Optional<ComposedProductionOrderDto> create(List<Long> productionOrderIds) {
 
         List<Long> validProductionOrderIds = getValidProductionOrders(productionOrderIds);
-        if(!haveSameProperties(productionOrderIds)) {
+        if (!haveSameProperties(productionOrderIds)) {
             throw new IllegalArgumentException("Production order list doesn't have same properties");
         }
         ComposedProductionOrderEntity composedEntity = createComposed();
@@ -53,7 +52,7 @@ public class ComposedProductionOrderServiceImpl implements ComposedProductionOrd
         setProductionOrdersWithComposed(validProductionOrderIds, composedEntity);
 
         saveAndUpdate(composedEntity);
-        return Optional.of(converter.convertToDto(composedEntity));
+        return Optional.of(converter.toDto(composedEntity, ComposedProductionOrderDto.class));
     }
 
     private void setProductionOrdersWithComposed(List<Long> validProductionOrderIds, ComposedProductionOrderEntity composedEntity) {
@@ -148,19 +147,19 @@ public class ComposedProductionOrderServiceImpl implements ComposedProductionOrd
 
     @Override
     public List<ComposedProductionOrderDto> getAll() {
-        return converter.convertToDto(repository.findAll());
+        return converter.toDto(repository.findAll(), ComposedProductionOrderDto.class);
     }
 
     @Override
     public List<ComposedSummaryDto> findSummarized(boolean withHits) {
         List<ComposedSummaryEntity> composedWithoutHits = repository.getOpenComposedSummaries(withHits);
-        return summaryConverter.toDto(composedWithoutHits);
+        return summaryConverter.toDto(composedWithoutHits, ComposedSummaryDto.class);
     }
 
     @Override
     public List<ComposedSummaryDto> findCompleted() {
         List<ComposedSummaryEntity> composedCompleted = repository.findCompleted();
-        return summaryConverter.toDto(composedCompleted);
+        return summaryConverter.toDto(composedCompleted, ComposedSummaryDto.class);
     }
 
     @Override

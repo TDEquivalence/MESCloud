@@ -1,6 +1,6 @@
 package com.tde.mescloud.service;
 
-import com.tde.mescloud.model.converter.BatchConverter;
+import com.tde.mescloud.model.converter.GenericConverter;
 import com.tde.mescloud.model.dto.BatchDto;
 import com.tde.mescloud.model.dto.RequestBatchDto;
 import com.tde.mescloud.model.entity.BatchEntity;
@@ -12,17 +12,14 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.logging.Logger;
 
 @Service
 @AllArgsConstructor
 @Log
 public class BatchServiceImpl implements BatchService {
 
-    private static final Logger logger = Logger.getLogger(BatchServiceImpl.class.getName());
-
     private final BatchRepository repository;
-    private final BatchConverter converter;
+    private final GenericConverter<BatchEntity, BatchDto> converter;
 
     private final ComposedProductionOrderService composedService;
 
@@ -31,11 +28,11 @@ public class BatchServiceImpl implements BatchService {
         BatchEntity batch = createBatch(requestBatch);
         BatchEntity savedBatch = saveAndUpdate(batch);
         setProductionOrderApproval(savedBatch);
-        return converter.toDto(savedBatch);
+        return converter.toDto(savedBatch, BatchDto.class);
     }
 
     private BatchEntity createBatch(RequestBatchDto requestBatch) {
-        BatchEntity batch = converter.toEntity(requestBatch.getBatch());
+        BatchEntity batch = converter.toEntity(requestBatch.getBatch(), BatchEntity.class);
         batch.setComposed(getComposedById(requestBatch.getComposedId()));
         return batch;
     }
@@ -60,11 +57,9 @@ public class BatchServiceImpl implements BatchService {
 
             composedService.setProductionOrderApproval(batch.getComposed(), batch.getIsApproved());
         } catch (IllegalArgumentException e) {
-            logger.warning("Production Order Approval failed: " + e.getMessage());
+            log.warning("Production Order Approval failed: " + e.getMessage());
         }
     }
-
-
 
     @Override
     public BatchEntity saveAndUpdate(BatchEntity batch) {
@@ -83,6 +78,7 @@ public class BatchServiceImpl implements BatchService {
 
     @Override
     public List<BatchDto> getAll() {
-        return converter.toDto(repository.findAll());
+        List<BatchEntity> batches = repository.findAll();
+        return converter.toDto(batches, BatchDto.class);
     }
 }

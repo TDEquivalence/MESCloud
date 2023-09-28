@@ -21,7 +21,7 @@ public class ImsEntity {
     private List<ProductionOrderEntity> productionOrders;
 
 
-    public boolean isAssociated() {
+    public boolean isInUse() {
         return countingEquipment != null;
     }
 }

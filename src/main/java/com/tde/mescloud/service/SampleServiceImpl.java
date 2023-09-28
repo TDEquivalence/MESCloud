@@ -1,7 +1,6 @@
 package com.tde.mescloud.service;
 
-import com.tde.mescloud.model.converter.ComposedProductionOrderConverter;
-import com.tde.mescloud.model.converter.SampleConverter;
+import com.tde.mescloud.model.converter.GenericConverter;
 import com.tde.mescloud.model.dto.ComposedProductionOrderDto;
 import com.tde.mescloud.model.dto.RequestSampleDto;
 import com.tde.mescloud.model.dto.SampleDto;
@@ -22,10 +21,10 @@ import java.util.Optional;
 public class SampleServiceImpl implements SampleService {
 
     private final SampleRepository repository;
-    private final SampleConverter converter;
+    private final GenericConverter<SampleEntity, SampleDto> converter;
 
     private final ComposedProductionOrderService composedService;
-    private final ComposedProductionOrderConverter composedConverter;
+    private final GenericConverter<ComposedProductionOrderEntity, ComposedProductionOrderDto> composedConverter;
 
     @Override
     public SampleDto create(RequestSampleDto requestSampleDto) {
@@ -40,7 +39,7 @@ public class SampleServiceImpl implements SampleService {
         sampleEntity.setCreatedAt(new Date());
 
         saveAndUpdate(sampleEntity);
-        return converter.convertToDto(sampleEntity);
+        return converter.toDto(sampleEntity, SampleDto.class);
     }
 
     private ComposedProductionOrderEntity createComposed(RequestSampleDto requestSampleDto) {
@@ -48,7 +47,7 @@ public class SampleServiceImpl implements SampleService {
         if (composedDto.isEmpty()) {
             throw new IllegalStateException("Composed Production Order creation error");
         }
-        return composedConverter.convertToEntity(composedDto.get());
+        return composedConverter.toEntity(composedDto.get(), ComposedProductionOrderEntity.class);
     }
 
     public SampleEntity saveAndUpdate(SampleEntity sample) {
@@ -68,6 +67,6 @@ public class SampleServiceImpl implements SampleService {
 
     @Override
     public List<SampleDto> getAll() {
-        return converter.convertToDto(repository.findAll());
+        return converter.toDto(repository.findAll(), SampleDto.class);
     }
 }
