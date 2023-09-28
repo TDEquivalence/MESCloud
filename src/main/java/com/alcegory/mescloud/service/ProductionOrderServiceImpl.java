@@ -95,8 +95,18 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
             e.printStackTrace();
         }
 
-        ProductionOrderDto productionOrder = converter.toDto(productionOrderEntityOpt.get());
-        return Optional.of(productionOrder);
+        return getPersistedProductionOrder(productionOrderEntityOpt.get().getCode());
+    }
+
+    private Optional<ProductionOrderDto> getPersistedProductionOrder(String code) {
+        Optional<ProductionOrderEntity> productionOrderOpt = repository.findByCode(code);
+        if(productionOrderOpt.isEmpty()) {
+            log.warning(() -> String.format("Unable to create Production Order - no Equipment found with code [%s]", code));
+            return Optional.empty();
+        }
+        ProductionOrderEntity productionOrderPersisted = productionOrderOpt.get();
+        ProductionOrderDto productionOrderDto = converter.toDto(productionOrderPersisted);
+        return Optional.of(productionOrderDto);
     }
 
     @Override
