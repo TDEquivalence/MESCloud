@@ -63,7 +63,7 @@ public class ProductionOrderConclusionProcess extends AbstractMesProtocolProcess
     public void executeProductionOrderConclusion(ProductionOrderEntity productionOrder, String equipmentCode) {
 
         if (productionOrder == null) {
-            log.warning(() -> String.format("No Production Order found for Equipment with code [%s]", productionOrder));
+            log.warning(() -> String.format("No Production Order found for Equipment with code [%s]", equipmentCode));
             return; // No need to continue if no production order is found.
         }
 
