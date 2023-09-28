@@ -1,7 +1,7 @@
 package com.tde.mescloud.service;
 
 import com.tde.mescloud.constant.EquipmentStatus;
-import com.tde.mescloud.model.converter.EquipmentStatusRecordConverter;
+import com.tde.mescloud.model.converter.GenericConverter;
 import com.tde.mescloud.model.dto.EquipmentStatusRecordDto;
 import com.tde.mescloud.model.entity.CountingEquipmentEntity;
 import com.tde.mescloud.model.entity.EquipmentStatusRecordEntity;
@@ -14,8 +14,6 @@ import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Collections;
-import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 
 @Service
@@ -24,7 +22,7 @@ import java.util.List;
 public class EquipmentStatusRecordServiceImpl implements EquipmentStatusRecordService {
 
     private EquipmentStatusRecordRepository repository;
-    private EquipmentStatusRecordConverter converter;
+    private GenericConverter<EquipmentStatusRecordEntity, EquipmentStatusRecordDto> converter;
 
     @Override
     public EquipmentStatusRecordDto save(long equipmentId, int equipmentStatus) {
@@ -36,7 +34,7 @@ public class EquipmentStatusRecordServiceImpl implements EquipmentStatusRecordSe
         equipmentStatusRecord.setRegisteredAt(Timestamp.from(Instant.now()));
 
         EquipmentStatusRecordEntity persistedEquipmentStatus = repository.save(equipmentStatusRecord);
-        return converter.toDto(persistedEquipmentStatus);
+        return converter.toDto(persistedEquipmentStatus, EquipmentStatusRecordDto.class);
     }
 
     private List<EquipmentStatusRecordEntity> findRecordsForPeriodAndLastBefore(Long equipmentId,

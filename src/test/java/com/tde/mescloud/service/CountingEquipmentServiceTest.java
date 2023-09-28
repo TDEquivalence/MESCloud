@@ -2,16 +2,20 @@ package com.tde.mescloud.service;
 
 import com.tde.mescloud.exception.ActiveProductionOrderException;
 import com.tde.mescloud.exception.IncompleteConfigurationException;
-import com.tde.mescloud.model.converter.CountingEquipmentConverterImpl;
+import com.tde.mescloud.model.converter.GenericConverter;
+import com.tde.mescloud.model.dto.CountingEquipmentDto;
 import com.tde.mescloud.model.dto.EquipmentOutputDto;
 import com.tde.mescloud.model.dto.ImsDto;
 import com.tde.mescloud.model.dto.RequestConfigurationDto;
+import com.tde.mescloud.model.entity.CountingEquipmentEntity;
 import com.tde.mescloud.repository.CountingEquipmentRepository;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.EmptyResultDataAccessException;
 
@@ -22,9 +26,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 @SpringBootTest
-//@ExtendWith(MockitoExtension.class) - JUnit5 annotation
-@RunWith(MockitoJUnitRunner.class)
-public class CountingEquipmentServiceTest {
+@ExtendWith(MockitoExtension.class)
+class CountingEquipmentServiceTest {
 
     @InjectMocks
     private CountingEquipmentServiceImpl countingEquipmentService;
@@ -36,7 +39,7 @@ public class CountingEquipmentServiceTest {
     private ProductionOrderServiceImpl productionOrderService;
 
     @Mock
-    private CountingEquipmentConverterImpl converter;
+    private GenericConverter<CountingEquipmentEntity, CountingEquipmentDto> converter;
 
 
     @Test
@@ -64,7 +67,7 @@ public class CountingEquipmentServiceTest {
             assertTrue(e instanceof EmptyResultDataAccessException);
         }
 
-        verify(repository, times(1)).findById(equipmentId);
+        verify(repository, times(1)).findByIdWithActiveProductionOrder(equipmentId);
         verify(repository, never()).save(any());
     }
 
@@ -80,11 +83,10 @@ public class CountingEquipmentServiceTest {
         request.setImsDto(imsDto);
         request.setEquipmentEffectiveness(0.95);
         request.setTheoreticalProduction(1000);
-        request.setAvailability(0.99);
-        request.setPerformance(0.98);
+        request.setAvailabilityTarget(0.99);
+        request.setPerformanceTarget(0.98);
         request.setQuality(0.97);
 
         return request;
     }
-
 }

@@ -1,6 +1,6 @@
 package com.tde.mescloud.service;
 
-import com.tde.mescloud.model.converter.ImsConverter;
+import com.tde.mescloud.model.converter.GenericConverter;
 import com.tde.mescloud.model.dto.ImsDto;
 import com.tde.mescloud.model.entity.ImsEntity;
 import com.tde.mescloud.repository.ImsRepository;
@@ -18,13 +18,13 @@ public class ImsServiceImpl implements ImsService {
 
     private static final int MIN_CODE_SIZE = 3;
 
-    private ImsConverter converter;
+    private GenericConverter<ImsEntity, ImsDto> converter;
     private ImsRepository repository;
 
     @Override
     public List<ImsDto> getAll() {
         List<ImsEntity> entities = repository.findAll();
-        return converter.toDto(entities);
+        return converter.toDto(entities, ImsDto.class);
     }
 
     @Override
@@ -35,7 +35,7 @@ public class ImsServiceImpl implements ImsService {
             return Optional.empty();
         }
 
-        ImsDto ims = converter.toDto(persistedImsOpt.get());
+        ImsDto ims = converter.toDto(persistedImsOpt.get(), ImsDto.class);
         return Optional.of(ims);
     }
 
@@ -53,7 +53,7 @@ public class ImsServiceImpl implements ImsService {
         }
 
         ImsEntity imsEntity = imsEntityOpt.get();
-        if (imsEntity.isAssociated()) {
+        if (imsEntity.isInUse()) {
             log.warning(String.format("IMS already in use at Counting Equipment with id [%s]", imsEntity.getCountingEquipment().getId()));
             return false;
         }
@@ -68,8 +68,8 @@ public class ImsServiceImpl implements ImsService {
             return Optional.empty();
         }
 
-        ImsEntity imsEntity = converter.toEntity(imsDto);
+        ImsEntity imsEntity = converter.toEntity(imsDto, ImsEntity.class);
         ImsEntity persistedIms = repository.save(imsEntity);
-        return Optional.of(converter.toDto(persistedIms));
+        return Optional.of(converter.toDto(persistedIms, ImsDto.class));
     }
 }

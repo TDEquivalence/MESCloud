@@ -1,6 +1,6 @@
 package com.tde.mescloud.service;
 
-import com.tde.mescloud.model.converter.HitConverter;
+import com.tde.mescloud.model.converter.GenericConverter;
 import com.tde.mescloud.model.dto.HitDto;
 import com.tde.mescloud.model.dto.RequestHitDto;
 import com.tde.mescloud.model.entity.HitEntity;
@@ -22,7 +22,7 @@ public class HitServiceImpl implements HitService {
 
     private final SampleService sampleService;
     private final HitRepository repository;
-    private final HitConverter converter;
+    private final GenericConverter<HitEntity, HitDto> converter;
 
     @Override
     public List<HitDto> create(RequestHitDto requestHitDto) {
@@ -54,7 +54,7 @@ public class HitServiceImpl implements HitService {
 
     private List<HitDto> saveHitsAndUpdateSample(List<HitDto> hitList) {
         SampleEntity sample = getSample(hitList);
-        List<HitEntity> hits = converter.convertToEntity(hitList);
+        List<HitEntity> hits = converter.toEntity(hitList, HitEntity.class);
 
         saveHitAndSetSample(sample, hits);
         setTcaAverageInSample(sample, hits);
@@ -62,7 +62,7 @@ public class HitServiceImpl implements HitService {
 
         sampleService.saveAndUpdate(sample);
 
-        return converter.convertToDto(hits);
+        return converter.toDto(hits, HitDto.class);
     }
 
     private void setReliability(SampleEntity sample) {
@@ -131,6 +131,6 @@ public class HitServiceImpl implements HitService {
 
     @Override
     public List<HitDto> getAll() {
-        return converter.convertToDto(repository.findAll());
+        return converter.toDto(repository.findAll(), HitDto.class);
     }
 }

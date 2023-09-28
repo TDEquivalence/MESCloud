@@ -1,12 +1,11 @@
 package com.tde.mescloud.service;
 
-import com.tde.mescloud.model.converter.FactoryConverterImpl;
+import com.tde.mescloud.model.converter.GenericConverter;
 import com.tde.mescloud.model.dto.FactoryDto;
 import com.tde.mescloud.model.entity.FactoryEntity;
 import com.tde.mescloud.repository.FactoryRepository;
 import jakarta.persistence.EntityNotFoundException;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.AllArgsConstructor;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Service;
 
@@ -14,27 +13,18 @@ import java.util.List;
 
 @ConfigurationProperties(prefix = "factory")
 @Service
+@AllArgsConstructor
 public class FactoryServiceImpl implements FactoryService {
 
     private final FactoryRepository repository;
-    private final FactoryConverterImpl converter;
-
-    @Getter
-    @Setter
-    private String timeZone;
-
-    public FactoryServiceImpl(FactoryRepository repository, FactoryConverterImpl converter) {
-        this.repository = repository;
-        this.converter = converter;
-    }
-
+    private final GenericConverter<FactoryEntity, FactoryDto> converter;
 
     @Override
     public FactoryDto saveFactory(FactoryDto factoryDto) {
         validateFactoryDto(factoryDto);
-        FactoryEntity entity = converter.convertToEntity(factoryDto);
+        FactoryEntity entity = converter.toEntity(factoryDto, FactoryEntity.class);
         repository.save(entity);
-        return converter.convertToDto(entity);
+        return converter.toDto(entity, FactoryDto.class);
     }
 
     @Override
@@ -42,20 +32,20 @@ public class FactoryServiceImpl implements FactoryService {
         validateId(id);
         FactoryEntity entity = repository.findFactoryById(id);
         validateEntity(entity);
-        return converter.convertToDto(entity);
+        return converter.toDto(entity, FactoryDto.class);
     }
 
     @Override
     public FactoryDto getFactoryByName(String name) {
         validateName(name);
         FactoryEntity entity = repository.findByName(name);
-        return converter.convertToDto(entity);
+        return converter.toDto(entity, FactoryDto.class);
     }
 
     @Override
     public List<FactoryDto> getAllFactories() {
         List<FactoryEntity> factories = repository.findAll();
-        return converter.convertToDto(factories);
+        return converter.toDto(factories, FactoryDto.class);
     }
 
     @Override
@@ -104,5 +94,4 @@ public class FactoryServiceImpl implements FactoryService {
             throw new IllegalArgumentException("Invalid factory.");
         }
     }
-
 }

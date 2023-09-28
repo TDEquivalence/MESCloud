@@ -1,6 +1,6 @@
 package com.tde.mescloud.service;
 
-import com.tde.mescloud.model.converter.EquipmentOutputConverter;
+import com.tde.mescloud.model.converter.GenericConverter;
 import com.tde.mescloud.model.dto.EquipmentOutputDto;
 import com.tde.mescloud.model.entity.EquipmentOutputEntity;
 import com.tde.mescloud.repository.EquipmentOutputRepository;
@@ -16,7 +16,7 @@ import java.util.Optional;
 public class EquipmentOutputServiceImpl implements EquipmentOutputService {
 
     private final EquipmentOutputRepository repository;
-    private final EquipmentOutputConverter converter;
+    private final GenericConverter<EquipmentOutputEntity, EquipmentOutputDto> converter;
 
 
     @Override
@@ -28,7 +28,7 @@ public class EquipmentOutputServiceImpl implements EquipmentOutputService {
             return Optional.empty();
         }
 
-        EquipmentOutputDto equipmentOutput = converter.toDto(entity.get());
+        EquipmentOutputDto equipmentOutput = converter.toDto(entity.get(), EquipmentOutputDto.class);
         return Optional.of(equipmentOutput);
     }
 }

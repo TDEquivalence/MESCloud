@@ -20,7 +20,7 @@ public class RequestConfigurationDto {
 
     private Double equipmentEffectiveness;
     private Integer theoreticalProduction;
-    private Double availability;
-    private Double performance;
+    private Double availabilityTarget;
+    private Double performanceTarget;
     private Double quality;
 }
