@@ -52,7 +52,7 @@ public class ProductionOrderConclusionProcess extends AbstractMesProtocolProcess
             throw new IllegalStateException("Production order code: " + equipmentCounts.getProductionOrderCode() + "not found for equipment code: " + equipmentCounts.getEquipmentCode());
         }
 
-        executeProductionOrderConclusion(equipmentCounts.getProductionOrderCode(), equipmentCounts.getEquipmentCode());
+        executeProductionOrderConclusion(productionOrder, equipmentCounts.getEquipmentCode());
     }
 
     @Override
@@ -60,15 +60,12 @@ public class ProductionOrderConclusionProcess extends AbstractMesProtocolProcess
         return MqttDTOConstants.PRODUCTION_ORDER_CONCLUSION_RESPONSE_DTO_NAME;
     }
 
-    public void executeProductionOrderConclusion(String productionOrderCode, String equipmentCode) {
-        Optional<ProductionOrderEntity> productionOrderOpt = repository.findByCode(productionOrderCode);
+    public void executeProductionOrderConclusion(ProductionOrderEntity productionOrder, String equipmentCode) {
 
-        if (productionOrderOpt.isEmpty()) {
-            log.warning(() -> String.format("No Production Order found for Equipment with code [%s]", productionOrderCode));
+        if (productionOrder == null) {
+            log.warning(() -> String.format("No Production Order found for Equipment with code [%s]", productionOrder));
             return; // No need to continue if no production order is found.
         }
-
-        ProductionOrderEntity productionOrder = productionOrderOpt.get();
 
         if (!productionOrder.isCompleted()) {
             try {
