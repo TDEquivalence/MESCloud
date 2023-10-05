@@ -11,6 +11,16 @@ import lombok.Setter;
 @AllArgsConstructor
 public class EquipmentKpiDto {
 
-    private Double kpiValue;
     private Double kpiTarget;
+    private Double kpiValue;
+
+    public EquipmentKpiDto(CountingEquipmentDto equipment, KpiDto kpi) {
+        this.kpiTarget = equipment == null ? null : equipment.getQualityTarget();
+        this.kpiValue = kpi == null ? null : kpi.getValue();
+    }
+
+    public EquipmentKpiDto(CountingEquipmentDto equipment, Double kpiValue) {
+        this.kpiTarget = equipment == null ? null : equipment.getQualityTarget();
+        this.kpiValue = kpiValue;
+    }
 }

@@ -68,17 +68,16 @@ public class KpiServiceImpl implements KpiService {
         CountingEquipmentDto countingEquipment = countingEquipmentDtoOpt.get();
 
         KpiDto qualityKpi = computeEquipmentQuality(equipmentId, requestKpiDto);
-        EquipmentKpiDto quality = createEquipmentKpi(countingEquipment.getQualityTarget(), qualityKpi);
+        EquipmentKpiDto quality = new EquipmentKpiDto(countingEquipment, qualityKpi);
 
         KpiDto availabilityKpi = computeAvailability(equipmentId, requestKpiDto);
-        EquipmentKpiDto availability = createEquipmentKpi(countingEquipment.getAvailabilityTarget(), availabilityKpi);
+        EquipmentKpiDto availability = new EquipmentKpiDto(countingEquipment, availabilityKpi);
 
         KpiDto performanceKpi = computePerformance(qualityKpi, availabilityKpi, countingEquipment);
-        EquipmentKpiDto performance = createEquipmentKpi(countingEquipment.getPerformanceTarget(), performanceKpi);
+        EquipmentKpiDto performance = new EquipmentKpiDto(countingEquipment, performanceKpi);
 
         Double overallEffectivePerformance = computeOverallEffectivePerformance(qualityKpi, availabilityKpi, performanceKpi);
-        EquipmentKpiDto overallEquipmentEffectiveness
-                = new EquipmentKpiDto(countingEquipment.getOverallEquipmentEffectivenessTarget(), overallEffectivePerformance);
+        EquipmentKpiDto overallEquipmentEffectiveness = new EquipmentKpiDto(countingEquipment, overallEffectivePerformance);
 
         return EquipmentKpiAggregatorDto.builder()
                 .qualityKpi(quality)
@@ -190,9 +189,5 @@ public class KpiServiceImpl implements KpiService {
         }
 
         return quality.getValue() * availability.getValue() * performance.getValue();
-    }
-
-    private EquipmentKpiDto createEquipmentKpi(Double target, KpiDto kpi) {
-        return kpi != null ? new EquipmentKpiDto(target, kpi.getValue()) : null;
     }
 }
