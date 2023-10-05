@@ -3,6 +3,7 @@ package com.alcegory.mescloud.service;
 import com.alcegory.mescloud.exception.IncompleteConfigurationException;
 import com.alcegory.mescloud.model.dto.*;
 import com.alcegory.mescloud.utility.DateUtil;
+import com.alcegory.mescloud.utility.DoubleUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
@@ -117,10 +118,10 @@ public class KpiServiceImpl implements KpiService {
 
     @Override
     public KpiDto computeAvailability(Long equipmentId, RequestKpiDto filter) {
-        Double totalScheduledTime = Double.valueOf(getTotalScheduledTime(equipmentId, filter));
-        Double totalStoppageTime = Double.valueOf(getTotalStoppageTime(equipmentId, filter));
+        Long totalScheduledTime = getTotalScheduledTime(equipmentId, filter);
+        Long totalStoppageTime = getTotalStoppageTime(equipmentId, filter);
 
-        return new KpiDto(totalScheduledTime, totalStoppageTime);
+        return new KpiDto(DoubleUtil.safeDoubleValue(totalScheduledTime), DoubleUtil.safeDoubleValue(totalStoppageTime));
     }
 
     public Long getTotalScheduledTime(Long equipmentId, RequestKpiDto filter) {
@@ -170,7 +171,7 @@ public class KpiServiceImpl implements KpiService {
         }
 
         Double realProductionInSeconds = qualityKpi.getDividend() / availabilityKpi.getDividend();
-        return new KpiDto(realProductionInSeconds, Double.valueOf(countingEquipment.getTheoreticalProduction()));
+        return new KpiDto(realProductionInSeconds, DoubleUtil.safeDoubleValue(countingEquipment.getTheoreticalProduction()));
     }
 
     private Double computeOverallEffectivePerformance(KpiDto quality, KpiDto availability, KpiDto performance) {

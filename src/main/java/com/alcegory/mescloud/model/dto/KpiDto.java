@@ -1,6 +1,6 @@
 package com.alcegory.mescloud.model.dto;
 
-import lombok.AllArgsConstructor;
+import com.alcegory.mescloud.utility.DoubleUtil;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -16,8 +16,9 @@ public class KpiDto {
     private Double divider;
 
     public KpiDto(Integer dividend, Integer divider) {
-        this.dividend = Double.valueOf(dividend);
-        this.divider = Double.valueOf(divider);
+
+        this.dividend = DoubleUtil.safeDoubleValue(dividend);
+        this.divider = DoubleUtil.safeDoubleValue(divider);
     }
 
     public KpiDto(Double dividend, Double divider) {
@@ -26,12 +27,15 @@ public class KpiDto {
     }
 
     public Double getValue() {
-
-        if (dividend == null || dividend == 0 || divider == null || divider == 0) {
+        if (hasInvalidDivisionMembers()) {
             log.warning(String.format("Unable to calculate value: cannot divide dividend [%s] by the divisor [%s]", dividend, divider));
             return null;
         }
 
         return this.dividend / this.divider;
+    }
+
+    private boolean hasInvalidDivisionMembers() {
+        return dividend == null || dividend == 0 || divider == null || divider == 0;
     }
 }
