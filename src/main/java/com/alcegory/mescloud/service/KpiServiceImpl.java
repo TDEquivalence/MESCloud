@@ -140,11 +140,15 @@ public class KpiServiceImpl implements KpiService {
 
         Long totalStoppageTime = 0L;
         for (ProductionOrderDto productionOrder : productionOrders) {
+
+            Timestamp safeEndDate = productionOrder.getCompletedAt() != null ?
+                    Timestamp.from(productionOrder.getCompletedAt().toInstant()) : null;
+            
             totalStoppageTime +=
                     equipmentStatusRecordService.calculateStoppageTimeInSeconds(
                             equipmentId,
                             Timestamp.from(productionOrder.getCreatedAt().toInstant()),
-                            Timestamp.from(productionOrder.getCompletedAt().toInstant()));
+                            safeEndDate);
         }
 
         return totalStoppageTime;
