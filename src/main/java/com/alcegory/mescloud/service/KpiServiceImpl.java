@@ -175,15 +175,14 @@ public class KpiServiceImpl implements KpiService {
 
     private Double computeOverallEffectivePerformance(KpiDto quality, KpiDto availability, KpiDto performance) {
 
-        if (quality.getValue() == null ||
-                quality.getValue() == 0 ||
-                availability.getValue() == null ||
-                availability.getValue() == 0 ||
-                performance.getValue() == null ||
-                performance.getValue() == 0) {
+        if (isValueZeroOrMissing(quality) || isValueZeroOrMissing(availability) || isValueZeroOrMissing(performance)) {
             return null;
         }
 
         return quality.getValue() * availability.getValue() * performance.getValue();
+    }
+
+    private boolean isValueZeroOrMissing(KpiDto kpiDto) {
+        return kpiDto == null || kpiDto.getValue() == null || kpiDto.getValue() == 0;
     }
 }
