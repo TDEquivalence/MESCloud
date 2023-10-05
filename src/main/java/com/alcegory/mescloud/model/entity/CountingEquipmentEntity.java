@@ -22,7 +22,7 @@ public class CountingEquipmentEntity {
     private int pTimerCommunicationCycle;
     @OneToOne(
             fetch = FetchType.EAGER,
-            cascade = {CascadeType.PERSIST, CascadeType.MERGE},
+            cascade = {CascadeType.PERSIST},
             orphanRemoval = false
     )
     @JoinColumn(name = "ims_id", referencedColumnName = "id")
@@ -31,7 +31,7 @@ public class CountingEquipmentEntity {
     @OneToMany(
             mappedBy = "countingEquipment",
             fetch = FetchType.EAGER,
-            cascade = {CascadeType.PERSIST, CascadeType.MERGE},
+            cascade = {CascadeType.PERSIST},
             orphanRemoval = false
     )
     private List<EquipmentOutputEntity> outputs;

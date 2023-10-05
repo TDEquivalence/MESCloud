@@ -1,18 +1,23 @@
 package com.alcegory.mescloud.service;
 
 import com.alcegory.mescloud.exception.ActiveProductionOrderException;
+import com.alcegory.mescloud.exception.EquipmentNotFoundException;
+import com.alcegory.mescloud.exception.ImsNotFoundException;
 import com.alcegory.mescloud.exception.IncompleteConfigurationException;
-import com.alcegory.mescloud.repository.CountingEquipmentRepository;
 import com.alcegory.mescloud.model.converter.CountingEquipmentConverter;
+import com.alcegory.mescloud.model.converter.GenericConverter;
 import com.alcegory.mescloud.model.dto.CountingEquipmentDto;
+import com.alcegory.mescloud.model.dto.ImsDto;
 import com.alcegory.mescloud.model.dto.RequestConfigurationDto;
 import com.alcegory.mescloud.model.entity.CountingEquipmentEntity;
 import com.alcegory.mescloud.model.entity.EquipmentOutputEntity;
 import com.alcegory.mescloud.model.entity.ImsEntity;
+import com.alcegory.mescloud.repository.CountingEquipmentRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +36,7 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
     private CountingEquipmentRepository repository;
     private CountingEquipmentConverter converter;
     private ImsService imsService;
+    private GenericConverter<ImsEntity, ImsDto> imsConverter;
     private EquipmentStatusRecordService statusRecordService;
     private ProductionOrderService productionOrderService;
 
@@ -71,7 +77,7 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
 
     @Override
     public Optional<CountingEquipmentDto> findById(long id) {
-        Optional<CountingEquipmentEntity> countingEquipmentOpt = repository.findByIdWithActiveProductionOrder(id);
+        Optional<CountingEquipmentEntity> countingEquipmentOpt = repository.findByIdWithLastProductionOrder(id);
         if (countingEquipmentOpt.isEmpty()) {
             log.warning(() -> String.format("No Counting Equipment found for id: [%s]", id));
             return Optional.empty();
@@ -124,7 +130,6 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
         CountingEquipmentEntity countingEquipment = countingEquipmentOpt.get();
         countingEquipment.setEquipmentStatus(equipmentStatus);
         CountingEquipmentEntity updatedCountingEquipment = repository.save(countingEquipment);
-        //TODO: Refactor
 
         if (hasStatusChanged(countingEquipment, equipmentStatus)) {
             statusRecordService.save(countingEquipment.getId(), equipmentStatus);
@@ -140,23 +145,42 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
     }
 
     @Override
-    public Optional<CountingEquipmentDto> updateIms(Long equipmentId, Long imsId) {
-        Optional<CountingEquipmentEntity> countingEquipmentOpt = repository.findById(equipmentId);
-        if (countingEquipmentOpt.isEmpty()) {
-            log.warning(String.format("Unable to set IMS - no counting equipment found with id [%s]", equipmentId));
-            return Optional.empty();
-        }
+    public CountingEquipmentDto updateIms(Long equipmentId, Long imsId)
+            throws EquipmentNotFoundException, ImsNotFoundException, IllegalStateException {
 
-        if (!imsService.isValidAndFree(imsId)) {
-            log.warning(String.format("IMS with ID [%s] either does NOT exist or is already in use", imsId));
-            return Optional.empty();
+        Optional<CountingEquipmentEntity> countingEquipmentOpt = repository.findByIdWithLastProductionOrder(equipmentId);
+        if (countingEquipmentOpt.isEmpty()) {
+            String msg = String.format("Unable to set IMS - no counting equipment found with id [%s]", equipmentId);
+            log.warning(msg);
+            throw new EquipmentNotFoundException(msg);
         }
 
         CountingEquipmentEntity countingEquipment = countingEquipmentOpt.get();
-        setIms(countingEquipment, imsId);
+        if (hasActiveProductionOrder(countingEquipment)) {
+            String msg = String.format("Unable to set IMS - counting equipment [%s] already has an active production order", countingEquipment.getAlias());
+            log.warning(msg);
+            throw new ActiveProductionOrderException("Counting equipment");
+        }
+        
+        Optional<ImsDto> imsOpt = imsService.findById(imsId);
+        if (imsOpt.isEmpty()) {
+            String msg = String.format("Unable to find an IMS with id [%s]", imsId);
+            log.warning(msg);
+            throw new ImsNotFoundException(msg);
+        }
 
-        CountingEquipmentDto countingEquipmentDto = save(countingEquipment);
-        return Optional.of(countingEquipmentDto);
+        ImsDto ims = imsOpt.get();
+        if (ims.getCountingEquipmentId() != null) {
+            String msg = String.format("IMS with id [%s] is already in use by equipment [%s]", imsId, ims.getCountingEquipmentId());
+            log.warning(msg);
+            throw new IllegalStateException(msg);
+        }
+
+        ImsEntity imsEntity = new ImsEntity();
+        imsEntity.setId(ims.getId());
+        countingEquipment.setIms(imsEntity);
+
+        return save(countingEquipment);
     }
 
     @Override
@@ -164,10 +188,10 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
             throws IncompleteConfigurationException, EmptyResultDataAccessException, ActiveProductionOrderException {
 
         if (containsNullProperty(request)) {
-            throw new IncompleteConfigurationException("Counting equipment configuration is incomplete. All properties (alias, outputs, and imsCode) must be specified.");
+            throw new IncompleteConfigurationException("Counting equipment configuration is incomplete: properties alias and outputs must be specified.");
         }
 
-        Optional<CountingEquipmentEntity> countingEquipmentOpt = repository.findByIdWithActiveProductionOrder(equipmentId);
+        Optional<CountingEquipmentEntity> countingEquipmentOpt = repository.findByIdWithLastProductionOrder(equipmentId);
         if (countingEquipmentOpt.isEmpty()) {
             String msg = String.format("Counting equipment with id [%s] does not exist.", equipmentId);
             log.warning(msg);
@@ -188,8 +212,7 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
 
     private boolean containsNullProperty(RequestConfigurationDto countingEquipmentDto) {
         return countingEquipmentDto.getAlias() == null ||
-                countingEquipmentDto.getOutputs() == null ||
-                countingEquipmentDto.getImsDto() == null;
+                countingEquipmentDto.getOutputs() == null;
     }
 
     private boolean hasActiveProductionOrder(CountingEquipmentEntity countingEquipment) {
@@ -213,7 +236,7 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
         toUpdate.setAvailabilityTarget(updateFrom.getAvailabilityTarget());
         toUpdate.setOverallEquipmentEffectivenessTarget(updateFrom.getOverallEquipmentEffectivenessTarget());
         updateOutputs(toUpdate, updateFrom);
-        updateIms(toUpdate, updateFrom);
+        updateIms(toUpdate, updateFrom.getIms());
     }
 
     private void updateOutputs(CountingEquipmentEntity toUpdate, CountingEquipmentEntity updateFrom) {
@@ -231,32 +254,31 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
         });
     }
 
-    private void updateIms(CountingEquipmentEntity toUpdate, CountingEquipmentEntity updateFrom) {
-        String imsCodeToUpdateFrom = updateFrom.getIms().getCode();
-        ImsEntity imsDb = imsService.findByCode(imsCodeToUpdateFrom);
+    private void updateIms(CountingEquipmentEntity toUpdate, ImsEntity requestIms) {
 
-        if (imsDb != null) {
-            toUpdate.setIms(imsDb);
+        if (requestIms == null || requestIms.getCode() == null || requestIms.getCode().isEmpty()) {
+            toUpdate.setIms(null);
+            return;
         }
 
-        if (updateFrom.getIms() != null && imsDb == null) {
-            toUpdate.getIms().setCode(imsCodeToUpdateFrom);
-        }
+        Optional<ImsEntity> persistedImsOpt = imsService.findByCode(requestIms.getCode());
 
-        if (toUpdate.getIms() == null) {
-            toUpdate.setIms(updateFrom.getIms());
-        }
+        ImsEntity imsToUpdate = persistedImsOpt.orElseGet(() -> {
+            ImsEntity newImsEntity = new ImsEntity();
+            newImsEntity.setCode(requestIms.getCode());
+            return newImsEntity;
+
+//            ImsDto newIms = new ImsDto();
+//            newIms.setCode(requestIms.getCode());
+//            ImsDto persistedIms = imsService.create(newIms);
+//            return imsConverter.toEntity(persistedIms, ImsEntity.class);
+        });
+
+        toUpdate.setIms(imsToUpdate);
     }
-
 
     private void ensureMinimumPTimer(CountingEquipmentEntity countingEquipmentEntity) {
         int currentPTimer = countingEquipmentEntity.getPTimerCommunicationCycle();
         countingEquipmentEntity.setPTimerCommunicationCycle(Math.max(MIN_P_TIMER, currentPTimer));
-    }
-
-    private void setIms(CountingEquipmentEntity countingEquipment, Long imsId) {
-        ImsEntity imsEntity = new ImsEntity();
-        imsEntity.setId(imsId);
-        countingEquipment.setIms(imsEntity);
     }
 }

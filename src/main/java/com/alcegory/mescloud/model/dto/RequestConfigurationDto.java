@@ -16,11 +16,11 @@ public class RequestConfigurationDto {
     private int pTimerCommunicationCycle;
 
     private List<EquipmentOutputDto> outputs;
-    private ImsDto imsDto;
+    private ImsDto ims;
 
-    private Double equipmentEffectiveness;
     private Integer theoreticalProduction;
+    private Double qualityTarget;
     private Double availabilityTarget;
     private Double performanceTarget;
-    private Double quality;
+    private Double overallEquipmentEffectivenessTarget;
 }

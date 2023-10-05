@@ -20,12 +20,8 @@ public class ImsController {
 
     @PostMapping()
     public ResponseEntity<ImsDto> create(@RequestBody ImsDto imsDto) {
-        Optional<ImsDto> persistedDtoOpt = imsService.create(imsDto);
-        if (persistedDtoOpt.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-
-        return new ResponseEntity<>(persistedDtoOpt.get(), HttpStatus.OK);
+        ImsDto createdIms = imsService.create(imsDto);
+        return new ResponseEntity<>(createdIms, HttpStatus.OK);
     }
 
     @GetMapping

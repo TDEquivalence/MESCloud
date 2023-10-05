@@ -32,6 +32,6 @@ public class ProductionOrderSummaryEntity {
     private String gauge;
     private String category;
     private String washingProcess;
-    //TODO: Improve naming and change to Long
+
     private Long validAmount;
 }
