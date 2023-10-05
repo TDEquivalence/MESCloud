@@ -117,8 +117,8 @@ public class KpiServiceImpl implements KpiService {
 
     @Override
     public KpiDto computeAvailability(Long equipmentId, RequestKpiDto filter) {
-        double totalScheduledTime = getTotalScheduledTime(equipmentId, filter);
-        double totalStoppageTime = getTotalStoppageTime(equipmentId, filter);
+        Double totalScheduledTime = Double.valueOf(getTotalScheduledTime(equipmentId, filter));
+        Double totalStoppageTime = Double.valueOf(getTotalStoppageTime(equipmentId, filter));
 
         return new KpiDto(totalScheduledTime, totalStoppageTime);
     }
