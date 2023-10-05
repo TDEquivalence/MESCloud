@@ -10,9 +10,9 @@ import java.util.Date;
 public class ProductionOrderSummaryDto {
 
     private long id;
-    private long equipmentId;
+    private CountingEquipmentDto equipment;
     private String code;
-    private String imsCode;
+    private ImsDto ims;
     private int targetAmount;
     private Date createdAt;
 

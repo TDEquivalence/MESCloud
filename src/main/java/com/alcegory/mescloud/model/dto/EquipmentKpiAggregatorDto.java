@@ -12,5 +12,5 @@ public class EquipmentKpiAggregatorDto {
     private EquipmentKpiDto qualityKpi;
     private EquipmentKpiDto availabilityKpi;
     private EquipmentKpiDto performanceKpi;
-    private EquipmentKpiDto overallEffectiveness;
+    private EquipmentKpiDto overallEquipmentEffectivenessKpi;
 }

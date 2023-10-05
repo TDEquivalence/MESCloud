@@ -36,7 +36,7 @@ public class KpiController {
     }
 
     @PostMapping("/{equipmentId}/aggregator")
-    public ResponseEntity<EquipmentKpiAggregatorDto> getEquipmentKpiAggregator(@RequestParam long equipmentId,
+    public ResponseEntity<EquipmentKpiAggregatorDto> getEquipmentKpiAggregator(@PathVariable long equipmentId,
                                                                                @RequestBody RequestKpiDto filter) {
         try {
             EquipmentKpiAggregatorDto kpiAggregatorDto = kpiService.getEquipmentKpiAggregator(equipmentId, filter);
@@ -47,7 +47,7 @@ public class KpiController {
     }
 
     @PostMapping("/{equipmentId}/daily-aggregator")
-    public ResponseEntity<List<EquipmentKpiAggregatorDto>> getEquipmentKpiAggregatorPerDay(@RequestParam long equipmentId,
+    public ResponseEntity<List<EquipmentKpiAggregatorDto>> getEquipmentKpiAggregatorPerDay(@PathVariable long equipmentId,
                                                                                            @RequestBody RequestKpiDto filter) {
         try {
             List<EquipmentKpiAggregatorDto> kpiAggregatorsDto = kpiService.getEquipmentKpiAggregatorPerDay(equipmentId, filter);

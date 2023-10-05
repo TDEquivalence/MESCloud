@@ -1,5 +1,6 @@
 package com.alcegory.mescloud.model.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,13 +16,14 @@ public class CountingEquipmentDto {
     private String alias;
     private int equipmentStatus;
     private String productionOrderCode;
+    @JsonProperty("pTimerCommunicationCycle")
     private int pTimerCommunicationCycle;
     private List<EquipmentOutputDto> outputs;
-    private String imsCode;
+    private ImsDto ims;
 
     private Integer theoreticalProduction;
-    private Double overallEquipmentEffectivenessTarget;
+    private Double qualityTarget;
     private Double availabilityTarget;
     private Double performanceTarget;
-    private Double qualityTarget;
+    private Double overallEquipmentEffectivenessTarget;
 }

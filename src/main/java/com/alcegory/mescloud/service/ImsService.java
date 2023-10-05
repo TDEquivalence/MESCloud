@@ -8,13 +8,13 @@ import java.util.Optional;
 
 public interface ImsService {
 
-    Optional<ImsDto> create(ImsDto ims);
+    ImsDto create(ImsDto ims);
 
     List<ImsDto> getAll();
 
     Optional<ImsDto> findById(Long id);
 
-    ImsEntity findByCode(String code);
+    Optional<ImsEntity> findByCode(String code);
 
     boolean isValidAndFree(Long imsId);
 }

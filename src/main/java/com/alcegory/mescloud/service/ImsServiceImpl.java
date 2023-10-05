@@ -40,7 +40,7 @@ public class ImsServiceImpl implements ImsService {
     }
 
     @Override
-    public ImsEntity findByCode(String code) {
+    public Optional<ImsEntity> findByCode(String code) {
         return repository.findByCode(code);
     }
 
@@ -61,15 +61,15 @@ public class ImsServiceImpl implements ImsService {
         return true;
     }
 
-    public Optional<ImsDto> create(ImsDto imsDto) {
+    public ImsDto create(ImsDto imsDto) {
 
         if (imsDto.getCode() == null || imsDto.getCode().length() < MIN_CODE_SIZE) {
             log.warning(String.format("Invalid IMS code: [%s]", imsDto.getCode()));
-            return Optional.empty();
+            return null;
         }
 
         ImsEntity imsEntity = converter.toEntity(imsDto, ImsEntity.class);
         ImsEntity persistedIms = repository.save(imsEntity);
-        return Optional.of(converter.toDto(persistedIms, ImsDto.class));
+        return converter.toDto(persistedIms, ImsDto.class);
     }
 }

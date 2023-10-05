@@ -168,7 +168,7 @@ public class KpiServiceImpl implements KpiService {
                 .qualityKpi(quality)
                 .availabilityKpi(availability)
                 .performanceKpi(performance)
-                .overallEffectiveness(overallEquipmentEffectiveness)
+                .overallEquipmentEffectivenessKpi(overallEquipmentEffectiveness)
                 .build();
     }
 
