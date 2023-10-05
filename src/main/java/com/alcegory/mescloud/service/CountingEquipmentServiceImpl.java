@@ -161,7 +161,7 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
             log.warning(msg);
             throw new ActiveProductionOrderException("Counting equipment");
         }
-        
+
         Optional<ImsDto> imsOpt = imsService.findById(imsId);
         if (imsOpt.isEmpty()) {
             String msg = String.format("Unable to find an IMS with id [%s]", imsId);
@@ -264,14 +264,10 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
         Optional<ImsEntity> persistedImsOpt = imsService.findByCode(requestIms.getCode());
 
         ImsEntity imsToUpdate = persistedImsOpt.orElseGet(() -> {
-            ImsEntity newImsEntity = new ImsEntity();
-            newImsEntity.setCode(requestIms.getCode());
-            return newImsEntity;
-
-//            ImsDto newIms = new ImsDto();
-//            newIms.setCode(requestIms.getCode());
-//            ImsDto persistedIms = imsService.create(newIms);
-//            return imsConverter.toEntity(persistedIms, ImsEntity.class);
+            ImsDto newIms = new ImsDto();
+            newIms.setCode(requestIms.getCode());
+            ImsDto persistedIms = imsService.create(newIms);
+            return imsConverter.toEntity(persistedIms, ImsEntity.class);
         });
 
         toUpdate.setIms(imsToUpdate);
