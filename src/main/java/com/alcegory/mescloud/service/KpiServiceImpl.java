@@ -120,7 +120,7 @@ public class KpiServiceImpl implements KpiService {
         double totalScheduledTime = getTotalScheduledTime(equipmentId, filter);
         double totalStoppageTime = getTotalStoppageTime(equipmentId, filter);
 
-        return createKpi(totalScheduledTime, totalStoppageTime);
+        return new KpiDto(totalScheduledTime, totalStoppageTime);
     }
 
     public Long getTotalScheduledTime(Long equipmentId, RequestKpiDto filter) {
@@ -151,19 +151,10 @@ public class KpiServiceImpl implements KpiService {
 
     @Override
     public KpiDto computeEquipmentQuality(Long equipmentId, RequestKpiDto requestKpiDto) {
-        double validCounter = counterRecordService.sumValidCounterIncrement(equipmentId, requestKpiDto.getStartDate(), requestKpiDto.getEndDate());
-        double totalCounter = counterRecordService.sumCounterIncrement(equipmentId, requestKpiDto.getStartDate(), requestKpiDto.getEndDate());
+        Integer validCounter = counterRecordService.sumValidCounterIncrement(equipmentId, requestKpiDto.getStartDate(), requestKpiDto.getEndDate());
+        Integer totalCounter = counterRecordService.sumCounterIncrement(equipmentId, requestKpiDto.getStartDate(), requestKpiDto.getEndDate());
 
-        return createKpi(validCounter, totalCounter);
-    }
-
-    private KpiDto createKpi(double dividend, double divider) {
-        KpiDto kpi = new KpiDto();
-        kpi.setDividend(dividend);
-        kpi.setDivider(divider);
-        kpi.setValue(dividend / divider);
-
-        return kpi;
+        return new KpiDto(validCounter, totalCounter);
     }
 
     private KpiDto computePerformance(KpiDto qualityKpi, KpiDto availabilityKpi, CountingEquipmentDto countingEquipment) {
@@ -178,13 +169,18 @@ public class KpiServiceImpl implements KpiService {
             return null;
         }
 
-        double realProductionInSeconds = qualityKpi.getDividend() / availabilityKpi.getDividend();
-        return createKpi(realProductionInSeconds, countingEquipment.getTheoreticalProduction());
+        Double realProductionInSeconds = qualityKpi.getDividend() / availabilityKpi.getDividend();
+        return new KpiDto(realProductionInSeconds, Double.valueOf(countingEquipment.getTheoreticalProduction()));
     }
 
     private Double computeOverallEffectivePerformance(KpiDto quality, KpiDto availability, KpiDto performance) {
 
-        if (quality.getValue() == null || quality.getValue() == 0 || availability.getValue() == null || availability.getValue() == 0) {
+        if (quality.getValue() == null ||
+                quality.getValue() == 0 ||
+                availability.getValue() == null ||
+                availability.getValue() == 0 ||
+                performance.getValue() == null ||
+                performance.getValue() == 0) {
             return null;
         }
 
