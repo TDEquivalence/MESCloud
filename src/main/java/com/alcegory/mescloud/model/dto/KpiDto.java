@@ -7,7 +7,7 @@ import lombok.Setter;
 @Setter
 public class KpiDto {
 
-    private double divider;
-    private double dividend;
-    private double value;
+    private Double divider;
+    private Double dividend;
+    private Double value;
 }
