@@ -1,7 +1,9 @@
 package com.alcegory.mescloud.service;
 
+import com.alcegory.mescloud.exception.IncompleteConfigurationException;
 import com.alcegory.mescloud.model.dto.*;
 import com.alcegory.mescloud.utility.DateUtil;
+import com.alcegory.mescloud.utility.DoubleUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
@@ -54,6 +56,39 @@ public class KpiServiceImpl implements KpiService {
     }
 
     @Override
+    public EquipmentKpiAggregatorDto getEquipmentKpiAggregator(Long equipmentId, RequestKpiDto requestKpiDto)
+            throws NoSuchElementException, IncompleteConfigurationException, ArithmeticException {
+
+        Optional<CountingEquipmentDto> countingEquipmentDtoOpt = countingEquipmentService.findById(equipmentId);
+        if (countingEquipmentDtoOpt.isEmpty()) {
+            String msg = String.format("Unable to find counting equipment with id [%s]", equipmentId);
+            log.warning(msg);
+            throw new NoSuchElementException(msg);
+        }
+
+        CountingEquipmentDto countingEquipment = countingEquipmentDtoOpt.get();
+
+        KpiDto qualityKpi = computeEquipmentQuality(equipmentId, requestKpiDto);
+        EquipmentKpiDto quality = new EquipmentKpiDto(countingEquipment, qualityKpi);
+
+        KpiDto availabilityKpi = computeAvailability(equipmentId, requestKpiDto);
+        EquipmentKpiDto availability = new EquipmentKpiDto(countingEquipment, availabilityKpi);
+
+        KpiDto performanceKpi = computePerformance(qualityKpi, availabilityKpi, countingEquipment);
+        EquipmentKpiDto performance = new EquipmentKpiDto(countingEquipment, performanceKpi);
+
+        Double overallEffectivePerformance = computeOverallEffectivePerformance(qualityKpi, availabilityKpi, performanceKpi);
+        EquipmentKpiDto overallEquipmentEffectiveness = new EquipmentKpiDto(countingEquipment, overallEffectivePerformance);
+
+        return EquipmentKpiAggregatorDto.builder()
+                .qualityKpi(quality)
+                .availabilityKpi(availability)
+                .performanceKpi(performance)
+                .overallEquipmentEffectivenessKpi(overallEquipmentEffectiveness)
+                .build();
+    }
+
+    @Override
     public List<EquipmentKpiAggregatorDto> getEquipmentKpiAggregatorPerDay(Long equipmentId, RequestKpiDto kpiRequest) {
 
         final Instant startDate = kpiRequest.getStartDate().toInstant();
@@ -77,17 +112,16 @@ public class KpiServiceImpl implements KpiService {
         return equipmentKpiAggregators;
     }
 
-    //TODO: This should be a filter behavior
     private Instant getPropertyAsInstant(KpiFilterDto filter, CounterRecordFilter.Property counterRecordProperty) {
         return DateUtil.convertToInstant(filter.getSearch().getValue(counterRecordProperty));
     }
 
     @Override
     public KpiDto computeAvailability(Long equipmentId, RequestKpiDto filter) {
-        double totalScheduledTime = getTotalScheduledTime(equipmentId, filter);
-        double totalStoppageTime = getTotalStoppageTime(equipmentId, filter);
+        Long totalScheduledTime = getTotalScheduledTime(equipmentId, filter);
+        Long totalStoppageTime = getTotalStoppageTime(equipmentId, filter);
 
-        return createKpi(totalScheduledTime, totalStoppageTime);
+        return new KpiDto(DoubleUtil.safeDoubleValue(totalScheduledTime), DoubleUtil.safeDoubleValue(totalStoppageTime));
     }
 
     public Long getTotalScheduledTime(Long equipmentId, RequestKpiDto filter) {
@@ -106,11 +140,15 @@ public class KpiServiceImpl implements KpiService {
 
         Long totalStoppageTime = 0L;
         for (ProductionOrderDto productionOrder : productionOrders) {
+
+            Timestamp safeEndDate = productionOrder.getCompletedAt() != null ?
+                    Timestamp.from(productionOrder.getCompletedAt().toInstant()) : null;
+            
             totalStoppageTime +=
                     equipmentStatusRecordService.calculateStoppageTimeInSeconds(
                             equipmentId,
                             Timestamp.from(productionOrder.getCreatedAt().toInstant()),
-                            Timestamp.from(productionOrder.getCompletedAt().toInstant()));
+                            safeEndDate);
         }
 
         return totalStoppageTime;
@@ -118,65 +156,38 @@ public class KpiServiceImpl implements KpiService {
 
     @Override
     public KpiDto computeEquipmentQuality(Long equipmentId, RequestKpiDto requestKpiDto) {
-        double validCounter = counterRecordService.sumValidCounterIncrement(equipmentId, requestKpiDto.getStartDate(), requestKpiDto.getEndDate());
-        double totalCounter = counterRecordService.sumCounterIncrement(equipmentId, requestKpiDto.getStartDate(), requestKpiDto.getEndDate());
+        Integer validCounter = counterRecordService.sumValidCounterIncrement(equipmentId, requestKpiDto.getStartDate(), requestKpiDto.getEndDate());
+        Integer totalCounter = counterRecordService.sumCounterIncrement(equipmentId, requestKpiDto.getStartDate(), requestKpiDto.getEndDate());
 
-        return createKpi(validCounter, totalCounter);
-    }
-
-    private KpiDto createKpi(double dividend, double divider) {
-        KpiDto kpi = new KpiDto();
-        kpi.setDividend(dividend);
-        kpi.setDivider(divider);
-        kpi.setValue(dividend / divider);
-
-        return kpi;
+        return new KpiDto(validCounter, totalCounter);
     }
 
     private KpiDto computePerformance(KpiDto qualityKpi, KpiDto availabilityKpi, CountingEquipmentDto countingEquipment) {
-        double realProductionInSeconds = qualityKpi.getDividend() / availabilityKpi.getDividend();
-        return createKpi(realProductionInSeconds, countingEquipment.getTheoreticalProduction());
+
+        if (countingEquipment.getTheoreticalProduction() == null) {
+            log.warning(String.format("Unable to compute performance: equipment [%s] has no theoretical production configuration value", countingEquipment.getId()));
+            return null;
+        }
+
+        if (qualityKpi.getDividend() == 0 || availabilityKpi.getDividend() == 0) {
+            log.warning(String.format("Unable to compute performance: cannot divide quality dividend [%s] by the availability dividend [%s]", qualityKpi.getDividend(), availabilityKpi.getDividend()));
+            return null;
+        }
+
+        Double realProductionInSeconds = qualityKpi.getDividend() / availabilityKpi.getDividend();
+        return new KpiDto(realProductionInSeconds, DoubleUtil.safeDoubleValue(countingEquipment.getTheoreticalProduction()));
     }
 
-    private double computeOverallEffectivePerformance(KpiDto quality, KpiDto availability, KpiDto performance) {
+    private Double computeOverallEffectivePerformance(KpiDto quality, KpiDto availability, KpiDto performance) {
+
+        if (isValueZeroOrMissing(quality) || isValueZeroOrMissing(availability) || isValueZeroOrMissing(performance)) {
+            return null;
+        }
+
         return quality.getValue() * availability.getValue() * performance.getValue();
     }
 
-    @Override
-    public EquipmentKpiAggregatorDto getEquipmentKpiAggregator(Long equipmentId, RequestKpiDto requestKpiDto) throws NoSuchElementException {
-
-        Optional<CountingEquipmentDto> countingEquipmentDtoOpt = countingEquipmentService.findById(equipmentId);
-        if (countingEquipmentDtoOpt.isEmpty()) {
-            String msg = String.format("Unable to find counting equipment with id [%s]", equipmentId);
-            log.warning(msg);
-            throw new NoSuchElementException(msg);
-        }
-
-        CountingEquipmentDto countingEquipment = countingEquipmentDtoOpt.get();
-
-        KpiDto qualityKpi = computeEquipmentQuality(equipmentId, requestKpiDto);
-        KpiDto availabilityKpi = computeAvailability(equipmentId, requestKpiDto);
-        KpiDto performanceKpi = computePerformance(qualityKpi, availabilityKpi, countingEquipment);
-        double overallEffectivePerformance = computeOverallEffectivePerformance(qualityKpi, availabilityKpi, performanceKpi);
-
-        EquipmentKpiDto quality = createEquipmentKpi(countingEquipment.getQualityTarget(), qualityKpi.getValue());
-        EquipmentKpiDto availability = createEquipmentKpi(countingEquipment.getAvailabilityTarget(), availabilityKpi.getValue());
-        EquipmentKpiDto performance = createEquipmentKpi(countingEquipment.getPerformanceTarget(), performanceKpi.getValue());
-        EquipmentKpiDto overallEquipmentEffectiveness = createEquipmentKpi(countingEquipment.getOverallEquipmentEffectivenessTarget(), overallEffectivePerformance);
-
-        return EquipmentKpiAggregatorDto.builder()
-                .qualityKpi(quality)
-                .availabilityKpi(availability)
-                .performanceKpi(performance)
-                .overallEquipmentEffectivenessKpi(overallEquipmentEffectiveness)
-                .build();
-    }
-
-    private EquipmentKpiDto createEquipmentKpi(double target, double value) {
-        EquipmentKpiDto equipmentKpi = new EquipmentKpiDto();
-        equipmentKpi.setKpiTarget(target);
-        equipmentKpi.setKpiValue(value);
-
-        return equipmentKpi;
+    private boolean isValueZeroOrMissing(KpiDto kpiDto) {
+        return kpiDto == null || kpiDto.getValue() == null || kpiDto.getValue() == 0;
     }
 }

@@ -27,7 +27,7 @@ public interface ProductionOrderRepository extends JpaRepository<ProductionOrder
     List<ProductionOrderEntity> findByComposedProductionOrderId(Long composedProductionOrderId);
 
     @Query("SELECT p FROM production_order p " +
-            "WHERE p.completedAt > :startDate " +
+            "WHERE (p.completedAt > :startDate OR p.completedAt IS NULL) " +
             "AND p.createdAt < :endDate " +
             "AND (p.equipment.id = :equipmentId)")
     List<ProductionOrderEntity> findByEquipmentAndPeriod(Long equipmentId, Date startDate, Date endDate);

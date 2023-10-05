@@ -1,7 +1,9 @@
 package com.alcegory.mescloud.api.rest;
 
+import com.alcegory.mescloud.exception.IncompleteConfigurationException;
 import com.alcegory.mescloud.model.dto.*;
 import com.alcegory.mescloud.service.KpiService;
+import com.alcegory.mescloud.utility.HttpUtil;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +16,9 @@ import java.util.NoSuchElementException;
 @RequestMapping("/api/kpi")
 @AllArgsConstructor
 public class KpiController {
+
+    private static final String EQUIPMENT_ERROR_CAUSE = "EQUIPMENT";
+    private static final String KPI_ERROR_CAUSE = "KPI";
 
     private final KpiService kpiService;
 
@@ -43,6 +48,10 @@ public class KpiController {
             return new ResponseEntity<>(kpiAggregatorDto, HttpStatus.OK);
         } catch (NoSuchElementException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        } catch (IncompleteConfigurationException e) {
+            return HttpUtil.responseWithHeaders(HttpStatus.CONFLICT, EQUIPMENT_ERROR_CAUSE, e);
+        } catch (ArithmeticException e) {
+            return HttpUtil.responseWithHeaders(HttpStatus.CONFLICT, KPI_ERROR_CAUSE, e);
         }
     }
 
