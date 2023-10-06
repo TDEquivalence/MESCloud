@@ -10,6 +10,7 @@ import java.util.Date;
 public class ComposedSummaryDto {
 
     private Integer id;
+    private String code;
     private Date createdAt;
     private Integer amount;
     private Integer reliability;
@@ -19,4 +20,5 @@ public class ComposedSummaryDto {
     private String category;
     private String washingProcess;
     private boolean isBatchApproved;
+    private String batchCode;
 }

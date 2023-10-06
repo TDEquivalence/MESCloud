@@ -14,6 +14,7 @@ public class ComposedSummaryEntity {
 
     @Id
     private Integer id;
+    private String code;
     private Date createdAt;
     private Integer amount;
     private Integer reliability;
@@ -23,4 +24,5 @@ public class ComposedSummaryEntity {
     private String category;
     private String washingProcess;
     private Boolean isBatchApproved;
+    private String batchCode;
 }
