@@ -13,6 +13,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -77,6 +78,7 @@ public class ComposedProductionOrderServiceImpl implements ComposedProductionOrd
         ComposedProductionOrderEntity composedEntity = new ComposedProductionOrderEntity();
         String composedProductionCode = generateCode();
         composedEntity.setCode(composedProductionCode);
+        composedEntity.setCreatedAt(new Date());
 
         return repository.save(composedEntity);
     }
