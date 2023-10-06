@@ -120,8 +120,11 @@ public class KpiServiceImpl implements KpiService {
     public KpiDto computeAvailability(Long equipmentId, RequestKpiDto filter) {
         Long totalScheduledTime = getTotalScheduledTime(equipmentId, filter);
         Long totalStoppageTime = getTotalStoppageTime(equipmentId, filter);
+        Long effectiveProductionTime = totalScheduledTime - totalStoppageTime;
 
-        return new KpiDto(DoubleUtil.safeDoubleValue(totalScheduledTime), DoubleUtil.safeDoubleValue(totalStoppageTime));
+        KpiDto kpi = new KpiDto(DoubleUtil.safeDoubleValue(effectiveProductionTime), DoubleUtil.safeDoubleValue(totalScheduledTime));
+        kpi.setValueAsDivision();
+        return kpi;
     }
 
     public Long getTotalScheduledTime(Long equipmentId, RequestKpiDto filter) {
@@ -143,7 +146,7 @@ public class KpiServiceImpl implements KpiService {
 
             Timestamp safeEndDate = productionOrder.getCompletedAt() != null ?
                     Timestamp.from(productionOrder.getCompletedAt().toInstant()) : null;
-            
+
             totalStoppageTime +=
                     equipmentStatusRecordService.calculateStoppageTimeInSeconds(
                             equipmentId,
@@ -159,7 +162,9 @@ public class KpiServiceImpl implements KpiService {
         Integer validCounter = counterRecordService.sumValidCounterIncrement(equipmentId, requestKpiDto.getStartDate(), requestKpiDto.getEndDate());
         Integer totalCounter = counterRecordService.sumCounterIncrement(equipmentId, requestKpiDto.getStartDate(), requestKpiDto.getEndDate());
 
-        return new KpiDto(validCounter, totalCounter);
+        KpiDto kpi = new KpiDto(validCounter, totalCounter);
+        kpi.setValueAsDivision();
+        return kpi;
     }
 
     private KpiDto computePerformance(KpiDto qualityKpi, KpiDto availabilityKpi, CountingEquipmentDto countingEquipment) {
@@ -175,7 +180,9 @@ public class KpiServiceImpl implements KpiService {
         }
 
         Double realProductionInSeconds = qualityKpi.getDividend() / availabilityKpi.getDividend();
-        return new KpiDto(realProductionInSeconds, DoubleUtil.safeDoubleValue(countingEquipment.getTheoreticalProduction()));
+        KpiDto kpi = new KpiDto(realProductionInSeconds, countingEquipment.getTheoreticalProduction());
+        kpi.setValueAsDivision();
+        return kpi;
     }
 
     private Double computeOverallEffectivePerformance(KpiDto quality, KpiDto availability, KpiDto performance) {

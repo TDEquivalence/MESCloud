@@ -65,7 +65,7 @@ public class EquipmentStatusRecordServiceImpl implements EquipmentStatusRecordSe
         Duration stoppageDuration = Duration.ZERO;
 
         for (EquipmentStatusRecordEntity equipmentStatusRecord : records) {
-            if (isRecordActive(equipmentStatusRecord)) {
+            if (isRecordActive(equipmentStatusRecord) && (equipmentStatusRecord.getRegisteredAt().getTime() > lastActiveTime)) {
                 long stoppageInMillis = equipmentStatusRecord.getRegisteredAt().getTime() - lastActiveTime;
                 stoppageDuration = stoppageDuration.plusMillis(stoppageInMillis);
             } else {
