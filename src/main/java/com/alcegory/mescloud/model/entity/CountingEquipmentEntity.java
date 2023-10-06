@@ -42,7 +42,7 @@ public class CountingEquipmentEntity {
     @OneToMany(mappedBy = "countingEquipment", fetch = FetchType.LAZY)
     List<EquipmentStatusRecordEntity> equipmentStatusRecords;
 
-    private Integer theoreticalProduction;
+    private Double theoreticalProduction;
 
     private Double qualityTarget;
     private Double availabilityTarget;

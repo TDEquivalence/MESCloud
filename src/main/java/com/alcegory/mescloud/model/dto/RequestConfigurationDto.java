@@ -18,7 +18,7 @@ public class RequestConfigurationDto {
     private List<EquipmentOutputDto> outputs;
     private ImsDto ims;
 
-    private Integer theoreticalProduction;
+    private Double theoreticalProduction;
     private Double qualityTarget;
     private Double availabilityTarget;
     private Double performanceTarget;

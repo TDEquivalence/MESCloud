@@ -14,6 +14,7 @@ public class KpiDto {
 
     private Double dividend;
     private Double divider;
+    private Double value;
 
     public KpiDto(Integer dividend, Integer divider) {
 
@@ -26,16 +27,31 @@ public class KpiDto {
         this.divider = divider;
     }
 
-    public Double getValue() {
+    public void setValueAsDivision() {
         if (hasInvalidDivisionMembers()) {
             log.warning(String.format("Unable to calculate value: cannot divide dividend [%s] by the divisor [%s]", dividend, divider));
-            return null;
+            this.value = null;
+            return;
         }
 
-        return this.dividend / this.divider;
+        this.value = this.dividend / this.divider;
+    }
+
+    public void setValueAsDifference() {
+        if (hasInvalidSubtractionMembers()) {
+            log.warning(String.format("Unable to calculate value: cannot subtract [%s] from [%s]", divider, dividend));
+            this.value = null;
+            return;
+        }
+
+        this.value = this.dividend - this.divider;
     }
 
     private boolean hasInvalidDivisionMembers() {
         return dividend == null || dividend == 0 || divider == null || divider == 0;
+    }
+
+    private boolean hasInvalidSubtractionMembers() {
+        return dividend == null || dividend == 0 || divider == null;
     }
 }
