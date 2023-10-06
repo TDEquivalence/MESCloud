@@ -21,4 +21,6 @@ public class ComposedSummaryDto {
     private String washingProcess;
     private boolean isBatchApproved;
     private String batchCode;
+    private ImsDto ims;
+    private Integer amountOfHits;
 }
