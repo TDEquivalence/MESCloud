@@ -200,7 +200,7 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     }
 
     private int computedValueIncrement(CounterRecordEntity lastPersistedCount, CounterRecordEntity receivedCount) {
-        return receivedCount.getRealValue() - lastPersistedCount.getRealValue();
+        return receivedCount.getComputedValue() - lastPersistedCount.getComputedValue();
     }
 
     public boolean areValidInitialCounts(String productionOrderCode) {
