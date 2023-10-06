@@ -48,7 +48,7 @@ class CountingEquipmentServiceTest {
 
 
     @Test
-    public void testUpdateConfiguration_NullPropertyOnRequest() {
+    void testUpdateConfiguration_NullPropertyOnRequest() {
         long equipmentId = 10L;
         RequestConfigurationDto request = new RequestConfigurationDto();
 
@@ -62,7 +62,7 @@ class CountingEquipmentServiceTest {
     }
 
     @Test
-    public void testUpdateConfiguration_NoEquipmentFound() {
+    void testUpdateConfiguration_NoEquipmentFound() {
         long equipmentId = 10L;
         RequestConfigurationDto request = createFilledRequestConfigurationDto();
 
@@ -76,7 +76,7 @@ class CountingEquipmentServiceTest {
         verify(repository, never()).save(any());
     }
 
-    public RequestConfigurationDto createFilledRequestConfigurationDto() {
+    private RequestConfigurationDto createFilledRequestConfigurationDto() {
         RequestConfigurationDto request = new RequestConfigurationDto();
         request.setAlias("SampleAlias");
         request.setPTimerCommunicationCycle(10);
@@ -87,7 +87,7 @@ class CountingEquipmentServiceTest {
         ImsDto imsDto = new ImsDto();
         request.setIms(imsDto);
         request.setOverallEquipmentEffectivenessTarget(0.95);
-        request.setTheoreticalProduction(1000);
+        request.setTheoreticalProduction(0.2);
         request.setAvailabilityTarget(0.99);
         request.setPerformanceTarget(0.98);
         request.setQualityTarget(0.97);
