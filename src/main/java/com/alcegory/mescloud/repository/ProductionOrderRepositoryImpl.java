@@ -3,17 +3,18 @@ package com.alcegory.mescloud.repository;
 import com.alcegory.mescloud.model.entity.ProductionOrderSummaryEntity;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.*;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @AllArgsConstructor
 @Repository
 public class ProductionOrderRepositoryImpl {
+
+    private static final String PROP_ID = "id";
 
     private EntityManager entityManager;
 
@@ -23,7 +24,13 @@ public class ProductionOrderRepositoryImpl {
         Root<ProductionOrderSummaryEntity> root = query.from(ProductionOrderSummaryEntity.class);
         query.select(root);
 
-        TypedQuery<ProductionOrderSummaryEntity> typedQuery = entityManager.createQuery(query);
-        return typedQuery.getResultList();
+        List<Order> orders = new ArrayList<>();
+        Order newestOrder = criteriaBuilder.desc(root.get(PROP_ID));
+        orders.add(newestOrder);
+
+        query.select(root)
+                .orderBy(orders);
+
+        return entityManager.createQuery(query).getResultList();
     }
 }
