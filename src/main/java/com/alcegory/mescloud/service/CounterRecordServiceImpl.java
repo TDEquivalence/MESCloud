@@ -164,7 +164,7 @@ public class CounterRecordServiceImpl implements CounterRecordService {
         }
 
         int computedValue = calculateComputedValue(lastPersistedCountOpt.get(), receivedCount);
-        int increment = computedValueIncrement(lastPersistedCountOpt.get(), receivedCount);
+        int increment = calculateIncrement(lastPersistedCountOpt.get(), receivedCount);
         receivedCount.setIncrement(increment);
         receivedCount.setComputedValue(computedValue);
     }
@@ -189,18 +189,31 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     }
 
     private int rolloverCalculateComputedValue(CounterRecordEntity lastPersistedCount, CounterRecordEntity receivedCount) {
-        int incrementBeforeOverflow = PL_UINT_MAX_VALUE - lastPersistedCount.getRealValue();
-        int totalIncrement = incrementBeforeOverflow + ROLLOVER_OFFSET + receivedCount.getRealValue();
+        int totalIncrement = rolloverCalculateIncrement(lastPersistedCount, receivedCount);
         return lastPersistedCount.getComputedValue() + totalIncrement;
     }
 
+    private int rolloverCalculateIncrement(CounterRecordEntity lastPersistedCount, CounterRecordEntity receivedCount) {
+        int incrementBeforeOverflow = PL_UINT_MAX_VALUE - lastPersistedCount.getRealValue();
+        return incrementBeforeOverflow + ROLLOVER_OFFSET + receivedCount.getRealValue();
+    }
+
     private int defaultCalculateComputedValue(CounterRecordEntity lastPersistedCount, CounterRecordEntity receivedCount) {
-        int computedValueIncrement = computedValueIncrement(lastPersistedCount, receivedCount);
+        int computedValueIncrement = defaultComputeValueIncrement(lastPersistedCount, receivedCount);
         return lastPersistedCount.getComputedValue() + computedValueIncrement;
     }
 
-    private int computedValueIncrement(CounterRecordEntity lastPersistedCount, CounterRecordEntity receivedCount) {
-        return receivedCount.getComputedValue() - lastPersistedCount.getComputedValue();
+    private int defaultComputeValueIncrement(CounterRecordEntity lastPersistedCount, CounterRecordEntity receivedCount) {
+        return receivedCount.getRealValue() - lastPersistedCount.getRealValue();
+    }
+
+    private int calculateIncrement(CounterRecordEntity lastPersistedCount, CounterRecordEntity receivedCount) {
+
+        if (isRollover(lastPersistedCount, receivedCount)) {
+            return rolloverCalculateIncrement(lastPersistedCount, receivedCount);
+        }
+
+        return defaultComputeValueIncrement(lastPersistedCount, receivedCount);
     }
 
     public boolean areValidInitialCounts(String productionOrderCode) {
