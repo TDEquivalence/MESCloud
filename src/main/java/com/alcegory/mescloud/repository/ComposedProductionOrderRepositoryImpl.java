@@ -33,6 +33,8 @@ public class ComposedProductionOrderRepositoryImpl {
         predicates.add(hasAssociatedBatchPredicate(query, root));
 
         List<Order> orders = new ArrayList<>();
+        Order newestOrder = criteriaBuilder.desc(root.get(PROP_ID));
+        orders.add(newestOrder);
 
         query.select(root)
                 .where(criteriaBuilder.and(predicates.toArray(new Predicate[0])))
@@ -82,6 +84,8 @@ public class ComposedProductionOrderRepositoryImpl {
         predicates.add(noBatchPredicate);
 
         List<Order> orders = new ArrayList<>();
+        Order newestOrder = criteriaBuilder.desc(root.get(PROP_ID));
+        orders.add(newestOrder);
 
         query.select(root)
                 .where(criteriaBuilder.and(predicates.toArray(new Predicate[0])))
