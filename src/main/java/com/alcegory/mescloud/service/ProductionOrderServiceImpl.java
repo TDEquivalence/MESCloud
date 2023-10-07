@@ -100,8 +100,8 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
 
     private Optional<ProductionOrderDto> getPersistedProductionOrder(String code) {
         Optional<ProductionOrderEntity> productionOrderOpt = repository.findByCode(code);
-        if(productionOrderOpt.isEmpty()) {
-            log.warning(() -> String.format("Unable to create Production Order - no Equipment found with code [%s]", code));
+        if (productionOrderOpt.isEmpty()) {
+            log.warning(() -> String.format("Unable to get persisted Production Order with code [%s]", code));
             return Optional.empty();
         }
         ProductionOrderEntity productionOrderPersisted = productionOrderOpt.get();
