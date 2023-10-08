@@ -12,7 +12,7 @@ public class ComposedSummaryDto {
     private Integer id;
     private String code;
     private Date createdAt;
-    private Integer amount;
+    private Integer sampleAmount;
     private Integer reliability;
     private String inputBatch;
     private String source;
@@ -23,4 +23,5 @@ public class ComposedSummaryDto {
     private String batchCode;
     private ImsDto ims;
     private Integer amountOfHits;
+    private Integer validAmount;
 }
