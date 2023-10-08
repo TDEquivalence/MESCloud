@@ -30,4 +30,5 @@ public class ComposedSummaryEntity {
     @ManyToOne(fetch = FetchType.EAGER)
     private ImsEntity ims;
     private Integer amountOfHits;
+    private Integer validAmount;
 }

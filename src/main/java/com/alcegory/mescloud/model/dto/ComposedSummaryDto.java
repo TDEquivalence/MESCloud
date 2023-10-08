@@ -23,4 +23,5 @@ public class ComposedSummaryDto {
     private String batchCode;
     private ImsDto ims;
     private Integer amountOfHits;
+    private Integer validAmount;
 }
