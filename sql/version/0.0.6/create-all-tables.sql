@@ -259,6 +259,7 @@ SELECT DISTINCT
     po.input_batch, po.source, po.gauge, po.category, po.washing_process, po.ims_id,
     b.id AS batch_id,
     b.code AS batch_code,
+    s.amount AS sample_amount,
     b.is_approved AS is_batch_approved,
     COUNT(h.id) AS amount_of_hits,
     COALESCE(SUM(CAST(crpc.computed_value AS bigint)), 0) AS valid_amount
