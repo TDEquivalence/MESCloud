@@ -22,7 +22,9 @@ public class ProductionOrderEntity {
     private ImsEntity ims;
     private int targetAmount;
     private boolean isCompleted;
+    @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
+    @Temporal(TemporalType.TIMESTAMP)
     private Date completedAt;
 
     @OneToMany(mappedBy = "productionOrder")
