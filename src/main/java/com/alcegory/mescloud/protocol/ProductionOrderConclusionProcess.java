@@ -84,7 +84,7 @@ public class ProductionOrderConclusionProcess extends AbstractMesProtocolProcess
             productionOrder.setCompleted(true);
             productionOrder.setCompletedAt(new Date());
             repository.save(productionOrder);
-            Thread.sleep(THREAD_SLEEP_DURATION);
+            Thread.sleep(2000);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             log.severe("Thread interruption failed.");
