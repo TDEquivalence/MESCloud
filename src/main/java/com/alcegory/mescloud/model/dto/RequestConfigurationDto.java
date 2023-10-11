@@ -23,4 +23,5 @@ public class RequestConfigurationDto {
     private Double availabilityTarget;
     private Double performanceTarget;
     private Double overallEquipmentEffectivenessTarget;
+    private Double equipmentEffectiveness;
 }
