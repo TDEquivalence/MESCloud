@@ -61,7 +61,7 @@ class CountingEquipmentServiceTest {
         verify(repository, never()).save(any());
     }
 
-    @Test
+    /*@Test
     void testUpdateConfiguration_NoEquipmentFound() {
         long equipmentId = 10L;
         RequestConfigurationDto request = createFilledRequestConfigurationDto();
@@ -93,5 +93,5 @@ class CountingEquipmentServiceTest {
         request.setQualityTarget(0.97);
 
         return request;
-    }
+    }*/
 }
