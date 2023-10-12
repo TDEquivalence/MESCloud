@@ -8,6 +8,7 @@ import com.alcegory.mescloud.model.dto.ProductionOrderDto;
 import com.alcegory.mescloud.model.dto.RequestComposedDto;
 import com.alcegory.mescloud.model.entity.ComposedProductionOrderEntity;
 import com.alcegory.mescloud.model.entity.ComposedSummaryEntity;
+import com.alcegory.mescloud.utility.DateUtil;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
@@ -32,8 +33,10 @@ public class ComposedProductionOrderServiceImpl implements ComposedProductionOrd
     private final ProductionOrderService productionOrderService;
     private final GenericConverter<ComposedSummaryEntity, ComposedSummaryDto> summaryConverter;
 
+    private static final String OBO_SECTION_PREFIX = "OBO";
     private static final String CODE_PREFIX = "CP";
-    private static final int CODE_INITIAL_VALUE = 0;
+    private static final int FIRST_CODE_VALUE = 1;
+    private static final String FIVE_DIGIT_NUMBER_FORMAT = "%05d";
 
 
     @Override
@@ -83,21 +86,29 @@ public class ComposedProductionOrderServiceImpl implements ComposedProductionOrd
         return repository.save(composedEntity);
     }
 
-    private String incrementAndGenerateCode(int lastMaxCode) {
-        int codeIncremented = lastMaxCode + 1;
-        return CODE_PREFIX + String.format("%05d", codeIncremented);
-    }
-
     private String generateCode() {
-        Optional<String> savedLastMaxCode = repository.findLastMaxCode();
 
-        if (savedLastMaxCode.isPresent()) {
-            return incrementAndGenerateCode(Integer.parseInt(savedLastMaxCode.get()));
-        } else {
-            return incrementAndGenerateCode(CODE_INITIAL_VALUE);
-        }
+        Optional<ComposedProductionOrderEntity> composedProductionOrderOpt = repository.findTopByOrderByIdDesc();
+        String codePrefix = OBO_SECTION_PREFIX + CODE_PREFIX + DateUtil.getCurrentYearLastTwoDigits();
+
+        return composedProductionOrderOpt.isEmpty() ?
+                codePrefix + FIRST_CODE_VALUE :
+                codePrefix + generateFormattedCodeValue(composedProductionOrderOpt.get(), codePrefix);
     }
 
+    private String generateFormattedCodeValue(ComposedProductionOrderEntity composedProductionOrder, String codePrefix) {
+
+        if (composedProductionOrder.getCode() == null || composedProductionOrder.getCode().isEmpty()) {
+            String message = "Unable to generate new code: last stored Composed Production Order code is null or empty";
+            log.warning(message);
+            throw new IllegalStateException(message);
+        }
+
+        String lastCodeValueAsString = composedProductionOrder.getCode().substring(codePrefix.length());
+        int lastCodeValue = Integer.parseInt(lastCodeValueAsString);
+
+        return String.format(FIVE_DIGIT_NUMBER_FORMAT, ++lastCodeValue);
+    }
 
     private boolean haveSameProperties(List<Long> productionOrderIds) {
         if (productionOrderIds.isEmpty()) {
