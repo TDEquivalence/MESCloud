@@ -69,16 +69,17 @@ public class KpiServiceImpl implements KpiService {
         CountingEquipmentDto countingEquipment = countingEquipmentDtoOpt.get();
 
         KpiDto qualityKpi = computeEquipmentQuality(equipmentId, requestKpiDto);
-        EquipmentKpiDto quality = new EquipmentKpiDto(countingEquipment, qualityKpi);
+        EquipmentKpiDto quality = new EquipmentKpiDto(countingEquipment.getQualityTarget(), qualityKpi);
 
         KpiDto availabilityKpi = computeAvailability(equipmentId, requestKpiDto);
-        EquipmentKpiDto availability = new EquipmentKpiDto(countingEquipment, availabilityKpi);
+        EquipmentKpiDto availability = new EquipmentKpiDto(countingEquipment.getAvailabilityTarget(), availabilityKpi);
 
         KpiDto performanceKpi = computePerformance(qualityKpi, availabilityKpi, countingEquipment);
-        EquipmentKpiDto performance = new EquipmentKpiDto(countingEquipment, performanceKpi);
+        EquipmentKpiDto performance = new EquipmentKpiDto(countingEquipment.getPerformanceTarget(), performanceKpi);
 
         Double overallEffectivePerformance = computeOverallEffectivePerformance(qualityKpi, availabilityKpi, performanceKpi);
-        EquipmentKpiDto overallEquipmentEffectiveness = new EquipmentKpiDto(countingEquipment, overallEffectivePerformance);
+        EquipmentKpiDto overallEquipmentEffectiveness =
+                new EquipmentKpiDto(countingEquipment.getOverallEquipmentEffectivenessTarget(), overallEffectivePerformance);
 
         return EquipmentKpiAggregatorDto.builder()
                 .qualityKpi(quality)
