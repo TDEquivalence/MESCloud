@@ -17,9 +17,7 @@ import lombok.extern.java.Log;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @AllArgsConstructor
@@ -238,23 +236,26 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
     private void updateOutputsAlias(CountingEquipmentEntity toUpdate, CountingEquipmentEntity updateFrom) {
         List<EquipmentOutputEntity> equipmentOutputToUpdate = toUpdate.getOutputs();
         List<EquipmentOutputEntity> equipmentOutputUpdateFrom = updateFrom.getOutputs();
+        Map<String, EquipmentOutputEntity> outputMap = new HashMap<>();
 
-        for (EquipmentOutputEntity outputToUpdate: equipmentOutputToUpdate) {
-            for(EquipmentOutputEntity outputUpdateFrom : equipmentOutputUpdateFrom) {
+        for (EquipmentOutputEntity outputUpdateFrom : equipmentOutputUpdateFrom) {
+            outputMap.put(outputUpdateFrom.getCode(), outputUpdateFrom);
+        }
 
-                if (outputToUpdate.getCode().equals(outputUpdateFrom.getCode())) {
-                    String alias = outputUpdateFrom.getAlias().getAlias();
-                    if(!aliasService.isAliasUnique(alias)) {
-                        EquipmentOutputAliasEntity persistedAlias = aliasService.findByAlias(alias);
-                        outputToUpdate.setAlias(persistedAlias);
-                    } else {
-                        outputToUpdate.setAlias(outputUpdateFrom.getAlias());
-                    }
-                    outputService.save(outputToUpdate);
+        for (EquipmentOutputEntity outputToUpdate : equipmentOutputToUpdate) {
+            EquipmentOutputEntity outputUpdateFrom = outputMap.get(outputToUpdate.getCode());
+
+            if (outputUpdateFrom != null) {
+                String alias = outputUpdateFrom.getAlias().getAlias();
+                if (!aliasService.isAliasUnique(alias)) {
+                    EquipmentOutputAliasEntity persistedAlias = aliasService.findByAlias(alias);
+                    outputToUpdate.setAlias(persistedAlias);
+                } else {
+                    outputToUpdate.setAlias(outputUpdateFrom.getAlias());
                 }
-                
             }
         }
+        outputService.saveAll(equipmentOutputToUpdate);
     }
 
     private void updateIms(CountingEquipmentEntity toUpdate, ImsEntity requestIms) {

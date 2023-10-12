@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -36,5 +37,10 @@ public class EquipmentOutputServiceImpl implements EquipmentOutputService {
     public EquipmentOutputDto save(EquipmentOutputEntity entity) {
        EquipmentOutputEntity persistedEntity = repository.save(entity);
        return converter.toDto(persistedEntity, EquipmentOutputDto.class);
+    }
+
+    @Override
+    public List<EquipmentOutputEntity> saveAll(List<EquipmentOutputEntity> equipmentOutputToUpdate) {
+        return repository.saveAll(equipmentOutputToUpdate);
     }
 }
