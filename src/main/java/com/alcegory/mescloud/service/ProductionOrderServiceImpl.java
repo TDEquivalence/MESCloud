@@ -32,8 +32,8 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
 
     private static final String OBO_SECTION_PREFIX = "OBO";
     private static final String CODE_PREFIX = "PO";
-    private static final String NEW_CODE_FORMAT = "%05d";
-    private static int FIRST_CODE_VALUE = 1;
+    private static final String FIVE_DIGIT_NUMBER_FORMAT = "%05d";
+    private static final int FIRST_CODE_VALUE = 1;
 
     private final ProductionOrderRepository repository;
     private final ProductionOrderConverter converter;
@@ -145,26 +145,27 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
 
     @Override
     public String generateCode() {
-        return OBO_SECTION_PREFIX + CODE_PREFIX + DateUtil.getCurrentYearLastTwoDigits() + getNewCodeValueFormatted();
+
+        Optional<ProductionOrderEntity> productionOrderOpt = repository.findTopByOrderByIdDesc();
+        String codePrefix = OBO_SECTION_PREFIX + CODE_PREFIX + DateUtil.getCurrentYearLastTwoDigits();
+
+        return productionOrderOpt.isEmpty() ?
+                codePrefix + FIRST_CODE_VALUE :
+                codePrefix + generateFormattedCodeValue(productionOrderOpt.get(), codePrefix);
     }
 
-    private int calculateNewCodeValue() {
+    private String generateFormattedCodeValue(ProductionOrderEntity productionOrder, String codePrefix) {
 
-        ProductionOrderEntity productionOrderEntity = repository.findTopByOrderByIdDesc();
-
-        if (productionOrderEntity == null) {
-            return FIRST_CODE_VALUE;
+        if (productionOrder.getCode() == null || productionOrder.getCode().isEmpty()) {
+            String message = "Unable to generate new code: last stored Production Order code is null or empty";
+            log.warning(message);
+            throw new IllegalStateException(message);
         }
 
-        String codePrefix = OBO_SECTION_PREFIX + CODE_PREFIX + DateUtil.getCurrentYearLastTwoDigits();
-        String lastCodeValueAsString = productionOrderEntity.getCode().substring(codePrefix.length());
+        String lastCodeValueAsString = productionOrder.getCode().substring(codePrefix.length());
         int lastCodeValue = Integer.parseInt(lastCodeValueAsString);
-        return ++lastCodeValue;
-    }
 
-    private String getNewCodeValueFormatted() {
-        int newCode = calculateNewCodeValue();
-        return String.format(NEW_CODE_FORMAT, newCode);
+        return String.format(FIVE_DIGIT_NUMBER_FORMAT, ++lastCodeValue);
     }
 
     private void publishToPlc(ProductionOrderEntity productionOrderEntity) throws MesMqttException {
