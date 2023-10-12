@@ -12,9 +12,10 @@ import java.util.Optional;
 @Repository
 public interface ComposedProductionOrderRepository extends JpaRepository<ComposedProductionOrderEntity, Long> {
 
-    @Query("SELECT MAX(CAST(SUBSTRING(cp.code, 3) AS integer)) FROM composed_production_order cp WHERE cp.code LIKE 'CP%'")
+    @Query("SELECT MAX(CAST(SUBSTRING(cp.code, 6) AS integer)) FROM composed_production_order cp WHERE cp.code LIKE 'OBOCP%'")
     Optional<String> findLastMaxCode();
 
+    Optional<ComposedProductionOrderEntity> findTopByOrderByIdDesc();
 
     List<ComposedSummaryEntity> getOpenComposedSummaries(boolean withHits);
 

@@ -16,7 +16,6 @@ public class ProductionInstructionEntity {
     private int instruction;
     @ManyToOne
     private ProductionOrderEntity productionOrder;
-    //TODO: Add User relationship once UserEntity is defined
-    //private User createdBy;
+    @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
 }
