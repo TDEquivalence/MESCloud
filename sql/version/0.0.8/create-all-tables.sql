@@ -129,7 +129,7 @@ CREATE INDEX idx_equipment_output_code ON equipment_output (code);
 
 CREATE TABLE composed_production_order (
     id int GENERATED ALWAYS AS IDENTITY,
-    code VARCHAR(255) UNIQUE,
+    code VARCHAR(255) NOT NULL UNIQUE,
     created_at TIMESTAMP,
 
     PRIMARY KEY(id)
