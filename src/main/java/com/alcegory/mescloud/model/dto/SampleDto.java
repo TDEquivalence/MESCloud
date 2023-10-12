@@ -8,6 +8,7 @@ import lombok.Setter;
 public class SampleDto {
 
     private Long id;
+    private String composedCode;
     private int amount;
     private double tcaAverage;
     private double reliability;

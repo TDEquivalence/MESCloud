@@ -39,7 +39,9 @@ public class SampleServiceImpl implements SampleService {
         sampleEntity.setCreatedAt(new Date());
 
         saveAndUpdate(sampleEntity);
-        return converter.toDto(sampleEntity, SampleDto.class);
+        SampleDto sampleDto = converter.toDto(sampleEntity, SampleDto.class);
+        sampleDto.setComposedCode(composedEntity.getCode());
+        return sampleDto;
     }
 
     private ComposedProductionOrderEntity createComposed(RequestSampleDto requestSampleDto) {
