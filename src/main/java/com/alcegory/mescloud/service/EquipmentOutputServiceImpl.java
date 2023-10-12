@@ -31,4 +31,10 @@ public class EquipmentOutputServiceImpl implements EquipmentOutputService {
         EquipmentOutputDto equipmentOutput = converter.toDto(entity.get(), EquipmentOutputDto.class);
         return Optional.of(equipmentOutput);
     }
+
+    @Override
+    public EquipmentOutputDto save(EquipmentOutputEntity entity) {
+       EquipmentOutputEntity persistedEntity = repository.save(entity);
+       return converter.toDto(persistedEntity, EquipmentOutputDto.class);
+    }
 }

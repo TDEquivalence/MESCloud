@@ -6,10 +6,9 @@ import com.alcegory.mescloud.exception.ImsNotFoundException;
 import com.alcegory.mescloud.exception.IncompleteConfigurationException;
 import com.alcegory.mescloud.model.converter.CountingEquipmentConverter;
 import com.alcegory.mescloud.model.converter.GenericConverter;
-import com.alcegory.mescloud.model.dto.CountingEquipmentDto;
-import com.alcegory.mescloud.model.dto.ImsDto;
-import com.alcegory.mescloud.model.dto.RequestConfigurationDto;
+import com.alcegory.mescloud.model.dto.*;
 import com.alcegory.mescloud.model.entity.CountingEquipmentEntity;
+import com.alcegory.mescloud.model.entity.EquipmentOutputAliasEntity;
 import com.alcegory.mescloud.model.entity.EquipmentOutputEntity;
 import com.alcegory.mescloud.model.entity.ImsEntity;
 import com.alcegory.mescloud.repository.CountingEquipmentRepository;
@@ -17,14 +16,10 @@ import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -33,12 +28,13 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
 
     private static final int MIN_P_TIMER = 10;
 
-    private CountingEquipmentRepository repository;
-    private CountingEquipmentConverter converter;
-    private ImsService imsService;
-    private GenericConverter<ImsEntity, ImsDto> imsConverter;
-    private EquipmentStatusRecordService statusRecordService;
-    private ProductionOrderService productionOrderService;
+    private final CountingEquipmentRepository repository;
+    private final EquipmentOutputService outputService;
+    private final EquipmentOutputAliasService aliasService;
+    private final CountingEquipmentConverter converter;
+    private final ImsService imsService;
+    private final GenericConverter<ImsEntity, ImsDto> imsConverter;
+    private final EquipmentStatusRecordService statusRecordService;
 
     @Override
     public List<CountingEquipmentDto> findAllWithLastProductionOrder() {
@@ -235,23 +231,30 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
         toUpdate.setPerformanceTarget(updateFrom.getPerformanceTarget());
         toUpdate.setAvailabilityTarget(updateFrom.getAvailabilityTarget());
         toUpdate.setOverallEquipmentEffectivenessTarget(updateFrom.getOverallEquipmentEffectivenessTarget());
-        updateOutputs(toUpdate, updateFrom);
+        updateOutputsAlias(toUpdate, updateFrom);
         updateIms(toUpdate, updateFrom.getIms());
     }
 
-    private void updateOutputs(CountingEquipmentEntity toUpdate, CountingEquipmentEntity updateFrom) {
+    private void updateOutputsAlias(CountingEquipmentEntity toUpdate, CountingEquipmentEntity updateFrom) {
         List<EquipmentOutputEntity> equipmentOutputToUpdate = toUpdate.getOutputs();
         List<EquipmentOutputEntity> equipmentOutputUpdateFrom = updateFrom.getOutputs();
 
-        Map<String, EquipmentOutputEntity> equipmentOutputUpdateFromMap = equipmentOutputUpdateFrom.stream()
-                .collect(Collectors.toMap(EquipmentOutputEntity::getCode, Function.identity()));
+        for (EquipmentOutputEntity outputToUpdate: equipmentOutputToUpdate) {
+            for(EquipmentOutputEntity outputUpdateFrom : equipmentOutputUpdateFrom) {
 
-        equipmentOutputToUpdate.forEach(outputToUpdate -> {
-            EquipmentOutputEntity outputUpdateFrom = equipmentOutputUpdateFromMap.get(outputToUpdate.getCode());
-            if (outputUpdateFrom != null) {
-                outputToUpdate.setAlias(outputUpdateFrom.getAlias());
+                if (outputToUpdate.getCode().equals(outputUpdateFrom.getCode())) {
+                    String alias = outputUpdateFrom.getAlias().getAlias();
+                    if(!aliasService.isAliasUnique(alias)) {
+                        EquipmentOutputAliasEntity persistedAlias = aliasService.findByAlias(alias);
+                        outputToUpdate.setAlias(persistedAlias);
+                    } else {
+                        outputToUpdate.setAlias(outputUpdateFrom.getAlias());
+                    }
+                    outputService.save(outputToUpdate);
+                }
+                
             }
-        });
+        }
     }
 
     private void updateIms(CountingEquipmentEntity toUpdate, ImsEntity requestIms) {
