@@ -177,12 +177,12 @@ public class KpiServiceImpl implements KpiService {
             return null;
         }
 
-        if (qualityKpi.getValue() == 0 || availabilityKpi.getValue() == 0) {
+        if (qualityKpi.getDividend() == 0 || availabilityKpi.getDividend() == 0) {
             log.warning(String.format("Unable to compute performance: cannot divide quality dividend [%s] by the availability dividend [%s]", qualityKpi.getDividend(), availabilityKpi.getDividend()));
             return null;
         }
 
-        Double realProductionInSeconds = qualityKpi.getValue() / availabilityKpi.getValue();
+        Double realProductionInSeconds = qualityKpi.getDividend() / availabilityKpi.getDividend();
         KpiDto kpi = new KpiDto(realProductionInSeconds, countingEquipment.getTheoreticalProduction());
         kpi.setValueAsDivision();
         return kpi;
