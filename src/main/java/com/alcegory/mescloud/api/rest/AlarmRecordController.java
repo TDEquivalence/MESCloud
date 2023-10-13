@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/alarm")
+@RequestMapping("/api/alarm-record")
 @AllArgsConstructor
 public class AlarmRecordController {
 
