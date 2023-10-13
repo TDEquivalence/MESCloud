@@ -1,14 +1,13 @@
 package com.alcegory.mescloud.api.rest;
 
 import com.alcegory.mescloud.model.dto.ImsDto;
-import com.alcegory.mescloud.service.ImsServiceImpl;
+import com.alcegory.mescloud.service.spi.ImsServiceImpl;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 
 @RestController

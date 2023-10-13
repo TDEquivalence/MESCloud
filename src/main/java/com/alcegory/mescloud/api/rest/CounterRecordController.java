@@ -1,6 +1,6 @@
 package com.alcegory.mescloud.api.rest;
 
-import com.alcegory.mescloud.model.dto.CounterRecordFilter;
+import com.alcegory.mescloud.model.filter.CounterRecordFilter;
 import com.alcegory.mescloud.model.dto.PaginatedCounterRecordsDto;
 import com.alcegory.mescloud.service.CounterRecordService;
 import lombok.AllArgsConstructor;

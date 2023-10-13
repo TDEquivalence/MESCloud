@@ -1,6 +1,6 @@
 package com.alcegory.mescloud.repository;
 
-import com.alcegory.mescloud.model.dto.CounterRecordFilter;
+import com.alcegory.mescloud.model.filter.CounterRecordFilter;
 import com.alcegory.mescloud.model.dto.KpiFilterDto;
 import com.alcegory.mescloud.model.entity.*;
 import jakarta.persistence.EntityGraph;

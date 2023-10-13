@@ -1,5 +1,6 @@
 package com.alcegory.mescloud.model.dto;
 
+import com.alcegory.mescloud.model.filter.CounterRecordFilter;
 import com.alcegory.mescloud.utility.filter.FilterSearch;
 import com.alcegory.mescloud.utility.filter.Searchable;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;

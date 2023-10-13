@@ -1,4 +1,4 @@
-package com.alcegory.mescloud.model.dto;
+package com.alcegory.mescloud.model.filter;
 
 import com.alcegory.mescloud.utility.filter.AbstractPaginatedFilter;
 import com.alcegory.mescloud.utility.filter.FilterDataTypeOperation;

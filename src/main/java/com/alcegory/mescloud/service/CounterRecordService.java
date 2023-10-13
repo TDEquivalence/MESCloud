@@ -1,6 +1,7 @@
 package com.alcegory.mescloud.service;
 
 import com.alcegory.mescloud.model.dto.*;
+import com.alcegory.mescloud.model.filter.CounterRecordFilter;
 
 import java.sql.Timestamp;
 import java.util.List;

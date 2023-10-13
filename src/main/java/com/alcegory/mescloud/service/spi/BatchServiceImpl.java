@@ -1,4 +1,4 @@
-package com.alcegory.mescloud.service;
+package com.alcegory.mescloud.service.spi;
 
 import com.alcegory.mescloud.repository.BatchRepository;
 import com.alcegory.mescloud.model.converter.GenericConverter;
@@ -6,6 +6,8 @@ import com.alcegory.mescloud.model.dto.BatchDto;
 import com.alcegory.mescloud.model.dto.RequestBatchDto;
 import com.alcegory.mescloud.model.entity.BatchEntity;
 import com.alcegory.mescloud.model.entity.ComposedProductionOrderEntity;
+import com.alcegory.mescloud.service.BatchService;
+import com.alcegory.mescloud.service.ComposedProductionOrderService;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;

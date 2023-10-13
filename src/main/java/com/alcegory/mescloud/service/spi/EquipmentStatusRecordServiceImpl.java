@@ -1,4 +1,4 @@
-package com.alcegory.mescloud.service;
+package com.alcegory.mescloud.service.spi;
 
 import com.alcegory.mescloud.constant.EquipmentStatus;
 import com.alcegory.mescloud.repository.EquipmentStatusRecordRepository;
@@ -6,6 +6,7 @@ import com.alcegory.mescloud.model.converter.GenericConverter;
 import com.alcegory.mescloud.model.dto.EquipmentStatusRecordDto;
 import com.alcegory.mescloud.model.entity.CountingEquipmentEntity;
 import com.alcegory.mescloud.model.entity.EquipmentStatusRecordEntity;
+import com.alcegory.mescloud.service.EquipmentStatusRecordService;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
