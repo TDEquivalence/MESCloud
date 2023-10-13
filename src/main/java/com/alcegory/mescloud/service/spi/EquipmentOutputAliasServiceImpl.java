@@ -1,7 +1,8 @@
-package com.alcegory.mescloud.service;
+package com.alcegory.mescloud.service.spi;
 
 import com.alcegory.mescloud.model.entity.EquipmentOutputAliasEntity;
 import com.alcegory.mescloud.repository.EquipmentOutputAliasRepository;
+import com.alcegory.mescloud.service.EquipmentOutputAliasService;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;

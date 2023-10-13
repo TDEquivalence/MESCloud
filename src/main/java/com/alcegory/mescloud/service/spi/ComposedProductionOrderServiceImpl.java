@@ -1,4 +1,4 @@
-package com.alcegory.mescloud.service;
+package com.alcegory.mescloud.service.spi;
 
 import com.alcegory.mescloud.repository.ComposedProductionOrderRepository;
 import com.alcegory.mescloud.model.converter.GenericConverter;
@@ -8,6 +8,8 @@ import com.alcegory.mescloud.model.dto.ProductionOrderDto;
 import com.alcegory.mescloud.model.dto.RequestComposedDto;
 import com.alcegory.mescloud.model.entity.ComposedProductionOrderEntity;
 import com.alcegory.mescloud.model.entity.ComposedSummaryEntity;
+import com.alcegory.mescloud.service.ComposedProductionOrderService;
+import com.alcegory.mescloud.service.ProductionOrderService;
 import com.alcegory.mescloud.utility.DateUtil;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;

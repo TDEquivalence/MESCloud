@@ -1,7 +1,7 @@
 package com.alcegory.mescloud.api.rest;
 
 import com.alcegory.mescloud.model.dto.UserDto;
-import com.alcegory.mescloud.model.dto.UserFilter;
+import com.alcegory.mescloud.model.filter.UserFilter;
 import com.alcegory.mescloud.security.exception.UserNotFoundException;
 import com.alcegory.mescloud.service.UserService;
 import lombok.RequiredArgsConstructor;

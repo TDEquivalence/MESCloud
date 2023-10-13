@@ -6,7 +6,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@Entity(name = "Batch")
+@Entity(name = "batch")
 public class BatchEntity {
 
     @Id

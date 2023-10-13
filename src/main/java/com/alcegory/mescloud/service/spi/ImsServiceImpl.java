@@ -1,9 +1,10 @@
-package com.alcegory.mescloud.service;
+package com.alcegory.mescloud.service.spi;
 
 import com.alcegory.mescloud.repository.ImsRepository;
 import com.alcegory.mescloud.model.converter.GenericConverter;
 import com.alcegory.mescloud.model.dto.ImsDto;
 import com.alcegory.mescloud.model.entity.ImsEntity;
+import com.alcegory.mescloud.service.ImsService;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;

@@ -1,4 +1,4 @@
-package com.alcegory.mescloud.service;
+package com.alcegory.mescloud.service.spi;
 
 import com.alcegory.mescloud.repository.HitRepository;
 import com.alcegory.mescloud.model.converter.GenericConverter;
@@ -6,6 +6,8 @@ import com.alcegory.mescloud.model.dto.HitDto;
 import com.alcegory.mescloud.model.dto.RequestHitDto;
 import com.alcegory.mescloud.model.entity.HitEntity;
 import com.alcegory.mescloud.model.entity.SampleEntity;
+import com.alcegory.mescloud.service.HitService;
+import com.alcegory.mescloud.service.SampleService;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;

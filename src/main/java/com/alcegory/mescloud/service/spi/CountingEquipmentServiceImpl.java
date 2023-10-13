@@ -1,4 +1,4 @@
-package com.alcegory.mescloud.service;
+package com.alcegory.mescloud.service.spi;
 
 import com.alcegory.mescloud.exception.ActiveProductionOrderException;
 import com.alcegory.mescloud.exception.EquipmentNotFoundException;
@@ -12,6 +12,7 @@ import com.alcegory.mescloud.model.entity.EquipmentOutputAliasEntity;
 import com.alcegory.mescloud.model.entity.EquipmentOutputEntity;
 import com.alcegory.mescloud.model.entity.ImsEntity;
 import com.alcegory.mescloud.repository.CountingEquipmentRepository;
+import com.alcegory.mescloud.service.*;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.dao.EmptyResultDataAccessException;

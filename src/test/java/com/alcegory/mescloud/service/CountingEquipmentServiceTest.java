@@ -4,12 +4,14 @@ import com.alcegory.mescloud.exception.ActiveProductionOrderException;
 import com.alcegory.mescloud.exception.IncompleteConfigurationException;
 import com.alcegory.mescloud.model.converter.GenericConverter;
 import com.alcegory.mescloud.model.dto.CountingEquipmentDto;
-import com.alcegory.mescloud.model.dto.EquipmentOutputDto;
 import com.alcegory.mescloud.model.dto.ImsDto;
 import com.alcegory.mescloud.model.dto.RequestConfigurationDto;
 import com.alcegory.mescloud.model.entity.CountingEquipmentEntity;
 import com.alcegory.mescloud.model.entity.ImsEntity;
 import com.alcegory.mescloud.repository.CountingEquipmentRepository;
+import com.alcegory.mescloud.service.spi.CountingEquipmentServiceImpl;
+import com.alcegory.mescloud.service.spi.ImsServiceImpl;
+import com.alcegory.mescloud.service.spi.ProductionOrderServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -17,9 +19,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.EmptyResultDataAccessException;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;

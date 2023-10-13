@@ -2,16 +2,15 @@ package com.alcegory.mescloud.service;
 
 import com.alcegory.mescloud.repository.ProductionOrderRepository;
 import com.alcegory.mescloud.model.entity.ProductionOrderEntity;
+import com.alcegory.mescloud.service.spi.ProductionOrderServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.*;
-import java.util.logging.Logger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;

@@ -1,9 +1,10 @@
-package com.alcegory.mescloud.service;
+package com.alcegory.mescloud.service.spi;
 
 import com.alcegory.mescloud.repository.EquipmentOutputRepository;
 import com.alcegory.mescloud.model.converter.GenericConverter;
 import com.alcegory.mescloud.model.dto.EquipmentOutputDto;
 import com.alcegory.mescloud.model.entity.EquipmentOutputEntity;
+import com.alcegory.mescloud.service.EquipmentOutputService;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
@@ -35,8 +36,8 @@ public class EquipmentOutputServiceImpl implements EquipmentOutputService {
 
     @Override
     public EquipmentOutputDto save(EquipmentOutputEntity entity) {
-       EquipmentOutputEntity persistedEntity = repository.save(entity);
-       return converter.toDto(persistedEntity, EquipmentOutputDto.class);
+        EquipmentOutputEntity persistedEntity = repository.save(entity);
+        return converter.toDto(persistedEntity, EquipmentOutputDto.class);
     }
 
     @Override
