@@ -81,13 +81,13 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
 
             if (!lockHandler.hasAlreadyALock(equipmentCode)) {
                 lockHandler.lock(equipmentCode);
-                try {
-                    publishOrderCompletion(countingEquipmentOpt.get(), productionOrderEntityOpt.get());
-                } finally {
-                    lockHandler.unlock(equipmentCode);
-                }
+                log.info(() -> String.format("Get lock for equipment with code [%s]", equipmentCode));
+
+                publishOrderCompletion(countingEquipmentOpt.get(), productionOrderEntityOpt.get());
+
             } else {
                 lockHandler.waitForExecute(equipmentCode);
+                log.info(() -> String.format("Wait for execute unlock for equipment with code [%s]", equipmentCode));
             }
         } catch (InterruptedException e) {
             log.severe("Thread interrupted: " + e.getMessage());

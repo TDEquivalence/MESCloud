@@ -30,6 +30,7 @@ public class CounterRecordProcess extends AbstractMesProtocolProcess<PlcMqttDto>
 
         if (isCleanCounterRecord(equipmentCounts) && isProductionOrderCompleted(equipmentCounts.getEquipmentCode())) {
             lockHandler.unlock(equipmentCounts.getEquipmentCode());
+            log.info(() -> String.format("Unlock lock for equipment with code [%s]", equipmentCounts.getEquipmentCode()));
         }
 
         if (areInvalidContinuationCounts(equipmentCounts)) {
