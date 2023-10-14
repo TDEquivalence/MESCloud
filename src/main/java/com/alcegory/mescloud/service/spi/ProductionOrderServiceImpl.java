@@ -157,7 +157,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         String codePrefix = OBO_SECTION_PREFIX + CODE_PREFIX + DateUtil.getCurrentYearLastTwoDigits();
 
         return productionOrderOpt.isEmpty() ?
-                codePrefix + FIRST_CODE_VALUE :
+                codePrefix + String.format(FIVE_DIGIT_NUMBER_FORMAT, FIRST_CODE_VALUE) :
                 codePrefix + generateFormattedCodeValue(productionOrderOpt.get(), codePrefix);
     }
 
