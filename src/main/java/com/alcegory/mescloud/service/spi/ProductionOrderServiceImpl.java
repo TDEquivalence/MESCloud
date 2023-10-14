@@ -84,7 +84,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
                 log.info(() -> String.format("Get lock for equipment with code [%s]", equipmentCode));
 
                 publishOrderCompletion(countingEquipmentOpt.get(), productionOrderEntityOpt.get());
-
+                lockHandler.waitForExecute(equipmentCode);
             } else {
                 lockHandler.waitForExecute(equipmentCode);
                 log.info(() -> String.format("Wait for execute unlock for equipment with code [%s]", equipmentCode));
