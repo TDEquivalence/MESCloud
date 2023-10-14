@@ -15,7 +15,7 @@ public class LockUtil {
 
     private final ConcurrentMap<String, CountDownLatch> locks = new ConcurrentHashMap<>();
 
-    public void lock(String equipmentCode) {
+    public synchronized void lock(String equipmentCode) {
         CountDownLatch latch = new CountDownLatch(1);
         CountDownLatch existingLatch = locks.putIfAbsent(equipmentCode, latch);
         if (existingLatch != null) {
