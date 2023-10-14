@@ -32,4 +32,6 @@ public interface CountingEquipmentService {
 
     CountingEquipmentDto updateConfiguration(long equipmentId, RequestConfigurationDto request)
             throws IncompleteConfigurationException, EmptyResultDataAccessException, ActiveProductionOrderException;
+
+    boolean isProductionOrderCompleted(String equipmentCode);
 }

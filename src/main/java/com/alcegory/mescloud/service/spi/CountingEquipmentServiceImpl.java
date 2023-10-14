@@ -205,6 +205,7 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
         return converter.convertToDto(countingEquipment);
     }
 
+
     private boolean containsNullProperty(RequestConfigurationDto countingEquipmentDto) {
         return countingEquipmentDto.getAlias() == null ||
                 countingEquipmentDto.getOutputs() == null;
@@ -213,6 +214,17 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
     private boolean hasActiveProductionOrder(CountingEquipmentEntity countingEquipment) {
         return !countingEquipment.getProductionOrders().isEmpty() &&
                 !countingEquipment.getProductionOrders().get(0).isCompleted();
+    }
+
+
+    @Override
+    public boolean isProductionOrderCompleted(String equipmentCode) {
+        Optional<CountingEquipmentDto> countingEquipmentDto = findByCode(equipmentCode);
+        if (countingEquipmentDto.isEmpty()) {
+            return false;
+        }
+        CountingEquipmentEntity countingEquipment = converter.convertToEntity(countingEquipmentDto.get());
+        return hasActiveProductionOrder(countingEquipment);
     }
 
     private void updateEquipmentConfiguration(CountingEquipmentEntity persistedEquipment, RequestConfigurationDto request) {
