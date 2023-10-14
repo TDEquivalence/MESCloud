@@ -13,12 +13,10 @@ import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 
 @Service
 @Log
@@ -27,7 +25,7 @@ public class ProductionOrderConclusionProcess extends AbstractMesProtocolProcess
 
     private static final Logger logger = LoggerFactory.getLogger(ProductionOrderConclusionProcess.class);
 
-    private static final int THREAD_SLEEP_DURATION = 1000;
+    private static final int THREAD_SLEEP_DURATION = 500;
 
     private final CounterRecordService counterRecordService;
     private final CountingEquipmentService equipmentService;
@@ -61,30 +59,29 @@ public class ProductionOrderConclusionProcess extends AbstractMesProtocolProcess
         return MqttDTOConstants.PRODUCTION_ORDER_CONCLUSION_RESPONSE_DTO_NAME;
     }
 
-    public CompletableFuture<Void> executeProductionOrderConclusion(ProductionOrderEntity productionOrder, String equipmentCode) {
-        return CompletableFuture.supplyAsync(() -> {
-            if (productionOrder != null) {
-                if (!productionOrder.isCompleted()) {
-                    try {
-                        Thread.sleep(THREAD_SLEEP_DURATION);
-                        ProductionOrderMqttDto productionOrderMqttDto = createProductionOrderMqttDto(equipmentCode);
-                        mqttClient.publish(mqttSettings.getProtCountPlcTopic(), productionOrderMqttDto);
-                    } catch (InterruptedException e) {
-                        Thread.currentThread().interrupt();
-                        log.severe(() -> String.format("Unable to publish Order Completion to PLC for equipment with code [%s]", equipmentCode));
-                    } catch (Exception e) {
-                        log.severe("An unexpected error occurred during MQTT publication: " + e.getMessage());
-                    }
-                }
+    public void executeProductionOrderConclusion(ProductionOrderEntity productionOrder, String equipmentCode) {
 
-                productionOrder.setCompleted(true);
-                productionOrder.setCompletedAt(new Date());
-                repository.save(productionOrder);
-            } else {
-                log.warning(() -> String.format("No Production Order found for Equipment with code [%s]", equipmentCode));
+        if (productionOrder == null) {
+            log.warning(() -> String.format("No Production Order found for Equipment with code [%s]", equipmentCode));
+            return; // No need to continue if no production order is found.
+        }
+
+        if (!productionOrder.isCompleted()) {
+            try {
+                Thread.sleep(THREAD_SLEEP_DURATION);
+                ProductionOrderMqttDto productionOrderMqttDto = createProductionOrderMqttDto(equipmentCode);
+                mqttClient.publish(mqttSettings.getProtCountPlcTopic(), productionOrderMqttDto);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                log.severe(() -> String.format("Unable to publish Order Completion to PLC for equipment with code [%s]", equipmentCode));
+            } catch (Exception e) {
+                log.severe("An unexpected error occurred during MQTT publication: " + e.getMessage());
             }
-            return null;
-        });
+        }
+
+            productionOrder.setCompleted(true);
+            productionOrder.setCompletedAt(new Date());
+            repository.save(productionOrder);
     }
 
     private ProductionOrderMqttDto createProductionOrderMqttDto(String equipmentCode) {

@@ -25,7 +25,6 @@ import java.time.Duration;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 
 @Service
 @AllArgsConstructor
@@ -43,7 +42,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     private final CountingEquipmentRepository countingEquipmentRepository;
     private final MqttClient mqttClient;
     private final MesMqttSettings mqttSettings;
-    private final LockUtil lock;
+    private final LockUtil lockHandler;
 
 
     @Override
@@ -64,34 +63,42 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     }
 
     @Override
-    public CompletableFuture<Optional<ProductionOrderDto>> complete(long equipmentId) {
-        return countingEquipmentRepository.findById(equipmentId)
-                .map(countingEquipmentOpt -> {
-                    Optional<ProductionOrderEntity> productionOrderEntityOpt = repository.findActive(equipmentId);
-                    if (productionOrderEntityOpt.isPresent()) {
-                        try {
-                            ProductionOrderMqttDto productionOrderMqttDto = new ProductionOrderMqttDto();
-                            productionOrderMqttDto.setJsonType(MqttDTOConstants.PRODUCTION_ORDER_CONCLUSION_DTO_NAME);
-                            productionOrderMqttDto.setEquipmentEnabled(false);
-                            productionOrderMqttDto.setProductionOrderCode(productionOrderEntityOpt.get().getCode());
-                            productionOrderMqttDto.setTargetAmount(0);
-                            productionOrderMqttDto.setEquipmentCode(countingEquipmentOpt.getCode());
-                            mqttClient.publish(mqttSettings.getProtCountPlcTopic(), productionOrderMqttDto);
-                        } catch (MesMqttException e) {
-                            log.severe(() -> String.format("Unable to publish Order Completion to PLC for equipment [%s]", equipmentId));
-                        }
-                    } else {
-                        log.warning(() -> String.format("No active Production Order found for an Equipment with id [%s]", equipmentId));
-                    }
+    public Optional<ProductionOrderDto> complete(long equipmentId) {
+        Optional<CountingEquipmentEntity> countingEquipmentOpt = countingEquipmentRepository.findById(equipmentId);
+        if (countingEquipmentOpt.isEmpty()) {
+            log.warning(() -> String.format("Unable to find an Equipment with id [%s]", equipmentId));
+            return Optional.empty();
+        }
 
-                    return getPersistedProductionOrder(productionOrderEntityOpt.get().getCode());
-                })
-                .map(CompletableFuture::completedFuture)
-                .orElse(CompletableFuture.completedFuture(Optional.empty()))
-                .exceptionally(e -> {
-                    log.severe("Exception caught while saving production order " + e.getMessage());
-                    return Optional.empty();
-                });
+        Optional<ProductionOrderEntity> productionOrderEntityOpt = repository.findActive(equipmentId);
+        if (productionOrderEntityOpt.isEmpty()) {
+            log.warning(() -> String.format("No active Production Order found for an Equipment with id [%s]", equipmentId));
+            return Optional.empty();
+        }
+
+        try {
+            publishOrderCompletionToPLC(countingEquipmentOpt.get(), productionOrderEntityOpt.get());
+        } catch (MesMqttException e) {
+            log.severe(() -> String.format("Unable to publish Order Completion to PLC for equipment [%s]", equipmentId));
+        }
+
+        try {
+            lockHandler.waitForExecute();
+        } catch (InterruptedException e) {
+            log.severe("Thread interrupted: " + e.getMessage());
+            Thread.currentThread().interrupt();
+        }
+        return getPersistedProductionOrder(productionOrderEntityOpt.get().getCode());
+    }
+
+    private void publishOrderCompletionToPLC(CountingEquipmentEntity countingEquipment, ProductionOrderEntity productionOrder) throws MesMqttException {
+        ProductionOrderMqttDto productionOrderMqttDto = new ProductionOrderMqttDto();
+        productionOrderMqttDto.setJsonType(MqttDTOConstants.PRODUCTION_ORDER_CONCLUSION_DTO_NAME);
+        productionOrderMqttDto.setEquipmentEnabled(false);
+        productionOrderMqttDto.setProductionOrderCode(productionOrder.getCode());
+        productionOrderMqttDto.setTargetAmount(0);
+        productionOrderMqttDto.setEquipmentCode(countingEquipment.getCode());
+        mqttClient.publish(mqttSettings.getProtCountPlcTopic(), productionOrderMqttDto);
     }
 
 

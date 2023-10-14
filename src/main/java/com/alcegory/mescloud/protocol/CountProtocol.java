@@ -1,7 +1,10 @@
 package com.alcegory.mescloud.protocol;
 
 import com.alcegory.mescloud.api.mqtt.MqttClient;
+import com.alcegory.mescloud.constant.MqttDTOConstants;
 import com.alcegory.mescloud.exception.MesMqttException;
+import com.alcegory.mescloud.model.dto.PlcMqttDto;
+import com.alcegory.mescloud.utility.LockUtil;
 import com.amazonaws.services.iot.client.AWSIotMessage;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -19,16 +22,19 @@ import java.util.logging.Level;
 @Log
 public class CountProtocol extends AbstractMesProtocol {
 
+    private final String EMPTY_PRODUCTION_ORDER = "";
     public static final String BEAN_NAME = "protCountService";
 
     private final ObjectMapper objectMapper;
     private final MqttClient mqttClient;
     private final MesMqttSettings mesMqttSettings;
+    private final LockUtil lockHandler;
 
-    public CountProtocol(ObjectMapper objectMapper, MqttClient mqttClient, MesMqttSettings mesMqttSettings) {
+    public CountProtocol(ObjectMapper objectMapper, MqttClient mqttClient, MesMqttSettings mesMqttSettings, LockUtil lockHandler) {
         this.objectMapper = objectMapper;
         this.mqttClient = mqttClient;
         this.mesMqttSettings = mesMqttSettings;
+        this.lockHandler = lockHandler;
     }
 
 
@@ -59,6 +65,17 @@ public class CountProtocol extends AbstractMesProtocol {
         MqttDto mqttDTO = optMqttDTO.get();
         publishHasReceived(mqttDTO);
         executeMesProcess(mqttDTO);
+        if (isToConcludeProductionOrder(mqttDTO)) {
+            lockHandler.signalExecute();
+        }
+    }
+
+    private boolean isToConcludeProductionOrder (MqttDto mqttDTO) {
+        if (mqttDTO != null && MqttDTOConstants.COUNTING_RECORD_DTO_NAME.equals(mqttDTO.getJsonType())) {
+            PlcMqttDto plcMqttDto = (PlcMqttDto) mqttDTO;
+            return EMPTY_PRODUCTION_ORDER.equals(plcMqttDto.getProductionOrderCode()) && plcMqttDto.getEquipmentStatus() == 0;
+        }
+        return false;
     }
 
     private Optional<MqttDto> parseMqttDTO(AWSIotMessage message) {
