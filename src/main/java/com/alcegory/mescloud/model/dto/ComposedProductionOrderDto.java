@@ -12,6 +12,6 @@ public class ComposedProductionOrderDto {
     private Long id;
     private String code;
     private Date createdAt;
-    private Date approvalAt;
+    private Date approvedAt;
     private Date hitInsertedAt;
 }

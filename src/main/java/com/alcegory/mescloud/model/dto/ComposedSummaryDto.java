@@ -12,7 +12,7 @@ public class ComposedSummaryDto {
     private Integer id;
     private String code;
     private Date createdAt;
-    private Date approvalAt;
+    private Date approvedAt;
     private Date hitInsertedAt;
     private Integer sampleAmount;
     private Integer reliability;

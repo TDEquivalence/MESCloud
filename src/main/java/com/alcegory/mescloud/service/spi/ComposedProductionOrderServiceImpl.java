@@ -192,7 +192,7 @@ public class ComposedProductionOrderServiceImpl implements ComposedProductionOrd
             }
 
             productionOrderService.setProductionOrderApproval(composedId, isApproved);
-            composed.setApprovalAt(new Date());
+            composed.setApprovedAt(new Date());
             repository.save(composed);
         } catch (IllegalArgumentException | EntityNotFoundException e) {
             logger.warning("Error in setProductionOrderApproval: " + e.getMessage());
