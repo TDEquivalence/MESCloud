@@ -20,6 +20,10 @@ public class ComposedProductionOrderEntity {
     private String code;
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date approvedAt;
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date hitInsertedAt;
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "composedProductionOrder", cascade = CascadeType.MERGE)
     private List<ProductionOrderEntity> productionOrders = new ArrayList<>();
 }

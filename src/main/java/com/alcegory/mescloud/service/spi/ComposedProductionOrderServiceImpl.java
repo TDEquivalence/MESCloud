@@ -192,8 +192,19 @@ public class ComposedProductionOrderServiceImpl implements ComposedProductionOrd
             }
 
             productionOrderService.setProductionOrderApproval(composedId, isApproved);
+            composed.setApprovedAt(new Date());
+            repository.save(composed);
         } catch (IllegalArgumentException | EntityNotFoundException e) {
             logger.warning("Error in setProductionOrderApproval: " + e.getMessage());
         }
+    }
+
+    @Override
+    public void setHitInsertAtInComposed(ComposedProductionOrderEntity composed) {
+        if (composed == null) {
+            throw new EntityNotFoundException("ComposedProductionOrderEntity not found");
+        }
+        composed.setHitInsertedAt(new Date());
+        repository.save(composed);
     }
 }
