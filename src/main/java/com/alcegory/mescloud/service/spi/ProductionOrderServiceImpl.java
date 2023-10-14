@@ -25,6 +25,7 @@ import java.time.Duration;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 @AllArgsConstructor
@@ -63,47 +64,36 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     }
 
     @Override
-    public Optional<ProductionOrderDto> complete(long equipmentId) {
-        //TODO: Consider joining first and second DB call
-        Optional<CountingEquipmentEntity> countingEquipmentOpt = countingEquipmentRepository.findById(equipmentId);
-        if (countingEquipmentOpt.isEmpty()) {
-            log.warning(() -> String.format("Unable to find an Equipment with id [%s]", equipmentId));
-            return Optional.empty();
-        }
+    public CompletableFuture<Optional<ProductionOrderDto>> complete(long equipmentId) {
+        return countingEquipmentRepository.findById(equipmentId)
+                .map(countingEquipmentOpt -> {
+                    Optional<ProductionOrderEntity> productionOrderEntityOpt = repository.findActive(equipmentId);
+                    if (productionOrderEntityOpt.isPresent()) {
+                        try {
+                            ProductionOrderMqttDto productionOrderMqttDto = new ProductionOrderMqttDto();
+                            productionOrderMqttDto.setJsonType(MqttDTOConstants.PRODUCTION_ORDER_CONCLUSION_DTO_NAME);
+                            productionOrderMqttDto.setEquipmentEnabled(false);
+                            productionOrderMqttDto.setProductionOrderCode(productionOrderEntityOpt.get().getCode());
+                            productionOrderMqttDto.setTargetAmount(0);
+                            productionOrderMqttDto.setEquipmentCode(countingEquipmentOpt.getCode());
+                            mqttClient.publish(mqttSettings.getProtCountPlcTopic(), productionOrderMqttDto);
+                        } catch (MesMqttException e) {
+                            log.severe(() -> String.format("Unable to publish Order Completion to PLC for equipment [%s]", equipmentId));
+                        }
+                    } else {
+                        log.warning(() -> String.format("No active Production Order found for an Equipment with id [%s]", equipmentId));
+                    }
 
-        Optional<ProductionOrderEntity> productionOrderEntityOpt = repository.findActive(equipmentId);
-        if (productionOrderEntityOpt.isEmpty()) {
-            log.warning(() -> String.format("No active Production Order found for an Equipment with id [%s]", equipmentId));
-            return Optional.empty();
-        }
-
-        try {
-            ProductionOrderMqttDto productionOrderMqttDto = new ProductionOrderMqttDto();
-            productionOrderMqttDto.setJsonType(MqttDTOConstants.PRODUCTION_ORDER_CONCLUSION_DTO_NAME);
-            productionOrderMqttDto.setEquipmentEnabled(false);
-            productionOrderMqttDto.setProductionOrderCode(productionOrderEntityOpt.get().getCode());
-            productionOrderMqttDto.setTargetAmount(0);
-            productionOrderMqttDto.setEquipmentCode(countingEquipmentOpt.get().getCode());
-            mqttClient.publish(mqttSettings.getProtCountPlcTopic(), productionOrderMqttDto);
-        } catch (MesMqttException e) {
-            log.severe(() -> String.format("Unable to publish Order Completion to PLC for equipment [%s]", equipmentId));
-        }
-
-        try {
-            lock.waitForExecute();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            e.printStackTrace();
-            try {
-                Thread.sleep(2000);
-            } catch (InterruptedException sleepException) {
-                Thread.currentThread().interrupt();
-                sleepException.printStackTrace();
-            }
-        }
-
-        return getPersistedProductionOrder(productionOrderEntityOpt.get().getCode());
+                    return getPersistedProductionOrder(productionOrderEntityOpt.get().getCode());
+                })
+                .map(CompletableFuture::completedFuture)
+                .orElse(CompletableFuture.completedFuture(Optional.empty()))
+                .exceptionally(e -> {
+                    log.severe("Exception caught while saving production order " + e.getMessage());
+                    return Optional.empty();
+                });
     }
+
 
     private Optional<ProductionOrderDto> getPersistedProductionOrder(String code) {
         Optional<ProductionOrderEntity> productionOrderOpt = repository.findByCode(code);

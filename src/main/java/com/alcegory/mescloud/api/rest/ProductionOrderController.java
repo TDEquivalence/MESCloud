@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 @RestController
 @RequestMapping("/api/production-orders")
@@ -30,14 +31,17 @@ public class ProductionOrderController {
     }
 
     @PutMapping("{countingEquipmentId}/complete")
-    public ResponseEntity<ProductionOrderDto> complete(@PathVariable long countingEquipmentId) {
-        Optional<ProductionOrderDto> productionOrderOpt = service.complete(countingEquipmentId);
-        if (productionOrderOpt.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+    public CompletableFuture<ResponseEntity<ProductionOrderDto>> complete(@PathVariable long countingEquipmentId) {
+        return service.complete(countingEquipmentId)
+                .thenApply(productionOrderOpt -> {
+                    if (productionOrderOpt.isEmpty()) {
+                        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+                    }
 
-        return new ResponseEntity<>(productionOrderOpt.get(), HttpStatus.OK);
+                    return new ResponseEntity<>(productionOrderOpt.get(), HttpStatus.OK);
+                });
     }
+
 
     @GetMapping("/completed")
     public ResponseEntity<List<ProductionOrderSummaryDto>> getCompleted() {

@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 @Log
@@ -60,35 +61,30 @@ public class ProductionOrderConclusionProcess extends AbstractMesProtocolProcess
         return MqttDTOConstants.PRODUCTION_ORDER_CONCLUSION_RESPONSE_DTO_NAME;
     }
 
-    public void executeProductionOrderConclusion(ProductionOrderEntity productionOrder, String equipmentCode) {
+    public CompletableFuture<Void> executeProductionOrderConclusion(ProductionOrderEntity productionOrder, String equipmentCode) {
+        return CompletableFuture.supplyAsync(() -> {
+            if (productionOrder != null) {
+                if (!productionOrder.isCompleted()) {
+                    try {
+                        Thread.sleep(THREAD_SLEEP_DURATION);
+                        ProductionOrderMqttDto productionOrderMqttDto = createProductionOrderMqttDto(equipmentCode);
+                        mqttClient.publish(mqttSettings.getProtCountPlcTopic(), productionOrderMqttDto);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        log.severe(() -> String.format("Unable to publish Order Completion to PLC for equipment with code [%s]", equipmentCode));
+                    } catch (Exception e) {
+                        log.severe("An unexpected error occurred during MQTT publication: " + e.getMessage());
+                    }
+                }
 
-        if (productionOrder == null) {
-            log.warning(() -> String.format("No Production Order found for Equipment with code [%s]", equipmentCode));
-            return; // No need to continue if no production order is found.
-        }
-
-        if (!productionOrder.isCompleted()) {
-            try {
-                Thread.sleep(THREAD_SLEEP_DURATION);
-                ProductionOrderMqttDto productionOrderMqttDto = createProductionOrderMqttDto(equipmentCode);
-                mqttClient.publish(mqttSettings.getProtCountPlcTopic(), productionOrderMqttDto);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                log.severe(() -> String.format("Unable to publish Order Completion to PLC for equipment with code [%s]", equipmentCode));
-            } catch (Exception e) {
-                log.severe("An unexpected error occurred during MQTT publication: " + e.getMessage());
+                productionOrder.setCompleted(true);
+                productionOrder.setCompletedAt(new Date());
+                repository.save(productionOrder);
+            } else {
+                log.warning(() -> String.format("No Production Order found for Equipment with code [%s]", equipmentCode));
             }
-        }
-
-        try {
-            productionOrder.setCompleted(true);
-            productionOrder.setCompletedAt(new Date());
-            repository.save(productionOrder);
-        } catch (DataAccessException e) {
-            log.severe("DataAccessException caught while saving production order " + e.getMessage());
-        } finally {
-            lock.signalExecute();
-        }
+            return null;
+        });
     }
 
     private ProductionOrderMqttDto createProductionOrderMqttDto(String equipmentCode) {

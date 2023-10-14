@@ -7,6 +7,7 @@ import com.alcegory.mescloud.model.entity.ProductionOrderEntity;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 public interface ProductionOrderService {
 
@@ -18,7 +19,7 @@ public interface ProductionOrderService {
 
     boolean hasActiveProductionOrder(long countingEquipmentId);
 
-    Optional<ProductionOrderDto> complete(long countingEquipmentId);
+    CompletableFuture<Optional<ProductionOrderDto>> complete(long countingEquipmentId);
 
     ProductionOrderEntity saveAndUpdate(ProductionOrderEntity productionOrder);
 
