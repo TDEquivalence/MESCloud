@@ -6,6 +6,7 @@ import com.alcegory.mescloud.exception.IllegalAlarmStatusException;
 import com.alcegory.mescloud.model.converter.GenericConverter;
 import com.alcegory.mescloud.model.dto.AlarmRecordDto;
 import com.alcegory.mescloud.model.dto.RequestAlarmRecordRecognizeDto;
+import com.alcegory.mescloud.model.entity.AlarmRecordCounts;
 import com.alcegory.mescloud.model.entity.AlarmRecordEntity;
 import com.alcegory.mescloud.model.entity.UserEntity;
 import com.alcegory.mescloud.model.filter.AlarmRecordFilter;
@@ -61,5 +62,10 @@ public class AlarmRecordServiceImpl implements AlarmRecordService {
 
         AlarmRecordEntity updatedAlarmRecord = repository.save(alarmRecordToUpdate);
         return converter.toDto(updatedAlarmRecord, AlarmRecordDto.class);
+    }
+
+    @Override
+    public AlarmRecordCounts getAlarmCounts(AlarmRecordFilter filter) {
+        return repository.getAlarmRecordCounts(filter);
     }
 }

@@ -4,6 +4,7 @@ import com.alcegory.mescloud.exception.AlarmRecordNotFoundException;
 import com.alcegory.mescloud.exception.IllegalAlarmStatusException;
 import com.alcegory.mescloud.model.dto.AlarmRecordDto;
 import com.alcegory.mescloud.model.dto.RequestAlarmRecordRecognizeDto;
+import com.alcegory.mescloud.model.entity.AlarmRecordCounts;
 import com.alcegory.mescloud.model.filter.AlarmRecordFilter;
 import com.alcegory.mescloud.service.AlarmRecordService;
 import lombok.AllArgsConstructor;
@@ -40,5 +41,11 @@ public class AlarmRecordController {
         } catch (IllegalAlarmStatusException e) {
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
+    }
+
+    @PostMapping("/counts")
+    public ResponseEntity<AlarmRecordCounts> getAlarmCounts(AlarmRecordFilter filter) {
+        AlarmRecordCounts alarmRecordCounts = service.getAlarmCounts(filter);
+        return new ResponseEntity<>(alarmRecordCounts, HttpStatus.OK);
     }
 }
