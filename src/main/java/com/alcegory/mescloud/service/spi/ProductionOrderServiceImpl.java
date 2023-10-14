@@ -77,21 +77,34 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         }
 
         try {
-            publishOrderCompletionToPLC(countingEquipmentOpt.get(), productionOrderEntityOpt.get());
-        } catch (MesMqttException e) {
-            log.severe(() -> String.format("Unable to publish Order Completion to PLC for equipment [%s]", equipmentId));
-        }
+            String equipmentCode = countingEquipmentOpt.get().getCode();
 
-        lockHandler.lock(countingEquipmentOpt.get().getCode());
-        try {
-            lockHandler.waitForExecute(countingEquipmentOpt.get().getCode());
+            if (!lockHandler.hasAlreadyALock(equipmentCode)) {
+                lockHandler.lock(equipmentCode);
+                try {
+                    publishOrderCompletion(countingEquipmentOpt.get(), productionOrderEntityOpt.get());
+                } finally {
+                    lockHandler.unlock(equipmentCode);
+                }
+            } else {
+                lockHandler.waitForExecute(equipmentCode);
+            }
         } catch (InterruptedException e) {
             log.severe("Thread interrupted: " + e.getMessage());
             Thread.currentThread().interrupt();
         } catch (IllegalStateException e) {
             log.severe("Lock not found or other exception: " + e.getMessage());
         }
+
         return getPersistedProductionOrder(productionOrderEntityOpt.get().getCode());
+    }
+
+    public void publishOrderCompletion(CountingEquipmentEntity countingEquipment, ProductionOrderEntity productionOrder) {
+        try {
+            publishOrderCompletionToPLC(countingEquipment, productionOrder);
+        } catch (MesMqttException e) {
+            log.severe(() -> String.format("Unable to publish Order Completion to PLC for equipment [%s]", countingEquipment.getCode()));
+        }
     }
 
     private void publishOrderCompletionToPLC(CountingEquipmentEntity countingEquipment, ProductionOrderEntity productionOrder) throws MesMqttException {
