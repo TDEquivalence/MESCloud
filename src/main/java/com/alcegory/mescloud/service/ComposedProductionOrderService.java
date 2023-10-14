@@ -35,4 +35,6 @@ public interface ComposedProductionOrderService {
     List<ComposedSummaryDto> findCompleted();
 
     void setProductionOrderApproval(ComposedProductionOrderEntity composed, boolean isApproved);
+
+    void setHitInsertAtInComposed(ComposedProductionOrderEntity composed);
 }

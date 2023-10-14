@@ -13,6 +13,7 @@ public class ComposedSummaryDto {
     private String code;
     private Date createdAt;
     private Date approvalAt;
+    private Date hitInsertedAt;
     private Integer sampleAmount;
     private Integer reliability;
     private String inputBatch;

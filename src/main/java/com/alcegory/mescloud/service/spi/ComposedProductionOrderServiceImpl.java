@@ -198,4 +198,13 @@ public class ComposedProductionOrderServiceImpl implements ComposedProductionOrd
             logger.warning("Error in setProductionOrderApproval: " + e.getMessage());
         }
     }
+
+    @Override
+    public void setHitInsertAtInComposed(ComposedProductionOrderEntity composed) {
+        if (composed == null) {
+            throw new EntityNotFoundException("ComposedProductionOrderEntity not found");
+        }
+        composed.setHitInsertedAt(new Date());
+        repository.save(composed);
+    }
 }

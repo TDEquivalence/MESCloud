@@ -134,6 +134,7 @@ CREATE TABLE composed_production_order (
     code VARCHAR(255) NOT NULL UNIQUE,
     created_at TIMESTAMP,
     approval_at timestamp,
+    hit_inserted_at timestamp,
 
     PRIMARY KEY(id)
 );

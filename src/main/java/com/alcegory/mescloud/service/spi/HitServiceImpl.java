@@ -1,13 +1,16 @@
 package com.alcegory.mescloud.service.spi;
 
+import com.alcegory.mescloud.model.entity.ComposedProductionOrderEntity;
 import com.alcegory.mescloud.repository.HitRepository;
 import com.alcegory.mescloud.model.converter.GenericConverter;
 import com.alcegory.mescloud.model.dto.HitDto;
 import com.alcegory.mescloud.model.dto.RequestHitDto;
 import com.alcegory.mescloud.model.entity.HitEntity;
 import com.alcegory.mescloud.model.entity.SampleEntity;
+import com.alcegory.mescloud.service.ComposedProductionOrderService;
 import com.alcegory.mescloud.service.HitService;
 import com.alcegory.mescloud.service.SampleService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
@@ -23,6 +26,7 @@ public class HitServiceImpl implements HitService {
     public static final float TCA_LIMIT = 0.695f;
 
     private final SampleService sampleService;
+    private final ComposedProductionOrderService composedService;
     private final HitRepository repository;
     private final GenericConverter<HitEntity, HitDto> converter;
 
@@ -63,7 +67,7 @@ public class HitServiceImpl implements HitService {
         setReliability(sample);
 
         sampleService.saveAndUpdate(sample);
-
+        setHitInsertAtInComposed(sample);
         return converter.toDto(hits, HitDto.class);
     }
 
@@ -82,6 +86,13 @@ public class HitServiceImpl implements HitService {
             hitEntity.setSample(sample);
         }
         saveAndUpdateAll(hits);
+    }
+
+    private void setHitInsertAtInComposed(SampleEntity sample) {
+        if (sample == null) {
+            throw new EntityNotFoundException("SampleEntity not found");
+        }
+        composedService.setHitInsertAtInComposed(sample.getComposedProductionOrder());
     }
 
     private void setTcaAverageInSample(SampleEntity sample, List<HitEntity> hits) {
