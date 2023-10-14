@@ -7,7 +7,6 @@ import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.sql.Timestamp;
 import java.util.Date;
 
 @Entity(name = "composed_summary")
@@ -18,9 +17,7 @@ public class ComposedSummaryEntity {
     @Id
     private Integer id;
     private String code;
-    private Timestamp createdAt;
-    private Timestamp approvedAt;
-    private Timestamp hitInsertedAt;
+    private Date createdAt;
     private Integer sampleAmount;
     private Integer reliability;
     private String inputBatch;
