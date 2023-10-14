@@ -27,7 +27,7 @@ public class ProductionOrderConclusionProcess extends AbstractMesProtocolProcess
 
     private static final Logger logger = LoggerFactory.getLogger(ProductionOrderConclusionProcess.class);
 
-    private static final int THREAD_SLEEP_DURATION = 500;
+    private static final int THREAD_SLEEP_DURATION = 1000;
 
     private final CounterRecordService counterRecordService;
     private final CountingEquipmentService equipmentService;
