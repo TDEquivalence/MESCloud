@@ -1,7 +1,7 @@
 package com.alcegory.mescloud.model.filter;
 
 
-import com.alcegory.mescloud.utility.filter.AbstractPaginatedFilter;
+import com.alcegory.mescloud.utility.filter.AbstractFilter;
 import com.alcegory.mescloud.utility.filter.FilterDataTypeOperation;
 import com.alcegory.mescloud.utility.filter.FilterProperty;
 import lombok.AllArgsConstructor;
@@ -10,7 +10,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class AlarmRecordFilter extends AbstractPaginatedFilter<AlarmRecordFilter.Property> {
+public class AlarmRecordFilter extends AbstractFilter<AlarmRecordFilter.Property> {
 
     private static final String CREATED_AT_PROP = "createdAt";
     private static final String COMPLETED_AT_PROP = "completedAt";
