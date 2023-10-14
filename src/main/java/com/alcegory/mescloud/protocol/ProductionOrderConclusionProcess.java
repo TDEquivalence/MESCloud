@@ -84,10 +84,8 @@ public class ProductionOrderConclusionProcess extends AbstractMesProtocolProcess
             productionOrder.setCompleted(true);
             productionOrder.setCompletedAt(new Date());
             repository.save(productionOrder);
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            log.severe("Thread interruption failed.");
+        } catch (DataAccessException e) {
+            log.severe("DataAccessException caught while saving production order " + e.getMessage());
         } finally {
             lock.signalExecute();
         }

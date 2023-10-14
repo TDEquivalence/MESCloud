@@ -94,6 +94,12 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             e.printStackTrace();
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException sleepException) {
+                Thread.currentThread().interrupt();
+                sleepException.printStackTrace();
+            }
         }
 
         return getPersistedProductionOrder(productionOrderEntityOpt.get().getCode());
