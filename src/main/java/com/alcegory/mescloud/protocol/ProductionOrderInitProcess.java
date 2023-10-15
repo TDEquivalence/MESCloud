@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class ProductionOrderInitProcess extends AbstractMesProtocolProcess<PlcMqttDto> {
 
-    private final String PRODUCTION_ORDER_RESPONSE = "ProductionOrderResponse";
     private final String EMPTY_PRODUCTION_ORDER = "";
     private final LockUtil lockHandler;
 
@@ -44,7 +43,7 @@ public class ProductionOrderInitProcess extends AbstractMesProtocolProcess<PlcMq
     }
 
     private boolean isCleanProductionOrderResponse(PlcMqttDto plcProductionOrder) {
-        if (plcProductionOrder != null && PRODUCTION_ORDER_RESPONSE.equals(plcProductionOrder.getJsonType())) {
+        if (plcProductionOrder != null && MqttDTOConstants.PRODUCTION_ORDER_RESPONSE_DTO_NAME.equals(plcProductionOrder.getJsonType())) {
             return EMPTY_PRODUCTION_ORDER.equals(plcProductionOrder.getProductionOrderCode()) && plcProductionOrder.getEquipmentStatus() == 0;
         }
         return false;

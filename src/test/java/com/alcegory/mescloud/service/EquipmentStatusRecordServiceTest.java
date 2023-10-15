@@ -3,6 +3,7 @@ package com.alcegory.mescloud.service;
 import com.alcegory.mescloud.constant.EquipmentStatus;
 import com.alcegory.mescloud.repository.EquipmentStatusRecordRepository;
 import com.alcegory.mescloud.model.entity.EquipmentStatusRecordEntity;
+import com.alcegory.mescloud.service.spi.EquipmentStatusRecordServiceImpl;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
@@ -21,7 +22,7 @@ import java.util.List;
 @RunWith(MockitoJUnitRunner.class)
 public class EquipmentStatusRecordServiceTest {
 
-    /*@Mock
+    @Mock
     private EquipmentStatusRecordRepository equipmentStatusRecordRepository;
     @InjectMocks
     private EquipmentStatusRecordServiceImpl equipmentStatusRecordService;
@@ -51,5 +52,5 @@ public class EquipmentStatusRecordServiceTest {
         // Expected stoppage time calculation:
         // 1. From 13:50:00 to 13:55:00 -> stopped for 300 seconds
         Assertions.assertEquals(300L, result.longValue());
-    }*/
+    }
 }
