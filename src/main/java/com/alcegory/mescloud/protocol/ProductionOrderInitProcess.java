@@ -31,7 +31,7 @@ public class ProductionOrderInitProcess extends AbstractMesProtocolProcess<PlcMq
 
         if (!hasEquipmentAssociatedProductionOrder(equipmentCode) && isCleanProductionOrderResponse(equipmentCounts) && lockHandler.hasLock(equipmentCode)) {
             log.info(() -> String.format("Unlock lock for equipment with code [%s]",equipmentCode));
-            lockHandler.unlockToCount1(equipmentCounts.getEquipmentCode());
+            lockHandler.unlock(equipmentCounts.getEquipmentCode());
         }
 
         if (areInvalidInitialCounts(equipmentCounts)) {

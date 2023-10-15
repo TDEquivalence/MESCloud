@@ -27,7 +27,7 @@ public class CounterRecordProcess extends AbstractMesProtocolProcess<PlcMqttDto>
         equipmentService.updateEquipmentStatus(equipmentCounts.getEquipmentCode(), equipmentCounts.getEquipmentStatus());
 
         if (isCounterRecordWithoutPO(equipmentCounts) && lockHandler.hasLock(equipmentCounts.getEquipmentCode())) {
-            lockHandler.unlockToCount1(equipmentCounts.getEquipmentCode());
+            lockHandler.unlock(equipmentCounts.getEquipmentCode());
         }
 
         if (areInvalidContinuationCounts(equipmentCounts)) {

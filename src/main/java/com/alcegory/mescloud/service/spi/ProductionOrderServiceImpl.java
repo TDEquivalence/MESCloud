@@ -77,8 +77,9 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
             return Optional.empty();
         }
 
-        String equipmentCode = countingEquipmentOpt.get().getCode();
         try {
+            String equipmentCode = countingEquipmentOpt.get().getCode();
+
             synchronized (processLock) {
                 if (!lockHandler.hasLock(equipmentCode) && !isCompleted(productionOrderEntityOpt.get().getCode())) {
                     lockHandler.lock(equipmentCode);
@@ -94,10 +95,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
             Thread.currentThread().interrupt();
         } catch (IllegalStateException e) {
             log.severe("Lock not found or other exception: " + e.getMessage());
-        } finally {
-            lockHandler.unlockToCount0(equipmentCode);
         }
-
 
         return getPersistedProductionOrder(productionOrderEntityOpt.get().getCode());
     }
