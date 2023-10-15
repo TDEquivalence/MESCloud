@@ -79,7 +79,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         try {
             String equipmentCode = countingEquipmentOpt.get().getCode();
 
-            if (!lockHandler.hasAlreadyALock(equipmentCode)) {
+            if (!lockHandler.hasLock(equipmentCode)) {
                 lockHandler.lock(equipmentCode);
                 log.info(() -> String.format("Get lock for equipment with code [%s]", equipmentCode));
 
@@ -262,6 +262,14 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     public List<ProductionOrderDto> findByEquipmentAndPeriod(Long equipmentId, Date startDate, Date endDate) {
         List<ProductionOrderEntity> productionOrders = repository.findByEquipmentAndPeriod(equipmentId, startDate, endDate);
         return converter.toDto(productionOrders);
+    }
+
+    @Override
+    public boolean isCompleted(String productionOrderCode) {
+        if (productionOrderCode == null) {
+            return false;
+        }
+        return repository.isCompleted(productionOrderCode);
     }
 
     @Override

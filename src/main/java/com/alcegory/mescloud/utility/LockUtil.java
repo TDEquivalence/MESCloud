@@ -62,7 +62,7 @@ public class LockUtil {
         latch.await();
     }
 
-    public boolean hasAlreadyALock(String equipmentCode) {
+    public boolean hasLock(String equipmentCode) {
         return lockMap.containsKey(equipmentCode);
     }
 }

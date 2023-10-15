@@ -30,6 +30,7 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
     private final CountingEquipmentRepository repository;
     private final EquipmentOutputService outputService;
     private final EquipmentOutputAliasService aliasService;
+    private final ProductionOrderService productionOrderService;
     private final CountingEquipmentConverter converter;
     private final ImsService imsService;
     private final GenericConverter<ImsEntity, ImsDto> imsConverter;
@@ -223,8 +224,11 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
         if (countingEquipmentDto.isEmpty()) {
             return false;
         }
-        CountingEquipmentEntity countingEquipment = converter.convertToEntity(countingEquipmentDto.get());
-        return hasActiveProductionOrder(countingEquipment);
+        String productionOrderCode = countingEquipmentDto.get().getProductionOrderCode();
+        if (productionOrderCode == null) {
+            log.info(() -> String.format("Equipment with code [%s], doesn't  have associated production order ", equipmentCode));
+        }
+        return productionOrderService.isCompleted(productionOrderCode);
     }
 
     private void updateEquipmentConfiguration(CountingEquipmentEntity persistedEquipment, RequestConfigurationDto request) {

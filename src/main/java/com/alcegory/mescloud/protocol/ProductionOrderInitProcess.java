@@ -4,6 +4,7 @@ import com.alcegory.mescloud.constant.MqttDTOConstants;
 import com.alcegory.mescloud.model.dto.PlcMqttDto;
 import com.alcegory.mescloud.service.CounterRecordService;
 import com.alcegory.mescloud.service.CountingEquipmentService;
+import com.alcegory.mescloud.utility.LockUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
@@ -13,6 +14,10 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class ProductionOrderInitProcess extends AbstractMesProtocolProcess<PlcMqttDto> {
 
+    private final String PRODUCTION_ORDER_RESPONSE = "ProductionOrderResponse";
+    private final String EMPTY_PRODUCTION_ORDER = "";
+    private final LockUtil lockHandler;
+
     private final CounterRecordService counterRecordService;
     private final CountingEquipmentService equipmentService;
 
@@ -20,8 +25,15 @@ public class ProductionOrderInitProcess extends AbstractMesProtocolProcess<PlcMq
     @Override
     public void execute(PlcMqttDto equipmentCounts) {
 
-        log.info("Executing Production Order init process");
-        equipmentService.updateEquipmentStatus(equipmentCounts.getEquipmentCode(), equipmentCounts.getEquipmentStatus());
+        String equipmentCode = equipmentCounts.getEquipmentCode();
+
+        log.info("Executing Production Order response process");
+        equipmentService.updateEquipmentStatus(equipmentCode, equipmentCounts.getEquipmentStatus());
+
+        if (isProductionOrderCompleted(equipmentCode) && isCleanProductionOrderResponse(equipmentCounts) && lockHandler.hasLock(equipmentCode)) {
+            log.info(() -> String.format("Unlock lock for equipment with code [%s]",equipmentCode));
+            lockHandler.unlock(equipmentCounts.getEquipmentCode());
+        }
 
         if (areInvalidInitialCounts(equipmentCounts)) {
             log.warning(() -> String.format("Invalid initial count - Production Order [%s] already has records or does not exist",
@@ -29,6 +41,17 @@ public class ProductionOrderInitProcess extends AbstractMesProtocolProcess<PlcMq
         }
 
         counterRecordService.save(equipmentCounts);
+    }
+
+    private boolean isCleanProductionOrderResponse(PlcMqttDto plcCounterRecord) {
+        if (plcCounterRecord != null && PRODUCTION_ORDER_RESPONSE.equals(plcCounterRecord.getJsonType())) {
+            return EMPTY_PRODUCTION_ORDER.equals(plcCounterRecord.getProductionOrderCode()) && plcCounterRecord.getEquipmentStatus() == 0;
+        }
+        return false;
+    }
+
+    private boolean isProductionOrderCompleted(String equipmentCode) {
+        return equipmentService.isProductionOrderCompleted(equipmentCode);
     }
 
     private boolean areInvalidInitialCounts(PlcMqttDto equipmentCountsMqttDTO) {

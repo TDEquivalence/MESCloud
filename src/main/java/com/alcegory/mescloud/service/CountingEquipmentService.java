@@ -10,7 +10,6 @@ import com.alcegory.mescloud.model.entity.CountingEquipmentEntity;
 import org.springframework.dao.EmptyResultDataAccessException;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 public interface CountingEquipmentService {
