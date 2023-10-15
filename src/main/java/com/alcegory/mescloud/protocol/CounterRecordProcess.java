@@ -49,7 +49,7 @@ public class CounterRecordProcess extends AbstractMesProtocolProcess<PlcMqttDto>
     }
 
     private boolean isCleanCounterRecord(PlcMqttDto plcCounterRecord) {
-        if (plcCounterRecord != null && MqttDTOConstants.COUNTING_RECORD_DTO_NAME.equals(plcCounterRecord.getJsonType())) {
+        if (plcCounterRecord != null) {
             return EMPTY_PRODUCTION_ORDER.equals(plcCounterRecord.getProductionOrderCode()) && plcCounterRecord.getEquipmentStatus() == 0;
         }
         return false;
