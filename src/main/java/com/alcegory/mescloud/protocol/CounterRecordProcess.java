@@ -26,7 +26,7 @@ public class CounterRecordProcess extends AbstractMesProtocolProcess<PlcMqttDto>
         log.info("Executing Counter Record process");
         equipmentService.updateEquipmentStatus(equipmentCounts.getEquipmentCode(), equipmentCounts.getEquipmentStatus());
 
-        if (isCleanCounterRecord(equipmentCounts) && isProductionOrderCompleted(equipmentCounts.getEquipmentCode())) {
+        if (isCleanCounterRecord(equipmentCounts)) {
             log.info(() -> String.format("Unlock lock for equipment with code [%s]", equipmentCounts.getEquipmentCode()));
             lockHandler.unlock(equipmentCounts.getEquipmentCode());
         }
