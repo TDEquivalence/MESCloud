@@ -47,6 +47,7 @@ public class LockUtil {
             latch.countDown();
         } finally {
             lock.unlock();
+            locks.remove(equipmentCode);
         }
     }
 
