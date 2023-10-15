@@ -65,6 +65,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
 
     @Override
     public Optional<ProductionOrderDto> complete(long equipmentId) {
+        boolean hasCompleteProcessInitiated = false;
         Optional<CountingEquipmentEntity> countingEquipmentOpt = countingEquipmentRepository.findById(equipmentId);
         if (countingEquipmentOpt.isEmpty()) {
             log.warning(() -> String.format("Unable to find an Equipment with id [%s]", equipmentId));
@@ -82,11 +83,17 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
 
             synchronized (processLock) {
                 if (!lockHandler.hasLock(equipmentCode) && !isCompleted(productionOrderEntityOpt.get().getCode())) {
+                    hasCompleteProcessInitiated = true;
                     lockHandler.lock(equipmentCode);
                     log.info(() -> String.format("Get lock for equipment with code [%s]", equipmentCode));
 
                     publishOrderCompletion(countingEquipmentOpt.get(), productionOrderEntityOpt.get());
                 }
+
+                if(!hasCompleteProcessInitiated && !isCompleted(productionOrderEntityOpt.get().getCode())) {
+                    publishOrderCompletion(countingEquipmentOpt.get(), productionOrderEntityOpt.get());
+                }
+
                 log.info(() -> String.format("Wait for execute unlock for equipment with code [%s]", equipmentCode));
                 lockHandler.waitForExecute(equipmentCode);
             }
