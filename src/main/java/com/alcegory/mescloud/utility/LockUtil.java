@@ -2,6 +2,7 @@ package com.alcegory.mescloud.utility;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.java.Log;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -12,6 +13,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 @Setter
 @Getter
+@Log
 @Component
 public class LockUtil {
 
@@ -27,10 +29,11 @@ public class LockUtil {
             if (existingLatch != null) {
                 throw new IllegalStateException("Lock already acquired for equipmentCode: " + equipmentCode);
             }
-        } finally {
-            lock.unlock();
+        } catch (IllegalStateException e) {
+            log.severe(() -> String.format("Failed acquire lock for equipment with code [%s]", equipmentCode));
         }
     }
+
 
     public void unlock(String equipmentCode) {
         Lock lock = lockMap.get(equipmentCode);

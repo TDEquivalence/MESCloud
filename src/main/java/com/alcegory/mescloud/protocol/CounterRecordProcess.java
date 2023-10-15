@@ -16,8 +16,6 @@ public class CounterRecordProcess extends AbstractMesProtocolProcess<PlcMqttDto>
 
     private final String EMPTY_PRODUCTION_ORDER = "";
     private final LockUtil lockHandler;
-
-
     private final CounterRecordService counterRecordService;
     private final CountingEquipmentService equipmentService;
 
