@@ -2,7 +2,7 @@ DROP VIEW composed_summary;
 
 CREATE OR REPLACE VIEW composed_summary AS
 SELECT DISTINCT ON (cpo.id)
-    cpo.id, cpo.created_at, cpo.code,
+    cpo.id, cpo.created_at, cpo.code, cpo.approved_at, cpo.hit_inserted_at,
     s.amount, s.reliability,
     po.input_batch, po.source, po.gauge, po.category, po.washing_process,
     b.id AS batch_id,
