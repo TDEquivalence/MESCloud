@@ -15,7 +15,7 @@ public class ComposedSummaryDto {
     private Date approvedAt;
     private Date hitInsertedAt;
     private Integer sampleAmount;
-    private Integer reliability;
+    private Double reliability;
     private String inputBatch;
     private String source;
     private String gauge;
@@ -23,7 +23,6 @@ public class ComposedSummaryDto {
     private String washingProcess;
     private boolean isBatchApproved;
     private String batchCode;
-    private ImsDto ims;
     private Integer amountOfHits;
     private Integer validAmount;
 }
