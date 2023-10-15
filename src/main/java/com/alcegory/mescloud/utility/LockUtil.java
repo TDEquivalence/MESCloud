@@ -37,20 +37,16 @@ public class LockUtil {
 
     public void unlock(String equipmentCode) {
         Lock lock = lockMap.get(equipmentCode);
-        if (lock != null) {
-            lock.lock();
+        CountDownLatch latch = locks.get(equipmentCode);
+
+        if (lock == null || latch == null) {
+            throw new IllegalStateException("Lock not found for equipmentCode: " + equipmentCode);
         }
+
         try {
-            CountDownLatch latch = locks.get(equipmentCode);
-            if (latch == null) {
-                throw new IllegalStateException("Lock not found for equipmentCode: " + equipmentCode);
-            }
             latch.countDown();
-            locks.remove(equipmentCode);
         } finally {
-            if (lock != null) {
-                lock.unlock();
-            }
+            lock.unlock();
         }
     }
 
