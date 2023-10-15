@@ -1,14 +1,11 @@
 package com.alcegory.mescloud.model.entity;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.sql.Timestamp;
-import java.util.Date;
 
 @Entity(name = "composed_summary")
 @Getter
@@ -22,7 +19,7 @@ public class ComposedSummaryEntity {
     private Timestamp approvedAt;
     private Timestamp hitInsertedAt;
     private Integer sampleAmount;
-    private Integer reliability;
+    private Double reliability;
     private String inputBatch;
     private String source;
     private String gauge;
@@ -30,8 +27,6 @@ public class ComposedSummaryEntity {
     private String washingProcess;
     private Boolean isBatchApproved;
     private String batchCode;
-    @ManyToOne(fetch = FetchType.EAGER)
-    private ImsEntity ims;
     private Integer amountOfHits;
     private Integer validAmount;
 }
