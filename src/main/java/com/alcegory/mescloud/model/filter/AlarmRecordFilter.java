@@ -13,7 +13,6 @@ import lombok.Setter;
 public class AlarmRecordFilter extends AbstractFilter<AlarmRecordFilter.Property> {
 
     private static final String CREATED_AT_PROP = "createdAt";
-    private static final String COMPLETED_AT_PROP = "completedAt";
 
     @AllArgsConstructor
     @Getter
@@ -21,7 +20,7 @@ public class AlarmRecordFilter extends AbstractFilter<AlarmRecordFilter.Property
 
         STATUS("status", FilterDataTypeOperation.STRING_EQUAL),
         START_DATE("startDate", CREATED_AT_PROP, FilterDataTypeOperation.DATE_GREATER_OR_EQUAL),
-        END_DATE("endDate", COMPLETED_AT_PROP, FilterDataTypeOperation.DATE_LESS_OR_EQUAL);
+        END_DATE("endDate", CREATED_AT_PROP, FilterDataTypeOperation.DATE_LESS_OR_EQUAL);
 
         Property(String name, FilterDataTypeOperation dataTypeOperation) {
             this.name = name;
