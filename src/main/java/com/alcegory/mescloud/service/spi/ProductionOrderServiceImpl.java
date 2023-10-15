@@ -127,6 +127,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         }
         ProductionOrderEntity productionOrderPersisted = productionOrderOpt.get();
         ProductionOrderDto productionOrderDto = converter.toDto(productionOrderPersisted);
+        log.warning(() -> String.format("COMPLETE: Returning complete persisted Production Order with code [%s]", productionOrderDto.getCode()));
         return Optional.of(productionOrderDto);
     }
 
