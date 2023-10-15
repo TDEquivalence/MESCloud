@@ -14,6 +14,7 @@ import com.alcegory.mescloud.model.dto.ProductionOrderSummaryDto;
 import com.alcegory.mescloud.model.entity.CountingEquipmentEntity;
 import com.alcegory.mescloud.model.entity.ProductionOrderEntity;
 import com.alcegory.mescloud.model.entity.ProductionOrderSummaryEntity;
+import com.alcegory.mescloud.service.CountingEquipmentService;
 import com.alcegory.mescloud.service.ProductionOrderService;
 import com.alcegory.mescloud.utility.DateUtil;
 import com.alcegory.mescloud.utility.LockUtil;
@@ -39,6 +40,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     private final ProductionOrderRepository repository;
     private final ProductionOrderConverter converter;
     private final GenericConverter<ProductionOrderSummaryEntity, ProductionOrderSummaryDto> summaryConverter;
+    private final CountingEquipmentService countingService;
     private final CountingEquipmentRepository countingEquipmentRepository;
     private final MqttClient mqttClient;
     private final MesMqttSettings mqttSettings;
@@ -79,7 +81,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         try {
             String equipmentCode = countingEquipmentOpt.get().getCode();
 
-            if (!lockHandler.hasLock(equipmentCode)) {
+            if (!lockHandler.hasLock(equipmentCode) && hasEquipmentAssociatedProductionOrder(equipmentCode)) {
                 lockHandler.lock(equipmentCode);
                 log.info(() -> String.format("Get lock for equipment with code [%s]", equipmentCode));
 
@@ -297,5 +299,9 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         long durationInMillisenconds = Math.max(0, endDate.getTime() - startDate.getTime());
 
         return Duration.ofMillis(durationInMillisenconds);
+    }
+
+    private boolean hasEquipmentAssociatedProductionOrder(String equipmentCode) {
+        return countingService.hasEquipmentAssociatedProductionOrder(equipmentCode);
     }
 }
