@@ -79,9 +79,14 @@ public class ProductionOrderConclusionProcess extends AbstractMesProtocolProcess
             }
         }
 
-            productionOrder.setCompleted(true);
-            productionOrder.setCompletedAt(new Date());
-            repository.save(productionOrder);
+        completeProductionOrder(productionOrder);
+    }
+
+    private void completeProductionOrder(ProductionOrderEntity productionOrder) {
+        log.info(() -> String.format("CONCLUSION: Complete and save production order with code [%s]", productionOrder.getCode()));
+        productionOrder.setCompleted(true);
+        productionOrder.setCompletedAt(new Date());
+        repository.save(productionOrder);
     }
 
     private ProductionOrderMqttDto createProductionOrderMqttDto(String equipmentCode) {

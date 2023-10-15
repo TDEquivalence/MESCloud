@@ -219,7 +219,7 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
 
 
     @Override
-    public boolean isProductionOrderCompleted(String equipmentCode) {
+    public boolean hasEquipmentAssociatedProductionOrder(String equipmentCode) {
         Optional<CountingEquipmentDto> countingEquipmentDto = findByCode(equipmentCode);
         if (countingEquipmentDto.isEmpty()) {
             return false;
