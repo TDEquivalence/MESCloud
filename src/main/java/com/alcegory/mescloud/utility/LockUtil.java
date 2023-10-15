@@ -22,15 +22,18 @@ public class LockUtil {
 
     public void lock(String equipmentCode) {
         Lock lock = lockMap.computeIfAbsent(equipmentCode, k -> new ReentrantLock());
-        lock.lock();
-        try {
-            CountDownLatch latch = new CountDownLatch(1);
-            CountDownLatch existingLatch = locks.putIfAbsent(equipmentCode, latch);
-            if (existingLatch != null) {
-                throw new IllegalStateException("Lock already acquired for equipmentCode: " + equipmentCode);
+        if (lock.tryLock()) {
+            try {
+                CountDownLatch latch = new CountDownLatch(1);
+                CountDownLatch existingLatch = locks.putIfAbsent(equipmentCode, latch);
+                if (existingLatch != null) {
+                    log.warning(() -> "Lock already acquired for equipmentCode: " + equipmentCode);
+                }
+            } catch (IllegalStateException e) {
+                log.severe(() -> String.format("Failed to acquire lock for equipment with code [%s]", equipmentCode));
             }
-        } catch (IllegalStateException e) {
-            log.severe(() -> String.format("Failed acquire lock for equipment with code [%s]", equipmentCode));
+        } else {
+            log.warning(() -> "Failed to acquire lock for equipmentCode: " + equipmentCode);
         }
     }
 

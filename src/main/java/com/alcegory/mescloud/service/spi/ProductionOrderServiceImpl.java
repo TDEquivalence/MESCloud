@@ -91,6 +91,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
                 }
 
                 if(!hasCompleteProcessInitiated && !isCompleted(productionOrderEntityOpt.get().getCode())) {
+                    lockHandler.lock(equipmentCode);
                     publishOrderCompletion(countingEquipmentOpt.get(), productionOrderEntityOpt.get());
                 }
 
