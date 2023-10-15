@@ -43,9 +43,9 @@ public class ProductionOrderInitProcess extends AbstractMesProtocolProcess<PlcMq
         counterRecordService.save(equipmentCounts);
     }
 
-    private boolean isCleanProductionOrderResponse(PlcMqttDto plcCounterRecord) {
-        if (plcCounterRecord != null && PRODUCTION_ORDER_RESPONSE.equals(plcCounterRecord.getJsonType())) {
-            return EMPTY_PRODUCTION_ORDER.equals(plcCounterRecord.getProductionOrderCode()) && plcCounterRecord.getEquipmentStatus() == 0;
+    private boolean isCleanProductionOrderResponse(PlcMqttDto plcProductionOrder) {
+        if (plcProductionOrder != null && PRODUCTION_ORDER_RESPONSE.equals(plcProductionOrder.getJsonType())) {
+            return EMPTY_PRODUCTION_ORDER.equals(plcProductionOrder.getProductionOrderCode()) && plcProductionOrder.getEquipmentStatus() == 0;
         }
         return false;
     }
