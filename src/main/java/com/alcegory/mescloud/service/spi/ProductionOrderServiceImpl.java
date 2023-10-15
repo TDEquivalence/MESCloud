@@ -44,6 +44,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     private final MesMqttSettings mqttSettings;
     private final LockUtil lockHandler;
 
+    private final Object processLock = new Object();
 
     @Override
     public Optional<ProductionOrderDto> findByCode(String code) {
@@ -79,14 +80,13 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         try {
             String equipmentCode = countingEquipmentOpt.get().getCode();
 
-            if (!lockHandler.hasLock(equipmentCode) && !isCompleted(productionOrderEntityOpt.get().getCode())) {
-                lockHandler.lock(equipmentCode);
-                log.info(() -> String.format("Get lock for equipment with code [%s]", equipmentCode));
+            synchronized (processLock) {
+                if (!lockHandler.hasLock(equipmentCode) && !isCompleted(productionOrderEntityOpt.get().getCode())) {
+                    lockHandler.lock(equipmentCode);
+                    log.info(() -> String.format("Get lock for equipment with code [%s]", equipmentCode));
 
-                publishOrderCompletion(countingEquipmentOpt.get(), productionOrderEntityOpt.get());
-                log.info(() -> String.format("Wait for execute unlock for equipment with code [%s]", equipmentCode));
-                lockHandler.waitForExecute(equipmentCode);
-            } else {
+                    publishOrderCompletion(countingEquipmentOpt.get(), productionOrderEntityOpt.get());
+                }
                 log.info(() -> String.format("Wait for execute unlock for equipment with code [%s]", equipmentCode));
                 lockHandler.waitForExecute(equipmentCode);
             }
