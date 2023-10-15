@@ -10,7 +10,6 @@ import com.alcegory.mescloud.model.entity.CountingEquipmentEntity;
 import org.springframework.dao.EmptyResultDataAccessException;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 public interface CountingEquipmentService {
@@ -32,4 +31,6 @@ public interface CountingEquipmentService {
 
     CountingEquipmentDto updateConfiguration(long equipmentId, RequestConfigurationDto request)
             throws IncompleteConfigurationException, EmptyResultDataAccessException, ActiveProductionOrderException;
+
+    boolean hasEquipmentAssociatedProductionOrder(String equipmentCode);
 }

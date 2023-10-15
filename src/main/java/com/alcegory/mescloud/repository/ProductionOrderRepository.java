@@ -31,4 +31,7 @@ public interface ProductionOrderRepository extends JpaRepository<ProductionOrder
             "AND p.createdAt < :endDate " +
             "AND (p.equipment.id = :equipmentId)")
     List<ProductionOrderEntity> findByEquipmentAndPeriod(Long equipmentId, Date startDate, Date endDate);
+
+    @Query("SELECT po.isCompleted FROM production_order po WHERE po.code = :productionOrderCode")
+    boolean isCompleted(String productionOrderCode);
 }

@@ -30,6 +30,7 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
     private final CountingEquipmentRepository repository;
     private final EquipmentOutputService outputService;
     private final EquipmentOutputAliasService aliasService;
+    private final ProductionOrderService productionOrderService;
     private final CountingEquipmentConverter converter;
     private final ImsService imsService;
     private final GenericConverter<ImsEntity, ImsDto> imsConverter;
@@ -205,6 +206,7 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
         return converter.convertToDto(countingEquipment);
     }
 
+
     private boolean containsNullProperty(RequestConfigurationDto countingEquipmentDto) {
         return countingEquipmentDto.getAlias() == null ||
                 countingEquipmentDto.getOutputs() == null;
@@ -213,6 +215,20 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
     private boolean hasActiveProductionOrder(CountingEquipmentEntity countingEquipment) {
         return !countingEquipment.getProductionOrders().isEmpty() &&
                 !countingEquipment.getProductionOrders().get(0).isCompleted();
+    }
+
+
+    @Override
+    public boolean hasEquipmentAssociatedProductionOrder(String equipmentCode) {
+        Optional<CountingEquipmentDto> countingEquipmentDto = findByCode(equipmentCode);
+        if (countingEquipmentDto.isEmpty()) {
+            return false;
+        }
+        String productionOrderCode = countingEquipmentDto.get().getProductionOrderCode();
+        if (productionOrderCode == null) {
+            log.info(() -> String.format("Equipment with code [%s], doesn't  have associated production order ", equipmentCode));
+        }
+        return productionOrderService.isCompleted(productionOrderCode);
     }
 
     private void updateEquipmentConfiguration(CountingEquipmentEntity persistedEquipment, RequestConfigurationDto request) {

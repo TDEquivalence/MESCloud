@@ -39,4 +39,6 @@ public interface ProductionOrderService {
     Long calculateScheduledTimeInSeconds(Long equipmentId, Date startDate, Date endDate);
 
     List<ProductionOrderDto> findByEquipmentAndPeriod(Long equipmentId, Date startDate, Date endDate);
+
+    boolean isCompleted(String productionOrderCode);
 }

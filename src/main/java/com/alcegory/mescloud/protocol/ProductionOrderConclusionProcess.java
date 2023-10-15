@@ -13,7 +13,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -80,15 +79,14 @@ public class ProductionOrderConclusionProcess extends AbstractMesProtocolProcess
             }
         }
 
-        try {
-            productionOrder.setCompleted(true);
-            productionOrder.setCompletedAt(new Date());
-            repository.save(productionOrder);
-        } catch (DataAccessException e) {
-            log.severe("DataAccessException caught while saving production order " + e.getMessage());
-        } finally {
-            lock.signalExecute();
-        }
+        completeProductionOrder(productionOrder);
+    }
+
+    private void completeProductionOrder(ProductionOrderEntity productionOrder) {
+        log.info(() -> String.format("CONCLUSION: Complete and save production order with code [%s]", productionOrder.getCode()));
+        productionOrder.setCompleted(true);
+        productionOrder.setCompletedAt(new Date());
+        repository.save(productionOrder);
     }
 
     private ProductionOrderMqttDto createProductionOrderMqttDto(String equipmentCode) {
