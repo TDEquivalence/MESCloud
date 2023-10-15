@@ -79,7 +79,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         try {
             String equipmentCode = countingEquipmentOpt.get().getCode();
 
-            if (!lockHandler.hasLock(equipmentCode) && !isCompleted(equipmentCode)) {
+            if (!lockHandler.hasLock(equipmentCode) && !isCompleted(productionOrderEntityOpt.get().getCode())) {
                 lockHandler.lock(equipmentCode);
                 log.info(() -> String.format("Get lock for equipment with code [%s]", equipmentCode));
 
