@@ -27,7 +27,6 @@ public class LockUtil {
             if (existingLatch != null) {
                 throw new IllegalStateException("Lock already acquired for equipmentCode: " + equipmentCode);
             }
-            latch.countDown();
         } finally {
             lock.unlock();
         }
