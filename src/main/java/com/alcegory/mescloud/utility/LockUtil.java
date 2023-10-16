@@ -62,6 +62,14 @@ public class LockUtil {
         latch.await();
     }
 
+    public void unlockAndLock(String equipmentCode) {
+        log.info(() -> String.format("Unlock and Lock for equipment with code [%s]", equipmentCode));
+        if (hasLock(equipmentCode)) {
+            unlock(equipmentCode);
+        }
+        lock(equipmentCode);
+    }
+
     public boolean hasLock(String equipmentCode) {
         return lockMap.containsKey(equipmentCode);
     }

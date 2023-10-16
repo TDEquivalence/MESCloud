@@ -113,7 +113,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
                             productionOrderEntityOpt.get().getCode()));
                     ProductionOrderEntity productionOrder = findActiveProductionOrder(countingEquipmentOpt.get().getId());
                     if (productionOrder != null) {
-                        unlockAndLock(equipmentCode);
+                        lockHandler.unlockAndLock(equipmentCode);
                         publishOrderCompletion(countingEquipmentOpt.get(), productionOrder);
                     }
                 }
@@ -143,7 +143,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         if (productionOrder != null && !isCompleted(productionOrder.getCode()) || hasActiveProductionOrder(equipment.getId())) {
             log.info(() -> String.format("Production order was not complete as expected for equipment code [%s]", equipment.getCode()));
             publishOrderCompletion(equipment, productionOrder);
-            unlockAndLock(equipment.getCode());
+            lockHandler.unlockAndLock(equipment.getCode());
             log.info(() -> String.format("Get lock for equipment with code [%s]", equipment.getCode()));
             try {
                 log.info(() -> String.format("Wait for execute unlock for equipment with code [%s]", equipment.getCode()));
@@ -156,14 +156,6 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
             return false;
         }
         return true;
-    }
-
-    private void unlockAndLock(String equipmentCode) {
-        log.info(() -> String.format("Unlock and Lock for equipment with code [%s]", equipmentCode));
-        if (lockHandler.hasLock(equipmentCode)) {
-            lockHandler.unlock(equipmentCode);
-        }
-        lockHandler.lock(equipmentCode);
     }
 
     public void publishOrderCompletion(CountingEquipmentEntity countingEquipment, ProductionOrderEntity productionOrder) {
