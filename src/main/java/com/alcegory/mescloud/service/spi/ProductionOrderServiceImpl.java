@@ -117,7 +117,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         }
 
         if (lockHandler.hasLock(equipmentCode)) {
-            lockHandler.releaseAllLocks(equipmentCode);
+            lockHandler.unlock(equipmentCode);
         }
 
         return Optional.ofNullable(getPersistedProductionOrder(productionOrderEntityOpt.get().getCode()));
