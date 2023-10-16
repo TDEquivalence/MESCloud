@@ -65,13 +65,15 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
 
     @Override
     public Optional<ProductionOrderDto> complete(long equipmentId) {
+        log.info(() -> String.format("Complete process Production Order started for equipmentId [%s]:", equipmentId));
         boolean hasCompleteProcessInitiated = false;
         Optional<CountingEquipmentEntity> countingEquipmentOpt = countingEquipmentRepository.findById(equipmentId);
         if (countingEquipmentOpt.isEmpty()) {
             log.warning(() -> String.format("Unable to find an Equipment with id [%s]", equipmentId));
             return Optional.empty();
         }
-
+        log.info(() -> String.format("Complete process Production Order started for equipment code [%s]:",
+                countingEquipmentOpt.get().getCode()));
         Optional<ProductionOrderEntity> productionOrderEntityOpt = repository.findActive(equipmentId);
         if (productionOrderEntityOpt.isEmpty()) {
             log.warning(() -> String.format("No active Production Order found for an Equipment with id [%s]", equipmentId));
@@ -79,18 +81,21 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         }
 
         try {
+            log.info(() -> String.format("Starting synchronization for equipment code [%s]:",
+                    countingEquipmentOpt.get().getCode()));
             String equipmentCode = countingEquipmentOpt.get().getCode();
 
             synchronized (processLock) {
                 if (!lockHandler.hasLock(equipmentCode) && !isCompleted(productionOrderEntityOpt.get().getCode())) {
                     hasCompleteProcessInitiated = true;
                     lockHandler.lock(equipmentCode);
-                    log.info(() -> String.format("Get lock for equipment with code [%s]", equipmentCode));
+                    log.info(() -> String.format("FIRST attempt to get lock for equipment with code [%s]", equipmentCode));
 
                     publishOrderCompletion(countingEquipmentOpt.get(), productionOrderEntityOpt.get());
                 }
 
                 if(!hasCompleteProcessInitiated && !isCompleted(productionOrderEntityOpt.get().getCode())) {
+                    log.info(() -> String.format("SECOND attempt to get lock for equipment with code [%s]", equipmentCode));
                     unlockAndLock(equipmentCode);
                     publishOrderCompletion(countingEquipmentOpt.get(), productionOrderEntityOpt.get());
                 }
@@ -136,6 +141,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     }
 
     private void unlockAndLock(String equipmentCode) {
+        log.info(() -> String.format("Unlock and Lock for equipment with code [%s]", equipmentCode));
         if (lockHandler.hasLock(equipmentCode)) {
             lockHandler.unlock(equipmentCode);
         }
