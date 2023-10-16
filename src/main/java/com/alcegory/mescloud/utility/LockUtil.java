@@ -24,7 +24,7 @@ public class LockUtil {
         Lock lock = lockMap.computeIfAbsent(equipmentCode, k -> new ReentrantLock());
         if (lock.tryLock()) {
             try {
-                CountDownLatch latch = new CountDownLatch(1);
+                CountDownLatch latch = new CountDownLatch(2);
                 CountDownLatch existingLatch = locks.putIfAbsent(equipmentCode, latch);
                 if (existingLatch != null) {
                     log.warning(() -> "Lock already acquired for equipmentCode: " + equipmentCode);
@@ -72,6 +72,20 @@ public class LockUtil {
 
     public boolean hasLock(String equipmentCode) {
         return lockMap.containsKey(equipmentCode);
+    }
+
+    public void releaseAllLocks(String equipmentCode) {
+        Lock lock = lockMap.get(equipmentCode);
+        CountDownLatch latch = locks.get(equipmentCode);
+
+        if (lock != null && latch != null) {
+            while (latch.getCount() > 0) {
+                latch.countDown();
+            }
+
+            lock.unlock();
+            locks.remove(equipmentCode);
+        }
     }
 }
 
