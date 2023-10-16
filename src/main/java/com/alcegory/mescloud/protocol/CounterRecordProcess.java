@@ -14,8 +14,6 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class CounterRecordProcess extends AbstractMesProtocolProcess<PlcMqttDto> {
 
-    private final String EMPTY_PRODUCTION_ORDER = "";
-    private final LockUtil lockHandler;
     private final CounterRecordService counterRecordService;
     private final CountingEquipmentService equipmentService;
 
@@ -25,10 +23,6 @@ public class CounterRecordProcess extends AbstractMesProtocolProcess<PlcMqttDto>
 
         log.info("Executing Counter Record process");
         equipmentService.updateEquipmentStatus(equipmentCounts.getEquipmentCode(), equipmentCounts.getEquipmentStatus());
-
-        if (isCounterRecordWithoutPO(equipmentCounts) && lockHandler.hasLock(equipmentCounts.getEquipmentCode())) {
-            lockHandler.unlock(equipmentCounts.getEquipmentCode());
-        }
 
         if (areInvalidContinuationCounts(equipmentCounts)) {
             log.warning(() -> String.format("Invalid continuation count - Production Order [%s] has no initial records or does not exist",
@@ -41,11 +35,6 @@ public class CounterRecordProcess extends AbstractMesProtocolProcess<PlcMqttDto>
         //Counter values are the same for 3 consecutive counts
         //Equipment status is not 1
         //3 pTimerCommunicationCycles without receiving counts
-    }
-
-    private boolean isCounterRecordWithoutPO(PlcMqttDto counterRecord) {
-        return counterRecord != null && EMPTY_PRODUCTION_ORDER.equals(counterRecord.getProductionOrderCode()) &&
-                MqttDTOConstants.COUNTING_RECORD_DTO_NAME.equals(counterRecord.getJsonType());
     }
 
     private boolean areInvalidContinuationCounts(PlcMqttDto equipmentCountsMqttDTO) {
