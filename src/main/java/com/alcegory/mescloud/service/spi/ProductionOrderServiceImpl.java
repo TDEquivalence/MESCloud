@@ -76,78 +76,91 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     @Override
     public Optional<ProductionOrderDto> complete(long equipmentId) {
         log.info(() -> String.format("Complete process Production Order started for equipmentId [%s]:", equipmentId));
-        boolean hasCompleteProcessInitiated = false;
+
         Optional<CountingEquipmentEntity> countingEquipmentOpt = countingEquipmentRepository.findById(equipmentId);
         if (countingEquipmentOpt.isEmpty()) {
-            log.warning(() -> String.format("Unable to find an Equipment with id [%s]", equipmentId));
-            return Optional.empty();
-        }
-        log.info(() -> String.format("Complete process Production Order started for equipment code [%s]:",
-                countingEquipmentOpt.get().getCode()));
-        Optional<ProductionOrderEntity> productionOrderEntityOpt = repository.findActive(equipmentId);
-        if (productionOrderEntityOpt.isEmpty()) {
-            log.warning(() -> String.format("No active Production Order found for an Equipment with id [%s]", equipmentId));
+            log.warning(() -> String.format("Unable to find Equipment with id [%s]", equipmentId));
             return Optional.empty();
         }
 
         String equipmentCode = countingEquipmentOpt.get().getCode();
-        try {
-            log.info(() -> String.format("Starting synchronization for equipment code [%s]:",
-                    countingEquipmentOpt.get().getCode()));
-
-            synchronized (processLock) {
-                if (!lockHandler.hasLock(equipmentCode) && hasActiveProductionOrder(equipmentId)
-                        && !isCompleted(productionOrderEntityOpt.get().getCode())) {
-                    hasCompleteProcessInitiated = true;
-                    lockHandler.lock(equipmentCode);
-                    log.info(() -> String.format("FIRST verification: get lock for equipment with code [%s]", equipmentCode));
-                    log.info(() -> String.format("FIRST verification: complete production order with code [%s]",
-                            productionOrderEntityOpt.get().getCode()));
-                    publishOrderCompletion(countingEquipmentOpt.get(), productionOrderEntityOpt.get());
-                }
-
-                if(!hasCompleteProcessInitiated && !isCompleted(productionOrderEntityOpt.get().getCode())
-                        && hasActiveProductionOrder(equipmentId)) {
-                    log.info(() -> String.format("SECOND verification: get lock for equipment with code [%s]", equipmentCode));
-                    log.info(() -> String.format("SECOND verification: complete production order with code [%s]",
-                            productionOrderEntityOpt.get().getCode()));
-                    ProductionOrderEntity productionOrder = findActiveProductionOrder(countingEquipmentOpt.get().getId());
-                    if (productionOrder != null) {
-                        lockHandler.unlockAndLock(equipmentCode);
-                        publishOrderCompletion(countingEquipmentOpt.get(), productionOrder);
-                    }
-                }
-
-                log.info(() -> String.format("Wait for execute unlock for equipment with code [%s]", equipmentCode));
-                lockHandler.waitForExecute(equipmentCode);
-            }
-        } catch (InterruptedException e) {
-            log.severe("Thread interrupted: " + e.getMessage());
-            Thread.currentThread().interrupt();
-        } catch (IllegalStateException e) {
-            log.severe("Lock not found or other exception: " + e.getMessage());
+        Optional<ProductionOrderEntity> productionOrderEntityOpt = repository.findActive(equipmentId);
+        if (productionOrderEntityOpt.isEmpty()) {
+            log.warning(() -> String.format("No active Production Order found for Equipment with id [%s]", equipmentId));
+            return Optional.empty();
         }
 
-        ProductionOrderDto productionOrderDto = getPersistedProductionOrder(productionOrderEntityOpt.get().getCode());
+        boolean isCompletePerformed;
+        synchronized (processLock) {
 
-        if (!isProductionOrderCompletedSuccessfully(countingEquipmentOpt.get())) {
-            productionOrderDto = getPersistedProductionOrder(productionOrderEntityOpt.get().getCode());
+            isCompletePerformed = performFirstVerification(equipmentCode, productionOrderEntityOpt.get(), countingEquipmentOpt.get());
+
+            if (!isCompletePerformed) {
+                isCompletePerformed = performSecondVerification(equipmentCode, productionOrderEntityOpt.get(), countingEquipmentOpt.get());
+            }
+
+            try {
+                log.info(() -> String.format("Wait for execute unlock for equipment with code [%s]", equipmentCode));
+                lockHandler.waitForExecute(equipmentCode);
+            } catch (InterruptedException e) {
+                log.severe("Thread interrupted: " + e.getMessage());
+                Thread.currentThread().interrupt();
+            }
+        }
+
+        if (!isProductionOrderCompletedSuccessfully(countingEquipmentOpt.get()) && !isCompletePerformed) {
+            Optional<ProductionOrderDto> completionResult =
+                    Optional.ofNullable(getPersistedProductionOrder(productionOrderEntityOpt.get().getCode()));
+            if (completionResult.isPresent()) {
+                return completionResult;
+            }
         }
 
         if (lockHandler.hasLock(equipmentCode)) {
-            log.info(() -> String.format("Check if equipment has lock in last step of complete process for  equipment with code [%s]", equipmentCode));
             lockHandler.unlock(equipmentCode);
         }
 
-        assert productionOrderDto != null;
-        return Optional.of(productionOrderDto);
+        return Optional.ofNullable(getPersistedProductionOrder(productionOrderEntityOpt.get().getCode()));
+    }
+
+
+    private boolean performFirstVerification(String equipmentCode, ProductionOrderEntity productionOrder,
+                                             CountingEquipmentEntity countingEquipment) {
+        if (!lockHandler.hasLock(equipmentCode) && hasActiveProductionOrder(countingEquipment.getId()) &&
+                !isCompleted(productionOrder.getCode())) {
+            lockHandler.lock(equipmentCode);
+            log.info(() -> String.format("FIRST verification: get lock for equipment with code [%s]", equipmentCode));
+            log.info(() -> String.format("FIRST verification: complete production order with code [%s]", productionOrder.getCode()));
+            publishOrderCompletion(countingEquipment, productionOrder);
+            return true;
+        }
+        return false;
+    }
+
+    private boolean performSecondVerification(String equipmentCode, ProductionOrderEntity productionOrder,
+                                              CountingEquipmentEntity countingEquipment) {
+        if (!isCompleted(productionOrder.getCode()) && hasActiveProductionOrder(countingEquipment.getId())) {
+            log.info(() -> String.format("SECOND verification: get lock for equipment with code [%s]", equipmentCode));
+            log.info(() -> String.format("SECOND verification: complete production order with code [%s]", productionOrder.getCode()));
+            ProductionOrderEntity activeProductionOrder = findActiveProductionOrder(countingEquipment.getId());
+            if (activeProductionOrder != null) {
+                lockHandler.unlockAndLock(equipmentCode);
+                publishOrderCompletion(countingEquipment, activeProductionOrder);
+            }
+            return true;
+        }
+        return false;
     }
 
     private boolean isProductionOrderCompletedSuccessfully(CountingEquipmentEntity equipment) {
         ProductionOrderEntity productionOrder = findActiveProductionOrder(equipment.getId());
-        if (productionOrder != null && !isCompleted(productionOrder.getCode()) || hasActiveProductionOrder(equipment.getId())) {
-            log.info(() -> String.format("Production order was not complete as expected for equipment code [%s]", equipment.getCode()));
+        if (productionOrder != null && !isCompleted(productionOrder.getCode()) ||
+                hasActiveProductionOrder(equipment.getId())) {
+            log.info(() -> String.format("Production order was not completed as expected for equipment code [%s]",
+                    equipment.getCode()));
             publishOrderCompletion(equipment, productionOrder);
+            log.info(() -> String.format("Publish to PLC to complete Production Order for equipment code [%s]",
+                    equipment.getCode()));
             lockHandler.unlockAndLock(equipment.getCode());
             log.info(() -> String.format("THIRD verification: Get lock for equipment with code [%s]", equipment.getCode()));
             try {
@@ -157,21 +170,22 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
                 log.severe("Thread interrupted: " + e.getMessage());
                 Thread.currentThread().interrupt();
             }
-
-            return false;
+            return true;
         }
-        return true;
+        return false;
     }
 
     public void publishOrderCompletion(CountingEquipmentEntity countingEquipment, ProductionOrderEntity productionOrder) {
         try {
             publishOrderCompletionToPLC(countingEquipment, productionOrder);
         } catch (MesMqttException e) {
-            log.severe(() -> String.format("Unable to publish Order Completion to PLC for equipment [%s]", countingEquipment.getCode()));
+            log.severe(() -> String.format("Unable to publish Order Completion to PLC for equipment [%s]",
+                    countingEquipment.getCode()));
         }
     }
 
-    private void publishOrderCompletionToPLC(CountingEquipmentEntity countingEquipment, ProductionOrderEntity productionOrder) throws MesMqttException {
+    private void publishOrderCompletionToPLC(CountingEquipmentEntity countingEquipment, ProductionOrderEntity productionOrder)
+            throws MesMqttException {
         ProductionOrderMqttDto productionOrderMqttDto = new ProductionOrderMqttDto();
         productionOrderMqttDto.setJsonType(MqttDTOConstants.PRODUCTION_ORDER_CONCLUSION_DTO_NAME);
         productionOrderMqttDto.setEquipmentEnabled(false);
@@ -190,7 +204,8 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         }
         ProductionOrderEntity productionOrderPersisted = productionOrderOpt.get();
         ProductionOrderDto productionOrderDto = converter.toDto(productionOrderPersisted);
-        log.warning(() -> String.format("COMPLETE: Returning complete persisted Production Order with code [%s]", productionOrderDto.getCode()));
+        log.warning(() -> String.format("COMPLETE: Returning complete persisted Production Order with code [%s]",
+                productionOrderDto.getCode()));
         return productionOrderDto;
     }
 
@@ -200,7 +215,8 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         Optional<CountingEquipmentEntity> countingEquipmentEntityOpt =
                 countingEquipmentRepository.findById(productionOrder.getEquipmentId());
         if (countingEquipmentEntityOpt.isEmpty()) {
-            log.warning(() -> String.format("Unable to create Production Order - no Equipment found with id [%s]", productionOrder.getEquipmentId()));
+            log.warning(() -> String.format("Unable to create Production Order - no Equipment found with id [%s]",
+                    productionOrder.getEquipmentId()));
             return Optional.empty();
         }
 

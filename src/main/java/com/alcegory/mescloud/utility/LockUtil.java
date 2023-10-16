@@ -43,7 +43,7 @@ public class LockUtil {
         CountDownLatch latch = locks.get(equipmentCode);
 
         if (lock == null || latch == null) {
-            throw new IllegalStateException("Lock not found for equipmentCode: " + equipmentCode);
+            throw new IllegalStateException("Unlock: lock not found for equipmentCode: " + equipmentCode);
         }
 
         try {
@@ -57,16 +57,16 @@ public class LockUtil {
     public void waitForExecute(String equipmentCode) throws InterruptedException {
         CountDownLatch latch = locks.get(equipmentCode);
         if (latch == null) {
-            throw new IllegalStateException("Lock not found for equipmentCode: " + equipmentCode);
+            throw new IllegalStateException("Lock not found or already released for equipmentCode: " + equipmentCode);
         }
         latch.await();
     }
 
     public void unlockAndLock(String equipmentCode) {
-        log.info(() -> String.format("Unlock and Lock for equipment with code [%s]", equipmentCode));
         if (hasLock(equipmentCode)) {
             unlock(equipmentCode);
         }
+        log.info(() -> String.format("Unlock and Lock for equipment with code [%s]", equipmentCode));
         lock(equipmentCode);
     }
 
