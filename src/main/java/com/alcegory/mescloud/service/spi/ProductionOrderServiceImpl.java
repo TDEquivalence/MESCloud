@@ -90,12 +90,15 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
                     hasCompleteProcessInitiated = true;
                     lockHandler.lock(equipmentCode);
                     log.info(() -> String.format("FIRST attempt to get lock for equipment with code [%s]", equipmentCode));
-
+                    log.info(() -> String.format("FIRST attempt complete production order with code [%s]",
+                            productionOrderEntityOpt.get().getCode()));
                     publishOrderCompletion(countingEquipmentOpt.get(), productionOrderEntityOpt.get());
                 }
 
                 if(!hasCompleteProcessInitiated && !isCompleted(productionOrderEntityOpt.get().getCode())) {
                     log.info(() -> String.format("SECOND attempt to get lock for equipment with code [%s]", equipmentCode));
+                    log.info(() -> String.format("SECOND attempt complete production order with code [%s]",
+                            productionOrderEntityOpt.get().getCode()));
                     unlockAndLock(equipmentCode);
                     publishOrderCompletion(countingEquipmentOpt.get(), productionOrderEntityOpt.get());
                 }
