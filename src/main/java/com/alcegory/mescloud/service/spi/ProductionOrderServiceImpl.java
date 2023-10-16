@@ -126,7 +126,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
 
     private boolean performFirstVerification(String equipmentCode, ProductionOrderEntity productionOrder,
                                              CountingEquipmentEntity countingEquipment) {
-        if (!lockHandler.hasLock(equipmentCode) && !isCompleted(productionOrder.getCode())) {
+        if (!lockHandler.hasLock(equipmentCode)) {
             lockHandler.lock(equipmentCode);
             log.info(() -> String.format("FIRST verification: get lock for equipment with code [%s]", equipmentCode));
             log.info(() -> String.format("FIRST verification: complete production order with code [%s]", productionOrder.getCode()));
