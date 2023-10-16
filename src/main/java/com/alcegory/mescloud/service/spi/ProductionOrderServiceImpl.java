@@ -86,7 +86,8 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
             String equipmentCode = countingEquipmentOpt.get().getCode();
 
             synchronized (processLock) {
-                if (!lockHandler.hasLock(equipmentCode) && !isCompleted(productionOrderEntityOpt.get().getCode())) {
+                if (!lockHandler.hasLock(equipmentCode) && hasActiveProductionOrder(equipmentId)
+                        && !isCompleted(productionOrderEntityOpt.get().getCode())) {
                     hasCompleteProcessInitiated = true;
                     lockHandler.lock(equipmentCode);
                     log.info(() -> String.format("FIRST attempt to get lock for equipment with code [%s]", equipmentCode));
@@ -95,7 +96,8 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
                     publishOrderCompletion(countingEquipmentOpt.get(), productionOrderEntityOpt.get());
                 }
 
-                if(!hasCompleteProcessInitiated && !isCompleted(productionOrderEntityOpt.get().getCode())) {
+                if(!hasCompleteProcessInitiated && !isCompleted(productionOrderEntityOpt.get().getCode())
+                        && hasActiveProductionOrder(equipmentId)) {
                     log.info(() -> String.format("SECOND attempt to get lock for equipment with code [%s]", equipmentCode));
                     log.info(() -> String.format("SECOND attempt complete production order with code [%s]",
                             productionOrderEntityOpt.get().getCode()));
@@ -125,7 +127,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
 
     private boolean isProductionOrderCompletedSuccessfully(CountingEquipmentEntity equipment, ProductionOrderDto productionOrderDto) {
         ProductionOrderEntity productionOrder = converter.toEntity(productionOrderDto);
-        if (!isCompleted(productionOrder.getCode())) {
+        if (hasActiveProductionOrder(equipment.getId()) && !isCompleted(productionOrder.getCode())) {
             log.info(() -> String.format("Production order was not complete as expected for equipment code [%s]", equipment.getCode()));
             publishOrderCompletion(equipment, productionOrder);
             unlockAndLock(equipment.getCode());
