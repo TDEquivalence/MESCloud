@@ -105,7 +105,34 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
             log.severe("Lock not found or other exception: " + e.getMessage());
         }
 
-        return getPersistedProductionOrder(productionOrderEntityOpt.get().getCode());
+        ProductionOrderDto productionOrderDto = getPersistedProductionOrder(productionOrderEntityOpt.get().getCode());
+
+        if (!isProductionOrderCompletedSuccessfully(countingEquipmentOpt.get(), productionOrderDto)) {
+            productionOrderDto = getPersistedProductionOrder(productionOrderEntityOpt.get().getCode());
+        }
+
+        assert productionOrderDto != null;
+        return Optional.of(productionOrderDto);
+    }
+
+    private boolean isProductionOrderCompletedSuccessfully(CountingEquipmentEntity equipment, ProductionOrderDto productionOrderDto) {
+        ProductionOrderEntity productionOrder = converter.toEntity(productionOrderDto);
+        if (!isCompleted(productionOrder.getCode())) {
+            log.info(() -> String.format("Production order was not complete as expected for equipment code [%s]", equipment.getCode()));
+            publishOrderCompletion(equipment, productionOrder);
+            lockHandler.lock(equipment.getCode());
+            log.info(() -> String.format("Get lock for equipment with code [%s]", equipment.getCode()));
+            try {
+                log.info(() -> String.format("Wait for execute unlock for equipment with code [%s]", equipment.getCode()));
+                lockHandler.waitForExecute(equipment.getCode());
+            } catch (InterruptedException e) {
+                log.severe("Thread interrupted: " + e.getMessage());
+                Thread.currentThread().interrupt();
+            }
+
+            return false;
+        }
+        return true;
     }
 
     public void publishOrderCompletion(CountingEquipmentEntity countingEquipment, ProductionOrderEntity productionOrder) {
@@ -127,16 +154,16 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     }
 
 
-    private Optional<ProductionOrderDto> getPersistedProductionOrder(String code) {
+    private ProductionOrderDto getPersistedProductionOrder(String code) {
         Optional<ProductionOrderEntity> productionOrderOpt = repository.findByCode(code);
         if (productionOrderOpt.isEmpty()) {
             log.warning(() -> String.format("Unable to get persisted Production Order with code [%s]", code));
-            return Optional.empty();
+            return null;
         }
         ProductionOrderEntity productionOrderPersisted = productionOrderOpt.get();
         ProductionOrderDto productionOrderDto = converter.toDto(productionOrderPersisted);
         log.warning(() -> String.format("COMPLETE: Returning complete persisted Production Order with code [%s]", productionOrderDto.getCode()));
-        return Optional.of(productionOrderDto);
+        return productionOrderDto;
     }
 
     @Override
