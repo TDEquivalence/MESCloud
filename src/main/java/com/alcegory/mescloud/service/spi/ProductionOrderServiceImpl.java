@@ -130,7 +130,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
 
         ProductionOrderDto productionOrderDto = getPersistedProductionOrder(productionOrderEntityOpt.get().getCode());
 
-        if (!isProductionOrderCompletedSuccessfully(countingEquipmentOpt.get()) {
+        if (!isProductionOrderCompletedSuccessfully(countingEquipmentOpt.get())) {
             productionOrderDto = getPersistedProductionOrder(productionOrderEntityOpt.get().getCode());
         }
 
