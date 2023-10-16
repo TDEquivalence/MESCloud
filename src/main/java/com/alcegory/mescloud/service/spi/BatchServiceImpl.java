@@ -49,7 +49,7 @@ public class BatchServiceImpl implements BatchService {
 
     private void setProductionOrderApproval(BatchEntity batch) {
         try {
-            if (batch == null || !Boolean.TRUE.equals(batch.getIsApproved())) {
+            if (batch == null) {
                 throw new IllegalArgumentException("Invalid batch or not approved");
             }
 
