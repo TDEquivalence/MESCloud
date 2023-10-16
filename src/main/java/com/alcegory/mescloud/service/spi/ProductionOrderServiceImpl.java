@@ -126,8 +126,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
 
     private boolean performFirstVerification(String equipmentCode, ProductionOrderEntity productionOrder,
                                              CountingEquipmentEntity countingEquipment) {
-        if (!lockHandler.hasLock(equipmentCode) && hasActiveProductionOrder(countingEquipment.getId()) &&
-                !isCompleted(productionOrder.getCode())) {
+        if (!lockHandler.hasLock(equipmentCode) && !isCompleted(productionOrder.getCode())) {
             lockHandler.lock(equipmentCode);
             log.info(() -> String.format("FIRST verification: get lock for equipment with code [%s]", equipmentCode));
             log.info(() -> String.format("FIRST verification: complete production order with code [%s]", productionOrder.getCode()));
@@ -139,7 +138,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
 
     private boolean performSecondVerification(String equipmentCode, ProductionOrderEntity productionOrder,
                                               CountingEquipmentEntity countingEquipment) {
-        if (!isCompleted(productionOrder.getCode()) && hasActiveProductionOrder(countingEquipment.getId())) {
+        if (!isCompleted(productionOrder.getCode())) {
             log.info(() -> String.format("SECOND verification: get lock for equipment with code [%s]", equipmentCode));
             log.info(() -> String.format("SECOND verification: complete production order with code [%s]", productionOrder.getCode()));
             ProductionOrderEntity activeProductionOrder = findActiveProductionOrder(countingEquipment.getId());
