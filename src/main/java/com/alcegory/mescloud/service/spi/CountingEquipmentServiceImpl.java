@@ -263,7 +263,12 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
             EquipmentOutputEntity outputUpdateFrom = outputMap.get(outputToUpdate.getCode());
 
             if (outputUpdateFrom != null) {
+
+                boolean isValidForProduction = outputUpdateFrom.isValidForProduction();
+                outputToUpdate.setValidForProduction(isValidForProduction);
+
                 String alias = outputUpdateFrom.getAlias().getAlias();
+
                 if (!aliasService.isAliasUnique(alias)) {
                     EquipmentOutputAliasEntity persistedAlias = aliasService.findByAlias(alias);
                     outputToUpdate.setAlias(persistedAlias);
@@ -274,6 +279,7 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
         }
         outputService.saveAll(equipmentOutputToUpdate);
     }
+
 
     private void updateIms(CountingEquipmentEntity toUpdate, ImsEntity requestIms) {
 
