@@ -2,9 +2,9 @@ package com.alcegory.mescloud.protocol;
 
 import com.alcegory.mescloud.constant.MqttDTOConstants;
 import com.alcegory.mescloud.model.dto.PlcMqttDto;
+import com.alcegory.mescloud.service.AlarmService;
 import com.alcegory.mescloud.service.CounterRecordService;
 import com.alcegory.mescloud.service.CountingEquipmentService;
-import com.alcegory.mescloud.utility.LockUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
@@ -16,6 +16,7 @@ public class CounterRecordProcess extends AbstractMesProtocolProcess<PlcMqttDto>
 
     private final CounterRecordService counterRecordService;
     private final CountingEquipmentService equipmentService;
+    private final AlarmService alarmService;
 
 
     @Override
@@ -23,6 +24,7 @@ public class CounterRecordProcess extends AbstractMesProtocolProcess<PlcMqttDto>
 
         log.info("Executing Counter Record process");
         equipmentService.updateEquipmentStatus(equipmentCounts.getEquipmentCode(), equipmentCounts.getEquipmentStatus());
+        alarmService.processPlcAlarms(equipmentCounts);
 
         if (areInvalidContinuationCounts(equipmentCounts)) {
             log.warning(() -> String.format("Invalid continuation count - Production Order [%s] has no initial records or does not exist",

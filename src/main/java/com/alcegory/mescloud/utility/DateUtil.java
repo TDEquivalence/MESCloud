@@ -14,6 +14,7 @@ import java.util.concurrent.TimeUnit;
 public class DateUtil {
 
     private DateUtil() {
+        //Utility class, not meant for instantiation
     }
 
     private static final int INCLUDE_LAST_DAY = 1;

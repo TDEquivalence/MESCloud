@@ -2,6 +2,7 @@ package com.alcegory.mescloud.protocol;
 
 import com.alcegory.mescloud.constant.MqttDTOConstants;
 import com.alcegory.mescloud.model.dto.PlcMqttDto;
+import com.alcegory.mescloud.service.AlarmService;
 import com.alcegory.mescloud.service.CounterRecordService;
 import com.alcegory.mescloud.service.CountingEquipmentService;
 import com.alcegory.mescloud.utility.LockUtil;
@@ -19,6 +20,7 @@ public class ProductionOrderInitProcess extends AbstractMesProtocolProcess<PlcMq
 
     private final CounterRecordService counterRecordService;
     private final CountingEquipmentService equipmentService;
+    private final AlarmService alarmService;
 
 
     @Override
@@ -28,10 +30,11 @@ public class ProductionOrderInitProcess extends AbstractMesProtocolProcess<PlcMq
 
         log.info("Executing Production Order response process");
         equipmentService.updateEquipmentStatus(equipmentCode, equipmentCounts.getEquipmentStatus());
+        alarmService.processPlcAlarms(equipmentCounts);
 
         if (!hasEquipmentAssociatedProductionOrder(equipmentCode) && isCleanProductionOrderResponse(equipmentCounts)
                 && lockHandler.hasLock(equipmentCode)) {
-            log.info(() -> String.format("Unlock lock for equipment with code [%s]",equipmentCode));
+            log.info(() -> String.format("Unlock lock for equipment with code [%s]", equipmentCode));
             lockHandler.unlock(equipmentCounts.getEquipmentCode());
         }
 

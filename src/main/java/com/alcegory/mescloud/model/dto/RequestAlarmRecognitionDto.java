@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class RequestAlarmRecordRecognizeDto {
+public class RequestAlarmRecognitionDto {
 
     private String comment;
 }

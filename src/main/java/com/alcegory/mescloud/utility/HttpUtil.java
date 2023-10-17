@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 public class HttpUtil {
 
     private HttpUtil() {
-        //HttpUtil is a util class, not meant for instantiation
+        //Utility class, not meant for instantiation
     }
 
     public static final String ERROR_CAUSE_HEADER = "Error-Cause";
