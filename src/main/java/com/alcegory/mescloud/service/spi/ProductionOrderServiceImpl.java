@@ -90,13 +90,18 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
             return Optional.empty();
         }
 
-        boolean isCompletePerformed;
+        boolean isCompletionPublish;
         synchronized (processLock) {
 
-            isCompletePerformed = performFirstVerification(equipmentCode, productionOrderEntityOpt.get(), countingEquipmentOpt.get());
+            isCompletionPublish = performFirstVerification(equipmentCode, productionOrderEntityOpt.get(), countingEquipmentOpt.get());
 
-            if (!isCompletePerformed) {
-                isCompletePerformed = performSecondVerification(equipmentCode, productionOrderEntityOpt.get(), countingEquipmentOpt.get());
+            if (!isCompletionPublish) {
+                isCompletionPublish = performSecondVerification(equipmentCode, productionOrderEntityOpt.get(), countingEquipmentOpt.get());
+            }
+
+            if (!isCompletionPublish) {
+                publishOrderCompletion(countingEquipmentOpt.get(), productionOrderEntityOpt.get());
+                lockHandler.lock(equipmentCode);
             }
 
             try {
@@ -105,14 +110,6 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
             } catch (InterruptedException e) {
                 log.severe("Thread interrupted: " + e.getMessage());
                 Thread.currentThread().interrupt();
-            }
-        }
-
-        if (!isProductionOrderCompletedSuccessfully(countingEquipmentOpt.get()) && !isCompletePerformed) {
-            Optional<ProductionOrderDto> completionResult =
-                    Optional.ofNullable(getPersistedProductionOrder(productionOrderEntityOpt.get().getCode()));
-            if (completionResult.isPresent()) {
-                return completionResult;
             }
         }
 
@@ -141,34 +138,8 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         if (!isCompleted(productionOrder.getCode())) {
             log.info(() -> String.format("SECOND verification: get lock for equipment with code [%s]", equipmentCode));
             log.info(() -> String.format("SECOND verification: complete production order with code [%s]", productionOrder.getCode()));
-            ProductionOrderEntity activeProductionOrder = findActiveProductionOrder(countingEquipment.getId());
-            if (activeProductionOrder != null) {
                 lockHandler.unlockAndLock(equipmentCode);
-                publishOrderCompletion(countingEquipment, activeProductionOrder);
-            }
-            return true;
-        }
-        return false;
-    }
-
-    private boolean isProductionOrderCompletedSuccessfully(CountingEquipmentEntity equipment) {
-        ProductionOrderEntity productionOrder = findActiveProductionOrder(equipment.getId());
-        if (productionOrder != null && !isCompleted(productionOrder.getCode()) ||
-                hasActiveProductionOrder(equipment.getId())) {
-            log.info(() -> String.format("Production order was not completed as expected for equipment code [%s]",
-                    equipment.getCode()));
-            publishOrderCompletion(equipment, productionOrder);
-            log.info(() -> String.format("Publish to PLC to complete Production Order for equipment code [%s]",
-                    equipment.getCode()));
-            lockHandler.unlockAndLock(equipment.getCode());
-            log.info(() -> String.format("THIRD verification: Get lock for equipment with code [%s]", equipment.getCode()));
-            try {
-                log.info(() -> String.format("Wait for execute unlock for equipment with code [%s]", equipment.getCode()));
-                lockHandler.waitForExecute(equipment.getCode());
-            } catch (InterruptedException e) {
-                log.severe("Thread interrupted: " + e.getMessage());
-                Thread.currentThread().interrupt();
-            }
+                publishOrderCompletion(countingEquipment, productionOrder);
             return true;
         }
         return false;
