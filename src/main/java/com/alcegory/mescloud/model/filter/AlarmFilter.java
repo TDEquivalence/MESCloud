@@ -10,7 +10,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class AlarmRecordFilter extends AbstractFilter<AlarmRecordFilter.Property> {
+public class AlarmFilter extends AbstractFilter<AlarmFilter.Property> {
 
     private static final String CREATED_AT_PROP = "createdAt";
 

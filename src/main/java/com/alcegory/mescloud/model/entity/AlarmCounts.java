@@ -9,8 +9,8 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class AlarmRecordCounts {
+public class AlarmCounts {
 
-    private long totalAlarmRecords;
-    private long totalActiveAlarmRecords;
+    private long totalAlarms;
+    private long totalActiveAlarms;
 }

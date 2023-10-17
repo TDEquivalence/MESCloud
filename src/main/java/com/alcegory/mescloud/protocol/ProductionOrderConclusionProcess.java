@@ -6,6 +6,7 @@ import com.alcegory.mescloud.constant.MqttDTOConstants;
 import com.alcegory.mescloud.model.dto.PlcMqttDto;
 import com.alcegory.mescloud.model.dto.ProductionOrderMqttDto;
 import com.alcegory.mescloud.model.entity.ProductionOrderEntity;
+import com.alcegory.mescloud.service.AlarmService;
 import com.alcegory.mescloud.service.CounterRecordService;
 import com.alcegory.mescloud.service.CountingEquipmentService;
 import com.alcegory.mescloud.utility.LockUtil;
@@ -29,6 +30,7 @@ public class ProductionOrderConclusionProcess extends AbstractMesProtocolProcess
 
     private final CounterRecordService counterRecordService;
     private final CountingEquipmentService equipmentService;
+    private final AlarmService alarmService;
     private final MqttClient mqttClient;
     private final ProductionOrderRepository repository;
     private final MesMqttSettings mqttSettings;
@@ -44,6 +46,8 @@ public class ProductionOrderConclusionProcess extends AbstractMesProtocolProcess
         }
 
         equipmentService.updateEquipmentStatus(equipmentCounts.getEquipmentCode(), equipmentCounts.getEquipmentStatus());
+        alarmService.processPlcAlarms(equipmentCounts);
+
         counterRecordService.save(equipmentCounts);
 
         ProductionOrderEntity productionOrder = getProductionOrderByCode(equipmentCounts.getProductionOrderCode());

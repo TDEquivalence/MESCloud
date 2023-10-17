@@ -238,10 +238,11 @@ CREATE TABLE batch (
 
 CREATE TABLE alarm (
     id serial PRIMARY KEY,
-    word int NOT NULL UNIQUE,
-    index int NOT NULL UNIQUE,
+    word int NOT NULL,
+    index int NOT NULL,
     code varchar(20) NOT NULL UNIQUE,
-    description varchar(100)
+    description varchar(100),
+    CONSTRAINT word_index_unique UNIQUE (word, index)
 );
 
 CREATE TABLE alarm_record (
@@ -249,7 +250,7 @@ CREATE TABLE alarm_record (
     alarm_id int,
     equipment_id int,
     production_order_id int,
-    status int NOT NULL CHECK (status IN (1, 2, 3)),
+    status varchar(10) NOT NULL CHECK (status IN ('ACTIVE', 'INACTIVE', 'RECOGNIZED')),
     comment text,
     created_at timestamp NOT NULL,
     completed_at timestamp,

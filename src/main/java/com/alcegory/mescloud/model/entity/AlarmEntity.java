@@ -1,11 +1,11 @@
 package com.alcegory.mescloud.model.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.alcegory.mescloud.constant.AlarmStatus;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.Date;
 
 @Getter
 @Setter
@@ -15,8 +15,23 @@ public class AlarmEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private int word;
-    private int index;
-    private String code;
-    private String description;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "alarm_configuration_id")
+    private AlarmConfigurationEntity alarmConfiguration;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "equipment_id")
+    private CountingEquipmentEntity equipment;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "production_order_id")
+    private ProductionOrderEntity productionOrder;
+    @Enumerated(EnumType.STRING)
+    private AlarmStatus status;
+    private String comment;
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date createdAt;
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date completedAt;
+    @ManyToOne
+    @JoinColumn(name = "completed_by")
+    private UserEntity completedBy;
 }

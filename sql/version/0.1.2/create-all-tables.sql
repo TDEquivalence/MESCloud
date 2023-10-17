@@ -236,19 +236,20 @@ CREATE TABLE batch (
   FOREIGN KEY (composed_production_order_id) REFERENCES composed_production_order (id)
 );
 
-CREATE TABLE alarm (
+CREATE TABLE alarm_configuration (
     id serial PRIMARY KEY,
-    word int NOT NULL,
-    index int NOT NULL,
+    word_index int NOT NULL,
+    bit_index int NOT NULL,
     code varchar(20) NOT NULL UNIQUE,
     description varchar(100),
-    CONSTRAINT word_index_unique UNIQUE (word, index)
+
+    CONSTRAINT word_bit_indexes_unique UNIQUE (word_index, bit_index)
 );
 
-CREATE TABLE alarm_record (
+CREATE TABLE alarm (
     id serial PRIMARY KEY,
-    alarm_id int,
-    equipment_id int,
+    alarm_configuration_id int NOT NULL,
+    equipment_id int NOT NULL,
     production_order_id int,
     status varchar(10) NOT NULL CHECK (status IN ('ACTIVE', 'INACTIVE', 'RECOGNIZED')),
     comment text,
@@ -257,7 +258,7 @@ CREATE TABLE alarm_record (
     completed_by int,
 
     FOREIGN KEY (equipment_id) REFERENCES counting_equipment (id),
-    FOREIGN KEY (alarm_id) REFERENCES Alarm (id),
+    FOREIGN KEY (alarm_configuration_id) REFERENCES alarm_configuration (id),
     FOREIGN KEY (production_order_id) REFERENCES production_order (id),
     FOREIGN KEY (completed_by) REFERENCES Users (id)
 );
@@ -284,20 +285,31 @@ WHERE po.is_completed = true AND po.composed_production_order_id IS NULL AND crp
 GROUP BY po.id;
 
 CREATE OR REPLACE VIEW composed_summary AS
-SELECT DISTINCT
-    cpo.id, cpo.created_at, cpo.code,
+SELECT DISTINCT ON (cpo.id)
+    cpo.id, cpo.created_at, cpo.code, cpo.approved_at, cpo.hit_inserted_at,
     s.amount, s.reliability,
-    po.input_batch, po.source, po.gauge, po.category, po.washing_process, po.ims_id,
+    po.input_batch, po.source, po.gauge, po.category, po.washing_process,
     b.id AS batch_id,
     b.code AS batch_code,
     s.amount AS sample_amount,
     b.is_approved AS is_batch_approved,
-    COUNT(h.id) AS amount_of_hits,
+    subquery.amount_of_hits,
     COALESCE(SUM(CAST(crpc.computed_value AS bigint)), 0) AS valid_amount
 FROM composed_production_order cpo
 LEFT JOIN sample s ON cpo.id = s.composed_production_order_id
-LEFT JOIN hit h ON s.id = h.sample_id
 LEFT JOIN production_order po ON cpo.id = po.composed_production_order_id
 LEFT JOIN batch b ON cpo.id = b.composed_production_order_id
 LEFT JOIN counter_record_production_conclusion crpc ON po.id = crpc.production_order_id
-GROUP BY cpo.id, cpo.created_at, cpo.code, s.amount, s.reliability, po.input_batch, po.source, po.gauge, po.category, po.washing_process, po.ims_id, b.id, b.code, b.is_approved;
+LEFT JOIN (
+    SELECT s.composed_production_order_id, COUNT(h.id) AS amount_of_hits
+    FROM sample s
+    JOIN hit h ON s.id = h.sample_id
+    GROUP BY s.composed_production_order_id
+) AS subquery ON cpo.id = subquery.composed_production_order_id
+WHERE crpc.is_valid_for_production = true
+GROUP BY
+    cpo.id, cpo.created_at, cpo.code,
+    s.amount, s.reliability,
+    po.input_batch, po.source, po.gauge, po.category, po.washing_process,
+    b.id, b.code, b.is_approved,
+    subquery.amount_of_hits;
