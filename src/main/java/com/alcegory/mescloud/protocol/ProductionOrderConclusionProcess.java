@@ -9,7 +9,6 @@ import com.alcegory.mescloud.model.entity.ProductionOrderEntity;
 import com.alcegory.mescloud.service.AlarmService;
 import com.alcegory.mescloud.service.CounterRecordService;
 import com.alcegory.mescloud.service.CountingEquipmentService;
-import com.alcegory.mescloud.utility.LockUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.slf4j.Logger;
@@ -34,8 +33,6 @@ public class ProductionOrderConclusionProcess extends AbstractMesProtocolProcess
     private final MqttClient mqttClient;
     private final ProductionOrderRepository repository;
     private final MesMqttSettings mqttSettings;
-    private final LockUtil lock;
-
     @Override
     public void execute(PlcMqttDto equipmentCounts) {
 
@@ -89,7 +86,6 @@ public class ProductionOrderConclusionProcess extends AbstractMesProtocolProcess
     private void completeProductionOrder(ProductionOrderEntity productionOrder) {
         log.info(() -> String.format("CONCLUSION: Complete and save production order with code [%s]", productionOrder.getCode()));
         productionOrder.setCompleted(true);
-        productionOrder.setCompletedAt(new Date());
         repository.save(productionOrder);
     }
 
