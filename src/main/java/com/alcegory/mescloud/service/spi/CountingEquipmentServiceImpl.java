@@ -264,9 +264,11 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
 
             if (outputUpdateFrom != null) {
                 String alias = outputUpdateFrom.getAlias().getAlias();
+                boolean isValidForProduction = outputUpdateFrom.isValidForProduction();
                 if (!aliasService.isAliasUnique(alias)) {
                     EquipmentOutputAliasEntity persistedAlias = aliasService.findByAlias(alias);
                     outputToUpdate.setAlias(persistedAlias);
+                    outputToUpdate.setValidForProduction(isValidForProduction);
                 } else {
                     outputToUpdate.setAlias(outputUpdateFrom.getAlias());
                 }
