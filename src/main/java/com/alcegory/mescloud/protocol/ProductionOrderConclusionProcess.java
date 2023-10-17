@@ -84,7 +84,7 @@ public class ProductionOrderConclusionProcess extends AbstractMesProtocolProcess
     }
 
     private void completeProductionOrder(ProductionOrderEntity productionOrder) {
-        log.info(() -> String.format("CONCLUSION: Complete and save production order with code [%s]", productionOrder.getCode()));
+        log.info(() -> String.format("Set and save production order as completed, with code [%s]", productionOrder.getCode()));
         productionOrder.setCompleted(true);
         repository.save(productionOrder);
     }

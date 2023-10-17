@@ -75,36 +75,22 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
             return Optional.empty();
         }
 
+        publishProductionOrderCompletion(countingEquipmentOpt.get(), productionOrderEntityOpt.get());
+        log.info(() -> String.format("Production Order Conclusion already publish for equipmentId [%s]:", equipmentId));
 
-        publishOrderCompletion(countingEquipmentOpt.get(), productionOrderEntityOpt.get());
-        log.info(() -> String.format("Publish Production Order Conclusion for equipmentId [%s]:", equipmentId));
-
-        return setCompleteDate(productionOrderEntityOpt);
+        return setCompleteDate(productionOrderEntityOpt.get());
     }
 
-    public void publishOrderCompletion(CountingEquipmentEntity countingEquipment, ProductionOrderEntity productionOrder) {
+    public void publishProductionOrderCompletion(CountingEquipmentEntity countingEquipment, ProductionOrderEntity productionOrder) {
         try {
-            publishOrderCompletionToPLC(countingEquipment, productionOrder);
+            publishProductionOrderCompletionToPLC(countingEquipment, productionOrder);
         } catch (MesMqttException e) {
             log.severe(() -> String.format("Unable to publish Order Completion to PLC for equipment [%s]",
                     countingEquipment.getCode()));
         }
     }
 
-    private Optional<ProductionOrderDto> setCompleteDate(Optional<ProductionOrderEntity> productionOrderEntityOpt) {
-        if (productionOrderEntityOpt.isEmpty()) {
-            return Optional.empty();
-        }
-
-        ProductionOrderEntity productionOrderEntity = productionOrderEntityOpt.get();
-        productionOrderEntity.setCompletedAt(new Date());
-        repository.save(productionOrderEntity);
-        ProductionOrderDto productionOrderDto = converter.toDto(productionOrderEntity);
-
-        return Optional.of(productionOrderDto);
-    }
-
-    private void publishOrderCompletionToPLC(CountingEquipmentEntity countingEquipment, ProductionOrderEntity productionOrder)
+    private void publishProductionOrderCompletionToPLC(CountingEquipmentEntity countingEquipment, ProductionOrderEntity productionOrder)
             throws MesMqttException {
         ProductionOrderMqttDto productionOrderMqttDto = new ProductionOrderMqttDto();
         productionOrderMqttDto.setJsonType(MqttDTOConstants.PRODUCTION_ORDER_CONCLUSION_DTO_NAME);
@@ -113,6 +99,14 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         productionOrderMqttDto.setTargetAmount(0);
         productionOrderMqttDto.setEquipmentCode(countingEquipment.getCode());
         mqttClient.publish(mqttSettings.getProtCountPlcTopic(), productionOrderMqttDto);
+    }
+
+    private Optional<ProductionOrderDto> setCompleteDate(ProductionOrderEntity productionOrderEntity) {
+        productionOrderEntity.setCompletedAt(new Date());
+        repository.save(productionOrderEntity);
+        ProductionOrderDto productionOrderDto = converter.toDto(productionOrderEntity);
+
+        return Optional.of(productionOrderDto);
     }
 
     @Override
