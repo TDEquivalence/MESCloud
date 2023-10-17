@@ -78,7 +78,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         publishProductionOrderCompletion(countingEquipmentOpt.get(), productionOrderEntityOpt.get());
         log.info(() -> String.format("Production Order Conclusion already publish for equipmentId [%s]:", equipmentId));
 
-        return setCompleteDate(productionOrderEntityOpt.get());
+        return completeAndSetDate(productionOrderEntityOpt.get());
     }
 
     public void publishProductionOrderCompletion(CountingEquipmentEntity countingEquipment, ProductionOrderEntity productionOrder) {
@@ -101,8 +101,9 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         mqttClient.publish(mqttSettings.getProtCountPlcTopic(), productionOrderMqttDto);
     }
 
-    private Optional<ProductionOrderDto> setCompleteDate(ProductionOrderEntity productionOrderEntity) {
+    private Optional<ProductionOrderDto> completeAndSetDate(ProductionOrderEntity productionOrderEntity) {
         productionOrderEntity.setCompletedAt(new Date());
+        productionOrderEntity.setCompleted(true);
         repository.save(productionOrderEntity);
         ProductionOrderDto productionOrderDto = converter.toDto(productionOrderEntity);
 
