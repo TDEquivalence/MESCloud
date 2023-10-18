@@ -15,6 +15,7 @@ public class ProductionOrderSummaryDto {
     private ImsDto ims;
     private int targetAmount;
     private Date createdAt;
+    private Date completedAt;
 
     private String inputBatch;
     private String source;

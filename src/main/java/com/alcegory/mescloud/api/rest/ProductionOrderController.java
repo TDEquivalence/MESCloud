@@ -16,7 +16,7 @@ import java.util.Optional;
 @AllArgsConstructor
 public class ProductionOrderController {
 
-    private ProductionOrderService service;
+    private final ProductionOrderService service;
 
 
     @PostMapping
