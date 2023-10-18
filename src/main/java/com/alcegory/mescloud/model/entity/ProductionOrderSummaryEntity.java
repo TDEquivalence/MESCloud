@@ -27,6 +27,7 @@ public class ProductionOrderSummaryEntity {
     private Boolean isEquipmentEnabled;
     private Boolean isCompleted;
     private Date createdAt;
+    private Date completedAt;
     private String inputBatch;
     private String source;
     private String gauge;
