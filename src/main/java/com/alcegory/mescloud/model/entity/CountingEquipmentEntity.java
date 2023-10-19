@@ -48,4 +48,13 @@ public class CountingEquipmentEntity {
     private Double availabilityTarget;
     private Double performanceTarget;
     private Double overallEquipmentEffectivenessTarget;
+
+    @Enumerated(EnumType.STRING)
+    private OperationStatus operationStatus;
+
+    public enum OperationStatus {
+        PENDING,
+        IN_PROGRESS,
+        IDLE
+    }
 }

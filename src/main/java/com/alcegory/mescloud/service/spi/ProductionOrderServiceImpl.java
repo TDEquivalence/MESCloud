@@ -3,6 +3,7 @@ package com.alcegory.mescloud.service.spi;
 import com.alcegory.mescloud.api.mqtt.MqttClient;
 import com.alcegory.mescloud.constant.MqttDTOConstants;
 import com.alcegory.mescloud.exception.MesMqttException;
+import com.alcegory.mescloud.model.dto.CountingEquipmentDto;
 import com.alcegory.mescloud.protocol.MesMqttSettings;
 import com.alcegory.mescloud.repository.CountingEquipmentRepository;
 import com.alcegory.mescloud.repository.ProductionOrderRepository;
@@ -14,6 +15,7 @@ import com.alcegory.mescloud.model.dto.ProductionOrderSummaryDto;
 import com.alcegory.mescloud.model.entity.CountingEquipmentEntity;
 import com.alcegory.mescloud.model.entity.ProductionOrderEntity;
 import com.alcegory.mescloud.model.entity.ProductionOrderSummaryEntity;
+import com.alcegory.mescloud.service.CountingEquipmentService;
 import com.alcegory.mescloud.service.ProductionOrderService;
 import com.alcegory.mescloud.utility.DateUtil;
 import lombok.AllArgsConstructor;
@@ -38,6 +40,8 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     private final ProductionOrderRepository repository;
     private final ProductionOrderConverter converter;
     private final GenericConverter<ProductionOrderSummaryEntity, ProductionOrderSummaryDto> summaryConverter;
+    private final GenericConverter<CountingEquipmentEntity, CountingEquipmentDto> equipmentConverter;
+    private final CountingEquipmentService countingEquipmentService;
     private final CountingEquipmentRepository countingEquipmentRepository;
     private final MqttClient mqttClient;
     private final MesMqttSettings mqttSettings;
@@ -68,6 +72,9 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
             log.warning(() -> String.format("Unable to find Equipment with id [%s]", equipmentId));
             return Optional.empty();
         }
+
+        CountingEquipmentDto countingEquipmentDto = setOperationStatus(countingEquipmentOpt.get(), CountingEquipmentEntity.OperationStatus.PENDING);
+        log.info(() -> String.format("Pending status for Equipment with code [%s]", countingEquipmentDto.getCode()));
 
         Optional<ProductionOrderEntity> productionOrderEntityOpt = repository.findActive(equipmentId);
         if (productionOrderEntityOpt.isEmpty()) {
@@ -131,6 +138,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         productionOrderEntity.setIms(countingEquipmentEntity.getIms());
 
         ProductionOrderEntity persistedProductionOrder = repository.save(productionOrderEntity);
+        setOperationStatus(countingEquipmentEntity, CountingEquipmentEntity.OperationStatus.IN_PROGRESS);
 
         try {
             //TODO: remove to MesProtocolProcess level
@@ -277,5 +285,10 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         long durationInMillisenconds = Math.max(0, endDate.getTime() - startDate.getTime());
 
         return Duration.ofMillis(durationInMillisenconds);
+    }
+
+    private CountingEquipmentDto setOperationStatus(CountingEquipmentEntity countingEquipment, CountingEquipmentEntity.OperationStatus status) {
+        countingEquipmentService.setOperationStatus(countingEquipment, status);
+        return equipmentConverter.toDto(countingEquipment, CountingEquipmentDto.class);
     }
 }

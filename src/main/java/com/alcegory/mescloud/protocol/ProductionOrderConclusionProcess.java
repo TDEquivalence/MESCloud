@@ -1,6 +1,8 @@
 package com.alcegory.mescloud.protocol;
 
 import com.alcegory.mescloud.api.mqtt.MqttClient;
+import com.alcegory.mescloud.model.dto.CountingEquipmentDto;
+import com.alcegory.mescloud.model.entity.CountingEquipmentEntity;
 import com.alcegory.mescloud.repository.ProductionOrderRepository;
 import com.alcegory.mescloud.constant.MqttDTOConstants;
 import com.alcegory.mescloud.model.dto.PlcMqttDto;
@@ -81,6 +83,7 @@ public class ProductionOrderConclusionProcess extends AbstractMesProtocolProcess
         }
 
         completeProductionOrder(productionOrder);
+        setOperationStatus(equipmentCode);
     }
 
     private void completeProductionOrder(ProductionOrderEntity productionOrder) {
@@ -108,5 +111,9 @@ public class ProductionOrderConclusionProcess extends AbstractMesProtocolProcess
         }
 
         return productionOrderEntityOpt.get();
+    }
+
+    private void setOperationStatus(String equipmentCode) {
+        equipmentService.setOperationStatusByCode(equipmentCode, CountingEquipmentEntity.OperationStatus.IDLE);
     }
 }

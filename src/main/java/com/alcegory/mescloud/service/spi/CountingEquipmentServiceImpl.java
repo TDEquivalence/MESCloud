@@ -231,6 +231,23 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
         return productionOrderService.isCompleted(productionOrderCode);
     }
 
+    @Override
+    public CountingEquipmentDto setOperationStatus(CountingEquipmentEntity countingEquipment, CountingEquipmentEntity.OperationStatus status) {
+        countingEquipment.setOperationStatus(status);
+        repository.save(countingEquipment);
+        return converter.convertToDto(countingEquipment);
+    }
+
+    @Override
+    public void setOperationStatusByCode(String equipmentCode, CountingEquipmentEntity.OperationStatus status) {
+        Optional<CountingEquipmentEntity> countingEquipmentEntityOptional = repository.findByCode(equipmentCode);
+        countingEquipmentEntityOptional.ifPresent(countingEquipmentEntity -> setOperationStatus(countingEquipmentEntity, status));
+
+        if (countingEquipmentEntityOptional.isEmpty()) {
+            log.info(() -> String.format("Equipment with code [%s] not found", equipmentCode));
+        }
+    }
+
     private void updateEquipmentConfiguration(CountingEquipmentEntity persistedEquipment, RequestConfigurationDto request) {
         CountingEquipmentEntity countingEquipmentConfig = converter.convertToEntity(request);
         ensureMinimumPTimer(countingEquipmentConfig);
