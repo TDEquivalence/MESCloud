@@ -74,7 +74,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         }
 
         CountingEquipmentDto countingEquipmentDto = setOperationStatus(countingEquipmentOpt.get(), CountingEquipmentEntity.OperationStatus.PENDING);
-        log.info(() -> String.format("Pending status for Equipment with code [%s]", countingEquipmentDto.getCode()));
+        log.info(() -> String.format("Change status to PENDING for Equipment with code [%s]", countingEquipmentDto.getCode()));
 
         Optional<ProductionOrderEntity> productionOrderEntityOpt = repository.findActive(equipmentId);
         if (productionOrderEntityOpt.isEmpty()) {
@@ -138,6 +138,8 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         productionOrderEntity.setIms(countingEquipmentEntity.getIms());
 
         ProductionOrderEntity persistedProductionOrder = repository.save(productionOrderEntity);
+
+        log.info(() -> String.format("Change status to IN PROGRESS for Equipment with code [%s]", countingEquipmentEntity.getCode()));
         setOperationStatus(countingEquipmentEntity, CountingEquipmentEntity.OperationStatus.IN_PROGRESS);
 
         try {

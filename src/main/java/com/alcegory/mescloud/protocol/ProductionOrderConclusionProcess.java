@@ -114,6 +114,7 @@ public class ProductionOrderConclusionProcess extends AbstractMesProtocolProcess
     }
 
     private void setOperationStatus(String equipmentCode) {
+        log.info(() -> String.format("Change status to IDLE for Equipment with code [%s]", equipmentCode));
         equipmentService.setOperationStatusByCode(equipmentCode, CountingEquipmentEntity.OperationStatus.IDLE);
     }
 }
