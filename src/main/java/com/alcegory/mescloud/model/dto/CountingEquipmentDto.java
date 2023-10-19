@@ -1,6 +1,9 @@
 package com.alcegory.mescloud.model.dto;
 
+import com.alcegory.mescloud.model.entity.CountingEquipmentEntity;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -26,4 +29,6 @@ public class CountingEquipmentDto {
     private Double availabilityTarget;
     private Double performanceTarget;
     private Double overallEquipmentEffectivenessTarget;
+    @Enumerated(EnumType.STRING)
+    private CountingEquipmentEntity.OperationStatus operationStatus;
 }

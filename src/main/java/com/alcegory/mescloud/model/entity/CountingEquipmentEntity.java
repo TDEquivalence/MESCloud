@@ -53,8 +53,18 @@ public class CountingEquipmentEntity {
     private OperationStatus operationStatus;
 
     public enum OperationStatus {
-        PENDING,
-        IN_PROGRESS,
-        IDLE
+        PENDING("PENDING"),
+        IN_PROGRESS("IN_PROGRESS"),
+        IDLE("IDLE");
+
+        private final String value;
+
+        OperationStatus(String value) {
+            this.value = value;
+        }
+
+        public String getValue() {
+            return value;
+        }
     }
 }
