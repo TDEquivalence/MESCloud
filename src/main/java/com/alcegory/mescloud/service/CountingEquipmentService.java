@@ -31,6 +31,8 @@ public interface CountingEquipmentService {
 
     CountingEquipmentDto updateConfiguration(long equipmentId, RequestConfigurationDto request)
             throws IncompleteConfigurationException, EmptyResultDataAccessException, ActiveProductionOrderException;
+    
+    CountingEquipmentDto setOperationStatus(CountingEquipmentEntity countingEquipment, CountingEquipmentEntity.OperationStatus status);
 
-    boolean hasEquipmentAssociatedProductionOrder(String equipmentCode);
+    void setOperationStatusByCode(String equipmentCode, CountingEquipmentEntity.OperationStatus idle);
 }

@@ -48,4 +48,23 @@ public class CountingEquipmentEntity {
     private Double availabilityTarget;
     private Double performanceTarget;
     private Double overallEquipmentEffectivenessTarget;
+
+    @Enumerated(EnumType.STRING)
+    private OperationStatus operationStatus;
+
+    public enum OperationStatus {
+        PENDING("PENDING"),
+        IN_PROGRESS("IN_PROGRESS"),
+        IDLE("IDLE");
+
+        private final String value;
+
+        OperationStatus(String value) {
+            this.value = value;
+        }
+
+        public String getValue() {
+            return value;
+        }
+    }
 }
