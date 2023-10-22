@@ -1,5 +1,6 @@
 package com.alcegory.mescloud.service;
 
+import com.alcegory.mescloud.constant.AlarmStatus;
 import com.alcegory.mescloud.exception.AlarmConfigurationNotFoundException;
 import com.alcegory.mescloud.exception.AlarmNotFoundException;
 import com.alcegory.mescloud.exception.EquipmentNotFoundException;
@@ -15,11 +16,14 @@ import java.util.List;
 
 public interface AlarmService {
 
-    List<AlarmDto> findAllByFilter(AlarmFilter filter);
+    List<AlarmDto> findByFilter(AlarmFilter filter);
 
-    AlarmDto recognizeAlarm(Long alarmId, RequestAlarmRecognitionDto alarmRecognition, Authentication authentication) throws AlarmNotFoundException, IllegalAlarmStatusException;
+    List<AlarmDto> findByEquipmentIdAndStatus(Long equipmentId, AlarmStatus status);
+
+    AlarmDto recognizeAlarm(Long alarmId, RequestAlarmRecognitionDto alarmRecognition, Authentication authentication)
+            throws AlarmNotFoundException, IllegalAlarmStatusException;
 
     AlarmCounts getAlarmCounts(AlarmFilter filter);
 
-    void processPlcAlarms(PlcMqttDto plcMqttDto) throws AlarmConfigurationNotFoundException, EquipmentNotFoundException;
+    void processAlarms(PlcMqttDto plcMqttDto) throws AlarmConfigurationNotFoundException, EquipmentNotFoundException;
 }

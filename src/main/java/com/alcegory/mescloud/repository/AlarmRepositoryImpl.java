@@ -13,7 +13,7 @@ import java.util.List;
 @Repository
 public class AlarmRepositoryImpl extends AbstractFilterRepository<AlarmFilter.Property, AlarmEntity> {
 
-    public List<AlarmEntity> findAllByFilter(AlarmFilter filter) {
+    public List<AlarmEntity> findByFilter(AlarmFilter filter) {
         return super.findAllWithFilter(filter, AlarmEntity.class);
     }
 

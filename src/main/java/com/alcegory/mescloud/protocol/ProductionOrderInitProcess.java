@@ -26,7 +26,7 @@ public class ProductionOrderInitProcess extends AbstractMesProtocolProcess<PlcMq
 
         log.info("Executing Production Order response process");
         equipmentService.updateEquipmentStatus(equipmentCode, equipmentCounts.getEquipmentStatus());
-        alarmService.processPlcAlarms(equipmentCounts);
+        alarmService.processAlarms(equipmentCounts);
 
         if (areInvalidInitialCounts(equipmentCounts)) {
             log.warning(() -> String.format("Invalid initial count - Production Order [%s] already has records or does not exist",

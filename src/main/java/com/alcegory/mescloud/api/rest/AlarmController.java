@@ -23,8 +23,8 @@ public class AlarmController {
     private final AlarmService service;
 
     @PostMapping
-    public ResponseEntity<List<AlarmDto>> findAlarms(@RequestBody AlarmFilter filter) {
-        List<AlarmDto> alarmRecords = service.findAllByFilter(filter);
+    public ResponseEntity<List<AlarmDto>> findByFilter(@RequestBody AlarmFilter filter) {
+        List<AlarmDto> alarmRecords = service.findByFilter(filter);
         return new ResponseEntity<>(alarmRecords, HttpStatus.OK);
     }
 
