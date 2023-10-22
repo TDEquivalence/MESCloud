@@ -1,16 +1,13 @@
 package com.alcegory.mescloud.service.spi;
 
-import com.alcegory.mescloud.exception.ActiveProductionOrderException;
-import com.alcegory.mescloud.exception.EquipmentNotFoundException;
-import com.alcegory.mescloud.exception.ImsNotFoundException;
-import com.alcegory.mescloud.exception.IncompleteConfigurationException;
+import com.alcegory.mescloud.api.mqtt.MqttClient;
+import com.alcegory.mescloud.exception.*;
 import com.alcegory.mescloud.model.converter.CountingEquipmentConverter;
 import com.alcegory.mescloud.model.converter.GenericConverter;
+import com.alcegory.mescloud.model.converter.PlcMqttConverter;
 import com.alcegory.mescloud.model.dto.*;
-import com.alcegory.mescloud.model.entity.CountingEquipmentEntity;
-import com.alcegory.mescloud.model.entity.EquipmentOutputAliasEntity;
-import com.alcegory.mescloud.model.entity.EquipmentOutputEntity;
-import com.alcegory.mescloud.model.entity.ImsEntity;
+import com.alcegory.mescloud.model.entity.*;
+import com.alcegory.mescloud.protocol.MesMqttSettings;
 import com.alcegory.mescloud.repository.CountingEquipmentRepository;
 import com.alcegory.mescloud.service.*;
 import lombok.AllArgsConstructor;
@@ -34,6 +31,9 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
     private final ImsService imsService;
     private final GenericConverter<ImsEntity, ImsDto> imsConverter;
     private final EquipmentStatusRecordService statusRecordService;
+    private final PlcMqttConverter plcConverter;
+    private final MqttClient mqttClient;
+    private final MesMqttSettings mqttSettings;
 
     @Override
     public List<CountingEquipmentDto> findAllWithLastProductionOrder() {
@@ -180,7 +180,7 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
 
     @Override
     public CountingEquipmentDto updateConfiguration(long equipmentId, RequestConfigurationDto request)
-            throws IncompleteConfigurationException, EmptyResultDataAccessException, ActiveProductionOrderException {
+            throws IncompleteConfigurationException, EmptyResultDataAccessException, ActiveProductionOrderException, MesMqttException {
 
         if (containsNullProperty(request)) {
             throw new IncompleteConfigurationException("Counting equipment configuration is incomplete: properties alias and outputs must be specified.");
@@ -201,10 +201,16 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
         }
 
         updateEquipmentConfiguration(countingEquipment, request);
+        publishToPlc(countingEquipment);
         repository.save(countingEquipment);
+
         return converter.convertToDto(countingEquipment);
     }
 
+    private void publishToPlc(CountingEquipmentEntity countingEquipment) throws MesMqttException {
+        EquipmentConfigMqttDto equipmentConfig = plcConverter.toMqttDto(countingEquipment);
+        mqttClient.publish(mqttSettings.getProtCountPlcTopic(), equipmentConfig);
+    }
 
     private boolean containsNullProperty(RequestConfigurationDto countingEquipmentDto) {
         return countingEquipmentDto.getAlias() == null ||
