@@ -30,11 +30,13 @@ public class KpiDto {
     public void setValueAsDivision() {
         if (hasInvalidDivisionMembers()) {
             log.warning(String.format("Unable to calculate value: cannot divide dividend [%s] by the divisor [%s]", dividend, divider));
-            this.value = null;
-            return;
+            this.value = 0.0;
+        } else {
+            this.value = this.dividend / this.divider;
+            if (this.value < 0) {
+                this.value = 0.0;
+            }
         }
-
-        this.value = this.dividend / this.divider;
     }
 
     public void setValueAsDifference() {
