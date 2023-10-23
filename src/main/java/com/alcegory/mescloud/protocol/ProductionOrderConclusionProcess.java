@@ -1,7 +1,6 @@
 package com.alcegory.mescloud.protocol;
 
 import com.alcegory.mescloud.api.mqtt.MqttClient;
-import com.alcegory.mescloud.model.dto.CountingEquipmentDto;
 import com.alcegory.mescloud.model.entity.CountingEquipmentEntity;
 import com.alcegory.mescloud.repository.ProductionOrderRepository;
 import com.alcegory.mescloud.constant.MqttDTOConstants;
@@ -17,7 +16,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
 import java.util.Optional;
 
 @Service
@@ -35,6 +33,7 @@ public class ProductionOrderConclusionProcess extends AbstractMesProtocolProcess
     private final MqttClient mqttClient;
     private final ProductionOrderRepository repository;
     private final MesMqttSettings mqttSettings;
+
     @Override
     public void execute(PlcMqttDto equipmentCounts) {
 
@@ -45,7 +44,7 @@ public class ProductionOrderConclusionProcess extends AbstractMesProtocolProcess
         }
 
         equipmentService.updateEquipmentStatus(equipmentCounts.getEquipmentCode(), equipmentCounts.getEquipmentStatus());
-        alarmService.processPlcAlarms(equipmentCounts);
+        alarmService.processAlarms(equipmentCounts);
 
         counterRecordService.save(equipmentCounts);
 

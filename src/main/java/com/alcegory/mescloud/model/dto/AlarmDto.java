@@ -18,5 +18,6 @@ public class AlarmDto {
     private String comment;
     private Date createdAt;
     private Date completedAt;
-    private UserDto completedBy;
+    private Date recognizedAt;
+    private UserDto recognizedBy;
 }

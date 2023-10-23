@@ -31,7 +31,9 @@ public class AlarmEntity {
     private Date createdAt;
     @Temporal(TemporalType.TIMESTAMP)
     private Date completedAt;
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date recognizedAt;
     @ManyToOne
-    @JoinColumn(name = "completed_by")
-    private UserEntity completedBy;
+    @JoinColumn(name = "recognized_by")
+    private UserEntity recognizedBy;
 }

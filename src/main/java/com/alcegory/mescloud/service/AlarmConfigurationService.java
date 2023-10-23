@@ -6,5 +6,5 @@ import java.util.Optional;
 
 public interface AlarmConfigurationService {
 
-    Optional<AlarmConfigurationEntity> findByWordIndexAndBitIndex(int wordIndex, int bitIndex);
+    Optional<AlarmConfigurationEntity> findByWordAndBitIndexes(int wordIndex, int bitIndex);
 }

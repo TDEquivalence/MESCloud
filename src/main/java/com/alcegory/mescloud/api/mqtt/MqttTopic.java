@@ -24,7 +24,6 @@ public class MqttTopic extends AWSIotTopic {
             log.info(() -> String.format("Message received on topic [%s]", message.getTopic()));
             SpringContext.getBean(CountProtocol.class, CountProtocol.BEAN_NAME).react(message);
         } catch (Exception e) {
-            e.printStackTrace();
             log.log(Level.SEVERE, e, () -> e.getMessage());
             log.severe(Arrays.toString(e.getStackTrace()));
         }
