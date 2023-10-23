@@ -1,9 +1,6 @@
 package com.alcegory.mescloud.api.rest;
 
-import com.alcegory.mescloud.exception.ActiveProductionOrderException;
-import com.alcegory.mescloud.exception.EquipmentNotFoundException;
-import com.alcegory.mescloud.exception.ImsNotFoundException;
-import com.alcegory.mescloud.exception.IncompleteConfigurationException;
+import com.alcegory.mescloud.exception.*;
 import com.alcegory.mescloud.model.dto.CountingEquipmentDto;
 import com.alcegory.mescloud.model.dto.RequestConfigurationDto;
 import com.alcegory.mescloud.model.dto.RequestImsDto;
@@ -26,6 +23,7 @@ public class CountingEquipmentController {
     private static final String IMS_ERROR_CAUSE = "IMS";
     private static final String EQUIPMENT_ERROR_CAUSE = "EQUIPMENT";
     private static final String CONFIG_ERROR_CAUSE = "CONFIG";
+    private static final String PLC_ERROR_CAUSE = "PLC";
 
     private CountingEquipmentService service;
 
@@ -71,6 +69,8 @@ public class CountingEquipmentController {
             return HttpUtil.responseWithHeaders(HttpStatus.NOT_FOUND, EQUIPMENT_ERROR_CAUSE, e);
         } catch (ActiveProductionOrderException e) {
             return HttpUtil.responseWithHeaders(HttpStatus.CONFLICT, EQUIPMENT_ERROR_CAUSE, e);
+        } catch (MesMqttException e) {
+            return HttpUtil.responseWithHeaders(HttpStatus.CONFLICT, PLC_ERROR_CAUSE, e);
         }
     }
 }

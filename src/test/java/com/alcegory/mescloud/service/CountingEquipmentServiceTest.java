@@ -2,6 +2,7 @@ package com.alcegory.mescloud.service;
 
 import com.alcegory.mescloud.exception.ActiveProductionOrderException;
 import com.alcegory.mescloud.exception.IncompleteConfigurationException;
+import com.alcegory.mescloud.exception.MesMqttException;
 import com.alcegory.mescloud.model.converter.GenericConverter;
 import com.alcegory.mescloud.model.dto.CountingEquipmentDto;
 import com.alcegory.mescloud.model.dto.ImsDto;
@@ -53,7 +54,8 @@ class CountingEquipmentServiceTest {
 
         try {
             countingEquipmentService.updateConfiguration(equipmentId, request);
-        } catch (IncompleteConfigurationException | EmptyResultDataAccessException | ActiveProductionOrderException e) {
+        } catch (IncompleteConfigurationException | EmptyResultDataAccessException | ActiveProductionOrderException |
+                 MesMqttException e) {
             assertTrue(e instanceof IncompleteConfigurationException);
         }
 
