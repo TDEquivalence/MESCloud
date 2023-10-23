@@ -201,21 +201,21 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     }
 
     private int defaultCalculateComputedValue(CounterRecordEntity lastPersistedCount, CounterRecordEntity receivedCount) {
-        int computedValueIncrement = defaultComputeValueIncrement(lastPersistedCount, receivedCount);
+        int computedValueIncrement = computeValueIncrement(lastPersistedCount, receivedCount);
         return lastPersistedCount.getComputedValue() + computedValueIncrement;
     }
 
-    private int defaultComputeValueIncrement(CounterRecordEntity lastPersistedCount, CounterRecordEntity receivedCount) {
+    private int computeValueIncrement(CounterRecordEntity lastPersistedCount, CounterRecordEntity receivedCount) {
         return receivedCount.getRealValue() - lastPersistedCount.getRealValue();
     }
 
     private int calculateIncrement(CounterRecordEntity lastPersistedCount, CounterRecordEntity receivedCount) {
 
-        if (isRollover(lastPersistedCount, receivedCount)) {
-            return rolloverCalculateIncrement(lastPersistedCount, receivedCount);
+        if (lastPersistedCount.getRealValue() > receivedCount.getRealValue()) {
+            return 0;
         }
 
-        return defaultComputeValueIncrement(lastPersistedCount, receivedCount);
+        return computeValueIncrement(lastPersistedCount, receivedCount);
     }
 
     public boolean areValidInitialCounts(String productionOrderCode) {
