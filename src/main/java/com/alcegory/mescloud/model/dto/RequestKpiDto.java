@@ -10,9 +10,9 @@ import java.sql.Timestamp;
 @Setter
 public class RequestKpiDto {
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Timestamp startDate;
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Timestamp endDate;
 }
