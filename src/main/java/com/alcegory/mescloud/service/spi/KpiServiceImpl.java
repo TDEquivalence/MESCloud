@@ -166,7 +166,6 @@ public class KpiServiceImpl implements KpiService {
         Integer totalCounter = counterRecordService.sumCounterIncrement(equipmentId, requestKpiDto.getStartDate(), requestKpiDto.getEndDate());
 
         KpiDto kpi = new KpiDto(validCounter, totalCounter);
-        handleNullKpiValues(kpi);
         kpi.setValueAsDivision();
         return kpi;
     }
@@ -174,12 +173,14 @@ public class KpiServiceImpl implements KpiService {
     private KpiDto computePerformance(KpiDto qualityKpi, KpiDto availabilityKpi, CountingEquipmentDto countingEquipment) {
 
         if (countingEquipment.getTheoreticalProduction() == null) {
-            log.warning(String.format("Unable to compute performance: equipment [%s] has no theoretical production configuration value",
-                    countingEquipment.getId()));
-            countingEquipment.setTheoreticalProduction(0.0);
+            log.warning(String.format("Unable to compute performance: equipment [%s] has no theoretical production configuration value", countingEquipment.getId()));
+            return null;
         }
 
-        handleNullKpiValues(qualityKpi);
+        if (qualityKpi.getDividend() == 0 || availabilityKpi.getDividend() == 0) {
+            log.warning(String.format("Unable to compute performance: cannot divide quality dividend [%s] by the availability dividend [%s]", qualityKpi.getDividend(), availabilityKpi.getDividend()));
+            return null;
+        }
 
         Double realProductionInSeconds = qualityKpi.getDividend() / availabilityKpi.getDividend();
         KpiDto kpi = new KpiDto(realProductionInSeconds, countingEquipment.getTheoreticalProduction());
@@ -190,7 +191,7 @@ public class KpiServiceImpl implements KpiService {
     private Double computeOverallEffectivePerformance(KpiDto quality, KpiDto availability, KpiDto performance) {
 
         if (isValueZeroOrMissing(quality) || isValueZeroOrMissing(availability) || isValueZeroOrMissing(performance)) {
-            return 0.0;
+            return null;
         }
 
         return quality.getValue() * availability.getValue() * performance.getValue();
@@ -198,17 +199,5 @@ public class KpiServiceImpl implements KpiService {
 
     private boolean isValueZeroOrMissing(KpiDto kpiDto) {
         return kpiDto == null || kpiDto.getValue() == null || kpiDto.getValue() == 0;
-    }
-
-    private void handleNullKpiValues(KpiDto kpi) {
-        if(kpi.getDividend() == null) {
-            log.info("Kpi dividend value is null");
-            kpi.setDividend(0.0);
-        }
-
-        if(kpi.getDivider() == null) {
-            log.info("Kpi divider value is null");
-            kpi.setDivider(0.0);
-        }
     }
 }
