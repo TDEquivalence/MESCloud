@@ -17,6 +17,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
+import static com.alcegory.mescloud.model.entity.CountingEquipmentEntity.OperationStatus.IN_PROGRESS;
+
 @Service
 @AllArgsConstructor
 @Log
@@ -311,5 +313,20 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
     private void ensureMinimumPTimer(CountingEquipmentEntity countingEquipmentEntity) {
         int currentPTimer = countingEquipmentEntity.getPTimerCommunicationCycle();
         countingEquipmentEntity.setPTimerCommunicationCycle(Math.max(MIN_P_TIMER, currentPTimer));
+    }
+
+    @Override
+    public void activateEquipment(CountingEquipmentEntity equipment) {
+        if (equipment == null) {
+            throw new IllegalArgumentException("Equipment is null.");
+        }
+
+        if (equipment.getEquipmentStatus() == 1) {
+            throw new IllegalStateException("Equipment is already active: " + equipment.getCode());
+        }
+
+        equipment.setEquipmentStatus(1);
+        equipment.setOperationStatus(IN_PROGRESS);
+        repository.save(equipment);
     }
 }

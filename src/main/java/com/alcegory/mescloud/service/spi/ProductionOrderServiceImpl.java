@@ -3,18 +3,18 @@ package com.alcegory.mescloud.service.spi;
 import com.alcegory.mescloud.api.mqtt.MqttClient;
 import com.alcegory.mescloud.constant.MqttDTOConstants;
 import com.alcegory.mescloud.exception.MesMqttException;
-import com.alcegory.mescloud.model.dto.CountingEquipmentDto;
-import com.alcegory.mescloud.protocol.MesMqttSettings;
-import com.alcegory.mescloud.repository.CountingEquipmentRepository;
-import com.alcegory.mescloud.repository.ProductionOrderRepository;
 import com.alcegory.mescloud.model.converter.GenericConverter;
 import com.alcegory.mescloud.model.converter.ProductionOrderConverter;
+import com.alcegory.mescloud.model.dto.CountingEquipmentDto;
 import com.alcegory.mescloud.model.dto.ProductionOrderDto;
 import com.alcegory.mescloud.model.dto.ProductionOrderMqttDto;
 import com.alcegory.mescloud.model.dto.ProductionOrderSummaryDto;
 import com.alcegory.mescloud.model.entity.CountingEquipmentEntity;
 import com.alcegory.mescloud.model.entity.ProductionOrderEntity;
 import com.alcegory.mescloud.model.entity.ProductionOrderSummaryEntity;
+import com.alcegory.mescloud.protocol.MesMqttSettings;
+import com.alcegory.mescloud.repository.CountingEquipmentRepository;
+import com.alcegory.mescloud.repository.ProductionOrderRepository;
 import com.alcegory.mescloud.service.CountingEquipmentService;
 import com.alcegory.mescloud.service.ProductionOrderService;
 import com.alcegory.mescloud.utility.DateUtil;
@@ -292,5 +292,19 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     private CountingEquipmentDto setOperationStatus(CountingEquipmentEntity countingEquipment, CountingEquipmentEntity.OperationStatus status) {
         countingEquipmentService.setOperationStatus(countingEquipment, status);
         return equipmentConverter.toDto(countingEquipment, CountingEquipmentDto.class);
+    }
+
+    @Override
+    public void reactivateProductionOrder(String productionOrderCode) {
+        Optional<ProductionOrderEntity> productionOrder = repository.findByCode(productionOrderCode);
+        if (productionOrder.isEmpty()) {
+            String message = "No production orders found for composed order code: " + productionOrderCode;
+            throw new IllegalStateException(message);
+        }
+
+        productionOrder.get().setCompletedAt(null);
+        productionOrder.get().setCompleted(false);
+        countingEquipmentService.activateEquipment(productionOrder.get().getEquipment());
+        repository.save(productionOrder.get());
     }
 }

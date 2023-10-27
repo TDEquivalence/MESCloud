@@ -32,4 +32,6 @@ public interface CountingEquipmentService {
     CountingEquipmentDto setOperationStatus(CountingEquipmentEntity countingEquipment, CountingEquipmentEntity.OperationStatus status);
 
     void setOperationStatusByCode(String equipmentCode, CountingEquipmentEntity.OperationStatus idle);
+
+    void activateEquipment(CountingEquipmentEntity equipment);
 }

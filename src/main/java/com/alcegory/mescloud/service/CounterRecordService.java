@@ -23,4 +23,6 @@ public interface CounterRecordService {
     Integer sumValidCounterIncrement(Long countingEquipmentId, Timestamp startDateFilter, Timestamp endDateFilter);
 
     Integer sumCounterIncrement(Long countingEquipmentId, Timestamp startDateFilter, Timestamp endDateFilter);
+
+    void isProductionOrderInactive(String productionOrderCode);
 }

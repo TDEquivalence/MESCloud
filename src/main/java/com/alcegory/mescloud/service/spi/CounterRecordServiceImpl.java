@@ -239,4 +239,15 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     public Integer sumCounterIncrement(Long countingEquipmentId, Timestamp startDateFilter, Timestamp endDateFilter) {
         return repository.sumCounterIncrement(countingEquipmentId, startDateFilter, endDateFilter);
     }
+
+    @Override
+    public void isProductionOrderInactive(String productionOrderCode) {
+        if (productionOrderCode != null && productionOrderService.isCompleted(productionOrderCode)) {
+            reactivateProductionOrder(productionOrderCode);
+        }
+    }
+
+    private void reactivateProductionOrder(String productionOrderCode) {
+        productionOrderService.reactivateProductionOrder(productionOrderCode);
+    }
 }

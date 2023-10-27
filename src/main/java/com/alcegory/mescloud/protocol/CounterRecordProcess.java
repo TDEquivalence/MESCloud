@@ -24,12 +24,14 @@ public class CounterRecordProcess extends AbstractMesProtocolProcess<PlcMqttDto>
 
         log.info("Executing Counter Record process");
         equipmentService.updateEquipmentStatus(equipmentCounts.getEquipmentCode(), equipmentCounts.getEquipmentStatus());
-        alarmService.processAlarms(equipmentCounts);
+        //alarmService.processAlarms(equipmentCounts);
 
         if (areInvalidContinuationCounts(equipmentCounts)) {
             log.warning(() -> String.format("Invalid continuation count - Production Order [%s] has no initial records or does not exist",
                     equipmentCounts.getProductionOrderCode()));
         }
+
+        isProductionOrderInactive(equipmentCounts);
 
         counterRecordService.save(equipmentCounts);
 
@@ -41,6 +43,10 @@ public class CounterRecordProcess extends AbstractMesProtocolProcess<PlcMqttDto>
 
     private boolean areInvalidContinuationCounts(PlcMqttDto equipmentCountsMqttDTO) {
         return !counterRecordService.areValidContinuationCounts(equipmentCountsMqttDTO.getProductionOrderCode());
+    }
+
+    private void isProductionOrderInactive(PlcMqttDto equipmentCountsMqttDTO) {
+        counterRecordService.isProductionOrderInactive(equipmentCountsMqttDTO.getProductionOrderCode());
     }
 
     @Override
