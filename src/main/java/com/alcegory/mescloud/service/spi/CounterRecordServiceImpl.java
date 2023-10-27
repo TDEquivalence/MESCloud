@@ -241,7 +241,7 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     }
 
     @Override
-    public void isProductionOrderInactive(String productionOrderCode) {
+    public void isProductionOrderCompleted(String productionOrderCode) {
         if (productionOrderCode != null && productionOrderService.isCompleted(productionOrderCode)) {
             reactivateProductionOrder(productionOrderCode);
         }

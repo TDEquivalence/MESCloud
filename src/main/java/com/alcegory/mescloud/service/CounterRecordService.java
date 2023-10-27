@@ -24,5 +24,5 @@ public interface CounterRecordService {
 
     Integer sumCounterIncrement(Long countingEquipmentId, Timestamp startDateFilter, Timestamp endDateFilter);
 
-    void isProductionOrderInactive(String productionOrderCode);
+    void isProductionOrderCompleted(String productionOrderCode);
 }
