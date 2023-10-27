@@ -31,7 +31,7 @@ public class CounterRecordProcess extends AbstractMesProtocolProcess<PlcMqttDto>
                     equipmentCounts.getProductionOrderCode()));
         }
 
-        isProductionOrderCompleted(equipmentCounts);
+        checkIfProductionOrderIsCompleted(equipmentCounts);
 
         counterRecordService.save(equipmentCounts);
 
@@ -45,8 +45,8 @@ public class CounterRecordProcess extends AbstractMesProtocolProcess<PlcMqttDto>
         return !counterRecordService.areValidContinuationCounts(equipmentCountsMqttDTO.getProductionOrderCode());
     }
 
-    private void isProductionOrderCompleted(PlcMqttDto equipmentCountsMqttDTO) {
-        counterRecordService.isProductionOrderCompleted(equipmentCountsMqttDTO.getProductionOrderCode());
+    private void checkIfProductionOrderIsCompleted(PlcMqttDto equipmentCountsMqttDTO) {
+        counterRecordService.checkIfProductionOrderIsCompleted(equipmentCountsMqttDTO.getProductionOrderCode());
     }
 
     @Override
