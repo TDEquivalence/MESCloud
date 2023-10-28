@@ -34,12 +34,12 @@ public interface CounterRecordRepository extends CrudRepository<CounterRecordEnt
 
     Integer sumCounterIncrement(Long countingEquipmentId, Timestamp startDateFilter, Timestamp endDateFilter);
 
-    @Query("SELECT cr FROM CounterRecordEntity cr " +
-            "WHERE (cr.equipmentOutput, cr.realValue, cr.computedValue, cr.increment, cr.productionOrder, cr.isValidForProduction) IN " +
-            "(SELECT cr2.equipmentOutput, cr2.realValue, cr2.computedValue, cr2.increment, cr2.productionOrder, cr2.isValidForProduction " +
-            "FROM CounterRecordEntity cr2 " +
-            "WHERE DATE(cr2.registeredAt) = DATE(:rangeDateToCompare)) " +
-            "GROUP BY cr.equipmentOutput, cr.realValue, cr.computedValue, cr.increment, cr.productionOrder, cr.isValidForProduction " +
-            "HAVING COUNT(cr) = 1")
-    List<CounterRecordEntity> checkIfRepeatedCounterRecords(List<CounterRecordEntity> counterRecords, @Param("rangeDateToCompare") Date rangeDateToCompare);
+    @Query("SELECT cr FROM CounterRecordEntity cr WHERE (cr.equipmentOutput, cr.realValue, cr.computedValue, cr.increment, " +
+            "cr.productionOrder, cr.isValidForProduction) IN (SELECT cr2.equipmentOutput, cr2.realValue, cr2.computedValue, " +
+            "cr2.increment, cr2.productionOrder, cr2.isValidForProduction FROM CounterRecordEntity cr2 " +
+            "WHERE DATE(cr2.registeredAt) = DATE(:rangeDateToCompare)) AND cr IN :counterRecords " +
+            "GROUP BY cr.equipmentOutput, cr.realValue, cr.computedValue, cr.increment, cr.productionOrder, " +
+            "cr.isValidForProduction HAVING COUNT(cr) = 1")
+    List<CounterRecordEntity> checkIfRepeatedCounterRecords(@Param("counterRecords") List<CounterRecordEntity> counterRecords, @Param("rangeDateToCompare") Date rangeDateToCompare);
+
 }
