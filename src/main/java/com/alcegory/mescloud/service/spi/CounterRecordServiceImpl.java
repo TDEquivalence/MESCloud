@@ -106,7 +106,7 @@ public class CounterRecordServiceImpl implements CounterRecordService {
             counterRecords.add(counterRecord);
         }
 
-        List<CounterRecordEntity> validCounterRecords = checkIfRepeatedCounterRecords(counterRecords);
+        List<CounterRecordEntity> validCounterRecords = checkIfNonRepeatedCounterRecords(counterRecords);
         Iterable<CounterRecordEntity> counterRecordEntities = repository.saveAll(validCounterRecords);
         return converter.toDto(counterRecordEntities);
     }
@@ -241,8 +241,23 @@ public class CounterRecordServiceImpl implements CounterRecordService {
         return repository.sumCounterIncrement(countingEquipmentId, startDateFilter, endDateFilter);
     }
 
-    private List<CounterRecordEntity> checkIfRepeatedCounterRecords(List<CounterRecordEntity> counterRecords) {
+    private List<CounterRecordEntity> checkIfNonRepeatedCounterRecords(List<CounterRecordEntity> counterRecords) {
         Date rangeDateToCompare = counterRecords.get(0).getRegisteredAt();
-        return repository.checkIfRepeatedCounterRecords(counterRecords, rangeDateToCompare);
+        List<CounterRecordEntity> nonRepeatedRecords = new ArrayList<>();
+
+        for (CounterRecordEntity unsavedRecord : counterRecords) {
+            if (repository.checkIfNonRepeatedCounterRecords(
+                    rangeDateToCompare,
+                    unsavedRecord.getEquipmentOutput(),
+                    unsavedRecord.getRealValue(),
+                    unsavedRecord.getComputedValue(),
+                    unsavedRecord.getIncrement(),
+                    unsavedRecord.getProductionOrder()
+            ).isEmpty()) {
+                nonRepeatedRecords.add(unsavedRecord);
+            }
+        }
+
+        return nonRepeatedRecords;
     }
 }

@@ -3,6 +3,8 @@ package com.alcegory.mescloud.repository;
 import com.alcegory.mescloud.model.dto.KpiFilterDto;
 import com.alcegory.mescloud.model.entity.CounterRecordConclusionEntity;
 import com.alcegory.mescloud.model.entity.CounterRecordEntity;
+import com.alcegory.mescloud.model.entity.EquipmentOutputEntity;
+import com.alcegory.mescloud.model.entity.ProductionOrderEntity;
 import com.alcegory.mescloud.model.filter.CounterRecordFilter;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -34,12 +36,20 @@ public interface CounterRecordRepository extends CrudRepository<CounterRecordEnt
 
     Integer sumCounterIncrement(Long countingEquipmentId, Timestamp startDateFilter, Timestamp endDateFilter);
 
-    @Query("SELECT cr FROM CounterRecordEntity cr WHERE (cr.equipmentOutput, cr.realValue, cr.computedValue, cr.increment, " +
-            "cr.productionOrder, cr.isValidForProduction) IN (SELECT cr2.equipmentOutput, cr2.realValue, cr2.computedValue, " +
-            "cr2.increment, cr2.productionOrder, cr2.isValidForProduction FROM CounterRecordEntity cr2 " +
-            "WHERE DATE(cr2.registeredAt) = DATE(:rangeDateToCompare)) AND cr IN :counterRecords " +
-            "GROUP BY cr.equipmentOutput, cr.realValue, cr.computedValue, cr.increment, cr.productionOrder, " +
-            "cr.isValidForProduction HAVING COUNT(cr) = 1")
-    List<CounterRecordEntity> checkIfRepeatedCounterRecords(@Param("counterRecords") List<CounterRecordEntity> counterRecords, @Param("rangeDateToCompare") Date rangeDateToCompare);
+    @Query("SELECT cr FROM CounterRecordEntity cr " +
+            "WHERE DATE(cr.registeredAt) = DATE(:rangeDateToCompare) " +
+            "AND cr.equipmentOutput = :equipmentOutput " +
+            "AND cr.realValue = :realValue " +
+            "AND cr.computedValue = :computedValue " +
+            "AND cr.increment = :increment " +
+            "AND cr.productionOrder = :productionOrder")
+    List<CounterRecordEntity> checkIfNonRepeatedCounterRecords(
+            @Param("rangeDateToCompare") Date rangeDateToCompare,
+            @Param("equipmentOutput") EquipmentOutputEntity equipmentOutput,
+            @Param("realValue") double realValue,
+            @Param("computedValue") double computedValue,
+            @Param("increment") double increment,
+            @Param("productionOrder") ProductionOrderEntity productionOrder
+    );
 
 }
