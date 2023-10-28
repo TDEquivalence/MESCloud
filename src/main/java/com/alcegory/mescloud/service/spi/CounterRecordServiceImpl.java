@@ -242,6 +242,7 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     }
 
     private List<CounterRecordEntity> checkIfRepeatedCounterRecords(List<CounterRecordEntity> counterRecords) {
-        return repository.checkIfRepeatedCounterRecords(counterRecords);
+        Date rangeDateToCompare = counterRecords.get(0).getRegisteredAt();
+        return repository.checkIfRepeatedCounterRecords(counterRecords, rangeDateToCompare);
     }
 }

@@ -6,8 +6,10 @@ import com.alcegory.mescloud.model.entity.CounterRecordEntity;
 import com.alcegory.mescloud.model.filter.CounterRecordFilter;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,7 +38,8 @@ public interface CounterRecordRepository extends CrudRepository<CounterRecordEnt
             "WHERE (cr.equipmentOutput, cr.realValue, cr.computedValue, cr.increment, cr.productionOrder, cr.isValidForProduction) IN " +
             "(SELECT cr2.equipmentOutput, cr2.realValue, cr2.computedValue, cr2.increment, cr2.productionOrder, cr2.isValidForProduction " +
             "FROM CounterRecordEntity cr2 " +
-            "GROUP BY cr2.equipmentOutput, cr2.realValue, cr2.computedValue, cr2.increment, cr2.productionOrder, cr2.isValidForProduction " +
-            "HAVING COUNT(cr2) = 1)")
-    List<CounterRecordEntity> checkIfRepeatedCounterRecords(List<CounterRecordEntity> counterRecords);
+            "WHERE DATE(cr2.registeredAt) = DATE(:startDate)) " +
+            "GROUP BY cr.equipmentOutput, cr.realValue, cr.computedValue, cr.increment, cr.productionOrder, cr.isValidForProduction " +
+            "HAVING COUNT(cr) = 1")
+    List<CounterRecordEntity> checkIfRepeatedCounterRecords(List<CounterRecordEntity> counterRecords, @Param("startDate") Date rangeDateToCompare);
 }
