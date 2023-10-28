@@ -106,7 +106,8 @@ public class CounterRecordServiceImpl implements CounterRecordService {
             counterRecords.add(counterRecord);
         }
 
-        Iterable<CounterRecordEntity> counterRecordEntities = repository.saveAll(counterRecords);
+        List<CounterRecordEntity> validCounterRecords = checkIfRepeatedCounterRecords(counterRecords);
+        Iterable<CounterRecordEntity> counterRecordEntities = repository.saveAll(validCounterRecords);
         return converter.toDto(counterRecordEntities);
     }
 
@@ -238,5 +239,9 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     @Override
     public Integer sumCounterIncrement(Long countingEquipmentId, Timestamp startDateFilter, Timestamp endDateFilter) {
         return repository.sumCounterIncrement(countingEquipmentId, startDateFilter, endDateFilter);
+    }
+
+    private List<CounterRecordEntity> checkIfRepeatedCounterRecords(List<CounterRecordEntity> counterRecords) {
+        return repository.checkIfRepeatedCounterRecords(counterRecords);
     }
 }
