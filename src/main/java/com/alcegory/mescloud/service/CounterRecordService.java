@@ -14,7 +14,7 @@ public interface CounterRecordService {
 
     PaginatedCounterRecordsDto getFilteredAndPaginated(CounterRecordFilter filterDto);
 
-    List<CounterRecordDto> save(PlcMqttDto equipmentCountsMqttDTO);
+    void save(PlcMqttDto equipmentCountsMqttDTO);
 
     boolean areValidInitialCounts(String productionOrderCode);
 

@@ -97,7 +97,7 @@ public class CounterRecordServiceImpl implements CounterRecordService {
 
         if (!isValid(equipmentCountsMqttDto)) {
             log.warning(() -> String.format("Received counts are invalid either because no Counting Equipment was found with the code [%s] or because received equipment outputs number [%s] does not match the Counting Equipment outputs number", equipmentCountsMqttDto.getEquipmentCode(), equipmentCountsMqttDto.getCounters().length));
-            return Collections.emptyList();
+            return;
         }
 
         List<CounterRecordEntity> counterRecords = new ArrayList<>(equipmentCountsMqttDto.getCounters().length);
@@ -107,10 +107,10 @@ public class CounterRecordServiceImpl implements CounterRecordService {
         }
 
         List<CounterRecordEntity> validCounterRecords = checkIfNonRepeatedCounterRecords(counterRecords);
-        if(validCounterRecords.isEmpty() || validCounterRecords. == null) {
+        if(validCounterRecords.isEmpty()) {
             return;
         }
-        Iterable<CounterRecordEntity> counterRecordEntities = repository.saveAll(validCounterRecords);
+        repository.saveAll(validCounterRecords);
     }
 
     private CounterRecordEntity extractCounterRecordEntity(CounterMqttDto counterDto, PlcMqttDto equipmentCountsDto) {
