@@ -245,16 +245,18 @@ public class CounterRecordServiceImpl implements CounterRecordService {
         Date rangeDateToCompare = counterRecords.get(0).getRegisteredAt();
         List<CounterRecordEntity> nonRepeatedRecords = new ArrayList<>();
 
-        for (CounterRecordEntity unsavedRecord : counterRecords) {
+        for (CounterRecordEntity counterRecord : counterRecords) {
             if (repository.checkIfNonRepeatedCounterRecords(
                     rangeDateToCompare,
-                    unsavedRecord.getEquipmentOutput(),
-                    unsavedRecord.getRealValue(),
-                    unsavedRecord.getComputedValue(),
-                    unsavedRecord.getIncrement(),
-                    unsavedRecord.getProductionOrder()
+                    counterRecord.getEquipmentOutput(),
+                    counterRecord.getRealValue(),
+                    counterRecord.getComputedValue(),
+                    counterRecord.getIncrement(),
+                    counterRecord.getProductionOrder(),
+                    counterRecord.getEquipmentOutputAlias(),
+                    counterRecord.getIsValidForProduction()
             ).isEmpty()) {
-                nonRepeatedRecords.add(unsavedRecord);
+                nonRepeatedRecords.add(counterRecord);
             }
         }
 

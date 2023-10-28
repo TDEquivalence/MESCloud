@@ -42,14 +42,18 @@ public interface CounterRecordRepository extends CrudRepository<CounterRecordEnt
             "AND cr.realValue = :realValue " +
             "AND cr.computedValue = :computedValue " +
             "AND cr.increment = :increment " +
-            "AND cr.productionOrder = :productionOrder")
+            "AND cr.productionOrder = :productionOrder " +
+            "AND cr.equipmentOutputAlias = :equipmentOutputAlias " +
+            "AND cr.isValidForProduction = :isValidForProduction")
     List<CounterRecordEntity> checkIfNonRepeatedCounterRecords(
             @Param("rangeDateToCompare") Date rangeDateToCompare,
             @Param("equipmentOutput") EquipmentOutputEntity equipmentOutput,
             @Param("realValue") double realValue,
             @Param("computedValue") double computedValue,
             @Param("increment") double increment,
-            @Param("productionOrder") ProductionOrderEntity productionOrder
+            @Param("productionOrder") ProductionOrderEntity productionOrder,
+            @Param("equipmentOutputAlias") String equipmentOutputAlias,
+            @Param("isValidForProduction") boolean isValidForProduction
     );
 
 }
