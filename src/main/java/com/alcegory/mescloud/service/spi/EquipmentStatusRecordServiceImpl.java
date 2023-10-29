@@ -60,44 +60,35 @@ public class EquipmentStatusRecordServiceImpl implements EquipmentStatusRecordSe
 
         List<EquipmentStatusRecordEntity> equipmentStatusRecords = findRecordsForPeriodAndLastBefore(equipmentId, startDate, endDate);
         if (equipmentStatusRecords.isEmpty()) {
+            log.info(() -> String.format("No equipment status found for equipment with id [%s]", equipmentId));
             return 0L;
         }
 
         long lastActiveTime = startDate.getTime();
-        Duration totalStoppageTimeInMillis = Duration.ZERO;
+        Duration stoppageDuratinInMillis = Duration.ZERO;
         EquipmentStatus lastEquipmentStatus = EquipmentStatus.ACTIVE;
 
         for (EquipmentStatusRecordEntity equipmentStatusRecord : equipmentStatusRecords) {
-            if (isRecordActive(equipmentStatusRecord) && (equipmentStatusRecord.getRegisteredAt().getTime() > lastActiveTime)) {
+            lastEquipmentStatus = equipmentStatusRecord.getEquipmentStatus();
+            lastActiveTime = Math.max(equipmentStatusRecord.getRegisteredAt().getTime(), lastActiveTime);
+
+            if (EquipmentStatus.ACTIVE.equals(equipmentStatusRecord.getEquipmentStatus())) {
                 long stoppageInMillis = equipmentStatusRecord.getRegisteredAt().getTime() - lastActiveTime;
-                totalStoppageTimeInMillis = totalStoppageTimeInMillis.plusMillis(stoppageInMillis);
-                lastActiveTime = determineLastActiveTime(equipmentStatusRecord, lastActiveTime);
-                lastEquipmentStatus = EquipmentStatus.ACTIVE;
-            } else {
-                lastActiveTime = determineLastActiveTime(equipmentStatusRecord, lastActiveTime);
-                lastEquipmentStatus = EquipmentStatus.STOPPED;
+                stoppageDuratinInMillis = stoppageDuratinInMillis.plusMillis(stoppageInMillis);
             }
         }
 
         if (!EquipmentStatus.ACTIVE.equals(lastEquipmentStatus)) {
             long stoppageInMillis = endDate.getTime() - lastActiveTime;
-            totalStoppageTimeInMillis = totalStoppageTimeInMillis.plusMillis(stoppageInMillis);
+            stoppageDuratinInMillis = stoppageDuratinInMillis.plusMillis(stoppageInMillis);
         }
 
-        return totalStoppageTimeInMillis.getSeconds();
+        return stoppageDuratinInMillis.getSeconds();
     }
 
     private void validateInput(Timestamp startDate, Timestamp endDate) {
         if (startDate.after(endDate)) {
             throw new IllegalArgumentException("Start date cannot be after end date");
         }
-    }
-
-    private boolean isRecordActive(EquipmentStatusRecordEntity equipmentStatusRecord) {
-        return EquipmentStatus.ACTIVE.equals(equipmentStatusRecord.getEquipmentStatus());
-    }
-
-    private long determineLastActiveTime(EquipmentStatusRecordEntity statusRecord, long lastActiveTime) {
-        return Math.max(statusRecord.getRegisteredAt().getTime(), lastActiveTime);
     }
 }
