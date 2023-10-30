@@ -22,7 +22,8 @@ import java.util.*;
 @Log
 public class CountingEquipmentServiceImpl implements CountingEquipmentService {
 
-    private static final int MIN_P_TIMER = 10;
+    private static final int MIN_P_TIMER_IN_MINUTES = 1;
+    private static final int MIN_P_TIMER_IN_SECONDS = MIN_P_TIMER_IN_MINUTES * 60;
 
     private final CountingEquipmentRepository repository;
     private final EquipmentOutputService outputService;
@@ -209,6 +210,10 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
 
     private void publishToPlc(CountingEquipmentEntity countingEquipment) throws MesMqttException {
         EquipmentConfigMqttDto equipmentConfig = plcConverter.toMqttDto(countingEquipment);
+        int pTimerCommunicationCycleInSeconds = equipmentConfig.getPTimerCommunicationCycle() * 60;
+        int finalPTimerCommunicationCycleInSeconds = Math.max(MIN_P_TIMER_IN_SECONDS, pTimerCommunicationCycleInSeconds);
+        equipmentConfig.setPTimerCommunicationCycle(finalPTimerCommunicationCycleInSeconds);
+
         mqttClient.publish(mqttSettings.getProtCountPlcTopic(), equipmentConfig);
     }
 
@@ -310,6 +315,6 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
 
     private void ensureMinimumPTimer(CountingEquipmentEntity countingEquipmentEntity) {
         int currentPTimer = countingEquipmentEntity.getPTimerCommunicationCycle();
-        countingEquipmentEntity.setPTimerCommunicationCycle(Math.max(MIN_P_TIMER, currentPTimer));
+        countingEquipmentEntity.setPTimerCommunicationCycle(Math.max(MIN_P_TIMER_IN_MINUTES, currentPTimer));
     }
 }
