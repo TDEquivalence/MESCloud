@@ -19,6 +19,7 @@ public class ProductionOrderConverterImpl implements ProductionOrderConverter {
         productionOrderEntity.setCode(productionOrderDto.getCode());
         productionOrderEntity.setTargetAmount(productionOrderDto.getTargetAmount());
         productionOrderEntity.setCreatedAt(productionOrderDto.getCreatedAt());
+        productionOrderEntity.setCompletedAt(productionOrderDto.getCompletedAt());
         productionOrderEntity.setInputBatch(productionOrderDto.getInputBatch());
         productionOrderEntity.setSource(productionOrderDto.getSource());
         productionOrderEntity.setGauge(productionOrderDto.getGauge());
@@ -51,6 +52,7 @@ public class ProductionOrderConverterImpl implements ProductionOrderConverter {
         dto.setCode(entity.getCode());
         dto.setTargetAmount(entity.getTargetAmount());
         dto.setCreatedAt(entity.getCreatedAt());
+        dto.setCompletedAt(entity.getCompletedAt());
         dto.setGauge(entity.getGauge());
         dto.setSource(entity.getSource());
         dto.setCategory(entity.getCategory());
