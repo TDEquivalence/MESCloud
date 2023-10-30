@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 public class AlarmServiceImpl implements AlarmService {
 
     private static final int PLC_BITS_PER_WORD = 16;
+    public static final int ZERO_BASED_OFFSET = 1;
 
     private GenericConverter<AlarmEntity, AlarmDto> converter;
     private AlarmRepository repository;
@@ -129,7 +130,8 @@ public class AlarmServiceImpl implements AlarmService {
     private void processAlarmBit(Map<Long, AlarmEntity> activeAlarmByConfigId, List<AlarmEntity> alarmsToUpsert, CountingEquipmentDto equipment, int wordIndex, int bitIndex)
             throws AlarmConfigurationNotFoundException {
 
-        AlarmConfigurationEntity alarmConfig = findAlarmConfiguration(wordIndex, bitIndex);
+        int binaryBitIndex = BinaryUtil.flipIndex(PLC_BITS_PER_WORD - ZERO_BASED_OFFSET, bitIndex);
+        AlarmConfigurationEntity alarmConfig = findAlarmConfiguration(wordIndex, binaryBitIndex);
         AlarmEntity activeAlarm = activeAlarmByConfigId.get(alarmConfig.getId());
 
         if (activeAlarm == null) {

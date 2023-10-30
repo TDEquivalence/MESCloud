@@ -9,6 +9,7 @@ public class BinaryUtil {
         //Utility class, not meant for instantiation
     }
 
+
     public static boolean[][] toBinaryUnsigned(int[] integers, int bitsPerInteger) throws IllegalArgumentException {
 
         boolean[][] alarmBits = new boolean[integers.length][bitsPerInteger];
@@ -36,5 +37,9 @@ public class BinaryUtil {
         }
 
         return bitArray;
+    }
+
+    public static int flipIndex(int maxIndex, int index) {
+        return maxIndex - index;
     }
 }
