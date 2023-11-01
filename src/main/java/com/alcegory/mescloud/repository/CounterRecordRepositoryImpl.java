@@ -144,11 +144,16 @@ public class CounterRecordRepositoryImpl extends AbstractFilterRepository<Counte
 
         query.select(sumIncrement).where(predicateList.toArray(new Predicate[0]));
 
-        return entityManager.createQuery(query).getSingleResult();
+        Integer sum = entityManager.createQuery(query).getSingleResult();
+        return sum != null ? sum : 0;
     }
 
     public Integer sumValidCounterIncrement(Long countingEquipmentId, Timestamp startDateFilter, Timestamp endDateFilter) {
         Map<Long, Integer> incrementByPO = sumValidCounterIncrementByPO(countingEquipmentId, startDateFilter, endDateFilter);
+
+        if (incrementByPO.get(1L) == null) {
+            return 0;
+        }
 
         return incrementByPO.values().stream().mapToInt(Integer::intValue).sum();
     }

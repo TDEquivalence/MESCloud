@@ -12,7 +12,12 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
+
+import static com.alcegory.mescloud.model.dto.RequestKpiDto.createRequestKpiForDay;
 
 @Service
 @AllArgsConstructor
@@ -92,15 +97,15 @@ public class KpiServiceImpl implements KpiService {
 
     @Override
     public List<EquipmentKpiAggregatorDto> getEquipmentKpiAggregatorPerDay(Long equipmentId, RequestKpiDto kpiRequest) {
+        LocalDate startDate = kpiRequest.getStartDateAsLocalDate();
+        LocalDate endDate = kpiRequest.getEndDateAsLocalDate();
 
-        final Instant startDate = kpiRequest.getStartDateAsTimestamp().toInstant();
-        final Instant endDate = kpiRequest.getEndDateAsTimestamp().toInstant();
-
-        final int spanInDays = DateUtil.spanInDays(startDate, endDate);
         List<EquipmentKpiAggregatorDto> equipmentKpiAggregators = new ArrayList<>();
 
-        for (int i = 0; i <= spanInDays; i++) {
-            EquipmentKpiAggregatorDto aggregator = getEquipmentKpiAggregator(equipmentId, kpiRequest);
+        for (LocalDate currentDay = startDate; !currentDay.isAfter(endDate); currentDay = currentDay.plusDays(1)) {
+            RequestKpiDto currentKpiRequest = createRequestKpiForDay(currentDay);
+
+            EquipmentKpiAggregatorDto aggregator = getEquipmentKpiAggregator(equipmentId, currentKpiRequest);
             equipmentKpiAggregators.add(aggregator);
         }
 
@@ -125,13 +130,13 @@ public class KpiServiceImpl implements KpiService {
     public Long getTotalScheduledTime(Long equipmentId, RequestKpiDto filter) {
         return productionOrderService.calculateScheduledTimeInSeconds(
                 equipmentId,
-                filter.getStartDateAsTimestamp(),
-                filter.getEndDateAsTimestamp());
+                filter.getStartDate(),
+                filter.getEndDate());
     }
 
     private Long getTotalStoppageTime(Long equipmentId, RequestKpiDto filter) {
-        Date startDate = filter.getStartDateAsTimestamp();
-        Date endDate = filter.getEndDateAsTimestamp();
+        Date startDate = filter.getStartDate();
+        Date endDate = filter.getEndDate();
 
         List<ProductionOrderDto> productionOrders =
                 productionOrderService.findByEquipmentAndPeriod(equipmentId, startDate, endDate);
@@ -156,9 +161,9 @@ public class KpiServiceImpl implements KpiService {
     @Override
     public KpiDto computeEquipmentQuality(Long equipmentId, RequestKpiDto requestKpiDto) {
         Integer validCounter = counterRecordService.sumValidCounterIncrement(equipmentId,
-                requestKpiDto.getStartDateAsTimestamp(), requestKpiDto.getEndDateAsTimestamp());
-        Integer totalCounter = counterRecordService.sumCounterIncrement(equipmentId,requestKpiDto.getStartDateAsTimestamp(),
-                requestKpiDto.getEndDateAsTimestamp());
+                requestKpiDto.getStartDate(), requestKpiDto.getEndDate());
+        Integer totalCounter = counterRecordService.sumCounterIncrement(equipmentId,requestKpiDto.getStartDate(),
+                requestKpiDto.getEndDate());
 
         KpiDto kpi = new KpiDto(validCounter, totalCounter);
         kpi.setValueAsDivision();
