@@ -9,10 +9,7 @@ import jakarta.persistence.criteria.*;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Repository
 public class CounterRecordRepositoryImpl extends AbstractFilterRepository<CounterRecordFilter.Property, CounterRecordEntity> {
@@ -149,24 +146,19 @@ public class CounterRecordRepositoryImpl extends AbstractFilterRepository<Counte
     }
 
     public Integer sumValidCounterIncrement(Long countingEquipmentId, Timestamp startDateFilter, Timestamp endDateFilter) {
-        Map<Long, Integer> incrementByPO = sumValidCounterIncrementByPO(countingEquipmentId, startDateFilter, endDateFilter);
+        Integer resultSumIncrement = sumValidCounterIncrementByPO(countingEquipmentId, startDateFilter, endDateFilter);
 
-        if (incrementByPO.get(1L) == null) {
-            return 0;
-        }
-
-        return incrementByPO.values().stream().mapToInt(Integer::intValue).sum();
+        return Objects.requireNonNullElse(resultSumIncrement, 0);
     }
 
 
-    public Map<Long, Integer> sumValidCounterIncrementByPO(Long countingEquipmentId, Timestamp startDateFilter, Timestamp endDateFilter) {
+    public Integer sumValidCounterIncrementByPO(Long countingEquipmentId, Timestamp startDateFilter, Timestamp endDateFilter) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-        CriteriaQuery<Tuple> query = cb.createTupleQuery();
+        CriteriaQuery<Integer> query = cb.createQuery(Integer.class);
 
         Root<CounterRecordEntity> crRoot = query.from(CounterRecordEntity.class);
         Join<CounterRecordEntity, EquipmentOutputEntity> eoJoin = crRoot.join(EQUIPMENT_OUTPUT_PROP, JoinType.INNER);
         Join<EquipmentOutputEntity, CountingEquipmentEntity> countingEquipmentJoin = eoJoin.join(COUNTING_EQUIPMENT_PROP, JoinType.INNER);
-        Join<CounterRecordEntity, ProductionOrderEntity> poJoin = crRoot.join(EQUIPMENT_OUTPUT_PROP, JoinType.INNER);
 
         Expression<Integer> sumIncrementByPO = cb.sum(crRoot.get(INCREMENT_PROP));
 
@@ -182,21 +174,12 @@ public class CounterRecordRepositoryImpl extends AbstractFilterRepository<Counte
         predicateList.add(startDate);
         predicateList.add(endDate);
 
-        query.multiselect(poJoin.get("id"), sumIncrementByPO)
-                .where(cb.and(predicateList.toArray(new Predicate[0])))
-                .groupBy(poJoin.get("id"));
+        query.select(sumIncrementByPO)
+                .where(cb.and(predicateList.toArray(new Predicate[0])));
 
-        List<Tuple> result = entityManager.createQuery(query).getResultList();
-
-        Map<Long, Integer> incrementByPO = new HashMap<>();
-        for (Tuple tuple : result) {
-            Long productionOrderId = tuple.get(poJoin.get("id"));
-            Integer totalIncrement = tuple.get(sumIncrementByPO);
-            incrementByPO.put(productionOrderId, totalIncrement);
-        }
-
-        return incrementByPO;
+        return entityManager.createQuery(query).getSingleResult();
     }
+
 
     public Integer sumValidCounterIncrementForApprovedPO(Long countingEquipmentId, Timestamp startDateFilter, Timestamp endDateFilter) {
         Map<Long, Integer> incrementWithApprovedPO = sumValidCounterIncrementWithApprovedPO(countingEquipmentId, startDateFilter, endDateFilter);
