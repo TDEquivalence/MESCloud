@@ -1,0 +1,2 @@
+ALTER TABLE counting_equipment
+ALTER COLUMN theoretical_production TYPE DOUBLE PRECISION;
