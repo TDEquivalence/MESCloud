@@ -8,7 +8,6 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface EquipmentStatusRecordRepository extends JpaRepository<EquipmentStatusRecordEntity, Long> {
