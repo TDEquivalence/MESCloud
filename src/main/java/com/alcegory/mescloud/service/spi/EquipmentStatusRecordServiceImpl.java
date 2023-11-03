@@ -41,20 +41,16 @@ public class EquipmentStatusRecordServiceImpl implements EquipmentStatusRecordSe
     }
 
     private void setActiveStatus(EquipmentStatusRecordEntity equipmentStatusRecord, long equipmentId, int equipmentStatus) {
-        if (equipmentStatus == 0) {
-            EquipmentStatusRecordEntity lastEquipmentActiveStatus = repository.findLastEquipmentStatusWithStatusOne(equipmentId);
+        EquipmentStatusRecordEntity lastEquipmentActiveStatus = repository.findLastEquipmentStatusWithStatusOne(equipmentId);
+        if (equipmentStatus == 0 && lastEquipmentActiveStatus != null) {
             log.info(() -> String.format("Last active status: [%s] , equipmentId: [%s]", lastEquipmentActiveStatus, equipmentId));
-            if (lastEquipmentActiveStatus != null) {
-                Timestamp lastActiveStatus = equipmentStatusRecord.getRegisteredAt();
-                Timestamp previousActiveStatus = lastEquipmentActiveStatus.getRegisteredAt();
+            Timestamp lastActiveStatus = equipmentStatusRecord.getRegisteredAt();
+            Timestamp previousActiveStatus = lastEquipmentActiveStatus.getRegisteredAt();
 
-                long timeDifferenceMillis = lastActiveStatus.getTime() - previousActiveStatus.getTime();
+            long timeDifferenceMillis = lastActiveStatus.getTime() - previousActiveStatus.getTime();
 
-                Timestamp timeDifferenceTimestamp = new Timestamp(timeDifferenceMillis);
-                equipmentStatusRecord.setActiveTime(timeDifferenceTimestamp);
-            }
-        } else {
-            equipmentStatusRecord.setActiveTime(null);
+            Timestamp timeDifferenceTimestamp = new Timestamp(timeDifferenceMillis);
+            equipmentStatusRecord.setActiveTime(timeDifferenceTimestamp);
         }
     }
 
