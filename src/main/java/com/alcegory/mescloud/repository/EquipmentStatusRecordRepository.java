@@ -31,9 +31,10 @@ public interface EquipmentStatusRecordRepository extends JpaRepository<Equipment
             @Param("startDate") Timestamp startDate,
             @Param("endDate") Timestamp endDate);
 
-    @Query("SELECT e FROM EquipmentStatusRecordEntity e " +
-            "WHERE e.countingEquipment.id = :equipmentId " +
-            "AND e.equipmentStatus = 1 " +
-            "ORDER BY e.registeredAt DESC")
+    @Query(value = "SELECT * FROM equipment_status_record " +
+            "WHERE counting_equipment_id = :equipmentId " +
+            "AND equipment_status = 1 " +
+            "ORDER BY registered_at DESC " +
+            "LIMIT 1", nativeQuery = true)
     EquipmentStatusRecordEntity findLastEquipmentStatusWithStatusOne(@Param("equipmentId") Long equipmentId);
 }
