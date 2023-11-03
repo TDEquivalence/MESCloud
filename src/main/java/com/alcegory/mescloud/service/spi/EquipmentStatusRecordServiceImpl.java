@@ -34,8 +34,27 @@ public class EquipmentStatusRecordServiceImpl implements EquipmentStatusRecordSe
         equipmentStatusRecord.setEquipmentStatus(EquipmentStatus.getByStatus(equipmentStatus));
         equipmentStatusRecord.setRegisteredAt(Timestamp.from(Instant.now()));
 
+        setActiveStatus(equipmentStatusRecord, equipmentId, equipmentStatus);
+
         EquipmentStatusRecordEntity persistedEquipmentStatus = repository.save(equipmentStatusRecord);
         return converter.toDto(persistedEquipmentStatus, EquipmentStatusRecordDto.class);
+    }
+
+    private void setActiveStatus(EquipmentStatusRecordEntity equipmentStatusRecord, long equipmentId, int equipmentStatus) {
+        if (equipmentStatus == 0) {
+            EquipmentStatusRecordEntity lastEquipmentActiveStatus = repository.findLastEquipmentStatusWithStatusOne(equipmentId);
+            if (lastEquipmentActiveStatus != null) {
+                Timestamp lastActiveStatus = equipmentStatusRecord.getRegisteredAt();
+                Timestamp previousActiveStatus = lastEquipmentActiveStatus.getRegisteredAt();
+
+                long timeDifferenceMillis = lastActiveStatus.getTime() - previousActiveStatus.getTime();
+
+                Timestamp timeDifferenceTimestamp = new Timestamp(timeDifferenceMillis);
+                equipmentStatusRecord.setActiveTime(timeDifferenceTimestamp);
+            }
+        } else {
+            equipmentStatusRecord.setActiveTime(null);
+        }
     }
 
     private List<EquipmentStatusRecordEntity> findRecordsForPeriodAndLastBefore(Long equipmentId,

@@ -20,4 +20,6 @@ public class EquipmentStatusRecordEntity {
     private EquipmentStatus equipmentStatus;
     @Temporal(TemporalType.TIMESTAMP)
     private Timestamp registeredAt;
+    @Temporal(TemporalType.TIMESTAMP)
+    private Timestamp activeTime;
 }

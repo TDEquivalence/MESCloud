@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface EquipmentStatusRecordRepository extends JpaRepository<EquipmentStatusRecordEntity, Long> {
@@ -30,4 +31,10 @@ public interface EquipmentStatusRecordRepository extends JpaRepository<Equipment
             @Param("equipmentId") Long equipmentId,
             @Param("startDate") Timestamp startDate,
             @Param("endDate") Timestamp endDate);
+
+    @Query(value = "SELECT e FROM equipment_status_record e " +
+            "WHERE e.counting_equipment_id = :equipmentId " +
+            "AND e.equipment_status = 1 " +
+            "ORDER BY e.registered_at DESC", nativeQuery = true)
+    EquipmentStatusRecordEntity findLastEquipmentStatusWithStatusOne(@Param("equipmentId") Long equipmentId);
 }
