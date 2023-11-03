@@ -41,9 +41,10 @@ public class EquipmentStatusRecordServiceImpl implements EquipmentStatusRecordSe
     }
 
     private void setActiveStatus(EquipmentStatusRecordEntity equipmentStatusRecord, long equipmentId, int equipmentStatus) {
+        log.info(() -> String.format(" FInd last active status for equipmentId: [%s]", equipmentId));
         EquipmentStatusRecordEntity lastEquipmentActiveStatus = repository.findLastEquipmentStatusWithStatusOne(equipmentId);
         if (equipmentStatus == 0 && lastEquipmentActiveStatus != null) {
-            log.info(() -> String.format("Last active status: [%s] , equipmentId: [%s]", lastEquipmentActiveStatus, equipmentId));
+            log.info(() -> String.format("Last active status: [%s]", lastEquipmentActiveStatus));
             Timestamp lastActiveStatus = equipmentStatusRecord.getRegisteredAt();
             Timestamp previousActiveStatus = lastEquipmentActiveStatus.getRegisteredAt();
 
