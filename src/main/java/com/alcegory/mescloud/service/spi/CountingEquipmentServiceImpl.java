@@ -115,7 +115,7 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
     }
 
     @Override
-    public Optional<CountingEquipmentDto> updateEquipmentStatus(String equipmentCode, int equipmentStatus) {
+    public Optional<CountingEquipmentDto> updateEquipmentStatus(String equipmentCode, int equipmentStatus, boolean isInitResponse) {
 
         Optional<CountingEquipmentEntity> countingEquipmentOpt = repository.findByCodeWithLastStatusRecord(equipmentCode);
         if (countingEquipmentOpt.isEmpty()) {
@@ -127,7 +127,7 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
         countingEquipment.setEquipmentStatus(equipmentStatus);
         CountingEquipmentEntity updatedCountingEquipment = repository.save(countingEquipment);
 
-        if (hasStatusChanged(countingEquipment, equipmentStatus)) {
+        if (isInitResponse && hasStatusChanged(countingEquipment, equipmentStatus)) {
             statusRecordService.save(countingEquipment.getId(), equipmentStatus);
         }
 
