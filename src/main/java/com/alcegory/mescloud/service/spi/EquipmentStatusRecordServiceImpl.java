@@ -49,9 +49,7 @@ public class EquipmentStatusRecordServiceImpl implements EquipmentStatusRecordSe
             Timestamp previousActiveStatus = lastEquipmentActiveStatus.getRegisteredAt();
 
             long timeDifferenceMillis = lastActiveStatus.getTime() - previousActiveStatus.getTime();
-
-            Timestamp timeDifferenceTimestamp = new Timestamp(timeDifferenceMillis);
-            equipmentStatusRecord.setActiveTime(timeDifferenceTimestamp);
+            equipmentStatusRecord.setActiveTime(timeDifferenceMillis);
         }
     }
 

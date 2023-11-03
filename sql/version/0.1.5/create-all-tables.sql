@@ -203,6 +203,7 @@ CREATE TABLE equipment_status_record (
     counting_equipment_id int NOT NULL,
     equipment_status int NOT NULL,
     registered_at TIMESTAMP NOT NULL,
+    active_time int,
 
     PRIMARY KEY(id),
     FOREIGN KEY(counting_equipment_id) REFERENCES counting_equipment(id)

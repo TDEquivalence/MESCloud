@@ -1,2 +1,2 @@
 ALTER TABLE equipment_status_record
-ADD COLUMN active_time TIMESTAMP;
+ADD COLUMN active_time int;
