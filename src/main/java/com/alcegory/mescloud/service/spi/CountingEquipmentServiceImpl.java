@@ -127,7 +127,7 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
         countingEquipment.setEquipmentStatus(equipmentStatus);
         CountingEquipmentEntity updatedCountingEquipment = repository.save(countingEquipment);
 
-        if (isInitResponse && hasStatusChanged(countingEquipment, equipmentStatus)) {
+        if (isInitResponse || hasStatusChanged(countingEquipment, equipmentStatus)) {
             statusRecordService.save(countingEquipment.getId(), equipmentStatus);
         }
 
