@@ -1,6 +1,8 @@
 package com.alcegory.mescloud.service.spi;
 
 import com.alcegory.mescloud.constant.EquipmentStatus;
+import com.alcegory.mescloud.model.dto.ProductionOrderDto;
+import com.alcegory.mescloud.model.dto.RequestKpiDto;
 import com.alcegory.mescloud.repository.EquipmentStatusRecordRepository;
 import com.alcegory.mescloud.model.converter.GenericConverter;
 import com.alcegory.mescloud.model.dto.EquipmentStatusRecordDto;
@@ -11,10 +13,12 @@ import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 
+import java.sql.Time;
 import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -43,7 +47,7 @@ public class EquipmentStatusRecordServiceImpl implements EquipmentStatusRecordSe
     private void setActiveStatus(EquipmentStatusRecordEntity equipmentStatusRecord, long equipmentId, int equipmentStatus) {
         log.info(() -> String.format(" Find last active status for equipmentId: [%s]", equipmentId));
         EquipmentStatusRecordEntity lastEquipmentActiveStatus = repository.findLastEquipmentStatusWithStatusOne(equipmentId);
-        if (equipmentStatus == 0 && lastEquipmentActiveStatus != null) {
+        if (equipmentStatus == 0 && lastEquipmentActiveStatus.getEquipmentStatus().getStatus() == 1) {
             log.info(() -> String.format("Last active status: [%s]", lastEquipmentActiveStatus));
             Timestamp lastActiveStatus = equipmentStatusRecord.getRegisteredAt();
             Timestamp previousActiveStatus = lastEquipmentActiveStatus.getRegisteredAt();
@@ -69,41 +73,15 @@ public class EquipmentStatusRecordServiceImpl implements EquipmentStatusRecordSe
     }
 
     @Override
-    public Long calculateStoppageTimeInSeconds(Long equipmentId, Timestamp startDate, Timestamp endDate) {
+    public Long calculateActiveTimeInSeconds(Long equipmentId,ProductionOrderDto productionOrder, Timestamp startDate, Timestamp endDate) {
 
-        validateInput(startDate, endDate);
+        Timestamp createdAt = (Timestamp) productionOrder.getCreatedAt();
+        Timestamp completedAt = (Timestamp) productionOrder.getCompletedAt();
 
-        List<EquipmentStatusRecordEntity> equipmentStatusRecords = findRecordsForPeriodAndLastBefore(equipmentId, startDate, endDate);
-        if (equipmentStatusRecords.isEmpty()) {
-            log.info(() -> String.format("No equipment status found for equipment with id [%s]", equipmentId));
-            return 0L;
-        }
+        startDate = (startDate.before(createdAt)) ? createdAt : startDate;
+        endDate = (endDate.before(createdAt)) ? createdAt : endDate;
+        endDate = (completedAt != null && completedAt.before(endDate)) ? completedAt : endDate;
 
-        long lastActiveTime = startDate.getTime();
-        Duration stoppageDuratinInMillis = Duration.ZERO;
-        EquipmentStatus lastEquipmentStatus = EquipmentStatus.ACTIVE;
-
-        for (EquipmentStatusRecordEntity equipmentStatusRecord : equipmentStatusRecords) {
-            lastEquipmentStatus = equipmentStatusRecord.getEquipmentStatus();
-            lastActiveTime = Math.max(equipmentStatusRecord.getRegisteredAt().getTime(), lastActiveTime);
-
-            if (EquipmentStatus.ACTIVE.equals(equipmentStatusRecord.getEquipmentStatus())) {
-                long stoppageInMillis = equipmentStatusRecord.getRegisteredAt().getTime() - lastActiveTime;
-                stoppageDuratinInMillis = stoppageDuratinInMillis.plusMillis(stoppageInMillis);
-            }
-        }
-
-        if (!EquipmentStatus.ACTIVE.equals(lastEquipmentStatus)) {
-            long stoppageInMillis = endDate.getTime() - lastActiveTime;
-            stoppageDuratinInMillis = stoppageDuratinInMillis.plusMillis(stoppageInMillis);
-        }
-
-        return stoppageDuratinInMillis.getSeconds();
-    }
-
-    private void validateInput(Timestamp startDate, Timestamp endDate) {
-        if (startDate.after(endDate)) {
-            throw new IllegalArgumentException("Start date cannot be after end date");
-        }
+        return repository.sumTotalActiveTime(equipmentId, startDate, endDate);
     }
 }

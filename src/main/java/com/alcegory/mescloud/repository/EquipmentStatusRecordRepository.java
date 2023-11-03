@@ -33,8 +33,15 @@ public interface EquipmentStatusRecordRepository extends JpaRepository<Equipment
 
     @Query(value = "SELECT * FROM equipment_status_record " +
             "WHERE counting_equipment_id = :equipmentId " +
-            "AND equipment_status = 1 " +
             "ORDER BY registered_at DESC " +
             "LIMIT 1", nativeQuery = true)
     EquipmentStatusRecordEntity findLastEquipmentStatusWithStatusOne(@Param("equipmentId") Long equipmentId);
+
+    @Query(value = "SELECT SUM(active_time) AS total_active_time " +
+            "FROM equipment_status_record " +
+            "WHERE counting_equipment_id = :equipmentId " +
+            "AND registered_at >= :startDate " +
+            "AND registered_at <= :endDate", nativeQuery = true)
+    Long sumTotalActiveTime(@Param("equipmentId") Long equipmentId, @Param("startDate") Timestamp startDate,
+                            @Param("endDate") Timestamp endDate);
 }
