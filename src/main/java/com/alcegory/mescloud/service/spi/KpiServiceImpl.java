@@ -174,7 +174,7 @@ public class KpiServiceImpl implements KpiService {
             return null;
         }
 
-        Double realProductionInSeconds = qualityKpi.getDividend() / availabilityKpi.getDividend();
+        Double realProductionInSeconds = qualityKpi.getDivider() / availabilityKpi.getDividend();
         KpiDto kpi = new KpiDto(realProductionInSeconds, countingEquipment.getTheoreticalProduction());
         kpi.setValueAsDivision();
         return kpi;
