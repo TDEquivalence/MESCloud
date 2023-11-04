@@ -178,6 +178,8 @@ public class KpiServiceImpl implements KpiService {
         Double theoreticalProductionInMilliseconds = countingEquipment.getTheoreticalProduction() * SECONDS_TO_MILLISECONDS;
         log.info(String.format("theoretical production [%s]: ", theoreticalProductionInMilliseconds));
         Double realProduction = qualityKpi.getDivider() / availabilityKpi.getDividend();
+        log.info(String.format("quality divider [%s]: ", qualityKpi.getDivider()));
+        log.info(String.format("availability dividend [%s]: ", availabilityKpi.getDividend()));
         log.info(String.format("real production [%s]: ", realProduction));
         KpiDto kpi = new KpiDto(realProduction, theoreticalProductionInMilliseconds);
         kpi.setValueAsDivision();
