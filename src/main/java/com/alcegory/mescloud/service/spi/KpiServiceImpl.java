@@ -22,6 +22,7 @@ import static com.alcegory.mescloud.model.dto.RequestKpiDto.createRequestKpiForD
 public class KpiServiceImpl implements KpiService {
 
     private static final int PERCENTAGE = 100;
+    private static final int SECONDS_TO_MILLISECONDS = 1000;
 
     private final CounterRecordService counterRecordService;
     private final ProductionOrderService productionOrderService;
@@ -174,8 +175,9 @@ public class KpiServiceImpl implements KpiService {
             return null;
         }
 
-        Double realProductionInSeconds = qualityKpi.getDivider() / availabilityKpi.getDividend();
-        KpiDto kpi = new KpiDto(realProductionInSeconds, countingEquipment.getTheoreticalProduction());
+        Double theoreticalProductionInMilliseconds = countingEquipment.getTheoreticalProduction() * SECONDS_TO_MILLISECONDS;
+        Double realProduction = qualityKpi.getDivider() / availabilityKpi.getDividend();
+        KpiDto kpi = new KpiDto(realProduction, theoreticalProductionInMilliseconds);
         kpi.setValueAsDivision();
         return kpi;
     }
