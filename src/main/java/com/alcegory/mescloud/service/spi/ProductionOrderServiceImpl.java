@@ -266,17 +266,17 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     public Long calculateScheduledTimeInSeconds(Long equipmentId, Date startDate, Date endDate) {
 
         List<ProductionOrderEntity> productionOrders = repository.findByEquipmentAndPeriod(equipmentId, startDate, endDate);
-        Duration totalActiveTime = Duration.ZERO;
+        long totalActiveTime = 0L;
         for (ProductionOrderEntity productionOrder : productionOrders) {
 
-            Duration productionOrderActiveTime = calculateScheduledTime(productionOrder, startDate, endDate);
-            totalActiveTime = totalActiveTime.plus(productionOrderActiveTime);
+            Long productionOrderActiveTime = calculateScheduledTime(productionOrder, startDate, endDate);
+            totalActiveTime += productionOrderActiveTime;
         }
 
-        return totalActiveTime.getSeconds();
+        return totalActiveTime;
     }
 
-    private Duration calculateScheduledTime(ProductionOrderEntity productionOrder, Date startDate, Date endDate) {
+    private Long calculateScheduledTime(ProductionOrderEntity productionOrder, Date startDate, Date endDate) {
         Date createdAt = productionOrder.getCreatedAt();
         Date completedAt = productionOrder.getCompletedAt();
 
@@ -284,9 +284,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         endDate = (endDate.before(createdAt)) ? createdAt : endDate;
         endDate = (completedAt != null && completedAt.before(endDate)) ? completedAt : endDate;
 
-        long durationInMillisenconds = Math.max(0, endDate.getTime() - startDate.getTime());
-
-        return Duration.ofMillis(durationInMillisenconds);
+        return Math.max(0, endDate.getTime() - startDate.getTime());
     }
 
     private CountingEquipmentDto setOperationStatus(CountingEquipmentEntity countingEquipment, CountingEquipmentEntity.OperationStatus status) {
