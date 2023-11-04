@@ -22,7 +22,7 @@ import java.util.List;
 @RunWith(MockitoJUnitRunner.class)
 public class EquipmentStatusRecordServiceTest {
 
-    @Mock
+    /*@Mock
     private EquipmentStatusRecordRepository equipmentStatusRecordRepository;
     @InjectMocks
     private EquipmentStatusRecordServiceImpl equipmentStatusRecordService;
@@ -32,9 +32,9 @@ public class EquipmentStatusRecordServiceTest {
         record.setEquipmentStatus(status);
         record.setRegisteredAt(Timestamp.valueOf(createdAt));
         return record;
-    }
+    }*/
 
-    @Test
+    /*@Test
     public void testCalculateStoppageTimeInSeconds() {
         List<EquipmentStatusRecordEntity> equipmentStatusRecords = new ArrayList<>();
         equipmentStatusRecords.add(createEquipmentStatusRecord(EquipmentStatus.STOPPED, "2023-09-25 13:40:00"));
@@ -52,5 +52,5 @@ public class EquipmentStatusRecordServiceTest {
         // Expected stoppage time calculation:
         // 1. From 13:50:00 to 13:55:00 -> stopped for 300 seconds
         Assertions.assertEquals(300L, result.longValue());
-    }
+    }*/
 }

@@ -21,7 +21,7 @@ public interface CountingEquipmentService {
 
     CountingEquipmentDto save(CountingEquipmentDto countingEquipment);
 
-    Optional<CountingEquipmentDto> updateEquipmentStatus(String equipmentCode, int equipmentStatus);
+    Optional<CountingEquipmentDto> updateEquipmentStatus(String equipmentCode, int equipmentStatus, boolean isResponseProtocol);
 
     CountingEquipmentDto updateIms(Long equipmentId, Long imsId)
             throws EquipmentNotFoundException, ImsNotFoundException, IllegalStateException;

@@ -10,11 +10,8 @@ import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 
-import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 import static com.alcegory.mescloud.model.dto.RequestKpiDto.createRequestKpiForDay;
@@ -25,6 +22,7 @@ import static com.alcegory.mescloud.model.dto.RequestKpiDto.createRequestKpiForD
 public class KpiServiceImpl implements KpiService {
 
     private static final int PERCENTAGE = 100;
+    private static final int SECONDS_TO_MILLISECONDS = 1000;
 
     private final CounterRecordService counterRecordService;
     private final ProductionOrderService productionOrderService;
@@ -119,10 +117,11 @@ public class KpiServiceImpl implements KpiService {
     @Override
     public KpiDto computeAvailability(Long equipmentId, RequestKpiDto filter) {
         Long totalScheduledTime = getTotalScheduledTime(equipmentId, filter);
-        Long totalStoppageTime = getTotalStoppageTime(equipmentId, filter);
-        Long effectiveProductionTime = totalScheduledTime - totalStoppageTime;
+        log.info(String.format("Total scheduled time for equipment [%s]: [%s]", equipmentId, totalScheduledTime));
+        Long totalActiveTime = getTotalActiveTime(equipmentId, filter);
+        log.info(String.format("Total active time for equipment [%s]: [%s]", equipmentId, totalActiveTime));
 
-        KpiDto kpi = new KpiDto(DoubleUtil.safeDoubleValue(effectiveProductionTime), DoubleUtil.safeDoubleValue(totalScheduledTime));
+        KpiDto kpi = new KpiDto(DoubleUtil.safeDoubleValue(totalActiveTime), DoubleUtil.safeDoubleValue(totalScheduledTime));
         kpi.setValueAsDivision();
         return kpi;
     }
@@ -134,28 +133,22 @@ public class KpiServiceImpl implements KpiService {
                 filter.getEndDate());
     }
 
-    private Long getTotalStoppageTime(Long equipmentId, RequestKpiDto filter) {
+    private Long getTotalActiveTime(Long equipmentId, RequestKpiDto filter) {
         Date startDate = filter.getStartDate();
         Date endDate = filter.getEndDate();
 
         List<ProductionOrderDto> productionOrders =
                 productionOrderService.findByEquipmentAndPeriod(equipmentId, startDate, endDate);
 
-        Long totalStoppageTime = 0L;
+        Long totalActiveTime = 0L;
         for (ProductionOrderDto productionOrder : productionOrders) {
-
-            if (productionOrder.getCompletedAt() != null) {
-                Timestamp safeEndDate = Timestamp.from(productionOrder.getCompletedAt().toInstant());
-
-                totalStoppageTime +=
-                        equipmentStatusRecordService.calculateStoppageTimeInSeconds(
-                                equipmentId,
-                                Timestamp.from(productionOrder.getCreatedAt().toInstant()),
-                                safeEndDate);
+                totalActiveTime +=
+                        equipmentStatusRecordService.calculateActiveTimeInSeconds(equipmentId, productionOrder,
+                                filter.getStartDate(),
+                                filter.getEndDate());
             }
-        }
 
-        return totalStoppageTime;
+        return totalActiveTime;
     }
 
     @Override
@@ -182,8 +175,13 @@ public class KpiServiceImpl implements KpiService {
             return null;
         }
 
-        Double realProductionInSeconds = qualityKpi.getDividend() / availabilityKpi.getDividend();
-        KpiDto kpi = new KpiDto(realProductionInSeconds, countingEquipment.getTheoreticalProduction());
+        Double theoreticalProductionInMilliseconds = countingEquipment.getTheoreticalProduction() / SECONDS_TO_MILLISECONDS;
+        log.info(String.format("theoretical production [%s]: ", theoreticalProductionInMilliseconds));
+        Double realProduction = qualityKpi.getDivider() / availabilityKpi.getDividend();
+        log.info(String.format("quality divider [%s]: ", qualityKpi.getDivider()));
+        log.info(String.format("availability dividend [%s]: ", availabilityKpi.getDividend()));
+        log.info(String.format("real production [%s]: ", realProduction));
+        KpiDto kpi = new KpiDto(realProduction, theoreticalProductionInMilliseconds);
         kpi.setValueAsDivision();
         return kpi;
     }

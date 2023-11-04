@@ -25,7 +25,7 @@ public class ProductionOrderInitProcess extends AbstractMesProtocolProcess<PlcMq
         String equipmentCode = equipmentCounts.getEquipmentCode();
 
         log.info("Executing Production Order response process");
-        equipmentService.updateEquipmentStatus(equipmentCode, equipmentCounts.getEquipmentStatus());
+        equipmentService.updateEquipmentStatus(equipmentCode, equipmentCounts.getEquipmentStatus(), true);
         alarmService.processAlarms(equipmentCounts);
 
         if (areInvalidInitialCounts(equipmentCounts)) {
