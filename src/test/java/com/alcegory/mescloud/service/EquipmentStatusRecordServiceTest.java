@@ -22,7 +22,7 @@ import java.util.List;
 @RunWith(MockitoJUnitRunner.class)
 public class EquipmentStatusRecordServiceTest {
 
-    @Mock
+    /*@Mock
     private EquipmentStatusRecordRepository equipmentStatusRecordRepository;
     @InjectMocks
     private EquipmentStatusRecordServiceImpl equipmentStatusRecordService;
@@ -32,7 +32,7 @@ public class EquipmentStatusRecordServiceTest {
         record.setEquipmentStatus(status);
         record.setRegisteredAt(Timestamp.valueOf(createdAt));
         return record;
-    }
+    }*/
 
     /*@Test
     public void testCalculateStoppageTimeInSeconds() {
