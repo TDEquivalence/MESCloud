@@ -48,6 +48,9 @@ public class CounterRecordProcess extends AbstractMesProtocolProcess<PlcMqttDto>
 
     private void updateActiveTime(PlcMqttDto equipmentCounts) {
         long activeTime = equipmentCounts.getActiveTime();
+        if (equipmentCounts.getEquipmentStatus() != 1) {
+            return;
+        }
         productionOrderService.updateActiveTime(equipmentCounts.getProductionOrderCode(), activeTime);
     }
 
