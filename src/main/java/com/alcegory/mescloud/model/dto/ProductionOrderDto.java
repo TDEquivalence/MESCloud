@@ -23,5 +23,5 @@ public class ProductionOrderDto {
     private String category;
     private String washingProcess;
 
-    private Long activeTime;
+    private long activeTime;
 }
