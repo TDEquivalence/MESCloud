@@ -324,23 +324,19 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     private long calculateUpdatedActiveTime(ProductionOrderEntity productionOrder, long activeTimeToUpdateFrom) {
         long activeTime = productionOrder.getActiveTime();
 
-        if (activeTime == 0) {
-            return activeTimeToUpdateFrom;
-        }
-
-        if (isRollover(activeTime, activeTimeToUpdateFrom)) {
-            return calculateRolloverActiveTime(activeTime, activeTimeToUpdateFrom);
+        if (isRollover(productionOrder, activeTime, activeTimeToUpdateFrom)) {
+            return calculateRolloverActiveTime(activeTime, activeTimeToUpdateFrom) + activeTime;
         }
 
         return activeTimeToUpdateFrom;
     }
 
-    private long calculateRolloverActiveTime(long toUpdate, long updateFrom) {
-        long incrementBeforeOverflow = ACTIVE_TIME_MAX_VALUE - toUpdate;
-        return incrementBeforeOverflow + ROLLOVER_OFFSET + updateFrom;
+    private long calculateRolloverActiveTime(long activeTimePersisted, long receivedActiveTime) {
+        long incrementBeforeOverflow = ACTIVE_TIME_MAX_VALUE - activeTimePersisted;
+        return incrementBeforeOverflow + ROLLOVER_OFFSET + receivedActiveTime;
     }
 
-    private boolean isRollover(long activeTimePersisted, long receivedActiveTime) {
-        return receivedActiveTime < activeTimePersisted;
+    private boolean isRollover(ProductionOrderEntity productionOrder, long activeTimePersisted, long receivedActiveTime) {
+        return !productionOrder.isCompleted() && receivedActiveTime < activeTimePersisted;
     }
 }
