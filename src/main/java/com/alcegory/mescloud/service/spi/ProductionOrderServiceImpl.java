@@ -284,12 +284,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
 
         startDate = (startDate.before(createdAt)) ? createdAt : startDate;
         endDate = (endDate.before(createdAt)) ? createdAt : endDate;
-
-        if (completedAt != null) {
-            endDate = (completedAt.before(endDate)) ? completedAt : endDate;
-        } else {
-            endDate = new Date();
-        }
+        endDate = (completedAt != null && completedAt.before(endDate)) ? completedAt : endDate;
 
         long durationInMilliseconds = Math.max(0, endDate.getTime() - startDate.getTime());
 
