@@ -284,11 +284,16 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
 
         startDate = (startDate.before(createdAt)) ? createdAt : startDate;
         endDate = (endDate.before(createdAt)) ? createdAt : endDate;
-        endDate = (completedAt != null && completedAt.before(endDate)) ? completedAt : new Date();
 
-        long durationInMillisenconds = Math.max(0, endDate.getTime() - startDate.getTime());
+        if (completedAt != null) {
+            endDate = (completedAt.before(endDate)) ? completedAt : endDate;
+        } else {
+            endDate = new Date();
+        }
 
-        return Duration.ofMillis(durationInMillisenconds);
+        long durationInMilliseconds = Math.max(0, endDate.getTime() - startDate.getTime());
+
+        return Duration.ofMillis(durationInMilliseconds);
     }
 
     private CountingEquipmentDto setOperationStatus(CountingEquipmentEntity countingEquipment, CountingEquipmentEntity.OperationStatus status) {
