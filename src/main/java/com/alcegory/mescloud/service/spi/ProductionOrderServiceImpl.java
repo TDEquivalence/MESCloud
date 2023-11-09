@@ -23,6 +23,7 @@ import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -279,16 +280,25 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     }
 
     private Duration calculateScheduledTime(ProductionOrderEntity productionOrder, Date startDate, Date endDate) {
-        Date createdAt = productionOrder.getCreatedAt();
-        Date completedAt = productionOrder.getCompletedAt();
+        Instant createdAt = productionOrder.getCreatedAt().toInstant();
+        Instant completedAt = (productionOrder.getCompletedAt() != null) ?
+                productionOrder.getCompletedAt().toInstant() : null;
 
-        startDate = (startDate.before(createdAt)) ? createdAt : startDate;
-        endDate = (endDate.before(createdAt)) ? createdAt : endDate;
-        endDate = (completedAt != null && completedAt.before(endDate)) ? completedAt : endDate;
+        Instant adjustedStartDate = (createdAt.isAfter(Instant.ofEpochMilli(startDate.getTime()))) ? createdAt : Instant.ofEpochMilli(startDate.getTime());
+        Instant adjustedEndDate = (createdAt.isAfter(Instant.ofEpochMilli(endDate.getTime()))) ? createdAt : Instant.ofEpochMilli(endDate.getTime());
 
-        long durationInMilliseconds = Math.max(0, endDate.getTime() - startDate.getTime());
+        if (completedAt != null && completedAt.isBefore(adjustedEndDate)) {
+            adjustedEndDate = completedAt;
+        }
 
-        return Duration.ofMillis(durationInMilliseconds);
+        Instant nowTime = Instant.now();
+        if (adjustedEndDate.isAfter(nowTime)) {
+            adjustedEndDate = nowTime;
+        }
+
+        Duration duration = Duration.between(adjustedStartDate, adjustedEndDate);
+
+        return duration.isNegative() ? Duration.ZERO : duration;
     }
 
     private CountingEquipmentDto setOperationStatus(CountingEquipmentEntity countingEquipment, CountingEquipmentEntity.OperationStatus status) {
