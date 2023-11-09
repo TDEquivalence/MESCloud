@@ -179,8 +179,9 @@ public class KpiServiceImpl implements KpiService {
             return null;
         }
 
+        Double theoreticalProductionInMilliseconds = countingEquipment.getTheoreticalProduction() / SECONDS_TO_MILLISECONDS;
         Double realProductionInSeconds = qualityKpi.getDividend() / availabilityKpi.getDividend();
-        KpiDto kpi = new KpiDto(realProductionInSeconds, countingEquipment.getTheoreticalProduction());
+        KpiDto kpi = new KpiDto(realProductionInSeconds, theoreticalProductionInMilliseconds);
         kpi.setValueAsDivision();
         return kpi;
     }
