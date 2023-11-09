@@ -332,7 +332,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
             return calculateRolloverActiveTime(activeTime, activeTimeToUpdateFrom);
         }
 
-        return productionOrder.getActiveTime() + activeTimeToUpdateFrom;
+        return activeTimeToUpdateFrom;
     }
 
     private long calculateRolloverActiveTime(long toUpdate, long updateFrom) {
