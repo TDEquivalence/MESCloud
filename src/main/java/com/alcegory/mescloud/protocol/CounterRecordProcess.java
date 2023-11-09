@@ -26,7 +26,7 @@ public class CounterRecordProcess extends AbstractMesProtocolProcess<PlcMqttDto>
 
         log.info("Executing Counter Record process");
         equipmentService.updateEquipmentStatus(equipmentCounts.getEquipmentCode(), equipmentCounts.getEquipmentStatus());
-        productionOrderService.updateActiveTime(equipmentCounts.getProductionOrderCode(), equipmentCounts.getActiveTime());
+        updateActiveTime(equipmentCounts);
         alarmService.processAlarms(equipmentCounts);
 
         if (areInvalidContinuationCounts(equipmentCounts)) {
@@ -44,6 +44,13 @@ public class CounterRecordProcess extends AbstractMesProtocolProcess<PlcMqttDto>
 
     private boolean areInvalidContinuationCounts(PlcMqttDto equipmentCountsMqttDTO) {
         return !counterRecordService.areValidContinuationCounts(equipmentCountsMqttDTO.getProductionOrderCode());
+    }
+
+    private void updateActiveTime(PlcMqttDto equipmentCounts) {
+        Long activeTime = equipmentCounts.getActiveTime();
+        if (activeTime != null) {
+            productionOrderService.updateActiveTime(equipmentCounts.getProductionOrderCode(), activeTime);
+        }
     }
 
     @Override
