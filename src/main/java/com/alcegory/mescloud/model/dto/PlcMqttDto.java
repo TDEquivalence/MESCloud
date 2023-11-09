@@ -10,6 +10,7 @@ public class PlcMqttDto extends AbstractMqttDto {
     private String productionOrderCode;
     private String equipmentCode;
     private int equipmentStatus;
+    private long activeTime;
     private int[] alarms;
     private CounterMqttDto[] counters;
 }

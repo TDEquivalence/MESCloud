@@ -36,6 +36,8 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     private static final String CODE_PREFIX = "PO";
     private static final String FIVE_DIGIT_NUMBER_FORMAT = "%05d";
     private static final int FIRST_CODE_VALUE = 1;
+    private static final int ACTIVE_TIME_MAX_VALUE = 65535;
+    private static final int ROLLOVER_OFFSET = 1;
 
     private final ProductionOrderRepository repository;
     private final ProductionOrderConverter converter;
@@ -282,7 +284,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
 
         startDate = (startDate.before(createdAt)) ? createdAt : startDate;
         endDate = (endDate.before(createdAt)) ? createdAt : endDate;
-        endDate = (completedAt != null && completedAt.before(endDate)) ? completedAt : endDate;
+        endDate = (completedAt != null && completedAt.before(endDate)) ? completedAt : new Date();
 
         long durationInMillisenconds = Math.max(0, endDate.getTime() - startDate.getTime());
 
@@ -292,5 +294,36 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     private CountingEquipmentDto setOperationStatus(CountingEquipmentEntity countingEquipment, CountingEquipmentEntity.OperationStatus status) {
         countingEquipmentService.setOperationStatus(countingEquipment, status);
         return equipmentConverter.toDto(countingEquipment, CountingEquipmentDto.class);
+    }
+
+    @Override
+    public void updateActiveTime(String productionOrderCode, long activeTime) {
+        Optional<ProductionOrderEntity> productionOrderOpt = repository.findByCode(productionOrderCode);
+
+        if (productionOrderOpt.isEmpty()) {
+            return;
+        }
+
+        ProductionOrderEntity productionOrder = productionOrderOpt.get();
+        long activeTimeUpdated = calculateUpdatedActiveTime(productionOrder, activeTime);
+
+        productionOrder.setActiveTime(activeTimeUpdated);
+        repository.save(productionOrder);
+    }
+
+    private long calculateUpdatedActiveTime(ProductionOrderEntity productionOrder, long activeTimeToUpdateFrom) {
+        if (isRollover(productionOrder.getActiveTime(), activeTimeToUpdateFrom)) {
+            return calculateRolloverActiveTime(productionOrder.getActiveTime(), activeTimeToUpdateFrom);
+        }
+        return productionOrder.getActiveTime() + activeTimeToUpdateFrom;
+    }
+
+    private long calculateRolloverActiveTime(long toUpdate, long updateFrom) {
+        long incrementBeforeOverflow = ACTIVE_TIME_MAX_VALUE - toUpdate;
+        return incrementBeforeOverflow + ROLLOVER_OFFSET + updateFrom;
+    }
+
+    private boolean isRollover(long activeTimePersisted, long receivedActiveTime) {
+        return receivedActiveTime < activeTimePersisted;
     }
 }
