@@ -118,13 +118,10 @@ public class KpiServiceImpl implements KpiService {
     @Override
     public KpiDto computeAvailability(Long equipmentId, RequestKpiDto filter) {
         Long totalScheduledTime = getTotalScheduledTime(equipmentId, filter);
-        Long totalActiveTimeInSeconds = getActiveTime(equipmentId, filter);
-        long totalActiveTimeInMilliseconds = totalActiveTimeInSeconds / SECONDS_TO_MILLISECONDS;
-        long totalScheduleTimeInMilliseconds = totalScheduledTime / SECONDS_TO_MILLISECONDS;
-        log.info(String.format("Total active time in milliseconds [%s]", totalActiveTimeInMilliseconds));
+        Long totalActiveTime = getActiveTime(equipmentId, filter);
+        log.info(String.format("Total schedule time [%s]", totalScheduledTime));
 
-        KpiDto kpi = new KpiDto(DoubleUtil.safeDoubleValue(totalActiveTimeInMilliseconds),
-                DoubleUtil.safeDoubleValue(totalScheduleTimeInMilliseconds));
+        KpiDto kpi = new KpiDto(DoubleUtil.safeDoubleValue(totalActiveTime), DoubleUtil.safeDoubleValue(totalScheduledTime));
         kpi.setValueAsDivision();
         return kpi;
     }
@@ -149,7 +146,7 @@ public class KpiServiceImpl implements KpiService {
                     productionOrder.getActiveTime();
         }
 
-        log.info(String.format("getActiveTime: Total active time in seconds [%s]", totalActiveTime));
+        log.info(String.format("getActiveTime: Total active time [%s]", totalActiveTime));
         return totalActiveTime;
     }
 
@@ -179,9 +176,8 @@ public class KpiServiceImpl implements KpiService {
             return null;
         }
 
-        Double theoreticalProductionInMilliseconds = countingEquipment.getTheoreticalProduction() / SECONDS_TO_MILLISECONDS;
         Double realProductionInSeconds = qualityKpi.getDividend() / availabilityKpi.getDividend();
-        KpiDto kpi = new KpiDto(realProductionInSeconds, theoreticalProductionInMilliseconds);
+        KpiDto kpi = new KpiDto(realProductionInSeconds, countingEquipment.getTheoreticalProduction());
         kpi.setValueAsDivision();
         return kpi;
     }
