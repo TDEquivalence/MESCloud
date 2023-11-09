@@ -119,9 +119,10 @@ public class KpiServiceImpl implements KpiService {
     public KpiDto computeAvailability(Long equipmentId, RequestKpiDto filter) {
         Long totalScheduledTime = getTotalScheduledTime(equipmentId, filter);
         Long totalActiveTime = getActiveTime(equipmentId, filter);
-        long totalActiveTimeInSeconds = totalActiveTime / SECONDS_TO_MILLISECONDS;
+        long totalActiveTimeInMilliseconds = totalActiveTime / SECONDS_TO_MILLISECONDS;
+        log.info(String.format("Total active time in milliseconds [%s]", totalActiveTimeInMilliseconds));
 
-        KpiDto kpi = new KpiDto(DoubleUtil.safeDoubleValue(totalActiveTimeInSeconds), DoubleUtil.safeDoubleValue(totalScheduledTime));
+        KpiDto kpi = new KpiDto(DoubleUtil.safeDoubleValue(totalActiveTimeInMilliseconds), DoubleUtil.safeDoubleValue(totalScheduledTime));
         kpi.setValueAsDivision();
         return kpi;
     }
@@ -140,13 +141,14 @@ public class KpiServiceImpl implements KpiService {
         List<ProductionOrderDto> productionOrders =
                 productionOrderService.findByEquipmentAndPeriod(equipmentId, startDate, endDate);
 
-        Long totalStoppageTime = 0L;
+        long totalActiveTime = 0L;
         for (ProductionOrderDto productionOrder : productionOrders) {
-            totalStoppageTime +=
+            totalActiveTime +=
                     productionOrder.getActiveTime();
         }
 
-        return totalStoppageTime;
+        log.info(String.format("getActiveTime: Total active time in seconds [%s]", totalActiveTime));
+        return totalActiveTime;
     }
 
     @Override
@@ -164,12 +166,14 @@ public class KpiServiceImpl implements KpiService {
     private KpiDto computePerformance(KpiDto qualityKpi, KpiDto availabilityKpi, CountingEquipmentDto countingEquipment) {
 
         if (countingEquipment.getTheoreticalProduction() == null) {
-            log.warning(String.format("Unable to compute performance: equipment [%s] has no theoretical production configuration value", countingEquipment.getId()));
+            log.warning(String.format("Unable to compute performance: equipment [%s] has no theoretical production configuration value",
+                    countingEquipment.getId()));
             return null;
         }
 
         if (qualityKpi.getDividend() == 0 || availabilityKpi.getDividend() == 0) {
-            log.warning(String.format("Unable to compute performance: cannot divide quality dividend [%s] by the availability dividend [%s]", qualityKpi.getDividend(), availabilityKpi.getDividend()));
+            log.warning(String.format("Unable to compute performance: cannot divide quality dividend [%s] by the availability dividend [%s]",
+                    qualityKpi.getDividend(), availabilityKpi.getDividend()));
             return null;
         }
 
