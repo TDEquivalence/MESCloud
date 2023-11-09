@@ -46,9 +46,8 @@ public class ProductionOrderConclusionProcess extends AbstractMesProtocolProcess
         }
 
         equipmentService.updateEquipmentStatus(equipmentCounts.getEquipmentCode(), equipmentCounts.getEquipmentStatus());
-        productionOrderService.updateActiveTime(equipmentCounts.getProductionOrderCode(), equipmentCounts.getActiveTime());
         alarmService.processAlarms(equipmentCounts);
-
+        updateActiveTime(equipmentCounts);
         counterRecordService.save(equipmentCounts);
 
         ProductionOrderEntity productionOrder = getProductionOrderByCode(equipmentCounts.getProductionOrderCode());
@@ -86,6 +85,16 @@ public class ProductionOrderConclusionProcess extends AbstractMesProtocolProcess
 
         completeProductionOrder(productionOrder);
         setOperationStatus(equipmentCode);
+    }
+
+    private void updateActiveTime(PlcMqttDto equipmentCounts) {
+        Long activeTime = equipmentCounts.getActiveTime();
+
+        if (activeTime == null) {
+            return;
+        }
+
+        productionOrderService.updateActiveTime(equipmentCounts.getProductionOrderCode(), equipmentCounts.getActiveTime());
     }
 
     private void completeProductionOrder(ProductionOrderEntity productionOrder) {
