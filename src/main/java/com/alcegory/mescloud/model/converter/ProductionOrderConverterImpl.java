@@ -25,6 +25,7 @@ public class ProductionOrderConverterImpl implements ProductionOrderConverter {
         productionOrderEntity.setGauge(productionOrderDto.getGauge());
         productionOrderEntity.setCategory(productionOrderDto.getCategory());
         productionOrderEntity.setWashingProcess(productionOrderDto.getWashingProcess());
+        productionOrderEntity.setActiveTime(productionOrderDto.getActiveTime());
 
         return productionOrderEntity;
     }
@@ -58,6 +59,7 @@ public class ProductionOrderConverterImpl implements ProductionOrderConverter {
         dto.setCategory(entity.getCategory());
         dto.setWashingProcess(entity.getWashingProcess());
         dto.setInputBatch(entity.getInputBatch());
+        dto.setActiveTime(entity.getActiveTime());
 
         if (entity.getEquipment() != null) {
             dto.setEquipmentId(entity.getEquipment().getId());

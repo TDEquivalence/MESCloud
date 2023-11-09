@@ -5,6 +5,7 @@ import com.alcegory.mescloud.model.dto.PlcMqttDto;
 import com.alcegory.mescloud.service.AlarmService;
 import com.alcegory.mescloud.service.CounterRecordService;
 import com.alcegory.mescloud.service.CountingEquipmentService;
+import com.alcegory.mescloud.service.ProductionOrderService;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,7 @@ public class CounterRecordProcess extends AbstractMesProtocolProcess<PlcMqttDto>
 
     private final CounterRecordService counterRecordService;
     private final CountingEquipmentService equipmentService;
+    private final ProductionOrderService productionOrderService;
     private final AlarmService alarmService;
 
 
@@ -23,7 +25,8 @@ public class CounterRecordProcess extends AbstractMesProtocolProcess<PlcMqttDto>
     public void execute(PlcMqttDto equipmentCounts) {
 
         log.info("Executing Counter Record process");
-        equipmentService.updateEquipmentStatus(equipmentCounts.getEquipmentCode(), equipmentCounts.getEquipmentStatus(), false);
+        equipmentService.updateEquipmentStatus(equipmentCounts.getEquipmentCode(), equipmentCounts.getEquipmentStatus());
+        updateActiveTime(equipmentCounts);
         alarmService.processAlarms(equipmentCounts);
 
         if (areInvalidContinuationCounts(equipmentCounts)) {
@@ -41,6 +44,14 @@ public class CounterRecordProcess extends AbstractMesProtocolProcess<PlcMqttDto>
 
     private boolean areInvalidContinuationCounts(PlcMqttDto equipmentCountsMqttDTO) {
         return !counterRecordService.areValidContinuationCounts(equipmentCountsMqttDTO.getProductionOrderCode());
+    }
+
+    private void updateActiveTime(PlcMqttDto equipmentCounts) {
+        long activeTime = equipmentCounts.getActiveTime();
+        if (equipmentCounts.getEquipmentStatus() != 1) {
+            return;
+        }
+        productionOrderService.updateActiveTime(equipmentCounts.getProductionOrderCode(), activeTime);
     }
 
     @Override

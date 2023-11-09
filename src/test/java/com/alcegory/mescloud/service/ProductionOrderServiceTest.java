@@ -21,7 +21,7 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 class ProductionOrderServiceTest {
 
-    /*@Mock
+    @Mock
     private ProductionOrderRepository productionOrderRepository;
     @InjectMocks
     private ProductionOrderServiceImpl productionOrderService;
@@ -67,7 +67,7 @@ class ProductionOrderServiceTest {
         assertEquals(expectedIds, result);
     }
 
-    @Test
+    /*@Test
     void testCalculateActiveTime() {
 
         Long equipmentId = 1L;
@@ -93,7 +93,7 @@ class ProductionOrderServiceTest {
 
         long expectedActiveTimeSeconds = 24 * 60 * 60; // 1 day (Order 1) + 1 day (Order 2)
         assertEquals(expectedActiveTimeSeconds, activeTime);
-    }
+    }*/
 
     @Test
     void testGenerateCodeWithNullCode() {
@@ -112,5 +112,5 @@ class ProductionOrderServiceTest {
 
         String generatedCode = productionOrderService.generateCode();
         assertEquals("OBOPO2300002", generatedCode);
-    }*/
+    }
 }

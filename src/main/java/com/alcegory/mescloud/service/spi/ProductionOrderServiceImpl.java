@@ -23,6 +23,7 @@ import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -36,6 +37,8 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     private static final String CODE_PREFIX = "PO";
     private static final String FIVE_DIGIT_NUMBER_FORMAT = "%05d";
     private static final int FIRST_CODE_VALUE = 1;
+    private static final int ACTIVE_TIME_MAX_VALUE = 65535;
+    private static final int ROLLOVER_OFFSET = 1;
 
     private final ProductionOrderRepository repository;
     private final ProductionOrderConverter converter;
@@ -266,29 +269,74 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     public Long calculateScheduledTimeInSeconds(Long equipmentId, Date startDate, Date endDate) {
 
         List<ProductionOrderEntity> productionOrders = repository.findByEquipmentAndPeriod(equipmentId, startDate, endDate);
-        long totalActiveTime = 0L;
+        Duration totalActiveTime = Duration.ZERO;
         for (ProductionOrderEntity productionOrder : productionOrders) {
 
-            Long productionOrderActiveTime = calculateScheduledTime(productionOrder, startDate, endDate);
-            totalActiveTime += productionOrderActiveTime;
+            Duration productionOrderActiveTime = calculateScheduledTime(productionOrder, startDate, endDate);
+            totalActiveTime = totalActiveTime.plus(productionOrderActiveTime);
         }
 
-        return totalActiveTime;
+        return totalActiveTime.getSeconds();
     }
 
-    private Long calculateScheduledTime(ProductionOrderEntity productionOrder, Date startDate, Date endDate) {
-        Date createdAt = productionOrder.getCreatedAt();
-        Date completedAt = productionOrder.getCompletedAt();
+    private Duration calculateScheduledTime(ProductionOrderEntity productionOrder, Date startDate, Date endDate) {
+        Instant createdAt = productionOrder.getCreatedAt().toInstant();
+        Instant completedAt = (productionOrder.getCompletedAt() != null) ?
+                productionOrder.getCompletedAt().toInstant() : null;
 
-        startDate = (startDate.before(createdAt)) ? createdAt : startDate;
-        endDate = (endDate.before(createdAt)) ? createdAt : endDate;
-        endDate = (completedAt != null && completedAt.before(endDate)) ? completedAt : endDate;
+        Instant adjustedStartDate = (createdAt.isAfter(Instant.ofEpochMilli(startDate.getTime()))) ? createdAt : Instant.ofEpochMilli(startDate.getTime());
+        Instant adjustedEndDate = (createdAt.isAfter(Instant.ofEpochMilli(endDate.getTime()))) ? createdAt : Instant.ofEpochMilli(endDate.getTime());
 
-        return Math.max(0, endDate.getTime() - startDate.getTime());
+        if (completedAt != null && completedAt.isBefore(adjustedEndDate)) {
+            adjustedEndDate = completedAt;
+        }
+
+        Instant nowTime = Instant.now();
+        if (adjustedEndDate.isAfter(nowTime)) {
+            adjustedEndDate = nowTime;
+        }
+
+        Duration duration = Duration.between(adjustedStartDate, adjustedEndDate);
+
+        return duration.isNegative() ? Duration.ZERO : duration;
     }
 
     private CountingEquipmentDto setOperationStatus(CountingEquipmentEntity countingEquipment, CountingEquipmentEntity.OperationStatus status) {
         countingEquipmentService.setOperationStatus(countingEquipment, status);
         return equipmentConverter.toDto(countingEquipment, CountingEquipmentDto.class);
+    }
+
+    @Override
+    public void updateActiveTime(String productionOrderCode, long activeTime) {
+        Optional<ProductionOrderEntity> productionOrderOpt = repository.findByCode(productionOrderCode);
+
+        if (productionOrderOpt.isEmpty()) {
+            return;
+        }
+
+        ProductionOrderEntity productionOrder = productionOrderOpt.get();
+        long activeTimeUpdated = calculateUpdatedActiveTime(productionOrder, activeTime);
+
+        productionOrder.setActiveTime(activeTimeUpdated);
+        repository.save(productionOrder);
+    }
+
+    private long calculateUpdatedActiveTime(ProductionOrderEntity productionOrder, long activeTimeToUpdateFrom) {
+        long activeTime = productionOrder.getActiveTime();
+
+        if (isRollover(activeTime, activeTimeToUpdateFrom)) {
+            return calculateRolloverActiveTime(activeTime, activeTimeToUpdateFrom) + activeTime;
+        }
+
+        return activeTimeToUpdateFrom;
+    }
+
+    private long calculateRolloverActiveTime(long activeTimePersisted, long receivedActiveTime) {
+        long incrementBeforeOverflow = ACTIVE_TIME_MAX_VALUE - activeTimePersisted;
+        return incrementBeforeOverflow + ROLLOVER_OFFSET + receivedActiveTime;
+    }
+
+    private boolean isRollover(long activeTimePersisted, long receivedActiveTime) {
+        return receivedActiveTime < activeTimePersisted;
     }
 }
