@@ -118,11 +118,11 @@ public class KpiServiceImpl implements KpiService {
     @Override
     public KpiDto computeAvailability(Long equipmentId, RequestKpiDto filter) {
         Long totalScheduledTime = getTotalScheduledTime(equipmentId, filter);
-        Long totalActiveTime = getActiveTime(equipmentId, filter);
-        long totalActiveTimeInMilliseconds = totalActiveTime / SECONDS_TO_MILLISECONDS;
+        Long totalActiveTimeInSeconds = getActiveTime(equipmentId, filter);
+        long totalActiveTimeInMilliseconds = totalActiveTimeInSeconds / SECONDS_TO_MILLISECONDS;
         log.info(String.format("Total active time in milliseconds [%s]", totalActiveTimeInMilliseconds));
 
-        KpiDto kpi = new KpiDto(DoubleUtil.safeDoubleValue(totalActiveTimeInMilliseconds), DoubleUtil.safeDoubleValue(totalScheduledTime));
+        KpiDto kpi = new KpiDto(DoubleUtil.safeDoubleValue(totalActiveTimeInSeconds), DoubleUtil.safeDoubleValue(totalScheduledTime));
         kpi.setValueAsDivision();
         return kpi;
     }
