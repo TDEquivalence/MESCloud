@@ -23,7 +23,7 @@ public class CounterRecordProcess extends AbstractMesProtocolProcess<PlcMqttDto>
     public void execute(PlcMqttDto equipmentCounts) {
 
         log.info("Executing Counter Record process");
-        equipmentService.updateEquipmentStatus(equipmentCounts.getEquipmentCode(), equipmentCounts.getEquipmentStatus(), false);
+        equipmentService.updateEquipmentStatus(equipmentCounts.getEquipmentCode(), equipmentCounts.getEquipmentStatus());
         alarmService.processAlarms(equipmentCounts);
 
         if (areInvalidContinuationCounts(equipmentCounts)) {
