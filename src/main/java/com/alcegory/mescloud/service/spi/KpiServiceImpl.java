@@ -142,12 +142,8 @@ public class KpiServiceImpl implements KpiService {
 
         Long totalStoppageTime = 0L;
         for (ProductionOrderDto productionOrder : productionOrders) {
-
-            if (productionOrder.getCompletedAt() != null) {
-
-                totalStoppageTime +=
-                        productionOrder.getActiveTime();
-            }
+            totalStoppageTime +=
+                    productionOrder.getActiveTime();
         }
 
         return totalStoppageTime;
