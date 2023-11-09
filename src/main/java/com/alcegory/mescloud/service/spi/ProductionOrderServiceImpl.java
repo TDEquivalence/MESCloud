@@ -315,7 +315,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         long activeTime = productionOrder.getActiveTime();
 
         if (activeTime == 0) {
-            return activeTime;
+            return activeTimeToUpdateFrom;
         }
 
         if (isRollover(activeTime, activeTimeToUpdateFrom)) {
