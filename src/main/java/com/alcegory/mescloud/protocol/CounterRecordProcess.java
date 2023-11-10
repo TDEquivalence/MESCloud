@@ -47,6 +47,7 @@ public class CounterRecordProcess extends AbstractMesProtocolProcess<PlcMqttDto>
     }
 
     private void updateActiveTime(PlcMqttDto equipmentCounts) {
+        log.info("Active Time Counter Record Process: " + equipmentCounts.getActiveTime());
         Long activeTime = equipmentCounts.getActiveTime();
 
         if (activeTime == null) {
