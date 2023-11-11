@@ -329,7 +329,15 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
             return calculateRolloverActiveTime(activeTime, activeTimeToUpdateFrom) + activeTime;
         }
 
-        return activeTimeToUpdateFrom;
+        return calculateActiveTimeIncrement(productionOrder.getActiveTime(), activeTimeToUpdateFrom);
+    }
+
+    private long calculateActiveTimeIncrement(long activeTime, long activeTimeToUpdateFrom) {
+        if (activeTime == 0) {
+            return activeTimeToUpdateFrom;
+        }
+
+        return activeTimeToUpdateFrom - activeTime;
     }
 
     private long calculateRolloverActiveTime(long activeTimePersisted, long receivedActiveTime) {
