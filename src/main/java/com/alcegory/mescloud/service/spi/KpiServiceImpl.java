@@ -171,7 +171,7 @@ public class KpiServiceImpl implements KpiService {
             return null;
         }
 
-        if (qualityKpi.getDividend() == 0 || availabilityKpi.getDividend() == 0) {
+        if (qualityKpi.getDivider() == 0 || availabilityKpi.getDividend() == 0) {
             log.warning(String.format("Unable to compute performance: cannot divide quality dividend [%s] by the availability dividend [%s]",
                     qualityKpi.getDividend(), availabilityKpi.getDividend()));
             return null;
