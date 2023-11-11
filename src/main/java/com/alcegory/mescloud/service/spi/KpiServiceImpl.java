@@ -134,20 +134,20 @@ public class KpiServiceImpl implements KpiService {
     }
 
     private Long getActiveTime(Long equipmentId, RequestKpiDto filter) {
-        Timestamp startDate = filter.getStartDate();
-        Timestamp endDate = filter.getEndDate();
+        Date startDate = filter.getStartDate();
+        Date endDate = filter.getEndDate();
 
         List<ProductionOrderDto> productionOrders =
                 productionOrderService.findByEquipmentAndPeriod(equipmentId, startDate, endDate);
 
         long totalActiveTime = 0L;
         for (ProductionOrderDto productionOrder : productionOrders) {
-
-            totalActiveTime += counterRecordService.getActiveTimeByProductionOrderId(productionOrder.getId(),
-                    startDate, endDate);
+            log.info(String.format("getActiveTime: PO active time [%s]", productionOrder.getActiveTime()));
+            totalActiveTime +=
+                    productionOrder.getActiveTime();
         }
 
-        log.info(String.format("GetActiveTime: active time by PO [%s]", totalActiveTime));
+        log.info(String.format("getActiveTime: Total active time [%s]", totalActiveTime));
         return totalActiveTime;
     }
 

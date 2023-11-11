@@ -116,7 +116,6 @@ public class CounterRecordServiceImpl implements CounterRecordService {
         //counterRecord.setRegisteredAt(DateUtil.getCurrentTime(factoryService.getTimeZone()));
         counterRecord.setRegisteredAt(new Date());
         counterRecord.setRealValue(counterDto.getValue());
-        counterRecord.setActiveTime(equipmentCountsDto.getActiveTime());
 
         setEquipmentOutput(counterRecord, counterDto.getOutputCode());
         setProductionOrder(counterRecord, equipmentCountsDto.getProductionOrderCode());
@@ -239,10 +238,5 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     @Override
     public Integer sumCounterIncrement(Long countingEquipmentId, Timestamp startDateFilter, Timestamp endDateFilter) {
         return repository.sumCounterIncrement(countingEquipmentId, startDateFilter, endDateFilter);
-    }
-
-    @Override
-    public Long getActiveTimeByProductionOrderId(Long productionOrderId, Timestamp startDate, Timestamp endDate) {
-        return repository.getSumActiveTimeByProductionOrderId(productionOrderId, startDate, endDate);
     }
 }
