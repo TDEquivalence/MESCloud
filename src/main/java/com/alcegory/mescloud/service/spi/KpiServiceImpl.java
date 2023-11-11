@@ -143,8 +143,7 @@ public class KpiServiceImpl implements KpiService {
         long totalActiveTime = 0L;
         for (ProductionOrderDto productionOrder : productionOrders) {
 
-            totalActiveTime += counterRecordService.getActiveTimeByProductionOrderId(productionOrder.getId(),
-                    startDate, endDate);
+            totalActiveTime += counterRecordService.getActiveTimeByProductionOrderId(productionOrder.getId(), endDate);
         }
 
         log.info(String.format("GetActiveTime: active time by PO [%s]", totalActiveTime));

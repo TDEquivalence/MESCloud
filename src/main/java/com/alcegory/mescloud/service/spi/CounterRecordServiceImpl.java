@@ -242,7 +242,7 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     }
 
     @Override
-    public Long getActiveTimeByProductionOrderId(Long productionOrderId, Timestamp startDate, Timestamp endDate) {
-        return repository.getSumActiveTimeByProductionOrderId(productionOrderId, startDate, endDate);
+    public Long getActiveTimeByProductionOrderId(Long productionOrderId, Timestamp endDate) {
+        return repository.getActiveTimeByProductionOrderId(productionOrderId, endDate);
     }
 }
