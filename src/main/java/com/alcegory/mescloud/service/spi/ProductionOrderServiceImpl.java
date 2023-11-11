@@ -317,6 +317,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         ProductionOrderEntity productionOrder = productionOrderOpt.get();
         long activeTimeUpdated = calculateUpdatedActiveTime(productionOrder, activeTime);
 
+        log.info("Active Time Updated: " + activeTimeUpdated);
         productionOrder.setActiveTime(activeTimeUpdated);
         repository.save(productionOrder);
     }
