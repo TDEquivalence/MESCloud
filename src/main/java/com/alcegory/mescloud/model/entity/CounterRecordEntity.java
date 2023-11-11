@@ -28,4 +28,5 @@ public class CounterRecordEntity {
     @Temporal(TemporalType.TIMESTAMP)
     private Date registeredAt;
     private Boolean isValidForProduction;
+    long activeTime;
 }
