@@ -307,11 +307,11 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     }
 
     @Override
-    public void updateActiveTime(String productionOrderCode, long activeTime) {
+    public long updateActiveTime(String productionOrderCode, long activeTime) {
         Optional<ProductionOrderEntity> productionOrderOpt = repository.findByCode(productionOrderCode);
 
         if (productionOrderOpt.isEmpty()) {
-            return;
+            return 0L;
         }
 
         ProductionOrderEntity productionOrder = productionOrderOpt.get();
@@ -320,6 +320,8 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         log.info("Active Time Updated: " + activeTimeUpdated);
         productionOrder.setActiveTime(activeTimeUpdated);
         repository.save(productionOrder);
+
+        return activeTimeUpdated;
     }
 
     private long calculateUpdatedActiveTime(ProductionOrderEntity productionOrder, long activeTimeToUpdateFrom) {
@@ -339,5 +341,10 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
 
     private boolean isRollover(long activeTimePersisted, long receivedActiveTime) {
         return receivedActiveTime < activeTimePersisted;
+    }
+
+    @Override
+    public long getActiveTimeByProductionOrderCode(String productionOrderCode) {
+        return repository.getActiveTimeByProductionOrderCode(productionOrderCode);
     }
 }

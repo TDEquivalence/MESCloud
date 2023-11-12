@@ -26,7 +26,6 @@ public class CounterRecordProcess extends AbstractMesProtocolProcess<PlcMqttDto>
 
         log.info("Executing Counter Record process");
         equipmentService.updateEquipmentStatus(equipmentCounts.getEquipmentCode(), equipmentCounts.getEquipmentStatus());
-        updateActiveTime(equipmentCounts);
         alarmService.processAlarms(equipmentCounts);
 
         if (areInvalidContinuationCounts(equipmentCounts)) {
@@ -34,26 +33,17 @@ public class CounterRecordProcess extends AbstractMesProtocolProcess<PlcMqttDto>
                     equipmentCounts.getProductionOrderCode()));
         }
 
-        counterRecordService.save(equipmentCounts);
-
-        //TODO: Check for alert needs
-        //Counter values are the same for 3 consecutive counts
-        //Equipment status is not 1
-        //3 pTimerCommunicationCycles without receiving counts
+        long updatedActiveTime = updateActiveTime(equipmentCounts);
+        counterRecordService.save(equipmentCounts, updatedActiveTime);
     }
 
     private boolean areInvalidContinuationCounts(PlcMqttDto equipmentCountsMqttDTO) {
         return !counterRecordService.areValidContinuationCounts(equipmentCountsMqttDTO.getProductionOrderCode());
     }
 
-    private void updateActiveTime(PlcMqttDto equipmentCounts) {
-        log.info("Active Time Counter Record Process: " + equipmentCounts.getActiveTime());
+    private long updateActiveTime(PlcMqttDto equipmentCounts) {
         long activeTime = equipmentCounts.getActiveTime();
-
-        if (equipmentCounts.getEquipmentStatus() != 1) {
-            return;
-        }
-        productionOrderService.updateActiveTime(equipmentCounts.getProductionOrderCode(), activeTime);
+        return productionOrderService.updateActiveTime(equipmentCounts.getProductionOrderCode(), activeTime);
     }
 
     @Override

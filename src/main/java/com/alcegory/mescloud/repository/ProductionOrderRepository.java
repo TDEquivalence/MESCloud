@@ -4,6 +4,7 @@ import com.alcegory.mescloud.model.entity.ProductionOrderEntity;
 import com.alcegory.mescloud.model.entity.ProductionOrderSummaryEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
@@ -34,4 +35,7 @@ public interface ProductionOrderRepository extends JpaRepository<ProductionOrder
 
     @Query("SELECT po.isCompleted FROM production_order po WHERE po.code = :productionOrderCode")
     boolean isCompleted(String productionOrderCode);
+
+    @Query(value = "SELECT active_time FROM production_order WHERE code = :productionOrderCode", nativeQuery = true)
+    long getActiveTimeByProductionOrderCode(@Param("productionOrderCode") String productionOrderCode);
 }

@@ -42,5 +42,7 @@ public interface ProductionOrderService {
 
     boolean isCompleted(String productionOrderCode);
 
-    void updateActiveTime(String productionOrderCode, long activeTime);
+    long updateActiveTime(String productionOrderCode, long activeTime);
+
+    long getActiveTimeByProductionOrderCode(String productionOrderCode);
 }

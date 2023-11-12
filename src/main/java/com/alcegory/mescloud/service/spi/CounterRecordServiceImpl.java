@@ -93,16 +93,18 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     }
 
     @Override
-    public List<CounterRecordDto> save(PlcMqttDto equipmentCountsMqttDto) {
+    public List<CounterRecordDto> save(PlcMqttDto equipmentCountsMqttDto, long activeTime) {
 
         if (!isValid(equipmentCountsMqttDto)) {
-            log.warning(() -> String.format("Received counts are invalid either because no Counting Equipment was found with the code [%s] or because received equipment outputs number [%s] does not match the Counting Equipment outputs number", equipmentCountsMqttDto.getEquipmentCode(), equipmentCountsMqttDto.getCounters().length));
+            log.warning(() -> String.format("Received counts are invalid either because no Counting Equipment was found " +
+                    "with the code [%s] or because received equipment outputs number [%s] does not match " +
+                    "the Counting Equipment outputs number", equipmentCountsMqttDto.getEquipmentCode(), equipmentCountsMqttDto.getCounters().length));
             return Collections.emptyList();
         }
 
         List<CounterRecordEntity> counterRecords = new ArrayList<>(equipmentCountsMqttDto.getCounters().length);
         for (CounterMqttDto counterMqttDto : equipmentCountsMqttDto.getCounters()) {
-            CounterRecordEntity counterRecord = extractCounterRecordEntity(counterMqttDto, equipmentCountsMqttDto);
+            CounterRecordEntity counterRecord = extractCounterRecordEntity(counterMqttDto, equipmentCountsMqttDto, activeTime);
             counterRecords.add(counterRecord);
         }
 
@@ -110,13 +112,13 @@ public class CounterRecordServiceImpl implements CounterRecordService {
         return converter.toDto(counterRecordEntities);
     }
 
-    private CounterRecordEntity extractCounterRecordEntity(CounterMqttDto counterDto, PlcMqttDto equipmentCountsDto) {
+    private CounterRecordEntity extractCounterRecordEntity(CounterMqttDto counterDto, PlcMqttDto equipmentCountsDto, long activeTime) {
 
         CounterRecordEntity counterRecord = new CounterRecordEntity();
         //counterRecord.setRegisteredAt(DateUtil.getCurrentTime(factoryService.getTimeZone()));
         counterRecord.setRegisteredAt(new Date());
         counterRecord.setRealValue(counterDto.getValue());
-        counterRecord.setActiveTime(equipmentCountsDto.getActiveTime());
+        counterRecord.setActiveTime(activeTime);
 
         setEquipmentOutput(counterRecord, counterDto.getOutputCode());
         setProductionOrder(counterRecord, equipmentCountsDto.getProductionOrderCode());
