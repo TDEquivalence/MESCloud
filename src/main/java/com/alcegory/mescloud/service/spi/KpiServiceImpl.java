@@ -3,7 +3,10 @@ package com.alcegory.mescloud.service.spi;
 import com.alcegory.mescloud.exception.IncompleteConfigurationException;
 import com.alcegory.mescloud.model.dto.*;
 import com.alcegory.mescloud.model.filter.CounterRecordFilter;
-import com.alcegory.mescloud.service.*;
+import com.alcegory.mescloud.service.CounterRecordService;
+import com.alcegory.mescloud.service.CountingEquipmentService;
+import com.alcegory.mescloud.service.KpiService;
+import com.alcegory.mescloud.service.ProductionOrderService;
 import com.alcegory.mescloud.utility.DateUtil;
 import com.alcegory.mescloud.utility.DoubleUtil;
 import lombok.AllArgsConstructor;
@@ -27,7 +30,6 @@ public class KpiServiceImpl implements KpiService {
 
     private final CounterRecordService counterRecordService;
     private final ProductionOrderService productionOrderService;
-    private final EquipmentStatusRecordService equipmentStatusRecordService;
     private final CountingEquipmentService countingEquipmentService;
 
     @Override
@@ -119,7 +121,9 @@ public class KpiServiceImpl implements KpiService {
     public KpiDto computeAvailability(Long equipmentId, RequestKpiDto filter) {
         Long totalScheduledTime = getTotalScheduledTime(equipmentId, filter);
         Long totalActiveTime = getActiveTime(equipmentId, filter);
+
         log.info(String.format("Total schedule time [%s]", totalScheduledTime));
+        log.info(String.format("Total active time [%s]", totalScheduledTime));
 
         KpiDto kpi = new KpiDto(DoubleUtil.safeDoubleValue(totalActiveTime), DoubleUtil.safeDoubleValue(totalScheduledTime));
         kpi.setValueAsDivision();
@@ -142,11 +146,10 @@ public class KpiServiceImpl implements KpiService {
 
         long totalActiveTime = 0L;
         for (ProductionOrderDto productionOrder : productionOrders) {
-
+            log.info(String.format("GetActiveTime: active time by PO [%s]", totalActiveTime));
             totalActiveTime += counterRecordService.getActiveTimeByProductionOrderId(productionOrder.getId(), endDate);
         }
 
-        log.info(String.format("GetActiveTime: active time by PO [%s]", totalActiveTime));
         return totalActiveTime;
     }
 
