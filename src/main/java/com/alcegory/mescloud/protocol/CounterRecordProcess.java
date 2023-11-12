@@ -34,7 +34,7 @@ public class CounterRecordProcess extends AbstractMesProtocolProcess<PlcMqttDto>
         }
 
         long updatedActiveTime = updateActiveTime(equipmentCounts);
-        counterRecordService.save(equipmentCounts, updatedActiveTime);
+        counterRecordService.processCounterRecord(equipmentCounts, updatedActiveTime);
     }
 
     private boolean areInvalidContinuationCounts(PlcMqttDto equipmentCountsMqttDTO) {

@@ -93,7 +93,7 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     }
 
     @Override
-    public List<CounterRecordDto> save(PlcMqttDto equipmentCountsMqttDto, long activeTime) {
+    public List<CounterRecordDto> processCounterRecord(PlcMqttDto equipmentCountsMqttDto, long activeTime) {
 
         if (!isValid(equipmentCountsMqttDto)) {
             log.warning(() -> String.format("Received counts are invalid either because no Counting Equipment was found " +
@@ -108,8 +108,7 @@ public class CounterRecordServiceImpl implements CounterRecordService {
             counterRecords.add(counterRecord);
         }
 
-        Iterable<CounterRecordEntity> counterRecordEntities = repository.saveAll(counterRecords);
-        return converter.toDto(counterRecordEntities);
+        return saveAll(counterRecords);
     }
 
     private CounterRecordEntity extractCounterRecordEntity(CounterMqttDto counterDto, PlcMqttDto equipmentCountsDto, long activeTime) {
@@ -246,5 +245,10 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     @Override
     public Long getActiveTimeByProductionOrderId(Long productionOrderId, Timestamp endDate) {
         return repository.getActiveTimeByProductionOrderId(productionOrderId, endDate);
+    }
+
+    private List<CounterRecordDto> saveAll(List<CounterRecordEntity> counterRecords) {
+        Iterable<CounterRecordEntity> counterRecordEntities = repository.saveAll(counterRecords);
+        return converter.toDto(counterRecordEntities);
     }
 }

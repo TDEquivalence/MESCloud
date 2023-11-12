@@ -36,7 +36,7 @@ public class ProductionOrderInitProcess extends AbstractMesProtocolProcess<PlcMq
         }
 
         long updatedActiveTime = updateActiveTime(equipmentCounts);
-        counterRecordService.save(equipmentCounts, updatedActiveTime);
+        counterRecordService.processCounterRecord(equipmentCounts, updatedActiveTime);
     }
 
     private boolean areInvalidInitialCounts(PlcMqttDto equipmentCountsMqttDTO) {

@@ -49,7 +49,7 @@ public class ProductionOrderConclusionProcess extends AbstractMesProtocolProcess
         alarmService.processAlarms(equipmentCounts);
 
         long updatedActiveTime = updateActiveTime(equipmentCounts);
-        counterRecordService.save(equipmentCounts, updatedActiveTime);
+        counterRecordService.processCounterRecord(equipmentCounts, updatedActiveTime);
 
         ProductionOrderEntity productionOrder = getProductionOrderByCode(equipmentCounts.getProductionOrderCode());
         if (productionOrder == null) {
