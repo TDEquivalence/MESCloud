@@ -311,13 +311,14 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         Optional<ProductionOrderEntity> productionOrderOpt = repository.findByCode(productionOrderCode);
 
         if (productionOrderOpt.isEmpty()) {
+            log.warning("Update active time: No production order found for production order code: " + productionOrderCode);
             return 0L;
         }
 
         ProductionOrderEntity productionOrder = productionOrderOpt.get();
         long activeTimeUpdated = calculateUpdatedActiveTime(productionOrder, activeTime);
 
-        log.info("Active Time Updated: " + activeTimeUpdated);
+        log.info("Active Time calculated: " + activeTimeUpdated);
         productionOrder.setActiveTime(activeTimeUpdated);
         repository.save(productionOrder);
 
@@ -325,10 +326,10 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     }
 
     private long calculateUpdatedActiveTime(ProductionOrderEntity productionOrder, long activeTimeToUpdateFrom) {
-        long activeTime = productionOrder.getActiveTime();
+        long lastActiveTime = productionOrder.getActiveTime();
 
-        if (isRollover(activeTime, activeTimeToUpdateFrom)) {
-            return calculateRolloverActiveTime(activeTime, activeTimeToUpdateFrom) + activeTime;
+        if (isRollover(lastActiveTime, activeTimeToUpdateFrom)) {
+            return calculateRolloverActiveTime(lastActiveTime, activeTimeToUpdateFrom) + lastActiveTime;
         }
 
         return activeTimeToUpdateFrom;
