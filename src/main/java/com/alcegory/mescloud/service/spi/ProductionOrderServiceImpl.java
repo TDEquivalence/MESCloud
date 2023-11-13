@@ -352,7 +352,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     private long incrementActiveTime(long persistedActiveTime, long receivedActiveTime) {
         log.info(() -> String.format("persisted active time [%s]", persistedActiveTime));
         log.info(() -> String.format("received active time [%s]", receivedActiveTime));
-        if (receivedActiveTime > persistedActiveTime) {
+        if (receivedActiveTime >= persistedActiveTime) {
             return receivedActiveTime;
         }
 
