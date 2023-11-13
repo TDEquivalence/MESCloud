@@ -90,8 +90,7 @@ public class ProductionOrderConclusionProcess extends AbstractMesProtocolProcess
 
     private long updateActiveTime(PlcMqttDto equipmentCounts) {
         log.info("Active Time PO Conclusion: " + equipmentCounts.getActiveTime());
-        long activeTime = equipmentCounts.getActiveTime();
-        return productionOrderService.updateActiveTime(equipmentCounts.getProductionOrderCode(), activeTime);
+        return productionOrderService.updateActiveTime(equipmentCounts.getProductionOrderCode(), equipmentCounts.getActiveTime());
     }
 
     private void completeProductionOrder(ProductionOrderEntity productionOrder) {

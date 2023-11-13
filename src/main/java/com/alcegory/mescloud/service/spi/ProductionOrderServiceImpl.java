@@ -22,6 +22,8 @@ import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
@@ -325,23 +327,42 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         return activeTimeUpdated;
     }
 
-    private long calculateUpdatedActiveTime(ProductionOrderEntity productionOrder, long activeTimeToUpdateFrom) {
-        long lastActiveTime = productionOrder.getActiveTime();
+    private long calculateUpdatedActiveTime(ProductionOrderEntity productionOrder, long receivedActiveTime) {
+        long persistedActiveTime = productionOrder.getActiveTime();
 
-        if (isRollover(lastActiveTime, activeTimeToUpdateFrom)) {
-            return calculateRolloverActiveTime(lastActiveTime, activeTimeToUpdateFrom) + lastActiveTime;
+        if (persistedActiveTime > ACTIVE_TIME_MAX_VALUE && !isAfterRollover(persistedActiveTime, receivedActiveTime)) {
+            return incrementActiveTime(persistedActiveTime, receivedActiveTime);
         }
 
-        return activeTimeToUpdateFrom;
+        if (isRollover(persistedActiveTime, receivedActiveTime)) {
+            return calculateRolloverActiveTime(persistedActiveTime, receivedActiveTime) + persistedActiveTime;
+        }
+
+        return receivedActiveTime;
     }
 
     private long calculateRolloverActiveTime(long activeTimePersisted, long receivedActiveTime) {
         long incrementBeforeOverflow = ACTIVE_TIME_MAX_VALUE - activeTimePersisted;
-        return incrementBeforeOverflow + ROLLOVER_OFFSET + receivedActiveTime;
+        return activeTimePersisted + incrementBeforeOverflow + receivedActiveTime;
     }
 
     private boolean isRollover(long activeTimePersisted, long receivedActiveTime) {
         return receivedActiveTime < activeTimePersisted;
+    }
+
+    private boolean isAfterRollover(long persistedActiveTime, long receivedActiveTime) {
+        long activeTimeIncremented = persistedActiveTime + receivedActiveTime + 1;
+        long activeTimeToCompare = activeTimeIncremented - receivedActiveTime;
+        BigDecimal activeTime = BigDecimal.valueOf(activeTimeToCompare);
+        BigDecimal maxValue = BigDecimal.valueOf(ACTIVE_TIME_MAX_VALUE);
+
+        BigDecimal result = activeTime.divide(maxValue, 0, RoundingMode.DOWN);
+
+        return result.scale() == 0;
+    }
+
+    private long incrementActiveTime(long activeTimePersisted, long receivedActiveTime) {
+        return activeTimePersisted + receivedActiveTime;
     }
 
     @Override
