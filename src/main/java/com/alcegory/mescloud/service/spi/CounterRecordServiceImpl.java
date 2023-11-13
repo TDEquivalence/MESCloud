@@ -260,6 +260,12 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     }
 
     private void setComputedActiveTime(CounterRecordEntity lastPersistedCount, CounterRecordEntity counterRecord) {
+
+        if (lastPersistedCount == null) {
+            counterRecord.setComputedValue(INITIAL_COMPUTED_VALUE);
+            return;
+        }
+
         long updatedComputedActiveTime = calculateUpdatedActiveTime(lastPersistedCount, counterRecord);
         counterRecord.setComputedActiveTime(updatedComputedActiveTime);
     }
