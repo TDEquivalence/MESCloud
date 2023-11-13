@@ -41,6 +41,4 @@ public interface ProductionOrderService {
     List<ProductionOrderDto> findByEquipmentAndPeriod(Long equipmentId, Date startDate, Date endDate);
 
     boolean isCompleted(String productionOrderCode);
-
-    long getActiveTimeByProductionOrderCode(String productionOrderCode);
 }

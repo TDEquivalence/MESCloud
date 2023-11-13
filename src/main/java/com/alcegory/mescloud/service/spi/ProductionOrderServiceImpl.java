@@ -303,9 +303,4 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         countingEquipmentService.setOperationStatus(countingEquipment, status);
         return equipmentConverter.toDto(countingEquipment, CountingEquipmentDto.class);
     }
-
-    @Override
-    public long getActiveTimeByProductionOrderCode(String productionOrderCode) {
-        return repository.getActiveTimeByProductionOrderCode(productionOrderCode);
-    }
 }
