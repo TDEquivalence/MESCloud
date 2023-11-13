@@ -33,11 +33,6 @@ public interface CounterRecordRepository extends CrudRepository<CounterRecordEnt
 
     Integer sumCounterIncrement(Long countingEquipmentId, Timestamp startDateFilter, Timestamp endDateFilter);
 
-    @Query(value = "SELECT * FROM counter_record WHERE production_order_id = "
-            + "(SELECT id FROM production_order WHERE code = :productionOrderCode) "
-            + "ORDER BY id DESC LIMIT 1", nativeQuery = true)
-    CounterRecordEntity getLastCounterRecord(@Param("productionOrderCode") String productionOrderCode);
-
     @Query(value = "SELECT cr.computed_active_time FROM counter_record cr " +
             "WHERE cr.production_order_id = :productionOrderId " +
             "AND cr.registered_at <= :endDate " +

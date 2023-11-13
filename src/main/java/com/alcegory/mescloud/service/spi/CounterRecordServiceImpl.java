@@ -128,7 +128,7 @@ public class CounterRecordServiceImpl implements CounterRecordService {
             setComputedValue(counterRecord, lastPersistedCount);
         }
 
-        setComputedActiveTime(counterRecord, lastPersistedCount);
+        setComputedActiveTime(lastPersistedCount, counterRecord);
 
         return counterRecord;
     }
