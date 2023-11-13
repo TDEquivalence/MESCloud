@@ -37,8 +37,6 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     private static final String CODE_PREFIX = "PO";
     private static final String FIVE_DIGIT_NUMBER_FORMAT = "%05d";
     private static final int FIRST_CODE_VALUE = 1;
-    private static final int ACTIVE_TIME_MAX_VALUE = 65535;
-    private static final int ROLLOVER_OFFSET = 1;
 
     private final ProductionOrderRepository repository;
     private final ProductionOrderConverter converter;
@@ -304,60 +302,6 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     private CountingEquipmentDto setOperationStatus(CountingEquipmentEntity countingEquipment, CountingEquipmentEntity.OperationStatus status) {
         countingEquipmentService.setOperationStatus(countingEquipment, status);
         return equipmentConverter.toDto(countingEquipment, CountingEquipmentDto.class);
-    }
-
-    @Override
-    public long updateActiveTime(String productionOrderCode, long activeTime) {
-        Optional<ProductionOrderEntity> productionOrderOpt = repository.findByCode(productionOrderCode);
-
-        if (productionOrderOpt.isEmpty()) {
-            log.warning("Update active time: No production order found for production order code: " + productionOrderCode);
-            return 0L;
-        }
-
-        ProductionOrderEntity productionOrder = productionOrderOpt.get();
-        long activeTimeUpdated = calculateUpdatedActiveTime(productionOrder, activeTime);
-
-        log.info("Active Time calculated: " + activeTimeUpdated);
-        productionOrder.setActiveTime(activeTimeUpdated);
-        repository.save(productionOrder);
-
-        return activeTimeUpdated;
-    }
-
-    private long calculateUpdatedActiveTime(ProductionOrderEntity productionOrder, long receivedActiveTime) {
-        long persistedActiveTime = productionOrder.getActiveTime();
-
-        if (isRollover(persistedActiveTime, receivedActiveTime)) {
-            log.info(() -> String.format("is rollover: persisted active time [%s]", persistedActiveTime));
-            log.info(() -> String.format("is rollover: received active time [%s]", receivedActiveTime));
-            return calculateRolloverActiveTime(persistedActiveTime, receivedActiveTime) + persistedActiveTime;
-        }
-
-        return incrementActiveTime(persistedActiveTime, receivedActiveTime);
-    }
-
-    private long calculateRolloverActiveTime(long persistedActiveTime, long receivedActiveTime) {
-        long remainingActiveTime = ACTIVE_TIME_MAX_VALUE - persistedActiveTime;
-        return persistedActiveTime + remainingActiveTime  + receivedActiveTime + ROLLOVER_OFFSET;
-    }
-
-    private boolean isRollover(long persistedActiveTime, long receivedActiveTime) {
-        long incrementedActive = persistedActiveTime + receivedActiveTime + ROLLOVER_OFFSET;
-        long difference = incrementedActive - persistedActiveTime;
-
-        return receivedActiveTime < difference && persistedActiveTime > 0;
-    }
-
-    private long incrementActiveTime(long persistedActiveTime, long receivedActiveTime) {
-        log.info(() -> String.format("persisted active time [%s]", persistedActiveTime));
-        log.info(() -> String.format("received active time [%s]", receivedActiveTime));
-        if (receivedActiveTime >= persistedActiveTime) {
-            return receivedActiveTime;
-        }
-
-        log.info(() -> String.format("increment active time [%s]", persistedActiveTime + receivedActiveTime));
-        return persistedActiveTime + receivedActiveTime;
     }
 
     @Override

@@ -1,16 +1,15 @@
 package com.alcegory.mescloud.protocol;
 
 import com.alcegory.mescloud.api.mqtt.MqttClient;
-import com.alcegory.mescloud.model.entity.CountingEquipmentEntity;
-import com.alcegory.mescloud.repository.ProductionOrderRepository;
 import com.alcegory.mescloud.constant.MqttDTOConstants;
 import com.alcegory.mescloud.model.dto.PlcMqttDto;
 import com.alcegory.mescloud.model.dto.ProductionOrderMqttDto;
+import com.alcegory.mescloud.model.entity.CountingEquipmentEntity;
 import com.alcegory.mescloud.model.entity.ProductionOrderEntity;
+import com.alcegory.mescloud.repository.ProductionOrderRepository;
 import com.alcegory.mescloud.service.AlarmService;
 import com.alcegory.mescloud.service.CounterRecordService;
 import com.alcegory.mescloud.service.CountingEquipmentService;
-import com.alcegory.mescloud.service.ProductionOrderService;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.slf4j.Logger;
@@ -30,7 +29,6 @@ public class ProductionOrderConclusionProcess extends AbstractMesProtocolProcess
 
     private final CounterRecordService counterRecordService;
     private final CountingEquipmentService equipmentService;
-    private final ProductionOrderService productionOrderService;
     private final AlarmService alarmService;
     private final MqttClient mqttClient;
     private final ProductionOrderRepository repository;
@@ -48,8 +46,7 @@ public class ProductionOrderConclusionProcess extends AbstractMesProtocolProcess
         equipmentService.updateEquipmentStatus(equipmentCounts.getEquipmentCode(), equipmentCounts.getEquipmentStatus());
         alarmService.processAlarms(equipmentCounts);
 
-        long updatedActiveTime = updateActiveTime(equipmentCounts);
-        counterRecordService.processCounterRecord(equipmentCounts, updatedActiveTime);
+        counterRecordService.processCounterRecord(equipmentCounts);
 
         ProductionOrderEntity productionOrder = getProductionOrderByCode(equipmentCounts.getProductionOrderCode());
         if (productionOrder == null) {
@@ -86,11 +83,6 @@ public class ProductionOrderConclusionProcess extends AbstractMesProtocolProcess
 
         completeProductionOrder(productionOrder);
         setOperationStatus(equipmentCode);
-    }
-
-    private long updateActiveTime(PlcMqttDto equipmentCounts) {
-        log.info("Active Time PO Conclusion: " + equipmentCounts.getActiveTime());
-        return productionOrderService.updateActiveTime(equipmentCounts.getProductionOrderCode(), equipmentCounts.getActiveTime());
     }
 
     private void completeProductionOrder(ProductionOrderEntity productionOrder) {

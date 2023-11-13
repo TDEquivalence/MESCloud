@@ -22,6 +22,4 @@ public class ProductionOrderDto {
     private String gauge;
     private String category;
     private String washingProcess;
-
-    private long activeTime;
 }

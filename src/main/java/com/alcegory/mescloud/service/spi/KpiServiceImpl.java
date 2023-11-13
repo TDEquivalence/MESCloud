@@ -120,7 +120,7 @@ public class KpiServiceImpl implements KpiService {
     @Override
     public KpiDto computeAvailability(Long equipmentId, RequestKpiDto filter) {
         Long totalScheduledTime = getTotalScheduledTime(equipmentId, filter);
-        Long totalActiveTime = getActiveTime(equipmentId, filter);
+        Long totalActiveTime = getComputedActiveTime(equipmentId, filter);
 
         log.info(String.format("Total schedule time [%s]", totalScheduledTime));
         log.info(String.format("Total active time [%s]", totalScheduledTime));
@@ -137,7 +137,7 @@ public class KpiServiceImpl implements KpiService {
                 filter.getEndDate());
     }
 
-    private Long getActiveTime(Long equipmentId, RequestKpiDto filter) {
+    private Long getComputedActiveTime(Long equipmentId, RequestKpiDto filter) {
         Timestamp startDate = filter.getStartDate();
         Timestamp endDate = filter.getEndDate();
 
@@ -147,7 +147,7 @@ public class KpiServiceImpl implements KpiService {
         long totalActiveTime = 0L;
         for (ProductionOrderDto productionOrder : productionOrders) {
             log.info(String.format("GetActiveTime: active time by PO [%s]", totalActiveTime));
-            totalActiveTime += counterRecordService.getActiveTimeByProductionOrderId(productionOrder.getId(), endDate);
+            totalActiveTime += counterRecordService.getComputedActiveTimeByProductionOrderId(productionOrder.getId(), endDate);
         }
 
         return totalActiveTime;

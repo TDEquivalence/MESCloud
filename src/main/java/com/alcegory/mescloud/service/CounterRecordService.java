@@ -14,7 +14,7 @@ public interface CounterRecordService {
 
     PaginatedCounterRecordsDto getFilteredAndPaginated(CounterRecordFilter filterDto);
 
-    List<CounterRecordDto> processCounterRecord(PlcMqttDto equipmentCountsMqttDTO, long activeTime);
+    List<CounterRecordDto> processCounterRecord(PlcMqttDto equipmentCountsMqttDTO);
 
     boolean areValidInitialCounts(String productionOrderCode);
 
@@ -24,5 +24,5 @@ public interface CounterRecordService {
 
     Integer sumCounterIncrement(Long countingEquipmentId, Timestamp startDateFilter, Timestamp endDateFilter);
 
-    Long getActiveTimeByProductionOrderId(Long productionOrderId, Timestamp endDate);
+    Long getComputedActiveTimeByProductionOrderId(Long productionOrderId, Timestamp endDate);
 }
