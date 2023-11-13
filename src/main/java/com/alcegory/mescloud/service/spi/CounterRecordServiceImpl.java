@@ -293,9 +293,7 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     }
 
     private long incrementActiveTime(CounterRecordEntity lastPersistedCount, CounterRecordEntity counterRecord) {
-      long increment = lastPersistedCount.getActiveTime() - counterRecord.getActiveTime();
-
-        log.info(() -> String.format("Increment active time: [%s]", lastPersistedCount.getComputedValue() + increment));
+      long increment = counterRecord.getActiveTime() - lastPersistedCount.getActiveTime();
       return lastPersistedCount.getComputedValue() + increment;
     }
 }
