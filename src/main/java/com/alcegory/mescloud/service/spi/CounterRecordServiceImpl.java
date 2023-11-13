@@ -188,15 +188,15 @@ public class CounterRecordServiceImpl implements CounterRecordService {
 
     private int calculateComputedValue(CounterRecordEntity lastPersistedCount, CounterRecordEntity receivedCount) {
 
-        if (isRollover(lastPersistedCount.getRealValue(), receivedCount.getRealValue())) {
+        if (isRollover(lastPersistedCount, receivedCount)) {
             return rolloverCalculateComputedValue(lastPersistedCount, receivedCount);
         }
 
         return defaultCalculateComputedValue(lastPersistedCount, receivedCount);
     }
 
-    private boolean isRollover(long lastPersistedCountRealValue,long receivedCountRealValue) {
-        return lastPersistedCountRealValue < receivedCountRealValue;
+    private boolean isRollover(CounterRecordEntity lastPersistedCount, CounterRecordEntity receivedCount) {
+        return receivedCount.getRealValue() < lastPersistedCount.getRealValue();
     }
 
     private int rolloverCalculateComputedValue(CounterRecordEntity lastPersistedCount, CounterRecordEntity receivedCount) {
@@ -272,22 +272,30 @@ public class CounterRecordServiceImpl implements CounterRecordService {
 
     private long calculateUpdatedActiveTime(CounterRecordEntity lastPersistedCount, CounterRecordEntity counterRecord) {
         log.info(() -> String.format("Calculate active time, last persisted: [%s]", lastPersistedCount.getActiveTime()));
-        log.info(() -> String.format("Calculate received time, last persisted: [%s]", counterRecord.getActiveTime()));
+        log.info(() -> String.format("Calculate received time, received: [%s]", counterRecord.getActiveTime()));
 
-        if (isRollover(lastPersistedCount.getActiveTime(), counterRecord.getActiveTime())) {
+        if (isActiveTimeRollover(lastPersistedCount, counterRecord)) {
             return calculateRolloverActiveTime(lastPersistedCount.getActiveTime(), counterRecord.getActiveTime());
         }
 
         return incrementActiveTime(lastPersistedCount, counterRecord);
     }
 
+    private boolean isActiveTimeRollover(CounterRecordEntity lastPersistedCount, CounterRecordEntity receivedCount) {
+        return receivedCount.getActiveTime() < lastPersistedCount.getActiveTime();
+    }
+
     private long calculateRolloverActiveTime(long persistedActiveTime, long receivedActiveTime) {
+        log.info(() -> String.format("Calculate active time rollover, last persisted: [%s]", persistedActiveTime));
+        log.info(() -> String.format("Calculate received time rollover, received: [%s]", receivedActiveTime));
         long remainingActiveTime = ROLLOVER_MAX_VALUE - persistedActiveTime;
         return persistedActiveTime + remainingActiveTime  + receivedActiveTime + ROLLOVER_OFFSET;
     }
 
     private long incrementActiveTime(CounterRecordEntity lastPersistedCount, CounterRecordEntity counterRecord) {
       long increment = lastPersistedCount.getActiveTime() - counterRecord.getActiveTime();
+
+        log.info(() -> String.format("Increment active time: [%s]", lastPersistedCount.getComputedValue() + increment));
       return lastPersistedCount.getComputedValue() + increment;
     }
 }
