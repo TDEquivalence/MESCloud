@@ -328,7 +328,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     private long calculateUpdatedActiveTime(ProductionOrderEntity productionOrder, long receivedActiveTime) {
         long persistedActiveTime = productionOrder.getActiveTime();
 
-        if (persistedActiveTime > ACTIVE_TIME_MAX_VALUE && isToIncrement(persistedActiveTime, receivedActiveTime)) {
+        if (persistedActiveTime > ACTIVE_TIME_MAX_VALUE && !isRollover(persistedActiveTime, receivedActiveTime)) {
             return incrementActiveTime(persistedActiveTime, receivedActiveTime);
         }
 
@@ -344,13 +344,13 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         return activeTimePersisted + remainingActiveTime  + receivedActiveTime;
     }
 
-    private boolean isRollover(long activeTimePersisted, long receivedActiveTime) {
+    /*private boolean isRollover(long activeTimePersisted, long receivedActiveTime) {
         return receivedActiveTime < activeTimePersisted;
-    }
+    }*/
 
-    private boolean isToIncrement(long persistedActiveTime, long receivedActiveTime) {
+    private boolean isRollover(long persistedActiveTime, long receivedActiveTime) {
         long activeTimeToCompare = persistedActiveTime + receivedActiveTime + ROLLOVER_OFFSET;
-        return (activeTimeToCompare - receivedActiveTime) % ACTIVE_TIME_MAX_VALUE != 0;
+        return (activeTimeToCompare - receivedActiveTime) % ACTIVE_TIME_MAX_VALUE == 0;
     }
 
     private long incrementActiveTime(long activeTimePersisted, long receivedActiveTime) {
