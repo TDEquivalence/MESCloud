@@ -22,8 +22,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
@@ -342,8 +340,8 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     }
 
     private long calculateRolloverActiveTime(long activeTimePersisted, long receivedActiveTime) {
-        long incrementBeforeOverflow = ACTIVE_TIME_MAX_VALUE - activeTimePersisted;
-        return activeTimePersisted + incrementBeforeOverflow + receivedActiveTime;
+        long remainingActiveTime = ACTIVE_TIME_MAX_VALUE - activeTimePersisted;
+        return activeTimePersisted + remainingActiveTime  + receivedActiveTime;
     }
 
     private boolean isRollover(long activeTimePersisted, long receivedActiveTime) {
@@ -351,14 +349,8 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     }
 
     private boolean isAfterRollover(long persistedActiveTime, long receivedActiveTime) {
-        long activeTimeIncremented = persistedActiveTime + receivedActiveTime + 1;
-        long activeTimeToCompare = activeTimeIncremented - receivedActiveTime;
-        BigDecimal activeTime = BigDecimal.valueOf(activeTimeToCompare);
-        BigDecimal maxValue = BigDecimal.valueOf(ACTIVE_TIME_MAX_VALUE);
-
-        BigDecimal result = activeTime.divide(maxValue, 0, RoundingMode.DOWN);
-
-        return result.scale() == 0;
+        long activeTimeToCompare = persistedActiveTime + receivedActiveTime + ROLLOVER_OFFSET;
+        return (activeTimeToCompare - receivedActiveTime) % ACTIVE_TIME_MAX_VALUE == 0;
     }
 
     private long incrementActiveTime(long activeTimePersisted, long receivedActiveTime) {
