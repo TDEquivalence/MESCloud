@@ -339,13 +339,16 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         return receivedActiveTime;
     }
 
-    private long calculateRolloverActiveTime(long activeTimePersisted, long receivedActiveTime) {
-        long remainingActiveTime = ACTIVE_TIME_MAX_VALUE - activeTimePersisted;
-        return activeTimePersisted + remainingActiveTime  + receivedActiveTime;
+    private long calculateRolloverActiveTime(long persistedActiveTime, long receivedActiveTime) {
+        long remainingActiveTime = ACTIVE_TIME_MAX_VALUE - persistedActiveTime;
+        return persistedActiveTime + remainingActiveTime  + receivedActiveTime + ROLLOVER_OFFSET;
     }
 
     private boolean isRollover(long persistedActiveTime, long receivedActiveTime) {
-        return persistedActiveTime > receivedActiveTime;
+        long incrementedActive = persistedActiveTime + receivedActiveTime + ROLLOVER_OFFSET;
+        long difference = incrementedActive - persistedActiveTime;
+
+        return receivedActiveTime < difference;
     }
 
     private long incrementActiveTime(long activeTimePersisted, long receivedActiveTime) {
