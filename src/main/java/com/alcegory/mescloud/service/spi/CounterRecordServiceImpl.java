@@ -260,7 +260,7 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     }
 
     private void setComputedActiveTime(CounterRecordEntity lastPersistedCount, CounterRecordEntity counterRecord) {
-
+        log.info(() -> String.format("Set computed active time: [%s]", counterRecord.getActiveTime()));
         if (lastPersistedCount == null) {
             counterRecord.setComputedValue(INITIAL_COMPUTED_VALUE);
             return;
@@ -271,6 +271,8 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     }
 
     private long calculateUpdatedActiveTime(CounterRecordEntity lastPersistedCount, CounterRecordEntity counterRecord) {
+        log.info(() -> String.format("Calculate active time, last persisted: [%s]", lastPersistedCount.getActiveTime()));
+        log.info(() -> String.format("Calculate received time, last persisted: [%s]", counterRecord.getActiveTime()));
 
         if (isRollover(lastPersistedCount.getActiveTime(), counterRecord.getActiveTime())) {
             return calculateRolloverActiveTime(lastPersistedCount.getActiveTime(), counterRecord.getActiveTime());
