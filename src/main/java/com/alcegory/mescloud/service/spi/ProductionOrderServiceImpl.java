@@ -346,7 +346,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         long incrementedActive = persistedActiveTime + receivedActiveTime + ROLLOVER_OFFSET;
         long difference = incrementedActive - persistedActiveTime;
 
-        return receivedActiveTime < difference;
+        return receivedActiveTime < difference && persistedActiveTime > 0;
     }
 
     private long incrementActiveTime(long persistedActiveTime, long receivedActiveTime) {
