@@ -278,7 +278,7 @@ public class CounterRecordServiceImpl implements CounterRecordService {
             return calculateRolloverActiveTime(lastPersistedCount.getActiveTime(), counterRecord.getActiveTime());
         }
 
-        return incrementActiveTime(lastPersistedCount, counterRecord);
+        return incrementActiveTime(lastPersistedCount.getComputedValue(), counterRecord.getRealValue());
     }
 
     private boolean isActiveTimeRollover(CounterRecordEntity lastPersistedCount, CounterRecordEntity receivedCount) {
@@ -292,8 +292,7 @@ public class CounterRecordServiceImpl implements CounterRecordService {
         return persistedActiveTime + remainingActiveTime  + receivedActiveTime + ROLLOVER_OFFSET;
     }
 
-    private long incrementActiveTime(CounterRecordEntity lastPersistedCount, CounterRecordEntity counterRecord) {
-      long increment = counterRecord.getActiveTime() - lastPersistedCount.getActiveTime();
-      return lastPersistedCount.getComputedValue() + increment;
+    private long incrementActiveTime(long lastPersistedCount, long counterRecord) {
+      return lastPersistedCount + counterRecord;
     }
 }
