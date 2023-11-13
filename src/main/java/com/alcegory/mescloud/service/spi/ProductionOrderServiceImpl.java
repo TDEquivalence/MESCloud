@@ -329,6 +329,8 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         long persistedActiveTime = productionOrder.getActiveTime();
 
         if (isRollover(persistedActiveTime, receivedActiveTime)) {
+            log.info(() -> String.format("is rollover: persisted active time [%s]", persistedActiveTime));
+            log.info(() -> String.format("is rollover: received active time [%s]", receivedActiveTime));
             return calculateRolloverActiveTime(persistedActiveTime, receivedActiveTime) + persistedActiveTime;
         }
 
@@ -348,11 +350,13 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     }
 
     private long incrementActiveTime(long persistedActiveTime, long receivedActiveTime) {
-
+        log.info(() -> String.format("persisted active time [%s]", persistedActiveTime));
+        log.info(() -> String.format("received active time [%s]", receivedActiveTime));
         if (receivedActiveTime > persistedActiveTime) {
             return receivedActiveTime;
         }
 
+        log.info(() -> String.format("increment active time [%s]", persistedActiveTime + receivedActiveTime));
         return persistedActiveTime + receivedActiveTime;
     }
 
