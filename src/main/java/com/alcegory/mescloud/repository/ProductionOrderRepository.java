@@ -4,7 +4,6 @@ import com.alcegory.mescloud.model.entity.ProductionOrderEntity;
 import com.alcegory.mescloud.model.entity.ProductionOrderSummaryEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
@@ -17,9 +16,6 @@ public interface ProductionOrderRepository extends JpaRepository<ProductionOrder
     Optional<ProductionOrderEntity> findByCode(String equipmentOutputCode);
 
     Optional<ProductionOrderEntity> findTopByOrderByIdDesc();
-
-    @Query(value = "SELECT * FROM production_order po WHERE (po.equipment_id = :equipmentId AND po.is_completed = false) ORDER BY id DESC LIMIT 1", nativeQuery = true)
-    Optional<ProductionOrderEntity> findActive(long equipmentId);
 
     List<ProductionOrderEntity> findByIdIn(List<Long> ids);
 
