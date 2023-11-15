@@ -16,6 +16,6 @@ public class CounterRecordDto {
     private int computedValue;
     private Date registeredAt;
     private boolean isValidForProduction;
-    private long activeTime;
-    private long computedActiveTime;
+    private int activeTime;
+    private int computedActiveTime;
 }
