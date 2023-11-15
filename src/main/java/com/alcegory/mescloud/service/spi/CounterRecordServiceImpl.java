@@ -174,7 +174,7 @@ public class CounterRecordServiceImpl implements CounterRecordService {
             return;
         }
 
-        int computedValue = genericCalculate(lastPersistedCount.getRealValue(), receivedCount.getRealValue(),
+        int computedValue = calculate(lastPersistedCount.getRealValue(), receivedCount.getRealValue(),
                 lastPersistedCount.getComputedValue());
         int increment = calculateIncrement(lastPersistedCount, receivedCount);
         receivedCount.setIncrement(increment);
@@ -188,40 +188,40 @@ public class CounterRecordServiceImpl implements CounterRecordService {
             return;
         }
 
-        int updatedComputedActiveTime = genericCalculate(lastPersistedCount.getActiveTime(), counterRecord.getActiveTime(),
+        int updatedComputedActiveTime = calculate(lastPersistedCount.getActiveTime(), counterRecord.getActiveTime(),
                 lastPersistedCount.getComputedActiveTime());
         counterRecord.setComputedActiveTime(updatedComputedActiveTime);
     }
 
-    private int genericCalculate(int lastPersisted, int received, int computedPersisted) {
+    private int calculate(int lastPersisted, int received, int computedPersisted) {
 
-        if (isGenericRollover(lastPersisted, received)) {
-            return genericCalculateRollover(lastPersisted, received, computedPersisted);
+        if (isRollover(lastPersisted, received)) {
+            return calculateRollover(lastPersisted, received, computedPersisted);
         }
 
-        return genericIncrement(lastPersisted, received, computedPersisted);
+        return increment(lastPersisted, received, computedPersisted);
     }
 
-    private boolean isGenericRollover(int lastPersisted, int received) {
+    private boolean isRollover(int lastPersisted, int received) {
         return lastPersisted < received;
     }
 
-    private int genericCalculateRollover(int lastPersisted, int received, int computedPersisted) {
-        int totalIncrement = genericRolloverCalculateIncrement(lastPersisted, received);
+    private int calculateRollover(int lastPersisted, int received, int computedPersisted) {
+        int totalIncrement = rolloverCalculateIncrement(lastPersisted, received);
         return computedPersisted + totalIncrement;
     }
 
-    private int genericRolloverCalculateIncrement(int lastPersisted, int received) {
+    private int rolloverCalculateIncrement(int lastPersisted, int received) {
         int incrementBeforeOverflow = ROLLOVER_MAX_VALUE - lastPersisted;
         return incrementBeforeOverflow + ROLLOVER_OFFSET + received;
     }
 
-    private int genericIncrement(int lastPersisted, int received, int computedPersisted) {
-        int increment = genericComputeValueIncrement(lastPersisted, received);
+    private int increment(int lastPersisted, int received, int computedPersisted) {
+        int increment = computeValueIncrement(lastPersisted, received);
         return computedPersisted + increment;
     }
 
-    private int genericComputeValueIncrement(int lastPersisted, int received) {
+    private int computeValueIncrement(int lastPersisted, int received) {
         return received - lastPersisted;
     }
 
@@ -231,7 +231,7 @@ public class CounterRecordServiceImpl implements CounterRecordService {
             return 0;
         }
 
-        return genericComputeValueIncrement(lastPersistedCount.getRealValue(), receivedCount.getRealValue());
+        return computeValueIncrement(lastPersistedCount.getRealValue(), receivedCount.getRealValue());
     }
 
     private Optional<CounterRecordEntity> findLastPersistedCount(CounterRecordEntity counterRecord) {
