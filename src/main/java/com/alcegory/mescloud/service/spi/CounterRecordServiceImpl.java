@@ -171,58 +171,53 @@ public class CounterRecordServiceImpl implements CounterRecordService {
 
         if (lastPersistedCount == null) {
             receivedCount.setComputedValue(INITIAL_COMPUTED_VALUE);
+            receivedCount.setComputedActiveTime(INITIAL_COMPUTED_VALUE);
             return;
         }
 
         int computedValue = calculate(lastPersistedCount.getRealValue(), receivedCount.getRealValue(),
                 lastPersistedCount.getComputedValue());
+
+        int updatedComputedActiveTime = calculate(lastPersistedCount.getActiveTime(), receivedCount.getActiveTime(),
+                lastPersistedCount.getComputedActiveTime());
+
         int increment = calculateIncrement(lastPersistedCount, receivedCount);
+
         receivedCount.setIncrement(increment);
         receivedCount.setComputedValue(computedValue);
+        receivedCount.setComputedActiveTime(updatedComputedActiveTime);
     }
 
-    private void setComputedActiveTime(CounterRecordEntity lastPersistedCount, CounterRecordEntity counterRecord) {
-        log.info(() -> String.format("Set computed active time: [%s]", counterRecord.getActiveTime()));
-        if (lastPersistedCount == null) {
-            counterRecord.setComputedActiveTime(INITIAL_COMPUTED_VALUE);
-            return;
+    private int calculate(int lastPersistedCount, int receivedCount, int computedPersisted) {
+
+        if (isRollover(lastPersistedCount, receivedCount)) {
+            return calculateRollover(lastPersistedCount, receivedCount, computedPersisted);
         }
 
-        int updatedComputedActiveTime = calculate(lastPersistedCount.getActiveTime(), counterRecord.getActiveTime(),
-                lastPersistedCount.getComputedActiveTime());
-        counterRecord.setComputedActiveTime(updatedComputedActiveTime);
+        return increment(lastPersistedCount, receivedCount, computedPersisted);
     }
 
-    private int calculate(int lastPersisted, int received, int computedPersisted) {
-
-        if (isRollover(lastPersisted, received)) {
-            return calculateRollover(lastPersisted, received, computedPersisted);
-        }
-
-        return increment(lastPersisted, received, computedPersisted);
+    private boolean isRollover(int lastPersistedCount, int receivedCount) {
+        return lastPersistedCount < receivedCount;
     }
 
-    private boolean isRollover(int lastPersisted, int received) {
-        return lastPersisted < received;
-    }
-
-    private int calculateRollover(int lastPersisted, int received, int computedPersisted) {
-        int totalIncrement = rolloverCalculateIncrement(lastPersisted, received);
+    private int calculateRollover(int lastPersistedCount, int receivedCount, int computedPersisted) {
+        int totalIncrement = rolloverCalculateIncrement(lastPersistedCount, receivedCount);
         return computedPersisted + totalIncrement;
     }
 
-    private int rolloverCalculateIncrement(int lastPersisted, int received) {
-        int incrementBeforeOverflow = ROLLOVER_MAX_VALUE - lastPersisted;
-        return incrementBeforeOverflow + ROLLOVER_OFFSET + received;
+    private int rolloverCalculateIncrement(int lastPersistedCount, int receivedCount) {
+        int incrementBeforeOverflow = ROLLOVER_MAX_VALUE - lastPersistedCount;
+        return incrementBeforeOverflow + ROLLOVER_OFFSET + receivedCount;
     }
 
-    private int increment(int lastPersisted, int received, int computedPersisted) {
-        int increment = computeValueIncrement(lastPersisted, received);
+    private int increment(int lastPersistedCount, int receivedCount, int computedPersisted) {
+        int increment = computeValueIncrement(lastPersistedCount, receivedCount);
         return computedPersisted + increment;
     }
 
-    private int computeValueIncrement(int lastPersisted, int received) {
-        return received - lastPersisted;
+    private int computeValueIncrement(int lastPersistedCount, int receivedCount) {
+        return receivedCount - lastPersistedCount;
     }
 
     private int calculateIncrement(CounterRecordEntity lastPersistedCount, CounterRecordEntity receivedCount) {
