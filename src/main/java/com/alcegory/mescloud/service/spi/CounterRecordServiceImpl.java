@@ -221,7 +221,7 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     }
 
     private int genericComputeValueIncrement(int lastPersisted, int received) {
-        return lastPersisted - received;
+        return received - lastPersisted;
     }
 
     private int calculateIncrement(CounterRecordEntity lastPersistedCount, CounterRecordEntity receivedCount) {
