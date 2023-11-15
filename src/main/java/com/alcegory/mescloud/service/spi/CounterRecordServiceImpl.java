@@ -188,7 +188,7 @@ public class CounterRecordServiceImpl implements CounterRecordService {
             return;
         }
 
-        int updatedComputedActiveTime = genericCalculate(lastPersistedCount.getActiveTime(), counterRecord.getComputedActiveTime(),
+        int updatedComputedActiveTime = genericCalculate(lastPersistedCount.getActiveTime(), counterRecord.getActiveTime(),
                 lastPersistedCount.getComputedActiveTime());
         counterRecord.setComputedActiveTime(updatedComputedActiveTime);
     }
