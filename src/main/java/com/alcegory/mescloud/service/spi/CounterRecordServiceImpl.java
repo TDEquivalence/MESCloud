@@ -196,7 +196,7 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     private int genericCalculate(int lastPersisted, int received, int computedPersisted) {
 
         if (isGenericRollover(lastPersisted, received)) {
-            return genericCalculateRollover(lastPersisted, received);
+            return genericCalculateRollover(lastPersisted, received, computedPersisted);
         }
 
         return genericIncrement(lastPersisted, received, computedPersisted);
@@ -206,9 +206,9 @@ public class CounterRecordServiceImpl implements CounterRecordService {
         return lastPersisted < received;
     }
 
-    private int genericCalculateRollover(int lastPersisted, int received) {
+    private int genericCalculateRollover(int lastPersisted, int received, int computedPersisted) {
         int totalIncrement = genericRolloverCalculateIncrement(lastPersisted, received);
-        return lastPersisted + totalIncrement;
+        return computedPersisted + totalIncrement;
     }
 
     private int genericRolloverCalculateIncrement(int lastPersisted, int received) {
