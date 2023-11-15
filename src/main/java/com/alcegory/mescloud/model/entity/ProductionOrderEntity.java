@@ -26,7 +26,6 @@ public class ProductionOrderEntity {
     private Date createdAt;
     @Temporal(TemporalType.TIMESTAMP)
     private Date completedAt;
-    private long activeTime;
 
     @OneToMany(mappedBy = "productionOrder")
     private List<ProductionInstructionEntity> productionInstructions;

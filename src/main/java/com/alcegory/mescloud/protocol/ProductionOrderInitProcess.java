@@ -33,7 +33,7 @@ public class ProductionOrderInitProcess extends AbstractMesProtocolProcess<PlcMq
                     equipmentCounts.getProductionOrderCode()));
         }
 
-        counterRecordService.save(equipmentCounts);
+        counterRecordService.processCounterRecord(equipmentCounts);
     }
 
     private boolean areInvalidInitialCounts(PlcMqttDto equipmentCountsMqttDTO) {

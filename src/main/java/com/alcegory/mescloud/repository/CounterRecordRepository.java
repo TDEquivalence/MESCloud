@@ -6,6 +6,7 @@ import com.alcegory.mescloud.model.entity.CounterRecordConclusionEntity;
 import com.alcegory.mescloud.model.entity.CounterRecordEntity;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 
 import java.sql.Timestamp;
 import java.util.List;
@@ -31,4 +32,13 @@ public interface CounterRecordRepository extends CrudRepository<CounterRecordEnt
     Integer sumValidCounterIncrementForApprovedPO(Long countingEquipmentId, Timestamp startDateFilter, Timestamp endDateFilter);
 
     Integer sumCounterIncrement(Long countingEquipmentId, Timestamp startDateFilter, Timestamp endDateFilter);
+
+    @Query(value = "SELECT cr.computed_active_time FROM counter_record cr " +
+            "WHERE cr.production_order_id = :productionOrderId " +
+            "AND cr.registered_at <= :endDate " +
+            "ORDER BY cr.registered_at DESC " +
+            "LIMIT 1", nativeQuery = true)
+    Long getComputedActiveTimeByProductionOrderId(
+            @Param("productionOrderId") Long productionOrderId,
+            @Param("endDate") Timestamp endDate);
 }

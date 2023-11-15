@@ -3,7 +3,10 @@ package com.alcegory.mescloud.service.spi;
 import com.alcegory.mescloud.exception.IncompleteConfigurationException;
 import com.alcegory.mescloud.model.dto.*;
 import com.alcegory.mescloud.model.filter.CounterRecordFilter;
-import com.alcegory.mescloud.service.*;
+import com.alcegory.mescloud.service.CounterRecordService;
+import com.alcegory.mescloud.service.CountingEquipmentService;
+import com.alcegory.mescloud.service.KpiService;
+import com.alcegory.mescloud.service.ProductionOrderService;
 import com.alcegory.mescloud.utility.DateUtil;
 import com.alcegory.mescloud.utility.DoubleUtil;
 import lombok.AllArgsConstructor;
@@ -27,7 +30,6 @@ public class KpiServiceImpl implements KpiService {
 
     private final CounterRecordService counterRecordService;
     private final ProductionOrderService productionOrderService;
-    private final EquipmentStatusRecordService equipmentStatusRecordService;
     private final CountingEquipmentService countingEquipmentService;
 
     @Override
@@ -118,8 +120,10 @@ public class KpiServiceImpl implements KpiService {
     @Override
     public KpiDto computeAvailability(Long equipmentId, RequestKpiDto filter) {
         Long totalScheduledTime = getTotalScheduledTime(equipmentId, filter);
-        Long totalActiveTime = getActiveTime(equipmentId, filter);
+        Long totalActiveTime = getComputedActiveTime(equipmentId, filter);
+
         log.info(String.format("Total schedule time [%s]", totalScheduledTime));
+        log.info(String.format("Total active time [%s]", totalScheduledTime));
 
         KpiDto kpi = new KpiDto(DoubleUtil.safeDoubleValue(totalActiveTime), DoubleUtil.safeDoubleValue(totalScheduledTime));
         kpi.setValueAsDivision();
@@ -133,21 +137,19 @@ public class KpiServiceImpl implements KpiService {
                 filter.getEndDate());
     }
 
-    private Long getActiveTime(Long equipmentId, RequestKpiDto filter) {
-        Date startDate = filter.getStartDate();
-        Date endDate = filter.getEndDate();
+    private Long getComputedActiveTime(Long equipmentId, RequestKpiDto filter) {
+        Timestamp startDate = filter.getStartDate();
+        Timestamp endDate = filter.getEndDate();
 
         List<ProductionOrderDto> productionOrders =
                 productionOrderService.findByEquipmentAndPeriod(equipmentId, startDate, endDate);
 
         long totalActiveTime = 0L;
         for (ProductionOrderDto productionOrder : productionOrders) {
-            log.info(String.format("getActiveTime: PO active time [%s]", productionOrder.getActiveTime()));
-            totalActiveTime +=
-                    productionOrder.getActiveTime();
+            log.info(String.format("GetActiveTime: active time by PO [%s]", totalActiveTime));
+            totalActiveTime += counterRecordService.getComputedActiveTimeByProductionOrderId(productionOrder.getId(), endDate);
         }
 
-        log.info(String.format("getActiveTime: Total active time [%s]", totalActiveTime));
         return totalActiveTime;
     }
 
@@ -171,7 +173,7 @@ public class KpiServiceImpl implements KpiService {
             return null;
         }
 
-        if (qualityKpi.getDividend() == 0 || availabilityKpi.getDividend() == 0) {
+        if (qualityKpi.getDivider() == 0 || availabilityKpi.getDividend() == 0) {
             log.warning(String.format("Unable to compute performance: cannot divide quality dividend [%s] by the availability dividend [%s]",
                     qualityKpi.getDividend(), availabilityKpi.getDividend()));
             return null;

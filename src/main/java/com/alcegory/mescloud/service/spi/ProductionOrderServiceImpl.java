@@ -37,8 +37,6 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     private static final String CODE_PREFIX = "PO";
     private static final String FIVE_DIGIT_NUMBER_FORMAT = "%05d";
     private static final int FIRST_CODE_VALUE = 1;
-    private static final int ACTIVE_TIME_MAX_VALUE = 65535;
-    private static final int ROLLOVER_OFFSET = 1;
 
     private final ProductionOrderRepository repository;
     private final ProductionOrderConverter converter;
@@ -304,40 +302,5 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     private CountingEquipmentDto setOperationStatus(CountingEquipmentEntity countingEquipment, CountingEquipmentEntity.OperationStatus status) {
         countingEquipmentService.setOperationStatus(countingEquipment, status);
         return equipmentConverter.toDto(countingEquipment, CountingEquipmentDto.class);
-    }
-
-    @Override
-    public void updateActiveTime(String productionOrderCode, long activeTime) {
-        Optional<ProductionOrderEntity> productionOrderOpt = repository.findByCode(productionOrderCode);
-
-        if (productionOrderOpt.isEmpty()) {
-            return;
-        }
-
-        ProductionOrderEntity productionOrder = productionOrderOpt.get();
-        long activeTimeUpdated = calculateUpdatedActiveTime(productionOrder, activeTime);
-
-        log.info("Active Time Updated: " + activeTimeUpdated);
-        productionOrder.setActiveTime(activeTimeUpdated);
-        repository.save(productionOrder);
-    }
-
-    private long calculateUpdatedActiveTime(ProductionOrderEntity productionOrder, long activeTimeToUpdateFrom) {
-        long activeTime = productionOrder.getActiveTime();
-
-        if (isRollover(activeTime, activeTimeToUpdateFrom)) {
-            return calculateRolloverActiveTime(activeTime, activeTimeToUpdateFrom) + activeTime;
-        }
-
-        return activeTimeToUpdateFrom;
-    }
-
-    private long calculateRolloverActiveTime(long activeTimePersisted, long receivedActiveTime) {
-        long incrementBeforeOverflow = ACTIVE_TIME_MAX_VALUE - activeTimePersisted;
-        return incrementBeforeOverflow + ROLLOVER_OFFSET + receivedActiveTime;
-    }
-
-    private boolean isRollover(long activeTimePersisted, long receivedActiveTime) {
-        return receivedActiveTime < activeTimePersisted;
     }
 }
