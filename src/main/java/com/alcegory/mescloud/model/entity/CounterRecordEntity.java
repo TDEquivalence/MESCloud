@@ -28,6 +28,6 @@ public class CounterRecordEntity {
     @Temporal(TemporalType.TIMESTAMP)
     private Date registeredAt;
     private Boolean isValidForProduction;
-    private long activeTime;
-    private long computedActiveTime;
+    private int activeTime;
+    private int computedActiveTime;
 }
