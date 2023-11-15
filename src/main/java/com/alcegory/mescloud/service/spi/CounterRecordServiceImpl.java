@@ -124,11 +124,10 @@ public class CounterRecordServiceImpl implements CounterRecordService {
 
         //TODO: we have to check if this validation is correct, considering we can have counter records without PO.s
         CounterRecordEntity lastPersistedCount = getLastPersistedCount(counterRecord);
+
         if (counterRecord.getProductionOrder() != null) {
             setComputedValue(counterRecord, lastPersistedCount);
         }
-
-        setComputedActiveTime(lastPersistedCount, counterRecord);
 
         return counterRecord;
     }
@@ -171,51 +170,53 @@ public class CounterRecordServiceImpl implements CounterRecordService {
 
         if (lastPersistedCount == null) {
             receivedCount.setComputedValue(INITIAL_COMPUTED_VALUE);
+            receivedCount.setComputedActiveTime(INITIAL_COMPUTED_VALUE);
             return;
         }
 
-        int computedValue = calculateComputedValue(lastPersistedCount, receivedCount);
+        int computedValue = calculate(lastPersistedCount.getRealValue(), receivedCount.getRealValue(),
+                lastPersistedCount.getComputedValue());
+
+        int updatedComputedActiveTime = calculate(lastPersistedCount.getActiveTime(), receivedCount.getActiveTime(),
+                lastPersistedCount.getComputedActiveTime());
+
         int increment = calculateIncrement(lastPersistedCount, receivedCount);
+
         receivedCount.setIncrement(increment);
         receivedCount.setComputedValue(computedValue);
+        receivedCount.setComputedActiveTime(updatedComputedActiveTime);
     }
 
-    private Optional<CounterRecordEntity> findLastPersistedCount(CounterRecordEntity counterRecord) {
-        Long productionOrderId = counterRecord.getProductionOrder().getId();
-        Long equipmentOutputId = counterRecord.getEquipmentOutput().getId();
-        return repository.findLastByProductionOrderId(productionOrderId, equipmentOutputId);
-    }
-
-    private int calculateComputedValue(CounterRecordEntity lastPersistedCount, CounterRecordEntity receivedCount) {
+    private int calculate(int lastPersistedCount, int receivedCount, int computedPersisted) {
 
         if (isRollover(lastPersistedCount, receivedCount)) {
-            return rolloverCalculateComputedValue(lastPersistedCount, receivedCount);
+            return calculateRollover(lastPersistedCount, receivedCount, computedPersisted);
         }
 
-        return defaultCalculateComputedValue(lastPersistedCount, receivedCount);
+        return increment(lastPersistedCount, receivedCount, computedPersisted);
     }
 
-    private boolean isRollover(CounterRecordEntity lastPersistedCount, CounterRecordEntity receivedCount) {
-        return receivedCount.getRealValue() < lastPersistedCount.getRealValue();
+    private boolean isRollover(int lastPersistedCount, int receivedCount) {
+        return receivedCount < lastPersistedCount;
     }
 
-    private int rolloverCalculateComputedValue(CounterRecordEntity lastPersistedCount, CounterRecordEntity receivedCount) {
+    private int calculateRollover(int lastPersistedCount, int receivedCount, int computedPersisted) {
         int totalIncrement = rolloverCalculateIncrement(lastPersistedCount, receivedCount);
-        return lastPersistedCount.getComputedValue() + totalIncrement;
+        return computedPersisted + totalIncrement;
     }
 
-    private int rolloverCalculateIncrement(CounterRecordEntity lastPersistedCount, CounterRecordEntity receivedCount) {
-        int incrementBeforeOverflow = ROLLOVER_MAX_VALUE - lastPersistedCount.getRealValue();
-        return incrementBeforeOverflow + ROLLOVER_OFFSET + receivedCount.getRealValue();
+    private int rolloverCalculateIncrement(int lastPersistedCount, int receivedCount) {
+        int incrementBeforeOverflow = ROLLOVER_MAX_VALUE - lastPersistedCount;
+        return incrementBeforeOverflow + ROLLOVER_OFFSET + receivedCount;
     }
 
-    private int defaultCalculateComputedValue(CounterRecordEntity lastPersistedCount, CounterRecordEntity receivedCount) {
-        int computedValueIncrement = computeValueIncrement(lastPersistedCount, receivedCount);
-        return lastPersistedCount.getComputedValue() + computedValueIncrement;
+    private int increment(int lastPersistedCount, int receivedCount, int computedPersisted) {
+        int increment = computeValueIncrement(lastPersistedCount, receivedCount);
+        return computedPersisted + increment;
     }
 
-    private int computeValueIncrement(CounterRecordEntity lastPersistedCount, CounterRecordEntity receivedCount) {
-        return receivedCount.getRealValue() - lastPersistedCount.getRealValue();
+    private int computeValueIncrement(int lastPersistedCount, int receivedCount) {
+        return receivedCount - lastPersistedCount;
     }
 
     private int calculateIncrement(CounterRecordEntity lastPersistedCount, CounterRecordEntity receivedCount) {
@@ -224,7 +225,13 @@ public class CounterRecordServiceImpl implements CounterRecordService {
             return 0;
         }
 
-        return computeValueIncrement(lastPersistedCount, receivedCount);
+        return computeValueIncrement(lastPersistedCount.getRealValue(), receivedCount.getRealValue());
+    }
+
+    private Optional<CounterRecordEntity> findLastPersistedCount(CounterRecordEntity counterRecord) {
+        Long productionOrderId = counterRecord.getProductionOrder().getId();
+        Long equipmentOutputId = counterRecord.getEquipmentOutput().getId();
+        return repository.findLastByProductionOrderId(productionOrderId, equipmentOutputId);
     }
 
     public boolean areValidInitialCounts(String productionOrderCode) {
@@ -257,43 +264,5 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     private List<CounterRecordDto> saveAll(List<CounterRecordEntity> counterRecords) {
         Iterable<CounterRecordEntity> counterRecordEntities = repository.saveAll(counterRecords);
         return converter.toDto(counterRecordEntities);
-    }
-
-    private void setComputedActiveTime(CounterRecordEntity lastPersistedCount, CounterRecordEntity counterRecord) {
-        log.info(() -> String.format("Set computed active time: [%s]", counterRecord.getActiveTime()));
-        if (lastPersistedCount == null) {
-            counterRecord.setComputedActiveTime(INITIAL_COMPUTED_VALUE);
-            return;
-        }
-
-        int updatedComputedActiveTime = calculateUpdatedActiveTime(lastPersistedCount, counterRecord);
-        counterRecord.setComputedActiveTime(updatedComputedActiveTime);
-    }
-
-    private int calculateUpdatedActiveTime(CounterRecordEntity lastPersistedCount, CounterRecordEntity counterRecord) {
-        log.info(() -> String.format("Calculate active time, last persisted: [%s]", lastPersistedCount.getActiveTime()));
-        log.info(() -> String.format("Calculate received time, received: [%s]", counterRecord.getActiveTime()));
-
-        if (isActiveTimeRollover(lastPersistedCount, counterRecord)) {
-            return calculateRolloverActiveTime(lastPersistedCount.getActiveTime(), counterRecord.getActiveTime());
-        }
-
-        return incrementActiveTime(lastPersistedCount, counterRecord);
-    }
-
-    private boolean isActiveTimeRollover(CounterRecordEntity lastPersistedCount, CounterRecordEntity receivedCount) {
-        return receivedCount.getActiveTime() < lastPersistedCount.getActiveTime() && lastPersistedCount.getActiveTime() > 0;
-    }
-
-    private int calculateRolloverActiveTime(int persistedActiveTime, int receivedActiveTime) {
-        log.info(() -> String.format("Calculate active time rollover, last persisted: [%s]", persistedActiveTime));
-        log.info(() -> String.format("Calculate received time rollover, received: [%s]", receivedActiveTime));
-        int remainingActiveTime = ROLLOVER_MAX_VALUE - persistedActiveTime;
-        return persistedActiveTime + remainingActiveTime  + receivedActiveTime + ROLLOVER_OFFSET;
-    }
-
-    private int incrementActiveTime(CounterRecordEntity lastPersistedCount, CounterRecordEntity counterRecord) {
-        int increment = counterRecord.getActiveTime() - lastPersistedCount.getActiveTime();
-        return lastPersistedCount.getComputedActiveTime() + increment;
     }
 }
