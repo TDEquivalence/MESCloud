@@ -124,7 +124,7 @@ public class CounterRecordServiceImpl implements CounterRecordService {
 
         //TODO: we have to check if this validation is correct, considering we can have counter records without PO.s
         CounterRecordEntity lastPersistedCount = getLastPersistedCount(counterRecord);
-        
+
         if (counterRecord.getProductionOrder() != null) {
             setComputedValue(counterRecord, lastPersistedCount);
         }
@@ -197,7 +197,7 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     }
 
     private boolean isRollover(int lastPersistedCount, int receivedCount) {
-        return lastPersistedCount < receivedCount;
+        return receivedCount < lastPersistedCount;
     }
 
     private int calculateRollover(int lastPersistedCount, int receivedCount, int computedPersisted) {
