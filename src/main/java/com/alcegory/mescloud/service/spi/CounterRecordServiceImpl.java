@@ -174,7 +174,8 @@ public class CounterRecordServiceImpl implements CounterRecordService {
             return;
         }
 
-        int computedValue = genericCalculate(lastPersistedCount.getRealValue(), receivedCount.getRealValue(), receivedCount.getComputedValue());
+        int computedValue = genericCalculate(lastPersistedCount.getRealValue(), receivedCount.getRealValue(),
+                lastPersistedCount.getComputedValue());
         int increment = calculateIncrement(lastPersistedCount, receivedCount);
         receivedCount.setIncrement(increment);
         receivedCount.setComputedValue(computedValue);
@@ -206,8 +207,8 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     }
 
     private int genericCalculateRollover(int lastPersisted, int received) {
-        int remainingActiveTime = genericRolloverCalculateIncrement(lastPersisted, received);
-        return lastPersisted + remainingActiveTime  + received + ROLLOVER_OFFSET;
+        int totalIncrement = genericRolloverCalculateIncrement(lastPersisted, received);
+        return lastPersisted + totalIncrement;
     }
 
     private int genericRolloverCalculateIncrement(int lastPersisted, int received) {
