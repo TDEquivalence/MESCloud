@@ -268,14 +268,17 @@ public class CounterRecordServiceImpl implements CounterRecordService {
             return 0;
         }
 
+        long startDateMillis = startDate.getTime();
+        long endDateMillis = endDate.getTime();
+        int totalTimeIntervalInSeconds = (int) ((endDateMillis - startDateMillis) / 1000);
+
         int initialActiveTime = productionOrderActiveTime.get(0);
         int lastActiveTime = productionOrderActiveTime.get(productionOrderActiveTime.size() - 1);
 
         int activeTimeInterval = lastActiveTime - initialActiveTime;
-        int totalTimeInterval = (int) (endDate.getTime() - startDate.getTime());
-        int inactiveTimeInterval = totalTimeInterval - activeTimeInterval;
+        int inactiveTimeInterval = totalTimeIntervalInSeconds - activeTimeInterval;
 
-        return totalTimeInterval - inactiveTimeInterval;
+        return totalTimeIntervalInSeconds - inactiveTimeInterval;
     }
 
     private List<CounterRecordDto> saveAll(List<CounterRecordEntity> counterRecords) {
