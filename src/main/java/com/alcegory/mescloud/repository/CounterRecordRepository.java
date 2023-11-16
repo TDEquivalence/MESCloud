@@ -35,10 +35,10 @@ public interface CounterRecordRepository extends CrudRepository<CounterRecordEnt
 
     @Query(value = "SELECT cr.computed_active_time FROM counter_record cr " +
             "WHERE cr.production_order_id = :productionOrderId " +
-            "AND cr.registered_at BETWEEN :startDate AND :endDate " +
-            "ORDER BY cr.registered_at DESC", nativeQuery = true)
-    List<Integer> getComputedActiveTimeByProductionOrderId(
+            "AND cr.registered_at <= :endDate " +
+            "ORDER BY cr.registered_at DESC " +
+            "LIMIT 1", nativeQuery = true)
+    Long getComputedActiveTimeByProductionOrderId(
             @Param("productionOrderId") Long productionOrderId,
-            @Param("startDate") Timestamp startDate,
             @Param("endDate") Timestamp endDate);
 }
