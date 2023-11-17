@@ -15,7 +15,6 @@ import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
-import java.time.Instant;
 import java.util.*;
 
 @Service
@@ -248,47 +247,36 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     }
 
     @Override
-    public Integer sumValidCounterIncrement(Long countingEquipmentId, Instant startDateFilter, Instant endDateFilter) {
-        Timestamp startDate = Timestamp.from(startDateFilter);
-        Timestamp endDate = Timestamp.from(endDateFilter);
-
-        return repository.sumValidCounterIncrement(countingEquipmentId, startDate, endDate);
+    public Integer sumValidCounterIncrement(Long countingEquipmentId, Timestamp startDateFilter, Timestamp endDateFilter) {
+        return repository.sumValidCounterIncrement(countingEquipmentId, startDateFilter, endDateFilter);
     }
 
     @Override
-    public Integer sumCounterIncrement(Long countingEquipmentId, Instant startDateFilter, Instant endDateFilter) {
-        Timestamp startDate = Timestamp.from(startDateFilter);
-        Timestamp endDate = Timestamp.from(endDateFilter);
-
-        return repository.sumCounterIncrement(countingEquipmentId, startDate, endDate);
+    public Integer sumCounterIncrement(Long countingEquipmentId, Timestamp startDateFilter, Timestamp endDateFilter) {
+        return repository.sumCounterIncrement(countingEquipmentId, startDateFilter, endDateFilter);
     }
 
     @Override
-    public Integer getComputedActiveTimeByProductionOrderId(Long productionOrderId, Instant startDate,
-                                                            Instant endDate) {
-
-        if (productionOrderId == null || startDate == null || endDate == null) {
-            throw new IllegalArgumentException("Production order, start date, and end date cannot be null");
+    public long getComputedActiveTimeByProductionOrderId(Long productionOrderId, long totalScheduledTime, Timestamp startDate,
+                                                         Timestamp endDate) {
+        if (productionOrderId == null) {
+            throw new IllegalArgumentException("Production order cannot be null");
         }
 
         List<Integer> productionOrderActiveTime = repository.getComputedActiveTimeByProductionOrderId(productionOrderId,
-                Timestamp.from(startDate), Timestamp.from(endDate));
+                startDate, endDate);
 
         if (productionOrderActiveTime.isEmpty()) {
-            return 0;
+            return 0L;
         }
 
-        long startDateMillis = startDate.toEpochMilli();
-        long endDateMillis = endDate.toEpochMilli();
-        int totalTimeIntervalInSeconds = (int) ((endDateMillis - startDateMillis) / 1000);
-
+        int lastActiveTime= productionOrderActiveTime.get(0);
         int initialActiveTime = productionOrderActiveTime.get(productionOrderActiveTime.size() - 1);
-        int lastActiveTime = productionOrderActiveTime.get(0);
 
         int activeTimeInterval = lastActiveTime - initialActiveTime;
-        int inactiveTimeInterval = totalTimeIntervalInSeconds - activeTimeInterval;
+        int inactiveTimeInterval = (int) (totalScheduledTime - activeTimeInterval);
 
-        return totalTimeIntervalInSeconds - inactiveTimeInterval;
+        return totalScheduledTime - inactiveTimeInterval;
     }
 
     private List<CounterRecordDto> saveAll(List<CounterRecordEntity> counterRecords) {
