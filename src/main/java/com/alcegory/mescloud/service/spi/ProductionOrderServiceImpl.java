@@ -319,9 +319,9 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
 
         Instant nowTime = Instant.now();
         if (completedAtInstant.isAfter(nowTime)) {
-            Date lastCounterRecordRegistered = repository.findLastCounterRecordDateByProductionOrderId(productionOrder.getId());
-            if (lastCounterRecordRegistered != null) {
-                completedAtInstant = lastCounterRecordRegistered.toInstant();
+            Date lastCounterRecordDate = repository.findLastCounterRecordDateByProductionOrderId(productionOrder.getId());
+            if (lastCounterRecordDate != null) {
+                completedAtInstant = lastCounterRecordDate.toInstant();
             } else {
                 completedAtInstant = nowTime;
             }
