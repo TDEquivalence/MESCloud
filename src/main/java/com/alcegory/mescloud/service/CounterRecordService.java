@@ -24,5 +24,5 @@ public interface CounterRecordService {
 
     Integer sumCounterIncrement(Long countingEquipmentId, Timestamp startDateFilter, Timestamp endDateFilter);
 
-    Long getComputedActiveTimeByProductionOrderId(Long productionOrderId, Timestamp endDate);
+    Integer getComputedActiveTimeByProductionOrderId(Long productionOrderId, Timestamp startDate, Timestamp endDate);
 }
