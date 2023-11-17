@@ -46,7 +46,7 @@ public interface ProductionOrderService {
 
     boolean isCompleted(String productionOrderCode);
 
-    List<ProductionOrderEntity> findProductionOrdersWithinDateRange(Long equipmentId, Timestamp startDate, Timestamp endDate);
+    List<ProductionOrderEntity> findByEquipmentAndPeriod(Long equipmentId, Timestamp startDate, Timestamp endDate);
 
     Instant getAdjustedStartDate(ProductionOrderEntity productionOrder, Timestamp startDate);
 

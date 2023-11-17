@@ -118,7 +118,7 @@ public class KpiServiceImpl implements KpiService {
     @Override
     public KpiDto computeAvailability(Long equipmentId, RequestKpiDto filter) {
 
-        List<ProductionOrderEntity> productionOrders = getProductionOrderWithinDateRange(equipmentId, filter.getStartDate(),
+        List<ProductionOrderEntity> productionOrders = findByEquipmentAndPeriod(equipmentId, filter.getStartDate(),
                 filter.getEndDate());
 
         Long totalScheduledTime = 0L;
@@ -208,9 +208,9 @@ public class KpiServiceImpl implements KpiService {
         return kpiDto == null || kpiDto.getValue() == null || kpiDto.getValue() == 0;
     }
 
-    private List<ProductionOrderEntity> getProductionOrderWithinDateRange(Long equipmentId, Timestamp startDateFilter,
+    private List<ProductionOrderEntity> findByEquipmentAndPeriod(Long equipmentId, Timestamp startDateFilter,
                                                                           Timestamp endDateFilter) {
 
-        return productionOrderService.findProductionOrdersWithinDateRange(equipmentId, startDateFilter, endDateFilter);
+        return productionOrderService.findByEquipmentAndPeriod(equipmentId, startDateFilter, endDateFilter);
     }
 }

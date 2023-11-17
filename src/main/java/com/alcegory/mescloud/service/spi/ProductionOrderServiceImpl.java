@@ -277,7 +277,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         Timestamp startDate = Timestamp.from(startDateFilter);
         Timestamp endDate = Timestamp.from(endDateFilter);
 
-        List<ProductionOrderEntity> productionOrders = repository.findProductionOrdersWithinDateRange(equipmentId,
+        List<ProductionOrderEntity> productionOrders = repository.findByEquipmentAndPeriod(equipmentId,
                 startDate,
                 endDate);
 
@@ -331,8 +331,8 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     }
 
     @Override
-    public List<ProductionOrderEntity> findProductionOrdersWithinDateRange(Long equipmentId, Timestamp startDate, Timestamp endDate) {
-        return repository.findProductionOrdersWithinDateRange(equipmentId, startDate, endDate);
+    public List<ProductionOrderEntity> findByEquipmentAndPeriod(Long equipmentId, Timestamp startDate, Timestamp endDate) {
+        return repository.findByEquipmentAndPeriod(equipmentId, startDate, endDate);
     }
 
 }
