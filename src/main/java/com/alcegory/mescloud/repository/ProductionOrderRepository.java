@@ -4,9 +4,10 @@ import com.alcegory.mescloud.model.entity.ProductionOrderEntity;
 import com.alcegory.mescloud.model.entity.ProductionOrderSummaryEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -32,6 +33,12 @@ public interface ProductionOrderRepository extends JpaRepository<ProductionOrder
             "AND p.createdAt < :endDate " +
             "AND (p.equipment.id = :equipmentId)")
     List<ProductionOrderEntity> findByEquipmentAndPeriod(Long equipmentId, Date startDate, Date endDate);
+
+    @Query("SELECT p FROM production_order p " +
+            "WHERE p.createdAt > :startDate " +
+            "AND p.createdAt < :endDate " +
+            "AND (p.equipment.id = :equipmentId)")
+    List<ProductionOrderEntity> findProductionOrdersWithinDateRange(Long equipmentId, Timestamp startDate, Timestamp endDate);
 
     @Query("SELECT po.isCompleted FROM production_order po WHERE po.code = :productionOrderCode")
     boolean isCompleted(String productionOrderCode);

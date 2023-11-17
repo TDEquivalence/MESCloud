@@ -2,6 +2,7 @@ package com.alcegory.mescloud.service.spi;
 
 import com.alcegory.mescloud.exception.IncompleteConfigurationException;
 import com.alcegory.mescloud.model.dto.*;
+import com.alcegory.mescloud.model.entity.ProductionOrderEntity;
 import com.alcegory.mescloud.model.filter.CounterRecordFilter;
 import com.alcegory.mescloud.service.CounterRecordService;
 import com.alcegory.mescloud.service.CountingEquipmentService;
@@ -24,9 +25,6 @@ import static com.alcegory.mescloud.model.dto.RequestKpiDto.createRequestKpiForD
 @AllArgsConstructor
 @Log
 public class KpiServiceImpl implements KpiService {
-
-    private static final int PERCENTAGE = 100;
-    private static final int SECONDS_TO_MILLISECONDS = 1000;
 
     private final CounterRecordService counterRecordService;
     private final ProductionOrderService productionOrderService;
@@ -119,8 +117,21 @@ public class KpiServiceImpl implements KpiService {
 
     @Override
     public KpiDto computeAvailability(Long equipmentId, RequestKpiDto filter) {
-        Long totalScheduledTime = getTotalScheduledTime(equipmentId, filter);
-        Long totalActiveTime = getComputedActiveTime(equipmentId, filter);
+
+        List<ProductionOrderEntity> productionOrders = getProductionOrderWithinDateRange(equipmentId, filter.getStartDate(),
+                filter.getEndDate());
+
+        Long totalScheduledTime = 0L;
+        Long totalActiveTime = 0L;
+
+        for (ProductionOrderEntity productionOrder : productionOrders) {
+            Instant adjustedStartDate = productionOrderService.getAdjustedStartDate(productionOrder, filter.getStartDate());
+            Instant adjustedEndDate = productionOrderService.getAdjustedEndDate(productionOrder, filter.getEndDate());
+
+            totalScheduledTime += getProductionOrderTotalScheduledTime(adjustedStartDate, adjustedEndDate);
+            totalActiveTime += calculateActiveTimeByProductionOrderId(productionOrder, totalScheduledTime,
+                    adjustedStartDate, adjustedEndDate);
+        }
 
         log.info(String.format("Total schedule time [%s]", totalScheduledTime));
         log.info(String.format("Total active time [%s]", totalScheduledTime));
@@ -130,34 +141,33 @@ public class KpiServiceImpl implements KpiService {
         return kpi;
     }
 
-    public Long getTotalScheduledTime(Long equipmentId, RequestKpiDto filter) {
-        return productionOrderService.calculateScheduledTimeInSeconds(
-                equipmentId,
-                filter.getStartDate(),
-                filter.getEndDate());
+    @Override
+    public Long getProductionOrderTotalScheduledTime(Long equipmentId, RequestKpiDto filter) {
+        return productionOrderService.calculateScheduledTimeInSeconds(equipmentId, filter.getStartDateInstant(),
+                filter.getEndDateInstant());
     }
 
-    private Long getComputedActiveTime(Long equipmentId, RequestKpiDto filter) {
-        Timestamp startDate = filter.getStartDate();
-        Timestamp endDate = filter.getEndDate();
+    private Long getProductionOrderTotalScheduledTime(Instant startDate, Instant endDate) {
+        return productionOrderService.calculateScheduledTimeInSeconds(startDate, endDate);
+    }
 
-        List<ProductionOrderDto> productionOrders =
-                productionOrderService.findByEquipmentAndPeriod(equipmentId, startDate, endDate);
+    private Long calculateActiveTimeByProductionOrderId(ProductionOrderEntity productionOrder, long totalScheduledTime,
+                                                        Instant startDateFilter,
+                                                        Instant endDateFilter) {
 
-        long totalActiveTime = 0L;
-        for (ProductionOrderDto productionOrder : productionOrders) {
-            log.info(String.format("GetActiveTime: active time by PO [%s]", totalActiveTime));
-            totalActiveTime += counterRecordService.getComputedActiveTimeByProductionOrderId(productionOrder.getId(), endDate);
-        }
+        Timestamp startDate = Timestamp.from(startDateFilter);
+        Timestamp endDate = Timestamp.from(endDateFilter);
 
-        return totalActiveTime;
+        return counterRecordService.calculateActiveTimeByProductionOrderId(productionOrder.getId(), totalScheduledTime,
+                startDate, endDate);
     }
 
     @Override
     public KpiDto computeEquipmentQuality(Long equipmentId, RequestKpiDto requestKpiDto) {
         Integer validCounter = counterRecordService.sumValidCounterIncrement(equipmentId,
                 requestKpiDto.getStartDate(), requestKpiDto.getEndDate());
-        Integer totalCounter = counterRecordService.sumCounterIncrement(equipmentId,requestKpiDto.getStartDate(),
+
+        Integer totalCounter = counterRecordService.sumCounterIncrement(equipmentId, requestKpiDto.getStartDate(),
                 requestKpiDto.getEndDate());
 
         KpiDto kpi = new KpiDto(validCounter, totalCounter);
@@ -196,5 +206,11 @@ public class KpiServiceImpl implements KpiService {
 
     private boolean isValueZeroOrMissing(KpiDto kpiDto) {
         return kpiDto == null || kpiDto.getValue() == null || kpiDto.getValue() == 0;
+    }
+
+    private List<ProductionOrderEntity> getProductionOrderWithinDateRange(Long equipmentId, Timestamp startDateFilter,
+                                                                          Timestamp endDateFilter) {
+
+        return productionOrderService.findProductionOrdersWithinDateRange(equipmentId, startDateFilter, endDateFilter);
     }
 }

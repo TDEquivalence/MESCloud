@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -47,6 +48,14 @@ public class RequestKpiDto {
                         Timestamp.valueOf(dayStart),
                         Timestamp.valueOf(dayEnd)
                 );
+        }
+
+        public Instant getStartDateInstant() {
+                return this.startDate.toInstant();
+        }
+
+        public Instant getEndDateInstant() {
+                return this.endDate.toInstant();
         }
 }
 

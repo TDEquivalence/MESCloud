@@ -257,8 +257,26 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     }
 
     @Override
-    public Long getComputedActiveTimeByProductionOrderId(Long productionOrderId, Timestamp endDate) {
-        return repository.getComputedActiveTimeByProductionOrderId(productionOrderId, endDate);
+    public long calculateActiveTimeByProductionOrderId(Long productionOrderId, long totalScheduledTime, Timestamp startDate,
+                                                       Timestamp endDate) {
+        if (productionOrderId == null) {
+            throw new IllegalArgumentException("Production order cannot be null");
+        }
+
+        List<Integer> productionOrderActiveTime = repository.getComputedActiveTimeByProductionOrderId(productionOrderId,
+                startDate, endDate);
+
+        if (productionOrderActiveTime.isEmpty()) {
+            return 0L;
+        }
+
+        long lastActiveTime= productionOrderActiveTime.get(0);
+        long initialActiveTime = productionOrderActiveTime.get(productionOrderActiveTime.size() - 1);
+
+        long activeTimeInterval = lastActiveTime - initialActiveTime;
+        long inactiveTimeInterval = (int) (totalScheduledTime - activeTimeInterval);
+
+        return totalScheduledTime - inactiveTimeInterval;
     }
 
     private List<CounterRecordDto> saveAll(List<CounterRecordEntity> counterRecords) {
