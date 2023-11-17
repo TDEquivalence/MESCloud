@@ -14,7 +14,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 
-import java.sql.Time;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -130,7 +129,7 @@ public class KpiServiceImpl implements KpiService {
             Instant adjustedEndDate = productionOrderService.getAdjustedEndDate(productionOrder, filter.getEndDate());
 
             totalScheduledTime += getProductionOrderTotalScheduledTime(adjustedStartDate, adjustedEndDate);
-            totalActiveTime += getProductionOrderComputedActiveTime(productionOrder, totalScheduledTime,
+            totalActiveTime += calculateActiveTimeByProductionOrderId(productionOrder, totalScheduledTime,
                     adjustedStartDate, adjustedEndDate);
         }
 
@@ -142,24 +141,24 @@ public class KpiServiceImpl implements KpiService {
         return kpi;
     }
 
-    private Long getProductionOrderTotalScheduledTime(Instant startDate, Instant endDate) {
-        return productionOrderService.calculateScheduledTimeInSeconds(startDate, endDate);
-    }
-
     @Override
     public Long getProductionOrderTotalScheduledTime(Long equipmentId, RequestKpiDto filter) {
         return productionOrderService.calculateScheduledTimeInSeconds(equipmentId, filter.getStartDateInstant(),
                 filter.getEndDateInstant());
     }
 
-    private Long getProductionOrderComputedActiveTime(ProductionOrderEntity productionOrder, long totalScheduledTime,
-                                                      Instant startDateFilter,
-                                                      Instant endDateFilter) {
+    private Long getProductionOrderTotalScheduledTime(Instant startDate, Instant endDate) {
+        return productionOrderService.calculateScheduledTimeInSeconds(startDate, endDate);
+    }
+
+    private Long calculateActiveTimeByProductionOrderId(ProductionOrderEntity productionOrder, long totalScheduledTime,
+                                                        Instant startDateFilter,
+                                                        Instant endDateFilter) {
 
         Timestamp startDate = Timestamp.from(startDateFilter);
         Timestamp endDate = Timestamp.from(endDateFilter);
 
-        return counterRecordService.getComputedActiveTimeByProductionOrderId(productionOrder.getId(), totalScheduledTime,
+        return counterRecordService.calculateActiveTimeByProductionOrderId(productionOrder.getId(), totalScheduledTime,
                 startDate, endDate);
     }
 

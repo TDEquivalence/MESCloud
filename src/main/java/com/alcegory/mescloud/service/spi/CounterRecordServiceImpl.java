@@ -257,8 +257,8 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     }
 
     @Override
-    public long getComputedActiveTimeByProductionOrderId(Long productionOrderId, long totalScheduledTime, Timestamp startDate,
-                                                         Timestamp endDate) {
+    public long calculateActiveTimeByProductionOrderId(Long productionOrderId, long totalScheduledTime, Timestamp startDate,
+                                                       Timestamp endDate) {
         if (productionOrderId == null) {
             throw new IllegalArgumentException("Production order cannot be null");
         }
