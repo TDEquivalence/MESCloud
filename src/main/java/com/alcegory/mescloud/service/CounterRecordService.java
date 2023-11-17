@@ -1,9 +1,12 @@
 package com.alcegory.mescloud.service;
 
-import com.alcegory.mescloud.model.dto.*;
+import com.alcegory.mescloud.model.dto.CounterRecordDto;
+import com.alcegory.mescloud.model.dto.KpiFilterDto;
+import com.alcegory.mescloud.model.dto.PaginatedCounterRecordsDto;
+import com.alcegory.mescloud.model.dto.PlcMqttDto;
 import com.alcegory.mescloud.model.filter.CounterRecordFilter;
 
-import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.List;
 
 public interface CounterRecordService {
@@ -20,9 +23,9 @@ public interface CounterRecordService {
 
     boolean areValidContinuationCounts(String productionOrderCode);
 
-    Integer sumValidCounterIncrement(Long countingEquipmentId, Timestamp startDateFilter, Timestamp endDateFilter);
+    Integer sumValidCounterIncrement(Long countingEquipmentId, Instant startDateFilter, Instant endDateFilter);
 
-    Integer sumCounterIncrement(Long countingEquipmentId, Timestamp startDateFilter, Timestamp endDateFilter);
+    Integer sumCounterIncrement(Long countingEquipmentId, Instant startDateFilter, Instant endDateFilter);
 
-    Integer getComputedActiveTimeByProductionOrderId(Long productionOrderId, Timestamp startDate, Timestamp endDate);
+    Integer getComputedActiveTimeByProductionOrderId(Long productionOrderId, Instant startDate, Instant endDate);
 }

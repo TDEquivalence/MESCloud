@@ -15,6 +15,7 @@ import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.*;
 
 @Service
@@ -247,33 +248,42 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     }
 
     @Override
-    public Integer sumValidCounterIncrement(Long countingEquipmentId, Timestamp startDateFilter, Timestamp endDateFilter) {
-        return repository.sumValidCounterIncrement(countingEquipmentId, startDateFilter, endDateFilter);
+    public Integer sumValidCounterIncrement(Long countingEquipmentId, Instant startDateFilter, Instant endDateFilter) {
+        Timestamp startDate = Timestamp.from(startDateFilter);
+        Timestamp endDate = Timestamp.from(endDateFilter);
+
+        return repository.sumValidCounterIncrement(countingEquipmentId, startDate, endDate);
     }
 
     @Override
-    public Integer sumCounterIncrement(Long countingEquipmentId, Timestamp startDateFilter, Timestamp endDateFilter) {
-        return repository.sumCounterIncrement(countingEquipmentId, startDateFilter, endDateFilter);
+    public Integer sumCounterIncrement(Long countingEquipmentId, Instant startDateFilter, Instant endDateFilter) {
+        Timestamp startDate = Timestamp.from(startDateFilter);
+        Timestamp endDate = Timestamp.from(endDateFilter);
+
+        return repository.sumCounterIncrement(countingEquipmentId, startDate, endDate);
     }
 
     @Override
-    public Integer getComputedActiveTimeByProductionOrderId(Long productionOrderId, Timestamp startDate, Timestamp endDate) {
+    public Integer getComputedActiveTimeByProductionOrderId(Long productionOrderId, Instant startDate,
+                                                            Instant endDate) {
+
         if (productionOrderId == null || startDate == null || endDate == null) {
-            throw new IllegalArgumentException("Production order ID, start date, and end date cannot be null");
+            throw new IllegalArgumentException("Production order, start date, and end date cannot be null");
         }
 
-        List<Integer> productionOrderActiveTime = repository.getComputedActiveTimeByProductionOrderId(productionOrderId, startDate, endDate);
+        List<Integer> productionOrderActiveTime = repository.getComputedActiveTimeByProductionOrderId(productionOrderId,
+                Timestamp.from(startDate), Timestamp.from(endDate));
 
         if (productionOrderActiveTime.isEmpty()) {
             return 0;
         }
 
-        long startDateMillis = startDate.getTime();
-        long endDateMillis = endDate.getTime();
+        long startDateMillis = startDate.toEpochMilli();
+        long endDateMillis = endDate.toEpochMilli();
         int totalTimeIntervalInSeconds = (int) ((endDateMillis - startDateMillis) / 1000);
 
-        int initialActiveTime = productionOrderActiveTime.get(0);
-        int lastActiveTime = productionOrderActiveTime.get(productionOrderActiveTime.size() - 1);
+        int initialActiveTime = productionOrderActiveTime.get(productionOrderActiveTime.size() - 1);
+        int lastActiveTime = productionOrderActiveTime.get(0);
 
         int activeTimeInterval = lastActiveTime - initialActiveTime;
         int inactiveTimeInterval = totalTimeIntervalInSeconds - activeTimeInterval;
