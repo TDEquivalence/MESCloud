@@ -4,7 +4,6 @@ import com.alcegory.mescloud.model.entity.ProductionOrderEntity;
 import com.alcegory.mescloud.model.entity.ProductionOrderSummaryEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
@@ -37,9 +36,4 @@ public interface ProductionOrderRepository extends JpaRepository<ProductionOrder
 
     @Query("SELECT po.isCompleted FROM production_order po WHERE po.code = :productionOrderCode")
     boolean isCompleted(String productionOrderCode);
-
-    @Query(value = "SELECT cr.registered_at FROM counter_record cr " +
-            "WHERE cr.production_order_id = :productionOrderId " +
-            "ORDER BY cr.registered_at DESC LIMIT 1", nativeQuery = true)
-    Date findLastCounterRecordDateByProductionOrderId(@Param("productionOrderId") Long productionOrderId);
 }
