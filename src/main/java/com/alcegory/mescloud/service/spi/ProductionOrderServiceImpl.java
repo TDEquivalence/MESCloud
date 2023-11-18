@@ -319,19 +319,13 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
 
         Instant nowTime = Instant.now();
         if (completedAtInstant.isAfter(nowTime)) {
-            Date lastCounterRecordDate = repository.findLastCounterRecordDateByProductionOrderId(productionOrder.getId());
-            if (lastCounterRecordDate != null) {
-                completedAtInstant = lastCounterRecordDate.toInstant();
-            } else {
-                completedAtInstant = nowTime;
-            }
+            completedAtInstant = nowTime;
         }
 
         return completedAtInstant;
     }
 
-    private CountingEquipmentDto setOperationStatus(CountingEquipmentEntity countingEquipment,
-                                                    CountingEquipmentEntity.OperationStatus status) {
+    private CountingEquipmentDto setOperationStatus(CountingEquipmentEntity countingEquipment, CountingEquipmentEntity.OperationStatus status) {
         countingEquipmentService.setOperationStatus(countingEquipment, status);
         return equipmentConverter.toDto(countingEquipment, CountingEquipmentDto.class);
     }
@@ -340,4 +334,5 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     public List<ProductionOrderEntity> findByEquipmentAndPeriod(Long equipmentId, Timestamp startDate, Timestamp endDate) {
         return repository.findByEquipmentAndPeriod(equipmentId, startDate, endDate);
     }
+
 }
