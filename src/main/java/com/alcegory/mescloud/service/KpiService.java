@@ -10,7 +10,7 @@ public interface KpiService {
 
     KpiDto computeEquipmentQuality(Long equipmentId, RequestKpiDto requestKpiDto);
 
-    Long getTotalScheduledTime(Long equipmentId, RequestKpiDto filter);
+    Long getProductionOrderTotalScheduledTime(Long equipmentId, RequestKpiDto filter);
 
     KpiDto computeAvailability(Long equipmentId, RequestKpiDto filter);
 

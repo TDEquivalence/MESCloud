@@ -22,6 +22,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
@@ -257,50 +258,81 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
 
     @Override
     public boolean isCompleted(String productionOrderCode) {
-        if (productionOrderCode == null) {
-            return false;
-        }
         return repository.isCompleted(productionOrderCode);
     }
 
     @Override
-    public Long calculateScheduledTimeInSeconds(Long equipmentId, Date startDate, Date endDate) {
-
-        List<ProductionOrderEntity> productionOrders = repository.findByEquipmentAndPeriod(equipmentId, startDate, endDate);
+    public Long calculateScheduledTimeInSeconds(Instant startDate, Instant endDate) {
         Duration totalActiveTime = Duration.ZERO;
-        for (ProductionOrderEntity productionOrder : productionOrders) {
 
-            Duration productionOrderActiveTime = calculateScheduledTime(productionOrder, startDate, endDate);
-            totalActiveTime = totalActiveTime.plus(productionOrderActiveTime);
-        }
+        Duration productionOrderActiveTime = calculateScheduledTime(startDate, endDate);
+        totalActiveTime = totalActiveTime.plus(productionOrderActiveTime);
 
         return totalActiveTime.getSeconds();
     }
 
-    private Duration calculateScheduledTime(ProductionOrderEntity productionOrder, Date startDate, Date endDate) {
+    @Override
+    public Long calculateScheduledTimeInSeconds(Long equipmentId, Instant startDateFilter, Instant endDateFilter) {
+
+        Timestamp startDate = Timestamp.from(startDateFilter);
+        Timestamp endDate = Timestamp.from(endDateFilter);
+
+        List<ProductionOrderEntity> productionOrders = repository.findByEquipmentAndPeriod(equipmentId,
+                startDate,
+                endDate);
+
+        if (productionOrders.isEmpty()) {
+            return 0L;
+        }
+
+        long totalActiveTime = 0;
+        for (ProductionOrderEntity productionOrder : productionOrders) {
+            Instant adjustedStartDate = getAdjustedStartDate(productionOrder, startDate);
+            Instant adjustedEndDate = getAdjustedEndDate(productionOrder, endDate);
+            
+            totalActiveTime += calculateScheduledTimeInSeconds(adjustedStartDate, adjustedEndDate);
+        }
+
+        return totalActiveTime;
+    }
+
+    private Duration calculateScheduledTime(Instant startDate, Instant endDate) {
+        Duration duration = Duration.between(startDate, endDate);
+
+        return duration.isNegative() ? Duration.ZERO : duration;
+    }
+
+    @Override
+    public Instant getAdjustedStartDate(ProductionOrderEntity productionOrder, Timestamp startDate) {
         Instant createdAt = productionOrder.getCreatedAt().toInstant();
-        Instant completedAt = (productionOrder.getCompletedAt() != null) ?
-                productionOrder.getCompletedAt().toInstant() : null;
+        return (createdAt.isAfter(startDate.toInstant()) ? createdAt : startDate.toInstant());
+    }
 
-        Instant adjustedStartDate = (createdAt.isAfter(Instant.ofEpochMilli(startDate.getTime()))) ? createdAt : Instant.ofEpochMilli(startDate.getTime());
-        Instant adjustedEndDate = (createdAt.isAfter(Instant.ofEpochMilli(endDate.getTime()))) ? createdAt : Instant.ofEpochMilli(endDate.getTime());
+    @Override
+    public Instant getAdjustedEndDate(ProductionOrderEntity productionOrder, Timestamp endDate) {
+        Date completedAtDate = productionOrder.getCompletedAt();
+        Instant completedAtInstant = (completedAtDate != null) ? completedAtDate.toInstant() : null;
 
-        if (completedAt != null && completedAt.isBefore(adjustedEndDate)) {
-            adjustedEndDate = completedAt;
+        if (completedAtInstant == null) {
+            completedAtInstant = endDate.toInstant();
         }
 
         Instant nowTime = Instant.now();
-        if (adjustedEndDate.isAfter(nowTime)) {
-            adjustedEndDate = nowTime;
+        if (completedAtInstant.isAfter(nowTime)) {
+            completedAtInstant = nowTime;
         }
 
-        Duration duration = Duration.between(adjustedStartDate, adjustedEndDate);
-
-        return duration.isNegative() ? Duration.ZERO : duration;
+        return completedAtInstant;
     }
 
     private CountingEquipmentDto setOperationStatus(CountingEquipmentEntity countingEquipment, CountingEquipmentEntity.OperationStatus status) {
         countingEquipmentService.setOperationStatus(countingEquipment, status);
         return equipmentConverter.toDto(countingEquipment, CountingEquipmentDto.class);
     }
+
+    @Override
+    public List<ProductionOrderEntity> findByEquipmentAndPeriod(Long equipmentId, Timestamp startDate, Timestamp endDate) {
+        return repository.findByEquipmentAndPeriod(equipmentId, startDate, endDate);
+    }
+
 }
