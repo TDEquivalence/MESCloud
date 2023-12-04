@@ -229,6 +229,11 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     }
 
     private Optional<CounterRecordEntity> findLastPersistedCount(CounterRecordEntity counterRecord) {
+
+        if (counterRecord.getProductionOrder().getId() == null || counterRecord.getEquipmentOutput().getId() == null) {
+            return Optional.empty();
+        }
+
         Long productionOrderId = counterRecord.getProductionOrder().getId();
         Long equipmentOutputId = counterRecord.getEquipmentOutput().getId();
         return repository.findLastByProductionOrderId(productionOrderId, equipmentOutputId);
