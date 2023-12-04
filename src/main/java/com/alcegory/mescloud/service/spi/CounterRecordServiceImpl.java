@@ -270,11 +270,11 @@ public class CounterRecordServiceImpl implements CounterRecordService {
             return 0L;
         }
 
-        long lastActiveTime= productionOrderActiveTime.get(0);
+        long lastActiveTime = productionOrderActiveTime.get(0);
         long initialActiveTime = productionOrderActiveTime.get(productionOrderActiveTime.size() - 1);
 
         long activeTimeInterval = lastActiveTime - initialActiveTime;
-        long inactiveTimeInterval = (int) (totalScheduledTime - activeTimeInterval);
+        long inactiveTimeInterval = totalScheduledTime - activeTimeInterval;
 
         return totalScheduledTime - inactiveTimeInterval;
     }
