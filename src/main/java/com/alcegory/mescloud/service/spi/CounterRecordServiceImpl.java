@@ -182,10 +182,7 @@ public class CounterRecordServiceImpl implements CounterRecordService {
 
         int increment = calculateIncrement(lastPersistedCount, receivedCount);
 
-        int incrementActiveTime = calculateIncrementActiveTime(lastPersistedCount, receivedCount);
-
         receivedCount.setIncrement(increment);
-        receivedCount.setIncrementActiveTime(incrementActiveTime);
         receivedCount.setComputedValue(computedValue);
         receivedCount.setComputedActiveTime(updatedComputedActiveTime);
     }
@@ -231,23 +228,15 @@ public class CounterRecordServiceImpl implements CounterRecordService {
         return computeValueIncrement(lastPersistedCount.getRealValue(), receivedCount.getRealValue());
     }
 
-    private int calculateIncrementActiveTime(CounterRecordEntity lastPersistedCount, CounterRecordEntity receivedCount) {
-
-        if (lastPersistedCount.getActiveTime() > receivedCount.getActiveTime()) {
-            return 0;
-        }
-
-        return computeValueIncrement(lastPersistedCount.getActiveTime(), receivedCount.getActiveTime());
-    }
-
     private Optional<CounterRecordEntity> findLastPersistedCount(CounterRecordEntity counterRecord) {
 
         if (counterRecord.getProductionOrder().getId() == null || counterRecord.getEquipmentOutput().getId() == null) {
             return Optional.empty();
         }
 
-        return repository.findLastByProductionOrderId(counterRecord.getProductionOrder().getId(),
-                counterRecord.getEquipmentOutput().getId());
+        Long productionOrderId = counterRecord.getProductionOrder().getId();
+        Long equipmentOutputId = counterRecord.getEquipmentOutput().getId();
+        return repository.findLastByProductionOrderId(productionOrderId, equipmentOutputId);
     }
 
     public boolean areValidInitialCounts(String productionOrderCode) {
@@ -273,14 +262,26 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     }
 
     @Override
-    public Integer getSumIncrementActiveTimeByProductionOrderId(Long productionOrderId, Timestamp startDate,
-                                                             Timestamp endDate) {
+    public long calculateActiveTimeByProductionOrderId(Long productionOrderId, long totalScheduledTime, Timestamp startDate,
+                                                       Timestamp endDate) {
         if (productionOrderId == null) {
             throw new IllegalArgumentException("Production order cannot be null");
         }
 
-        return repository.getSumIncrementActiveTimeByProductionOrderId(productionOrderId,
+        List<Integer> productionOrderActiveTime = repository.getComputedActiveTimeByProductionOrderId(productionOrderId,
                 startDate, endDate);
+
+        if (productionOrderActiveTime.isEmpty()) {
+            return 0L;
+        }
+
+        long lastActiveTime = productionOrderActiveTime.get(0);
+        long initialActiveTime = productionOrderActiveTime.get(productionOrderActiveTime.size() - 1);
+
+        long activeTimeInterval = lastActiveTime - initialActiveTime;
+        long inactiveTimeInterval = totalScheduledTime - activeTimeInterval;
+
+        return totalScheduledTime - inactiveTimeInterval;
     }
 
     private List<CounterRecordDto> saveAll(List<CounterRecordEntity> counterRecords) {
