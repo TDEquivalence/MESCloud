@@ -190,6 +190,7 @@ CREATE TABLE counter_record (
     is_valid_for_production boolean,
     active_time int,
     computed_active_time int,
+    increment_active_time int,
 
     PRIMARY KEY(id),
     FOREIGN KEY(equipment_output_id) REFERENCES equipment_output(id),
