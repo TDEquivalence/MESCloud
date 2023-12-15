@@ -129,7 +129,7 @@ public class KpiServiceImpl implements KpiService {
             Instant adjustedEndDate = productionOrderService.getAdjustedEndDate(productionOrder, filter.getEndDate());
 
             totalScheduledTime += getProductionOrderTotalScheduledTime(adjustedStartDate, adjustedEndDate);
-            totalActiveTime += calculateActiveTimeByProductionOrderId(productionOrder,
+            totalActiveTime += calculateActiveTimeByProductionOrderId(productionOrder, totalScheduledTime,
                     adjustedStartDate, adjustedEndDate);
         }
 
@@ -151,14 +151,14 @@ public class KpiServiceImpl implements KpiService {
         return productionOrderService.calculateScheduledTimeInSeconds(startDate, endDate);
     }
 
-    private Integer calculateActiveTimeByProductionOrderId(ProductionOrderEntity productionOrder,
-                                                           Instant startDateFilter,
-                                                           Instant endDateFilter) {
+    private Long calculateActiveTimeByProductionOrderId(ProductionOrderEntity productionOrder, long totalScheduledTime,
+                                                        Instant startDateFilter,
+                                                        Instant endDateFilter) {
 
         Timestamp startDate = Timestamp.from(startDateFilter);
         Timestamp endDate = Timestamp.from(endDateFilter);
 
-        return counterRecordService.getSumIncrementActiveTimeByProductionOrderId(productionOrder.getId(),
+        return counterRecordService.calculateActiveTimeByProductionOrderId(productionOrder.getId(), totalScheduledTime,
                 startDate, endDate);
     }
 
