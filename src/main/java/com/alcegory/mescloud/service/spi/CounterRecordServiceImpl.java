@@ -274,10 +274,12 @@ public class CounterRecordServiceImpl implements CounterRecordService {
             return 0L;
         }
 
-        long lastActiveTime = productionOrderActiveTime.get(0);
-        long initialActiveTime = productionOrderActiveTime.get(productionOrderActiveTime.size() - 1);
+        productionOrderActiveTime.sort(Collections.reverseOrder());
 
-        return lastActiveTime - initialActiveTime;
+        long initialActiveTime = productionOrderActiveTime.get(0);
+        long lastActiveTime = productionOrderActiveTime.get(productionOrderActiveTime.size() - 1);
+
+        return initialActiveTime - lastActiveTime;
     }
 
     private List<CounterRecordDto> saveAll(List<CounterRecordEntity> counterRecords) {
