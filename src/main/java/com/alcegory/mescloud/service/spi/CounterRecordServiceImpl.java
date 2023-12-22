@@ -225,7 +225,7 @@ public class CounterRecordServiceImpl implements CounterRecordService {
             return 0;
         }
 
-        return computeValueIncrement(lastPersistedCount.getRealValue(), receivedCount.getRealValue());
+        return computeValueIncrement(lastPersistedCount.getComputedValue(), receivedCount.getComputedValue());
     }
 
     private Optional<CounterRecordEntity> findLastPersistedCount(CounterRecordEntity counterRecord) {
@@ -276,10 +276,11 @@ public class CounterRecordServiceImpl implements CounterRecordService {
 
         productionOrderActiveTime.sort(Collections.reverseOrder());
 
-        long initialActiveTime = productionOrderActiveTime.get(0);
-        long lastActiveTime = productionOrderActiveTime.get(productionOrderActiveTime.size() - 1);
+        long lastActiveTime = productionOrderActiveTime.get(0);
+        long initialActiveTime = productionOrderActiveTime.get(productionOrderActiveTime.size() - 1);
 
-        return initialActiveTime - lastActiveTime;
+        long activeTime = lastActiveTime - initialActiveTime;
+        return activeTime;
     }
 
     private List<CounterRecordDto> saveAll(List<CounterRecordEntity> counterRecords) {
