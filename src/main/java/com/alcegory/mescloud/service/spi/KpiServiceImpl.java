@@ -150,13 +150,15 @@ public class KpiServiceImpl implements KpiService {
         return productionOrderService.calculateScheduledTimeInSeconds(startDate, endDate);
     }
 
-    private Long calculateActiveTimeByProductionOrderId(ProductionOrderEntity productionOrder, Instant startDateFilter,
-                                                        Instant endDateFilter) {
+    private Integer calculateActiveTimeByProductionOrderId(ProductionOrderEntity productionOrder,
+                                                           Instant startDateFilter,
+                                                           Instant endDateFilter) {
 
         Timestamp startDate = Timestamp.from(startDateFilter);
         Timestamp endDate = Timestamp.from(endDateFilter);
 
-        return counterRecordService.calculateActiveTimeByProductionOrderId(productionOrder.getId(), startDate, endDate);
+        return counterRecordService.getSumIncrementActiveTimeByProductionOrderId(productionOrder.getId(),
+                startDate, endDate);
     }
 
     @Override
