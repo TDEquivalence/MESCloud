@@ -172,12 +172,12 @@ public class CounterRecordServiceImpl implements CounterRecordService {
         int updatedComputedActiveTime = calculate(lastPersistedCount.getActiveTime(), receivedCount.getActiveTime(),
                 lastPersistedCount.getComputedActiveTime());
 
-        int increment = calculateIncrement(lastPersistedCount, receivedCount);
-
-        int incrementActiveTime = calculateIncrementActiveTime(lastPersistedCount, receivedCount);
-
         receivedCount.setComputedValue(computedValue);
         receivedCount.setComputedActiveTime(updatedComputedActiveTime);
+
+        int increment = calculateIncrement(lastPersistedCount, receivedCount);
+        int incrementActiveTime = calculateIncrementActiveTime(lastPersistedCount, receivedCount);
+
         receivedCount.setIncrement(increment);
         receivedCount.setIncrementActiveTime(incrementActiveTime);
     }
