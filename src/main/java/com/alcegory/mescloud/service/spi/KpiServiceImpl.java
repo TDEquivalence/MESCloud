@@ -157,7 +157,7 @@ public class KpiServiceImpl implements KpiService {
         Timestamp startDate = Timestamp.from(startDateFilter);
         Timestamp endDate = Timestamp.from(endDateFilter);
 
-        return counterRecordService.getSumIncrementActiveTimeByProductionOrderId(productionOrder.getId(),
+        return counterRecordService.sumIncrementActiveTimeByProductionOrderId(productionOrder.getId(),
                 startDate, endDate);
     }
 

@@ -272,15 +272,15 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     }
 
     @Override
-    public Integer getSumIncrementActiveTimeByProductionOrderId(Long productionOrderId, Timestamp startDate,
+    public Integer sumIncrementActiveTimeByProductionOrderId(Long productionOrderId, Timestamp startDate,
                                                              Timestamp endDate) {
-      
+
         if (productionOrderId == null) {
             throw new IllegalArgumentException("Production order cannot be null");
         }
 
-        return repository.getSumIncrementActiveTimeByProductionOrderId(productionOrderId,
-                startDate, endDate);
+        Integer activeTime = repository.sumIncrementActiveTimeByProductionOrderId(productionOrderId, startDate, endDate);
+        return Optional.ofNullable(activeTime).orElse(0);
     }
 
     private List<CounterRecordDto> saveAll(List<CounterRecordEntity> counterRecords) {
