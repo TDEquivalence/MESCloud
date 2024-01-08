@@ -125,8 +125,11 @@ public class CounterRecordServiceImpl implements CounterRecordService {
         //TODO: we have to check if this validation is correct, considering we can have counter records without PO.s
         Optional<CounterRecordEntity> lastPersistedCount = getLastPersistedCount(counterRecord);
 
-        if (lastPersistedCount.isPresent() && counterRecord.getProductionOrder() != null) {
+        if (lastPersistedCount.isPresent()) {
             setComputedValue(counterRecord, lastPersistedCount.get());
+        } else {
+            counterRecord.setComputedValue(INITIAL_COMPUTED_VALUE);
+            counterRecord.setComputedActiveTime(INITIAL_COMPUTED_VALUE);
         }
 
         return counterRecord;
@@ -166,12 +169,6 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     }
 
     private void setComputedValue(CounterRecordEntity receivedCount, CounterRecordEntity lastPersistedCount) {
-
-        if (lastPersistedCount == null) {
-            receivedCount.setComputedValue(INITIAL_COMPUTED_VALUE);
-            receivedCount.setComputedActiveTime(INITIAL_COMPUTED_VALUE);
-            return;
-        }
 
         int computedValue = calculate(lastPersistedCount.getRealValue(), receivedCount.getRealValue(),
                 lastPersistedCount.getComputedValue());
