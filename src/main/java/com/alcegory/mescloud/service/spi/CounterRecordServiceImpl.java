@@ -114,28 +114,19 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     private CounterRecordEntity extractCounterRecordEntity(CounterMqttDto counterDto, PlcMqttDto equipmentCountsDto) {
 
         CounterRecordEntity counterRecord = new CounterRecordEntity();
-        //counterRecord.setRegisteredAt(DateUtil.getCurrentTime(factoryService.getTimeZone()));
         counterRecord.setRegisteredAt(new Date());
         counterRecord.setRealValue(counterDto.getValue());
         counterRecord.setActiveTime(equipmentCountsDto.getActiveTime());
 
         setEquipmentOutput(counterRecord, counterDto.getOutputCode());
         setProductionOrder(counterRecord, equipmentCountsDto.getProductionOrderCode());
-
-        //TODO: we have to check if this validation is correct, considering we can have counter records without PO.s
-        Optional<CounterRecordEntity> lastPersistedCount = findLastPersistedCount(counterRecord);
-
-        if (lastPersistedCount.isPresent()) {
-            setComputedValue(counterRecord, lastPersistedCount.get());
-        } else {
-            counterRecord.setComputedValue(INITIAL_COMPUTED_VALUE);
-            counterRecord.setComputedActiveTime(INITIAL_COMPUTED_VALUE);
-        }
+        setComputedValue(counterRecord);
 
         return counterRecord;
     }
 
     private void setEquipmentOutput(CounterRecordEntity counterRecord, String equipmentOutputCode) {
+
         Optional<EquipmentOutputDto> equipmentOutputOpt = equipmentOutputService.findByCode(equipmentOutputCode);
         if (equipmentOutputOpt.isEmpty()) {
             log.warning(() -> String.format("No Equipment Output found with the code [%s]", equipmentOutputCode));
@@ -152,7 +143,6 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     }
 
     private void setProductionOrder(CounterRecordEntity counterRecord, String productionOrderCode) {
-
         Optional<ProductionOrderDto> productionOrderOpt = productionOrderService.findByCode(productionOrderCode);
         if (productionOrderOpt.isEmpty()) {
             log.warning(() -> String.format("No Production Order found with the code [%s]", productionOrderCode));
@@ -164,22 +154,40 @@ public class CounterRecordServiceImpl implements CounterRecordService {
         counterRecord.setProductionOrder(productionOrderEntity);
     }
 
-    private void setComputedValue(CounterRecordEntity receivedCount, CounterRecordEntity lastPersistedCount) {
+    private void setComputedValue(CounterRecordEntity receivedCount) {
+        Optional<CounterRecordEntity> lastPersistedCountOpt = findLastPersistedCount(receivedCount);
 
+        if (lastPersistedCountOpt.isPresent()) {
+            setComputedValue(receivedCount, lastPersistedCountOpt.get());
+        } else {
+            handleMissingLastPersistedCount(receivedCount);
+        }
+    }
+
+    private void setComputedValue(CounterRecordEntity receivedCount, CounterRecordEntity lastPersistedCount) {
+        calculateCountComputedValue(receivedCount, lastPersistedCount);
+        calculateActiveComputedValue(receivedCount, lastPersistedCount);
+    }
+
+    private void calculateCountComputedValue(CounterRecordEntity receivedCount, CounterRecordEntity lastPersistedCount) {
         int computedValue = calculate(lastPersistedCount.getRealValue(), receivedCount.getRealValue(),
                 lastPersistedCount.getComputedValue());
+        receivedCount.setComputedValue(computedValue);
+        int increment = calculateIncrement(lastPersistedCount, receivedCount);
+        receivedCount.setIncrement(increment);
+    }
 
+    private void calculateActiveComputedValue(CounterRecordEntity receivedCount, CounterRecordEntity lastPersistedCount) {
         int updatedComputedActiveTime = calculate(lastPersistedCount.getActiveTime(), receivedCount.getActiveTime(),
                 lastPersistedCount.getComputedActiveTime());
-
-        receivedCount.setComputedValue(computedValue);
         receivedCount.setComputedActiveTime(updatedComputedActiveTime);
-
-        int increment = calculateIncrement(lastPersistedCount, receivedCount);
         int incrementActiveTime = calculateIncrementActiveTime(lastPersistedCount, receivedCount);
-
-        receivedCount.setIncrement(increment);
         receivedCount.setIncrementActiveTime(incrementActiveTime);
+    }
+
+    private void handleMissingLastPersistedCount(CounterRecordEntity receivedCount) {
+        receivedCount.setComputedValue(INITIAL_COMPUTED_VALUE);
+        receivedCount.setComputedActiveTime(INITIAL_COMPUTED_VALUE);
     }
 
     private int calculate(int lastPersistedCount, int receivedCount, int computedPersisted) {
@@ -215,7 +223,6 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     }
 
     private int calculateIncrement(CounterRecordEntity lastPersistedCount, CounterRecordEntity receivedCount) {
-
         if (lastPersistedCount.getComputedValue() > receivedCount.getComputedValue()) {
             return 0;
         }
@@ -224,7 +231,6 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     }
 
     private int calculateIncrementActiveTime(CounterRecordEntity lastPersistedCount, CounterRecordEntity receivedCount) {
-
         if (lastPersistedCount.getComputedActiveTime() > receivedCount.getComputedActiveTime()) {
             return 0;
         }
@@ -233,7 +239,6 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     }
 
     private Optional<CounterRecordEntity> findLastPersistedCount(CounterRecordEntity counterRecord) {
-
         if (counterRecord.getProductionOrder() == null || counterRecord.getEquipmentOutput() == null) {
             return Optional.empty();
         }
