@@ -236,7 +236,7 @@ public class CounterRecordServiceImpl implements CounterRecordService {
             return 0;
         }
 
-        return computeValueIncrement(lastPersistedCount.getActiveTime(), receivedCount.getActiveTime());
+        return computeValueIncrement(lastPersistedCount.getComputedActiveTime(), receivedCount.getComputedActiveTime());
     }
 
     private Optional<CounterRecordEntity> findLastPersistedCount(CounterRecordEntity counterRecord) {

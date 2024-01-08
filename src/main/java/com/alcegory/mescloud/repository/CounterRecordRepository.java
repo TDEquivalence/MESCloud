@@ -37,6 +37,7 @@ public interface CounterRecordRepository extends CrudRepository<CounterRecordEnt
             "FROM counter_record cr " +
             "WHERE cr.production_order_id = :productionOrderId " +
             "AND cr.registered_at BETWEEN :startDate AND :endDate " +
+            "AND cr.is_valid_for_production = true " +
             "GROUP BY cr.production_order_id", nativeQuery = true)
     Integer sumIncrementActiveTimeByProductionOrderId(
             @Param("productionOrderId") Long productionOrderId,
