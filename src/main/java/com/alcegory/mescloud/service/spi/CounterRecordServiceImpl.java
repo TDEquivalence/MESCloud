@@ -232,11 +232,11 @@ public class CounterRecordServiceImpl implements CounterRecordService {
 
     private int calculateIncrementActiveTime(CounterRecordEntity lastPersistedCount, CounterRecordEntity receivedCount) {
 
-        if (lastPersistedCount.getComputedValue() > receivedCount.getComputedValue()) {
+        if (lastPersistedCount.getComputedActiveTime() > receivedCount.getComputedActiveTime()) {
             return 0;
         }
 
-        return computeValueIncrement(lastPersistedCount.getComputedValue(), receivedCount.getComputedActiveTime());
+        return computeValueIncrement(lastPersistedCount.getComputedActiveTime(), receivedCount.getComputedActiveTime());
     }
 
     private Optional<CounterRecordEntity> findLastPersistedCount(CounterRecordEntity counterRecord) {
