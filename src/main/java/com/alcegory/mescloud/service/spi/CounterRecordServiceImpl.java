@@ -123,7 +123,7 @@ public class CounterRecordServiceImpl implements CounterRecordService {
         setProductionOrder(counterRecord, equipmentCountsDto.getProductionOrderCode());
 
         //TODO: we have to check if this validation is correct, considering we can have counter records without PO.s
-        Optional<CounterRecordEntity> lastPersistedCount = getLastPersistedCount(counterRecord);
+        Optional<CounterRecordEntity> lastPersistedCount = findLastPersistedCount(counterRecord);
 
         if (lastPersistedCount.isPresent()) {
             setComputedValue(counterRecord, lastPersistedCount.get());
@@ -133,10 +133,6 @@ public class CounterRecordServiceImpl implements CounterRecordService {
         }
 
         return counterRecord;
-    }
-
-    private Optional<CounterRecordEntity> getLastPersistedCount(CounterRecordEntity counterRecord) {
-        return findLastPersistedCount(counterRecord);
     }
 
     private void setEquipmentOutput(CounterRecordEntity counterRecord, String equipmentOutputCode) {
