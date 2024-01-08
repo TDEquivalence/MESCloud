@@ -188,6 +188,7 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     private void handleMissingLastPersistedCount(CounterRecordEntity receivedCount) {
         receivedCount.setComputedValue(INITIAL_COMPUTED_VALUE);
         receivedCount.setComputedActiveTime(INITIAL_COMPUTED_VALUE);
+        receivedCount.setIncrement(INITIAL_COMPUTED_VALUE);
     }
 
     private int calculate(int lastPersistedCount, int receivedCount, int computedPersisted) {
