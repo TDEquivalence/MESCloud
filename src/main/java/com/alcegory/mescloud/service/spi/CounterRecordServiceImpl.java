@@ -274,6 +274,7 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     @Override
     public Integer getSumIncrementActiveTimeByProductionOrderId(Long productionOrderId, Timestamp startDate,
                                                              Timestamp endDate) {
+      
         if (productionOrderId == null) {
             throw new IllegalArgumentException("Production order cannot be null");
         }
