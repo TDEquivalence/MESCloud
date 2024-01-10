@@ -1,6 +1,5 @@
 package com.alcegory.mescloud.service.spi;
 
-import com.alcegory.mescloud.model.entity.ComposedProductionOrderEntity;
 import com.alcegory.mescloud.repository.HitRepository;
 import com.alcegory.mescloud.model.converter.GenericConverter;
 import com.alcegory.mescloud.model.dto.HitDto;

@@ -35,7 +35,7 @@ public class BatchServiceImpl implements BatchService {
 
     private BatchEntity createBatch(RequestBatchDto requestBatch) {
         BatchEntity batch = converter.toEntity(requestBatch.getBatch(), BatchEntity.class);
-        batch.setComposed(getComposedById(requestBatch.getComposedId()));
+        batch.setComposedProductionOrder(getComposedById(requestBatch.getComposedId()));
         return batch;
     }
 
@@ -53,11 +53,11 @@ public class BatchServiceImpl implements BatchService {
                 throw new IllegalArgumentException("Invalid batch or not approved");
             }
 
-            if (batch.getComposed() == null) {
+            if (batch.getComposedProductionOrder() == null) {
                 throw new IllegalArgumentException("Composed batch is null");
             }
 
-            composedService.setProductionOrderApproval(batch.getComposed(), batch.getIsApproved());
+            composedService.setProductionOrderApproval(batch.getComposedProductionOrder(), batch.getIsApproved());
         } catch (IllegalArgumentException e) {
             log.warning("Production Order Approval failed: " + e.getMessage());
         }

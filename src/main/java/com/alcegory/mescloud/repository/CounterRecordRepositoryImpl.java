@@ -7,11 +7,9 @@ import com.alcegory.mescloud.utility.DateUtil;
 import jakarta.persistence.EntityGraph;
 import jakarta.persistence.Tuple;
 import jakarta.persistence.criteria.*;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 @Repository
@@ -26,6 +24,7 @@ public class CounterRecordRepositoryImpl extends AbstractFilterRepository<Counte
     private static final String REGISTERED_AT_PROP = "registeredAt";
     private static final String IS_VALID_FOR_PRODUCTION_PROP = "isValidForProduction";
     private static final String INCREMENT_PROP = "increment";
+    private static final String EQUIPMENT_OUTPUT = "equipmentOutput";
 
 
     public List<CounterRecordEntity> findLastPerProductionOrderAndEquipmentOutputPerDay(KpiFilterDto filter) {
@@ -37,8 +36,9 @@ public class CounterRecordRepositoryImpl extends AbstractFilterRepository<Counte
         Root<CounterRecordEntity> subRoot = subquery.from(CounterRecordEntity.class);
         subquery.select(criteriaBuilder.max(subRoot.get("computedValue")))
                 .where(
-                        criteriaBuilder.equal(root.get("equipmentOutput"), subRoot.get("equipmentOutput")),
-                        criteriaBuilder.equal(criteriaBuilder.function("date", Date.class, subRoot.get("registeredAt")), criteriaBuilder.function("date", Date.class, root.get("registeredAt")))
+                        criteriaBuilder.equal(root.get(EQUIPMENT_OUTPUT), subRoot.get(EQUIPMENT_OUTPUT)),
+                        criteriaBuilder.equal(criteriaBuilder.function("date", Date.class, subRoot.get(REGISTERED_AT_PROP)),
+                                criteriaBuilder.function("date", Date.class, root.get(REGISTERED_AT_PROP)))
                 );
 
         List<Predicate> predicates = new ArrayList<>();
