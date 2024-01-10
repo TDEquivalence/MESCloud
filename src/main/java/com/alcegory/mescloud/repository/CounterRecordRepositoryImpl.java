@@ -56,8 +56,8 @@ public class CounterRecordRepositoryImpl extends AbstractFilterRepository<Counte
         criteriaQuery.select(root)
                 .where(
                         criteriaBuilder.equal(root.get("computedValue"), subquery),
-                        criteriaBuilder.greaterThanOrEqualTo(root.get("registeredAt"), startDate),
-                        criteriaBuilder.lessThan(root.get("registeredAt"), endDate),
+                        criteriaBuilder.greaterThanOrEqualTo(root.get(REGISTERED_AT_PROP), startDate),
+                        criteriaBuilder.lessThan(root.get(REGISTERED_AT_PROP), endDate),
                         criteriaBuilder.and(predicates.toArray(new Predicate[0]))
                 );
 
