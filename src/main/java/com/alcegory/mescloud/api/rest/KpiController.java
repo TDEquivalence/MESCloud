@@ -28,6 +28,12 @@ public class KpiController {
         return new ResponseEntity<>(countingEquipmentKpiDto, HttpStatus.OK);
     }
 
+    @PostMapping("/equipment-daily-counts")
+    public ResponseEntity<CountingEquipmentKpiDto[]> getEquipmentOutputProductionPerDay(@RequestBody KpiFilterDto filter) {
+        CountingEquipmentKpiDto[] countingEquipmentKpiDto = kpiService.getEquipmentOutputProductionPerDay(filter);
+        return new ResponseEntity<>(countingEquipmentKpiDto, HttpStatus.OK);
+    }
+
     public ResponseEntity<Long> getEquipmentScheduledTime(@RequestParam long equipmentId, @RequestBody RequestKpiDto filter) {
         Long scheduledTime = kpiService.getProductionOrderTotalScheduledTime(equipmentId, filter);
         return new ResponseEntity<>(scheduledTime, HttpStatus.OK);

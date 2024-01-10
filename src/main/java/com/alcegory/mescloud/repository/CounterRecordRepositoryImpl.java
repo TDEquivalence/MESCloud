@@ -1,14 +1,16 @@
 package com.alcegory.mescloud.repository;
 
-import com.alcegory.mescloud.model.filter.CounterRecordFilter;
 import com.alcegory.mescloud.model.dto.KpiFilterDto;
 import com.alcegory.mescloud.model.entity.*;
+import com.alcegory.mescloud.model.filter.CounterRecordFilter;
 import jakarta.persistence.EntityGraph;
 import jakarta.persistence.Tuple;
 import jakarta.persistence.criteria.*;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 @Repository
@@ -23,6 +25,37 @@ public class CounterRecordRepositoryImpl extends AbstractFilterRepository<Counte
     private static final String REGISTERED_AT_PROP = "registeredAt";
     private static final String IS_VALID_FOR_PRODUCTION_PROP = "isValidForProduction";
     private static final String INCREMENT_PROP = "increment";
+
+
+    public List<CounterRecordEntity> findLastPerProductionOrderAndEquipmentOutputPerDay(Date startDate, Date endDate) {
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<CounterRecordEntity> criteriaQuery = criteriaBuilder.createQuery(CounterRecordEntity.class);
+        Root<CounterRecordEntity> root = criteriaQuery.from(CounterRecordEntity.class);
+
+        // Subquery to define the inner query
+        Subquery<Integer> subquery = criteriaQuery.subquery(Integer.class);
+        Root<CounterRecordEntity> subRoot = subquery.from(CounterRecordEntity.class);
+        subquery.select(criteriaBuilder.max(subRoot.get("computedValue")))
+                .where(
+                        criteriaBuilder.equal(root.get("equipmentOutput"), subRoot.get("equipmentOutput")),
+                        criteriaBuilder.equal(criteriaBuilder.function("date", Date.class, subRoot.get("registeredAt")), criteriaBuilder.function("date", Date.class, root.get("registeredAt")))
+                );
+
+        EntityGraph<CounterRecordEntity> entityGraph = entityManager.createEntityGraph(CounterRecordEntity.class);
+        entityGraph.addSubgraph(PRODUCTION_ORDER_PROP);
+        entityGraph.addSubgraph(EQUIPMENT_OUTPUT_PROP).addSubgraph(COUNTING_EQUIPMENT_PROP);
+        // Main query
+        criteriaQuery.select(root)
+                .where(
+                        criteriaBuilder.equal(root.get("computedValue"), subquery),
+                        criteriaBuilder.greaterThanOrEqualTo(root.get("registeredAt"), startDate),
+                        criteriaBuilder.lessThan(root.get("registeredAt"), endDate)
+                );
+
+        return entityManager.createQuery(criteriaQuery)
+                .setHint(JAKARTA_FETCHGRAPH, entityGraph)
+                .getResultList();
+    }
 
 
     public List<CounterRecordEntity> getFilteredAndPaginated(CounterRecordFilter filterDto) {
@@ -52,6 +85,7 @@ public class CounterRecordRepositoryImpl extends AbstractFilterRepository<Counte
                 .setMaxResults(filterDto.getTake())
                 .getResultList();
     }
+
 
     public List<CounterRecordConclusionEntity> findLastPerProductionOrder(CounterRecordFilter filterDto) {
 

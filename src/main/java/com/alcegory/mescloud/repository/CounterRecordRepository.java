@@ -1,14 +1,15 @@
 package com.alcegory.mescloud.repository;
 
-import com.alcegory.mescloud.model.filter.CounterRecordFilter;
 import com.alcegory.mescloud.model.dto.KpiFilterDto;
 import com.alcegory.mescloud.model.entity.CounterRecordConclusionEntity;
 import com.alcegory.mescloud.model.entity.CounterRecordEntity;
+import com.alcegory.mescloud.model.filter.CounterRecordFilter;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,6 +24,10 @@ public interface CounterRecordRepository extends CrudRepository<CounterRecordEnt
     List<CounterRecordConclusionEntity> findLastPerProductionOrder(CounterRecordFilter filterDto);
 
     List<CounterRecordConclusionEntity> findLastPerProductionOrder(KpiFilterDto filterDto);
+
+
+    List<CounterRecordEntity> findLastPerProductionOrderAndEquipmentOutputPerDay(@Param("startDate") Date startDate, @Param("endDate") Date endDate);
+
 
     //    @EntityGraph(attributePaths = { "equipmentOutput", "equipmentOutput.countingEquipment", "productionOrder" })
     List<CounterRecordEntity> getFilteredAndPaginated(CounterRecordFilter filterDto);

@@ -30,19 +30,31 @@ public class KpiServiceImpl implements KpiService {
     private final ProductionOrderService productionOrderService;
     private final CountingEquipmentService countingEquipmentService;
 
+
     @Override
-    public CountingEquipmentKpiDto[] computeEquipmentKpi(KpiFilterDto kpiFilter) {
+    public CountingEquipmentKpiDto[] getEquipmentOutputProductionPerDay(KpiFilterDto requestFilter) {
+        //Get max and min counterRecord per day per equipment.
 
-        List<CounterRecordDto> equipmentCounts = counterRecordService.filterConclusionRecordsKpi(kpiFilter);
+        //TODO: Implement
+        List<CounterRecordDto> equipmentCounts = counterRecordService.getEquipmentOutputProductionPerDay(requestFilter);
+        return sortPerDay(requestFilter, equipmentCounts);
+    }
 
+    @Override
+    public CountingEquipmentKpiDto[] computeEquipmentKpi(KpiFilterDto requestFilter) {
+        List<CounterRecordDto> equipmentCounts = counterRecordService.filterConclusionRecordsKpi(requestFilter);
+        return sortPerDay(requestFilter, equipmentCounts);
+    }
+
+    private CountingEquipmentKpiDto[] sortPerDay(KpiFilterDto requestFilter, List<CounterRecordDto> equipmentCounts) {
         if (equipmentCounts.isEmpty()) {
             return new CountingEquipmentKpiDto[0];
         }
 
         Map<String, CountingEquipmentKpiDto> equipmentKpiByEquipmentAlias = new LinkedHashMap<>();
 
-        Instant startDate = getPropertyAsInstant(kpiFilter, CounterRecordFilter.Property.START_DATE);
-        Instant endDate = getPropertyAsInstant(kpiFilter, CounterRecordFilter.Property.END_DATE);
+        Instant startDate = getPropertyAsInstant(requestFilter, CounterRecordFilter.Property.START_DATE);
+        Instant endDate = getPropertyAsInstant(requestFilter, CounterRecordFilter.Property.END_DATE);
         //TODO: TimeMode should be applied here
         final int spanInDays = DateUtil.spanInDays(startDate, endDate);
 
@@ -209,7 +221,7 @@ public class KpiServiceImpl implements KpiService {
     }
 
     private List<ProductionOrderEntity> findByEquipmentAndPeriod(Long equipmentId, Timestamp startDateFilter,
-                                                                          Timestamp endDateFilter) {
+                                                                 Timestamp endDateFilter) {
 
         return productionOrderService.findByEquipmentAndPeriod(equipmentId, startDateFilter, endDateFilter);
     }

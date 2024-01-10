@@ -10,6 +10,7 @@ import com.alcegory.mescloud.model.filter.CounterRecordFilter;
 import com.alcegory.mescloud.repository.CounterRecordRepository;
 import com.alcegory.mescloud.repository.ProductionOrderRepository;
 import com.alcegory.mescloud.service.*;
+import com.alcegory.mescloud.utility.DateUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
@@ -34,6 +35,17 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     private final CountingEquipmentService countingEquipmentService;
     private final FactoryService factoryService;
 
+
+    @Override
+    public List<CounterRecordDto> getEquipmentOutputProductionPerDay(KpiFilterDto filter) {
+        String startDateStr = filter.getSearch().getValue(CounterRecordFilter.Property.START_DATE);
+        Date startDate = Date.from(DateUtil.convertToInstant(startDateStr));
+        String endDateStr = filter.getSearch().getValue(CounterRecordFilter.Property.END_DATE);
+        Date endDate = Date.from(DateUtil.convertToInstant(endDateStr));
+
+        List<CounterRecordEntity> equipmentOutputProductionPerDay = repository.findLastPerProductionOrderAndEquipmentOutputPerDay(startDate, endDate);
+        return converter.toDto(equipmentOutputProductionPerDay);
+    }
 
     @Override
     public List<CounterRecordDto> filterConclusionRecordsKpi(KpiFilterDto filter) {
@@ -270,7 +282,7 @@ public class CounterRecordServiceImpl implements CounterRecordService {
             return 0L;
         }
 
-        long lastActiveTime= productionOrderActiveTime.get(0);
+        long lastActiveTime = productionOrderActiveTime.get(0);
         long initialActiveTime = productionOrderActiveTime.get(productionOrderActiveTime.size() - 1);
 
         long activeTimeInterval = lastActiveTime - initialActiveTime;
