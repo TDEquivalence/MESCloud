@@ -43,7 +43,7 @@ public class CounterRecordServiceImpl implements CounterRecordService {
         String endDateStr = filter.getSearch().getValue(CounterRecordFilter.Property.END_DATE);
         Date endDate = Date.from(DateUtil.convertToInstant(endDateStr));
 
-        List<CounterRecordEntity> equipmentOutputProductionPerDay = repository.findLastPerProductionOrderAndEquipmentOutputPerDay(startDate, endDate);
+        List<CounterRecordEntity> equipmentOutputProductionPerDay = repository.findLastPerProductionOrderAndEquipmentOutputPerDay(filter);
         return converter.toDto(equipmentOutputProductionPerDay);
     }
 

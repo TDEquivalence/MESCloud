@@ -3,6 +3,7 @@ package com.alcegory.mescloud.repository;
 import com.alcegory.mescloud.model.dto.KpiFilterDto;
 import com.alcegory.mescloud.model.entity.*;
 import com.alcegory.mescloud.model.filter.CounterRecordFilter;
+import com.alcegory.mescloud.utility.DateUtil;
 import jakarta.persistence.EntityGraph;
 import jakarta.persistence.Tuple;
 import jakarta.persistence.criteria.*;
@@ -27,12 +28,11 @@ public class CounterRecordRepositoryImpl extends AbstractFilterRepository<Counte
     private static final String INCREMENT_PROP = "increment";
 
 
-    public List<CounterRecordEntity> findLastPerProductionOrderAndEquipmentOutputPerDay(Date startDate, Date endDate) {
+    public List<CounterRecordEntity> findLastPerProductionOrderAndEquipmentOutputPerDay(KpiFilterDto filter) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<CounterRecordEntity> criteriaQuery = criteriaBuilder.createQuery(CounterRecordEntity.class);
         Root<CounterRecordEntity> root = criteriaQuery.from(CounterRecordEntity.class);
 
-        // Subquery to define the inner query
         Subquery<Integer> subquery = criteriaQuery.subquery(Integer.class);
         Root<CounterRecordEntity> subRoot = subquery.from(CounterRecordEntity.class);
         subquery.select(criteriaBuilder.max(subRoot.get("computedValue")))
@@ -41,15 +41,24 @@ public class CounterRecordRepositoryImpl extends AbstractFilterRepository<Counte
                         criteriaBuilder.equal(criteriaBuilder.function("date", Date.class, subRoot.get("registeredAt")), criteriaBuilder.function("date", Date.class, root.get("registeredAt")))
                 );
 
+        List<Predicate> predicates = new ArrayList<>();
+        addPredicates(filter, predicates, criteriaBuilder, root);
+
         EntityGraph<CounterRecordEntity> entityGraph = entityManager.createEntityGraph(CounterRecordEntity.class);
         entityGraph.addSubgraph(PRODUCTION_ORDER_PROP);
         entityGraph.addSubgraph(EQUIPMENT_OUTPUT_PROP).addSubgraph(COUNTING_EQUIPMENT_PROP);
-        // Main query
+
+        String startDateStr = filter.getSearch().getValue(CounterRecordFilter.Property.START_DATE);
+        Date startDate = Date.from(DateUtil.convertToInstant(startDateStr));
+        String endDateStr = filter.getSearch().getValue(CounterRecordFilter.Property.END_DATE);
+        Date endDate = Date.from(DateUtil.convertToInstant(endDateStr));
+
         criteriaQuery.select(root)
                 .where(
                         criteriaBuilder.equal(root.get("computedValue"), subquery),
                         criteriaBuilder.greaterThanOrEqualTo(root.get("registeredAt"), startDate),
-                        criteriaBuilder.lessThan(root.get("registeredAt"), endDate)
+                        criteriaBuilder.lessThan(root.get("registeredAt"), endDate),
+                        criteriaBuilder.and(predicates.toArray(new Predicate[0]))
                 );
 
         return entityManager.createQuery(criteriaQuery)

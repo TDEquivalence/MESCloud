@@ -26,7 +26,7 @@ public interface CounterRecordRepository extends CrudRepository<CounterRecordEnt
     List<CounterRecordConclusionEntity> findLastPerProductionOrder(KpiFilterDto filterDto);
 
 
-    List<CounterRecordEntity> findLastPerProductionOrderAndEquipmentOutputPerDay(@Param("startDate") Date startDate, @Param("endDate") Date endDate);
+    List<CounterRecordEntity> findLastPerProductionOrderAndEquipmentOutputPerDay(KpiFilterDto filterDto);
 
 
     //    @EntityGraph(attributePaths = { "equipmentOutput", "equipmentOutput.countingEquipment", "productionOrder" })
