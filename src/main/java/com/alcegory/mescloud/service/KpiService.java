@@ -8,6 +8,8 @@ public interface KpiService {
 
     CountingEquipmentKpiDto[] computeEquipmentKpi(KpiFilterDto filter);
 
+    CountingEquipmentKpiDto[] getEquipmentOutputProductionPerDay(KpiFilterDto filter);
+
     KpiDto computeEquipmentQuality(Long equipmentId, RequestKpiDto requestKpiDto);
 
     Long getProductionOrderTotalScheduledTime(Long equipmentId, RequestKpiDto filter);
