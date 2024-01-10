@@ -133,20 +133,19 @@ public class KpiServiceImpl implements KpiService {
         List<ProductionOrderEntity> productionOrders = findByEquipmentAndPeriod(equipmentId, filter.getStartDate(),
                 filter.getEndDate());
 
-        Long totalScheduledTime = 0L;
-        Long totalActiveTime = 0L;
+        long totalScheduledTime = 0L;
+        long totalActiveTime = 0L;
 
         for (ProductionOrderEntity productionOrder : productionOrders) {
             Instant adjustedStartDate = productionOrderService.getAdjustedStartDate(productionOrder, filter.getStartDate());
             Instant adjustedEndDate = productionOrderService.getAdjustedEndDate(productionOrder, filter.getEndDate());
 
             totalScheduledTime += getProductionOrderTotalScheduledTime(adjustedStartDate, adjustedEndDate);
-            totalActiveTime += calculateActiveTimeByProductionOrderId(productionOrder, totalScheduledTime,
-                    adjustedStartDate, adjustedEndDate);
+            totalActiveTime += calculateActiveTimeByProductionOrderId(productionOrder, adjustedStartDate, adjustedEndDate);
         }
 
         log.info(String.format("Total schedule time [%s]", totalScheduledTime));
-        log.info(String.format("Total active time [%s]", totalScheduledTime));
+        log.info(String.format("Total active time [%s]", totalActiveTime));
 
         KpiDto kpi = new KpiDto(DoubleUtil.safeDoubleValue(totalActiveTime), DoubleUtil.safeDoubleValue(totalScheduledTime));
         kpi.setValueAsDivision();
@@ -163,14 +162,14 @@ public class KpiServiceImpl implements KpiService {
         return productionOrderService.calculateScheduledTimeInSeconds(startDate, endDate);
     }
 
-    private Long calculateActiveTimeByProductionOrderId(ProductionOrderEntity productionOrder, long totalScheduledTime,
-                                                        Instant startDateFilter,
-                                                        Instant endDateFilter) {
+    private Integer calculateActiveTimeByProductionOrderId(ProductionOrderEntity productionOrder,
+                                                           Instant startDateFilter,
+                                                           Instant endDateFilter) {
 
         Timestamp startDate = Timestamp.from(startDateFilter);
         Timestamp endDate = Timestamp.from(endDateFilter);
 
-        return counterRecordService.calculateActiveTimeByProductionOrderId(productionOrder.getId(), totalScheduledTime,
+        return counterRecordService.sumIncrementActiveTimeByProductionOrderId(productionOrder.getId(),
                 startDate, endDate);
     }
 

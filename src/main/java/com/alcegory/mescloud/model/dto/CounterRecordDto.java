@@ -18,4 +18,5 @@ public class CounterRecordDto {
     private boolean isValidForProduction;
     private int activeTime;
     private int computedActiveTime;
+    private int incrementActiveTime;
 }
