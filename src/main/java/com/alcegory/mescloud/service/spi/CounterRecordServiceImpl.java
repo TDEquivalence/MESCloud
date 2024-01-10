@@ -120,7 +120,6 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     private CounterRecordEntity extractCounterRecordEntity(CounterMqttDto counterDto, PlcMqttDto equipmentCountsDto) {
 
         CounterRecordEntity counterRecord = new CounterRecordEntity();
-        //counterRecord.setRegisteredAt(DateUtil.getCurrentTime(factoryService.getTimeZone()));
         counterRecord.setRegisteredAt(new Date());
         counterRecord.setRealValue(counterDto.getValue());
         counterRecord.setActiveTime(equipmentCountsDto.getActiveTime());

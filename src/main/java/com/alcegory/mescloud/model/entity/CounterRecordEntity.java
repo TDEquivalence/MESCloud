@@ -30,5 +30,5 @@ public class CounterRecordEntity {
     private Boolean isValidForProduction;
     private int activeTime;
     private int computedActiveTime;
-    private Integer incrementActiveTime;
+    private int incrementActiveTime;
 }
