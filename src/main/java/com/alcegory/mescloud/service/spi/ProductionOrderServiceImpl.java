@@ -111,6 +111,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
             return;
         }
 
+        productionOrderOpt.get().setCompleted(true);
         setCompleteDate(productionOrderOpt.get());
     }
 
