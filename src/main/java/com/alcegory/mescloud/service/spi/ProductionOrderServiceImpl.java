@@ -58,7 +58,8 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
             return Optional.empty();
         }
 
-        CountingEquipmentDto countingEquipmentDto = setOperationStatus(countingEquipmentOpt.get(), CountingEquipmentEntity.OperationStatus.PENDING);
+        CountingEquipmentDto countingEquipmentDto = setOperationStatus(countingEquipmentOpt.get(),
+                CountingEquipmentEntity.OperationStatus.PENDING);
         log.info(() -> String.format("Change status to PENDING for Equipment with code [%s]", countingEquipmentDto.getCode()));
 
         Optional<ProductionOrderEntity> productionOrderEntityOpt = repository.findActive(equipmentId);
@@ -94,15 +95,6 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         mqttClient.publish(mqttSettings.getProtCountPlcTopic(), productionOrderMqttDto);
     }
 
-    private Optional<ProductionOrderDto> setCompleteDate(ProductionOrderEntity productionOrderEntity) {
-
-        productionOrderEntity.setCompletedAt(new Date());
-        repository.save(productionOrderEntity);
-        ProductionOrderDto productionOrderDto = converter.toDto(productionOrderEntity);
-
-        return Optional.of(productionOrderDto);
-    }
-
     @Override
     public void completeByCode(String productionOrderCode) {
 
@@ -111,8 +103,18 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
             return;
         }
 
-        productionOrderOpt.get().setCompleted(true);
-        setCompleteDate(productionOrderOpt.get());
+        ProductionOrderEntity productionOrder = productionOrderOpt.get();
+        productionOrder.setCompleted(true);
+        setCompleteDate(productionOrder);
+    }
+
+    private Optional<ProductionOrderDto> setCompleteDate(ProductionOrderEntity productionOrderEntity) {
+
+        productionOrderEntity.setCompletedAt(new Date());
+        repository.save(productionOrderEntity);
+        ProductionOrderDto productionOrderDto = converter.toDto(productionOrderEntity);
+
+        return Optional.of(productionOrderDto);
     }
 
     @Override
