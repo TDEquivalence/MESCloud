@@ -187,7 +187,7 @@ public class AlarmServiceImpl implements AlarmService {
 
     private void setProductionOrder(AlarmEntity alarm, String productionOrderCode) {
 
-        Optional<ProductionOrderDto> productionOrderOpt = productionOrderService.findByCode(productionOrderCode);
+        Optional<ProductionOrderDto> productionOrderOpt = productionOrderService.findDtoByCode(productionOrderCode);
         if (productionOrderOpt.isPresent()) {
             ProductionOrderEntity productionOrder = productionOrderConverter.toEntity(productionOrderOpt.get(), ProductionOrderEntity.class);
             alarm.setProductionOrder(productionOrder);
