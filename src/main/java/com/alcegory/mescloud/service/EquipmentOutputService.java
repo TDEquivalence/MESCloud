@@ -13,4 +13,8 @@ public interface EquipmentOutputService {
     EquipmentOutputDto save(EquipmentOutputEntity entity);
 
     List<EquipmentOutputEntity> saveAll(List<EquipmentOutputEntity> equipmentOutputToUpdate);
+
+    List<Long> findEquipmentOutputIdsByCountingEquipmentId(Long equipmentId);
+
+    Long findFirstEquipmentOutputIdByCountingEquipmentId(Long equipmentId);
 }
