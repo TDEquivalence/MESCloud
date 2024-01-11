@@ -149,7 +149,7 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     }
 
     private void setProductionOrder(CounterRecordEntity counterRecord, String productionOrderCode) {
-        Optional<ProductionOrderDto> productionOrderOpt = productionOrderService.findByCode(productionOrderCode);
+        Optional<ProductionOrderDto> productionOrderOpt = productionOrderService.findDtoByCode(productionOrderCode);
         if (productionOrderOpt.isEmpty()) {
             log.warning(() -> String.format("No Production Order found with the code [%s]", productionOrderCode));
             return;

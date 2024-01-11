@@ -55,7 +55,7 @@ public class KpiServiceImpl implements KpiService {
 
         Instant startDate = getPropertyAsInstant(requestFilter, CounterRecordFilter.Property.START_DATE);
         Instant endDate = getPropertyAsInstant(requestFilter, CounterRecordFilter.Property.END_DATE);
-        //TODO: TimeMode should be applied here
+
         final int spanInDays = DateUtil.spanInDays(startDate, endDate);
 
         for (CounterRecordDto equipmentCount : equipmentCounts) {
