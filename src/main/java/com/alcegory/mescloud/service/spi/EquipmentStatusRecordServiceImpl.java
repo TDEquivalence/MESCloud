@@ -22,8 +22,8 @@ import java.util.List;
 @Log
 public class EquipmentStatusRecordServiceImpl implements EquipmentStatusRecordService {
 
-    private EquipmentStatusRecordRepository repository;
-    private GenericConverter<EquipmentStatusRecordEntity, EquipmentStatusRecordDto> converter;
+    private final EquipmentStatusRecordRepository repository;
+    private final GenericConverter<EquipmentStatusRecordEntity, EquipmentStatusRecordDto> converter;
 
     @Override
     public EquipmentStatusRecordDto save(long equipmentId, int equipmentStatus) {

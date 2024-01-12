@@ -34,4 +34,6 @@ public interface ProductionOrderRepository extends JpaRepository<ProductionOrder
 
     @Query("SELECT po.isCompleted FROM production_order po WHERE po.code = :productionOrderCode")
     boolean isCompleted(String productionOrderCode);
+
+    boolean existsByEquipmentIdAndIsCompletedFalse(long equipmentId);
 }

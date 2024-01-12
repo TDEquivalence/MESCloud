@@ -32,14 +32,13 @@ public class AlarmServiceImpl implements AlarmService {
     private static final int PLC_BITS_PER_WORD = 16;
     public static final int ZERO_BASED_OFFSET = 1;
 
-    private GenericConverter<AlarmEntity, AlarmDto> converter;
-    private AlarmRepository repository;
-    private AlarmConfigurationService alarmCodeService;
-    private ProductionOrderService productionOrderService;
-    private GenericConverter<ProductionOrderEntity, ProductionOrderDto> productionOrderConverter;
-    private CountingEquipmentService countingEquipmentService;
-    private GenericConverter<CountingEquipmentEntity, CountingEquipmentDto> countingEquipmentConverter;
-
+    private final GenericConverter<AlarmEntity, AlarmDto> converter;
+    private final AlarmRepository repository;
+    private final AlarmConfigurationService alarmCodeService;
+    private final ProductionOrderService productionOrderService;
+    private final GenericConverter<ProductionOrderEntity, ProductionOrderDto> productionOrderConverter;
+    private final CountingEquipmentService countingEquipmentService;
+    private final GenericConverter<CountingEquipmentEntity, CountingEquipmentDto> countingEquipmentConverter;
 
     @Override
     public List<AlarmDto> findByFilter(AlarmFilter filter) {

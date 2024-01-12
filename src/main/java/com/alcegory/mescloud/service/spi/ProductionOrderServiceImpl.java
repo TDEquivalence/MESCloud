@@ -205,9 +205,8 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     }
 
     @Override
-    public boolean hasActiveProductionOrder(long countingEquipmentId) {
-        Optional<ProductionOrderEntity> productionOrderEntityOpt = repository.findActive(countingEquipmentId);
-        return productionOrderEntityOpt.isPresent();
+    public boolean hasActiveProductionOrder(long equipmentId) {
+        return repository.existsByEquipmentIdAndIsCompletedFalse(equipmentId);
     }
 
     @Override

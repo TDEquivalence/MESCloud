@@ -104,7 +104,8 @@ public class CounterRecordServiceImpl implements CounterRecordService {
         if (!isValid(equipmentCountsMqttDto)) {
             log.warning(() -> String.format("Received counts are invalid either because no Counting Equipment was found " +
                     "with the code [%s] or because received equipment outputs number [%s] does not match " +
-                    "the Counting Equipment outputs number", equipmentCountsMqttDto.getEquipmentCode(), equipmentCountsMqttDto.getCounters().length));
+                    "the Counting Equipment outputs number", equipmentCountsMqttDto.getEquipmentCode(),
+                    equipmentCountsMqttDto.getCounters().length));
             return Collections.emptyList();
         }
 

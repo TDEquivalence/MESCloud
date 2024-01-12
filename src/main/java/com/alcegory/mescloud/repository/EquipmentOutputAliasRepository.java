@@ -8,4 +8,6 @@ import org.springframework.stereotype.Repository;
 public interface EquipmentOutputAliasRepository extends JpaRepository<EquipmentOutputAliasEntity, Long> {
 
     EquipmentOutputAliasEntity findByAlias(String alias);
+
+    boolean existsByAlias(String alias);
 }

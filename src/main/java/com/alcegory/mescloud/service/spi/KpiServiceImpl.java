@@ -28,7 +28,6 @@ public class KpiServiceImpl implements KpiService {
     private final CountingEquipmentService countingEquipmentService;
     private final EquipmentOutputService equipmentOutputService;
 
-
     @Override
     public CountingEquipmentKpiDto[] getEquipmentOutputProductionPerDay(KpiFilterDto requestFilter) {
         //Get max and min counterRecord per day per equipment.
