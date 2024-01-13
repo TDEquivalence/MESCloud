@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 @Entity(name = "composed_summary")
 @Getter
@@ -15,6 +16,7 @@ public class ComposedSummaryEntity {
     @Id
     private Integer id;
     private String code;
+    private List<String> productionOrderCodes;
     private Timestamp createdAt;
     private Timestamp approvedAt;
     private Timestamp hitInsertedAt;
