@@ -16,7 +16,6 @@ import java.util.List;
 public class ComposedProductionOrderRepositoryImpl {
 
     private static final String PROP_ID = "id";
-    private static final String PROP_COMPOSED = "composedProductionOrder";
     private static final String PROP_SAMPLE = "sample";
     private static final String PROP_COMPOSED_PO = "composedProductionOrder";
 
@@ -48,7 +47,7 @@ public class ComposedProductionOrderRepositoryImpl {
 
         Subquery<Integer> subquery = rootQuery.subquery(Integer.class);
         Root<BatchEntity> subRoot = subquery.from(BatchEntity.class);
-        subquery.select(subRoot.get(PROP_COMPOSED).get(PROP_ID));
+        subquery.select(subRoot.get(PROP_COMPOSED_PO).get(PROP_ID));
 
         return root.get(PROP_ID).in(subquery);
     }
@@ -78,7 +77,7 @@ public class ComposedProductionOrderRepositoryImpl {
 
         Subquery<Integer> batchSubquery = query.subquery(Integer.class);
         Root<BatchEntity> batchRoot = batchSubquery.from(BatchEntity.class);
-        batchSubquery.select(batchRoot.get(PROP_COMPOSED).get(PROP_ID));
+        batchSubquery.select(batchRoot.get(PROP_COMPOSED_PO).get(PROP_ID));
 
         Predicate noBatchPredicate = criteriaBuilder.not(root.get(PROP_ID).in(batchSubquery));
         predicates.add(noBatchPredicate);
