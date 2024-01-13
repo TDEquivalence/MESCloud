@@ -16,7 +16,10 @@ public class CounterRecordDto {
     private int computedValue;
     private Date registeredAt;
     private boolean isValidForProduction;
-    private int activeTime;
-    private int computedActiveTime;
-    private int incrementActiveTime;
+    private String ims;
+    private String inputBatch;
+    private String source;
+    private String gauge;
+    private String category;
+    private String washingProcess;
 }

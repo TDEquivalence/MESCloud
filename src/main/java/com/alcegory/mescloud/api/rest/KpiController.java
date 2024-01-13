@@ -40,7 +40,7 @@ public class KpiController {
     }
 
     @PostMapping("/{equipmentId}/availability")
-    public ResponseEntity<KpiDto> getEquipmentAvailability(@RequestParam long equipmentId, @RequestBody RequestKpiDto filter) {
+    public ResponseEntity<KpiDto> getEquipmentAvailability(@PathVariable long equipmentId, @RequestBody RequestKpiDto filter) {
         KpiDto kpiAvailabilityDto = kpiService.computeAvailability(equipmentId, filter);
         return new ResponseEntity<>(kpiAvailabilityDto, HttpStatus.OK);
     }
