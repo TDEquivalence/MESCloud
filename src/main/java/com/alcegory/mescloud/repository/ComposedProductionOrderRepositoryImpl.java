@@ -16,7 +16,7 @@ import java.util.List;
 public class ComposedProductionOrderRepositoryImpl {
 
     private static final String PROP_ID = "id";
-    private static final String PROP_COMPOSED = "composed";
+    private static final String PROP_COMPOSED = "composedProductionOrder";
     private static final String PROP_SAMPLE = "sample";
     private static final String PROP_COMPOSED_PO = "composedProductionOrder";
 
