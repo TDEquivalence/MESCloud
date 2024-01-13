@@ -130,7 +130,7 @@ public class KpiServiceImpl implements KpiService {
         List<ProductionOrderEntity> productionOrders = findByEquipmentAndPeriod(equipmentId, filter.getStartDate(),
                 filter.getEndDate());
 
-        Long equipmentOutputId = equipmentOutputService.findFirstEquipmentOutputIdByCountingEquipmentId(equipmentId);
+        Long equipmentOutputId = equipmentOutputService.findIdByCountingEquipmentId(equipmentId);
 
         long totalScheduledTime = 0L;
         long totalActiveTime = 0L;

@@ -20,7 +20,7 @@ public class ComposedProductionOrderRepositoryImpl {
     private static final String PROP_SAMPLE = "sample";
     private static final String PROP_COMPOSED_PO = "composedProductionOrder";
 
-    private EntityManager entityManager;
+    private final EntityManager entityManager;
 
 
     public List<ComposedSummaryEntity> findCompleted() {

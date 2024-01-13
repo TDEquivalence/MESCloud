@@ -46,12 +46,12 @@ public class EquipmentOutputServiceImpl implements EquipmentOutputService {
     }
 
     @Override
-    public List<Long> findEquipmentOutputIdsByCountingEquipmentId(Long equipmentId) {
-        return repository.findEquipmentOutputIdsByCountingEquipmentId(equipmentId);
+    public List<Long> findIdsByCountingEquipmentId(Long equipmentId) {
+        return repository.findIdsByCountingEquipmentId(equipmentId);
     }
 
     @Override
-    public Long findFirstEquipmentOutputIdByCountingEquipmentId(Long equipmentId) {
-        return repository.findFirstEquipmentOutputIdByCountingEquipmentId(equipmentId);
+    public Long findIdByCountingEquipmentId(Long equipmentId) {
+        return repository.findIdByCountingEquipmentId(equipmentId);
     }
 }

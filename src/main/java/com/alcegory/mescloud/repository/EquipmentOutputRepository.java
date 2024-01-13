@@ -15,8 +15,9 @@ public interface EquipmentOutputRepository extends JpaRepository<EquipmentOutput
     Optional<EquipmentOutputEntity> findByCode(String equipmentOutputCode);
 
     @Query(value = "SELECT eo.id FROM equipment_output eo WHERE eo.counting_equipment_id = :countingEquipmentId", nativeQuery = true)
-    List<Long> findEquipmentOutputIdsByCountingEquipmentId(@Param("countingEquipmentId") Long countingEquipmentId);
+    List<Long> findIdsByCountingEquipmentId(@Param("countingEquipmentId") Long countingEquipmentId);
 
-    @Query(value = "SELECT eo.id FROM equipment_output eo WHERE eo.counting_equipment_id = :countingEquipmentId ORDER BY eo.id ASC LIMIT 1", nativeQuery = true)
-    Long findFirstEquipmentOutputIdByCountingEquipmentId(@Param("countingEquipmentId") Long countingEquipmentId);
+    @Query(value = "SELECT eo.id FROM equipment_output eo WHERE eo.counting_equipment_id = :countingEquipmentId ORDER BY eo.id ASC LIMIT 1",
+            nativeQuery = true)
+    Long findIdByCountingEquipmentId(@Param("countingEquipmentId") Long countingEquipmentId);
 }

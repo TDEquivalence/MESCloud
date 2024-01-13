@@ -17,7 +17,8 @@ public interface ProductionOrderRepository extends JpaRepository<ProductionOrder
 
     Optional<ProductionOrderEntity> findTopByOrderByIdDesc();
 
-    @Query(value = "SELECT * FROM production_order po WHERE (po.equipment_id = :equipmentId AND po.is_completed = false) ORDER BY id DESC LIMIT 1", nativeQuery = true)
+    @Query(value = "SELECT * FROM production_order po WHERE (po.equipment_id = :equipmentId AND po.is_completed = false) " +
+            "ORDER BY id DESC LIMIT 1", nativeQuery = true)
     Optional<ProductionOrderEntity> findActive(long equipmentId);
 
     List<ProductionOrderEntity> findByIdIn(List<Long> ids);
