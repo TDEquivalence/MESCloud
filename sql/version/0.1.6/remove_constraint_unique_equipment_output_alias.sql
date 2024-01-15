@@ -1,0 +1,2 @@
+ALTER TABLE equipment_output_alias
+DROP CONSTRAINT IF EXISTS equipment_output_alias_alias_key;
