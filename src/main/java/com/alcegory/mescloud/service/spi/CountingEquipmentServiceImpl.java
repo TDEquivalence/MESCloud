@@ -282,8 +282,8 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
 
                 String alias = outputUpdateFrom.getAlias().getAlias();
 
-                if (!aliasService.isAliasUnique(alias)) {
-                    EquipmentOutputAliasEntity persistedAlias = aliasService.findByAlias(alias);
+                EquipmentOutputAliasEntity persistedAlias = aliasService.findByAlias(alias);
+                if (persistedAlias != null) {
                     outputToUpdate.setAlias(persistedAlias);
                 } else {
                     outputToUpdate.setAlias(outputUpdateFrom.getAlias());
