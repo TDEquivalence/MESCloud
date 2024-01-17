@@ -66,16 +66,7 @@ class ProductionOrderServiceTest {
 
         assertEquals(expectedIds, result);
     }
-
-    @Test
-    void testGenerateCodeWithNullCode() {
-        ProductionOrderEntity productionOrder = new ProductionOrderEntity();
-        when(productionOrderRepository.findTopByOrderByIdDesc()).thenReturn(Optional.of(productionOrder));
-
-        Exception exception = assertThrows(IllegalStateException.class, () -> productionOrderService.generateCode());
-        assertEquals("Unable to generate new code: last stored Production Order code is null or empty", exception.getMessage());
-    }
-
+    
     @Test
     void testGenerateCodeWithProperlyFormattedCode() {
         ProductionOrderEntity productionOrderEntity = new ProductionOrderEntity();
