@@ -38,11 +38,6 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     private final FactoryService factoryService;
 
 
-    @Override
-    public List<CounterRecordDto> getEquipmentOutputProductionPerDay(KpiFilterDto filter) {
-        List<CounterRecordEntity> equipmentOutputProductionPerDay = repository.findLastPerProductionOrderAndEquipmentOutputPerDay(filter);
-        return converter.toDto(equipmentOutputProductionPerDay);
-    }
 
     @Override
     public List<CounterRecordDto> filterConclusionRecordsKpi(KpiFilterDto filter) {

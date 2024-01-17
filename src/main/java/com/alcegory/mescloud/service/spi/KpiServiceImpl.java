@@ -29,30 +29,18 @@ public class KpiServiceImpl implements KpiService {
     private final EquipmentOutputService equipmentOutputService;
 
     @Override
-    public CountingEquipmentKpiDto[] getEquipmentOutputProductionPerDay(KpiFilterDto requestFilter) {
-        //Get max and min counterRecord per day per equipment.
+    public CountingEquipmentKpiDto[] computeEquipmentKpi(KpiFilterDto kpiFilter) {
 
-        //TODO: Implement
-        List<CounterRecordDto> equipmentCounts = counterRecordService.getEquipmentOutputProductionPerDay(requestFilter);
-        return sortPerDay(requestFilter, equipmentCounts);
-    }
+        List<CounterRecordDto> equipmentCounts = counterRecordService.filterConclusionRecordsKpi(kpiFilter);
 
-    @Override
-    public CountingEquipmentKpiDto[] computeEquipmentKpi(KpiFilterDto requestFilter) {
-        List<CounterRecordDto> equipmentCounts = counterRecordService.filterConclusionRecordsKpi(requestFilter);
-        return sortPerDay(requestFilter, equipmentCounts);
-    }
-
-    private CountingEquipmentKpiDto[] sortPerDay(KpiFilterDto requestFilter, List<CounterRecordDto> equipmentCounts) {
         if (equipmentCounts.isEmpty()) {
             return new CountingEquipmentKpiDto[0];
         }
 
         Map<String, CountingEquipmentKpiDto> equipmentKpiByEquipmentAlias = new LinkedHashMap<>();
 
-        Instant startDate = getPropertyAsInstant(requestFilter, CounterRecordFilter.Property.START_DATE);
-        Instant endDate = getPropertyAsInstant(requestFilter, CounterRecordFilter.Property.END_DATE);
-
+        Instant startDate = getPropertyAsInstant(kpiFilter, CounterRecordFilter.Property.START_DATE);
+        Instant endDate = getPropertyAsInstant(kpiFilter, CounterRecordFilter.Property.END_DATE);
         final int spanInDays = DateUtil.spanInDays(startDate, endDate);
 
         for (CounterRecordDto equipmentCount : equipmentCounts) {

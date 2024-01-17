@@ -11,8 +11,6 @@ import java.util.List;
 
 public interface CounterRecordService {
 
-    List<CounterRecordDto> getEquipmentOutputProductionPerDay(KpiFilterDto filter);
-
     List<CounterRecordDto> filterConclusionRecordsKpi(KpiFilterDto filterDto);
 
     PaginatedCounterRecordsDto filterConclusionRecordsPaginated(CounterRecordFilter filterDto);
