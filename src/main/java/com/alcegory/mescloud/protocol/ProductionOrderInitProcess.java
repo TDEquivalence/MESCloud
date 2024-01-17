@@ -38,25 +38,11 @@ public class ProductionOrderInitProcess extends AbstractMesProtocolProcess<PlcMq
                     equipmentCounts.getProductionOrderCode()));
         }
 
-        if (!isEquipmentStatusOn(equipmentCounts)) {
-            return;
-        }
-
         counterRecordService.processCounterRecord(equipmentCounts);
     }
 
     private boolean areInvalidInitialCounts(PlcMqttDto equipmentCountsMqttDTO) {
         return !counterRecordService.areValidInitialCounts(equipmentCountsMqttDTO.getProductionOrderCode());
-    }
-
-    private boolean isEquipmentStatusOn(PlcMqttDto equipmentCounts) {
-        if (equipmentCounts.getEquipmentStatus() != EQUIPMENT_STATUS_ON) {
-            productionOrderService.completeByCode(equipmentCounts.getProductionOrderCode());
-            equipmentService.setOperationStatusByCode(equipmentCounts.getEquipmentCode(), CountingEquipmentEntity.OperationStatus.IDLE);
-            return false;
-        }
-
-        return true;
     }
 
     @Override
