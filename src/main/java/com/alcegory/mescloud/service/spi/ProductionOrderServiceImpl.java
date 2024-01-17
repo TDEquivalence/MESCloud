@@ -158,11 +158,14 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     public String generateCode() {
 
         Optional<ProductionOrderEntity> productionOrderOpt = repository.findTopByOrderByIdDesc();
-        String codePrefix = OBO_SECTION_PREFIX + CODE_PREFIX + DateUtil.getCurrentYearLastTwoDigits();
+        int yearLastTwoDigits = DateUtil.getCurrentYearLastTwoDigits();
+        String codePrefix = OBO_SECTION_PREFIX + CODE_PREFIX;
+        String codeWithYear = codePrefix + yearLastTwoDigits;
 
-        return productionOrderOpt.isEmpty() ?
-                codePrefix + String.format(FIVE_DIGIT_NUMBER_FORMAT, FIRST_CODE_VALUE) :
-                codePrefix + generateFormattedCodeValue(productionOrderOpt.get(), codePrefix);
+        return productionOrderOpt.isEmpty() ||
+                !hasYearChanged(productionOrderOpt.get().getCode(), yearLastTwoDigits, codePrefix) ?
+                codeWithYear + String.format(FIVE_DIGIT_NUMBER_FORMAT, FIRST_CODE_VALUE) :
+                codeWithYear + generateFormattedCodeValue(productionOrderOpt.get(), codeWithYear);
     }
 
     private String generateFormattedCodeValue(ProductionOrderEntity productionOrder, String codePrefix) {
@@ -177,6 +180,11 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         int lastCodeValue = Integer.parseInt(lastCodeValueAsString);
 
         return String.format(FIVE_DIGIT_NUMBER_FORMAT, ++lastCodeValue);
+    }
+
+    private boolean hasYearChanged(String productionOrderCode, int yearDigits, String codePrefix) {
+        String numericCode = productionOrderCode.substring(codePrefix.length());
+        return numericCode.startsWith(String.valueOf(yearDigits));
     }
 
     private void publishToPlc(ProductionOrderEntity productionOrderEntity) throws MesMqttException {
