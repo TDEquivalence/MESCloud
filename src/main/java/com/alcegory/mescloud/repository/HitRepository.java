@@ -11,6 +11,7 @@ import java.util.List;
 @Repository
 public interface HitRepository extends JpaRepository<HitEntity, Long> {
 
-    @Query(value = "SELECT * FROM hit h WHERE (h.sample_id = :sampleId AND h.is_valid_for_reliability = true AND h.tca > :tcaLimit)", nativeQuery = true)
+    @Query(value = "SELECT * FROM hit h WHERE (h.sample_id = :sampleId AND h.is_valid_for_reliability = true AND h.tca > :tcaLimit)",
+            nativeQuery = true)
     List<HitEntity> findValidHitsAboveTcaLimit(@Param("sampleId") Long sampleId, @Param("tcaLimit") Float tcaLimit);
 }

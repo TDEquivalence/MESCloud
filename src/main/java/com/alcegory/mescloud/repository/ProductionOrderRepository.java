@@ -6,8 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import java.sql.Timestamp;
-import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -19,7 +17,8 @@ public interface ProductionOrderRepository extends JpaRepository<ProductionOrder
 
     Optional<ProductionOrderEntity> findTopByOrderByIdDesc();
 
-    @Query(value = "SELECT * FROM production_order po WHERE (po.equipment_id = :equipmentId AND po.is_completed = false) ORDER BY id DESC LIMIT 1", nativeQuery = true)
+    @Query(value = "SELECT * FROM production_order po WHERE (po.equipment_id = :equipmentId AND po.is_completed = false) " +
+            "ORDER BY id DESC LIMIT 1", nativeQuery = true)
     Optional<ProductionOrderEntity> findActive(long equipmentId);
 
     List<ProductionOrderEntity> findByIdIn(List<Long> ids);
@@ -36,4 +35,6 @@ public interface ProductionOrderRepository extends JpaRepository<ProductionOrder
 
     @Query("SELECT po.isCompleted FROM production_order po WHERE po.code = :productionOrderCode")
     boolean isCompleted(String productionOrderCode);
+
+    boolean existsByEquipmentIdAndIsCompletedFalse(long equipmentId);
 }

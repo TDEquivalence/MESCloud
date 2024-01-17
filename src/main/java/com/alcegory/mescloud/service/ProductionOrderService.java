@@ -12,7 +12,7 @@ import java.util.Optional;
 
 public interface ProductionOrderService {
 
-    Optional<ProductionOrderDto> findByCode(String code);
+    Optional<ProductionOrderDto> findDtoByCode(String code);
 
     String generateCode();
 
@@ -27,6 +27,8 @@ public interface ProductionOrderService {
     List<ProductionOrderEntity> saveAndUpdateAll(List<ProductionOrderEntity> productionOrders);
 
     void delete(ProductionOrderEntity productionOrder);
+
+    void deleteByCode(String productionOrderCode);
 
     Optional<ProductionOrderEntity> findById(Long id);
 
@@ -43,6 +45,8 @@ public interface ProductionOrderService {
     Long calculateScheduledTimeInSeconds(Long equipmentId, Instant startDate, Instant endDate);
 
     List<ProductionOrderDto> findByEquipmentAndPeriod(Long equipmentId, Date startDate, Date endDate);
+
+    void completeByCode(String productionOrderCode);
 
     boolean isCompleted(String productionOrderCode);
 

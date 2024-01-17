@@ -12,7 +12,7 @@ import java.util.Optional;
 @AllArgsConstructor
 public class AlarmConfigurationServiceImpl implements AlarmConfigurationService {
 
-    AlarmConfigurationRepository repository;
+    private final AlarmConfigurationRepository repository;
 
     @Override
     public Optional<AlarmConfigurationEntity> findByWordAndBitIndexes(int wordIndex, int bitIndex) {

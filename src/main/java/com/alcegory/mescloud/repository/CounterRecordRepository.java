@@ -1,9 +1,9 @@
 package com.alcegory.mescloud.repository;
 
-import com.alcegory.mescloud.model.filter.CounterRecordFilter;
 import com.alcegory.mescloud.model.dto.KpiFilterDto;
 import com.alcegory.mescloud.model.entity.CounterRecordConclusionEntity;
 import com.alcegory.mescloud.model.entity.CounterRecordEntity;
+import com.alcegory.mescloud.model.filter.CounterRecordFilter;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -24,6 +24,10 @@ public interface CounterRecordRepository extends CrudRepository<CounterRecordEnt
 
     List<CounterRecordConclusionEntity> findLastPerProductionOrder(KpiFilterDto filterDto);
 
+
+    List<CounterRecordEntity> findLastPerProductionOrderAndEquipmentOutputPerDay(KpiFilterDto filterDto);
+
+
     //    @EntityGraph(attributePaths = { "equipmentOutput", "equipmentOutput.countingEquipment", "productionOrder" })
     List<CounterRecordEntity> getFilteredAndPaginated(CounterRecordFilter filterDto);
 
@@ -33,12 +37,15 @@ public interface CounterRecordRepository extends CrudRepository<CounterRecordEnt
 
     Integer sumCounterIncrement(Long countingEquipmentId, Timestamp startDateFilter, Timestamp endDateFilter);
 
-    @Query(value = "SELECT cr.computed_active_time FROM counter_record cr " +
+    @Query(value = "SELECT SUM(cr.increment_active_time) AS sum_increment_active_time " +
+            "FROM counter_record cr " +
             "WHERE cr.production_order_id = :productionOrderId " +
+            "AND cr.equipment_output_id = :equipmentOutputId " +
             "AND cr.registered_at BETWEEN :startDate AND :endDate " +
-            "ORDER BY cr.registered_at DESC", nativeQuery = true)
-    List<Integer> getComputedActiveTimeByProductionOrderId(
+            "GROUP BY cr.production_order_id", nativeQuery = true)
+    Integer sumIncrementActiveTimeByProductionOrderId(
             @Param("productionOrderId") Long productionOrderId,
+            @Param("equipmentOutputId") Long equipmentOutputId,
             @Param("startDate") Timestamp startDate,
             @Param("endDate") Timestamp endDate);
 }

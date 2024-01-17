@@ -18,7 +18,7 @@ public class ProductionOrderRepositoryImpl {
 
     private static final String PROP_ID = "id";
 
-    private EntityManager entityManager;
+    private final EntityManager entityManager;
 
     public List<ProductionOrderSummaryEntity> findCompletedWithoutComposed() {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();

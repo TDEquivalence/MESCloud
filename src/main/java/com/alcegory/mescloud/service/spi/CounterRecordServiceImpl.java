@@ -15,7 +15,10 @@ import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -34,6 +37,12 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     private final CountingEquipmentService countingEquipmentService;
     private final FactoryService factoryService;
 
+
+    @Override
+    public List<CounterRecordDto> getEquipmentOutputProductionPerDay(KpiFilterDto filter) {
+        List<CounterRecordEntity> equipmentOutputProductionPerDay = repository.findLastPerProductionOrderAndEquipmentOutputPerDay(filter);
+        return converter.toDto(equipmentOutputProductionPerDay);
+    }
 
     @Override
     public List<CounterRecordDto> filterConclusionRecordsKpi(KpiFilterDto filter) {
@@ -93,13 +102,14 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     }
 
     @Override
-    public List<CounterRecordDto> processCounterRecord(PlcMqttDto equipmentCountsMqttDto) {
+    public void processCounterRecord(PlcMqttDto equipmentCountsMqttDto) {
 
         if (!isValid(equipmentCountsMqttDto)) {
             log.warning(() -> String.format("Received counts are invalid either because no Counting Equipment was found " +
                     "with the code [%s] or because received equipment outputs number [%s] does not match " +
-                    "the Counting Equipment outputs number", equipmentCountsMqttDto.getEquipmentCode(), equipmentCountsMqttDto.getCounters().length));
-            return Collections.emptyList();
+                    "the Counting Equipment outputs number", equipmentCountsMqttDto.getEquipmentCode(),
+                    equipmentCountsMqttDto.getCounters().length));
+            return;
         }
 
         List<CounterRecordEntity> counterRecords = new ArrayList<>(equipmentCountsMqttDto.getCounters().length);
@@ -108,36 +118,25 @@ public class CounterRecordServiceImpl implements CounterRecordService {
             counterRecords.add(counterRecord);
         }
 
-        return saveAll(counterRecords);
+        saveAll(counterRecords);
     }
 
     private CounterRecordEntity extractCounterRecordEntity(CounterMqttDto counterDto, PlcMqttDto equipmentCountsDto) {
 
         CounterRecordEntity counterRecord = new CounterRecordEntity();
-        //counterRecord.setRegisteredAt(DateUtil.getCurrentTime(factoryService.getTimeZone()));
         counterRecord.setRegisteredAt(new Date());
         counterRecord.setRealValue(counterDto.getValue());
         counterRecord.setActiveTime(equipmentCountsDto.getActiveTime());
 
         setEquipmentOutput(counterRecord, counterDto.getOutputCode());
         setProductionOrder(counterRecord, equipmentCountsDto.getProductionOrderCode());
-
-        //TODO: we have to check if this validation is correct, considering we can have counter records without PO.s
-        CounterRecordEntity lastPersistedCount = getLastPersistedCount(counterRecord);
-
-        if (counterRecord.getProductionOrder() != null) {
-            setComputedValue(counterRecord, lastPersistedCount);
-        }
+        setComputedValue(counterRecord);
 
         return counterRecord;
     }
 
-    private CounterRecordEntity getLastPersistedCount(CounterRecordEntity counterRecord) {
-        return findLastPersistedCount(counterRecord)
-                .orElse(null);
-    }
-
     private void setEquipmentOutput(CounterRecordEntity counterRecord, String equipmentOutputCode) {
+
         Optional<EquipmentOutputDto> equipmentOutputOpt = equipmentOutputService.findByCode(equipmentOutputCode);
         if (equipmentOutputOpt.isEmpty()) {
             log.warning(() -> String.format("No Equipment Output found with the code [%s]", equipmentOutputCode));
@@ -154,8 +153,7 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     }
 
     private void setProductionOrder(CounterRecordEntity counterRecord, String productionOrderCode) {
-
-        Optional<ProductionOrderDto> productionOrderOpt = productionOrderService.findByCode(productionOrderCode);
+        Optional<ProductionOrderDto> productionOrderOpt = productionOrderService.findDtoByCode(productionOrderCode);
         if (productionOrderOpt.isEmpty()) {
             log.warning(() -> String.format("No Production Order found with the code [%s]", productionOrderCode));
             return;
@@ -166,25 +164,41 @@ public class CounterRecordServiceImpl implements CounterRecordService {
         counterRecord.setProductionOrder(productionOrderEntity);
     }
 
-    private void setComputedValue(CounterRecordEntity receivedCount, CounterRecordEntity lastPersistedCount) {
+    private void setComputedValue(CounterRecordEntity receivedCount) {
+        Optional<CounterRecordEntity> lastPersistedCountOpt = findLastPersistedCount(receivedCount);
 
-        if (lastPersistedCount == null) {
-            receivedCount.setComputedValue(INITIAL_COMPUTED_VALUE);
-            receivedCount.setComputedActiveTime(INITIAL_COMPUTED_VALUE);
-            return;
+        if (lastPersistedCountOpt.isPresent()) {
+            setComputedValue(receivedCount, lastPersistedCountOpt.get());
+        } else {
+            handleMissingLastPersistedCount(receivedCount);
         }
+    }
 
+    private void setComputedValue(CounterRecordEntity receivedCount, CounterRecordEntity lastPersistedCount) {
+        calculateCountComputedValue(receivedCount, lastPersistedCount);
+        calculateActiveComputedValue(receivedCount, lastPersistedCount);
+    }
+
+    private void calculateCountComputedValue(CounterRecordEntity receivedCount, CounterRecordEntity lastPersistedCount) {
         int computedValue = calculate(lastPersistedCount.getRealValue(), receivedCount.getRealValue(),
                 lastPersistedCount.getComputedValue());
+        receivedCount.setComputedValue(computedValue);
+        int increment = calculateIncrement(lastPersistedCount, receivedCount);
+        receivedCount.setIncrement(increment);
+    }
 
+    private void calculateActiveComputedValue(CounterRecordEntity receivedCount, CounterRecordEntity lastPersistedCount) {
         int updatedComputedActiveTime = calculate(lastPersistedCount.getActiveTime(), receivedCount.getActiveTime(),
                 lastPersistedCount.getComputedActiveTime());
-
-        int increment = calculateIncrement(lastPersistedCount, receivedCount);
-
-        receivedCount.setIncrement(increment);
-        receivedCount.setComputedValue(computedValue);
         receivedCount.setComputedActiveTime(updatedComputedActiveTime);
+        int incrementActiveTime = calculateIncrementActiveTime(lastPersistedCount, receivedCount);
+        receivedCount.setIncrementActiveTime(incrementActiveTime);
+    }
+
+    private void handleMissingLastPersistedCount(CounterRecordEntity receivedCount) {
+        receivedCount.setComputedValue(INITIAL_COMPUTED_VALUE);
+        receivedCount.setComputedActiveTime(INITIAL_COMPUTED_VALUE);
+        receivedCount.setIncrement(INITIAL_COMPUTED_VALUE);
     }
 
     private int calculate(int lastPersistedCount, int receivedCount, int computedPersisted) {
@@ -220,18 +234,28 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     }
 
     private int calculateIncrement(CounterRecordEntity lastPersistedCount, CounterRecordEntity receivedCount) {
-
-        if (lastPersistedCount.getRealValue() > receivedCount.getRealValue()) {
+        if (lastPersistedCount.getComputedValue() > receivedCount.getComputedValue()) {
             return 0;
         }
 
-        return computeValueIncrement(lastPersistedCount.getRealValue(), receivedCount.getRealValue());
+        return computeValueIncrement(lastPersistedCount.getComputedValue(), receivedCount.getComputedValue());
+    }
+
+    private int calculateIncrementActiveTime(CounterRecordEntity lastPersistedCount, CounterRecordEntity receivedCount) {
+        if (lastPersistedCount.getComputedActiveTime() > receivedCount.getComputedActiveTime()) {
+            return 0;
+        }
+
+        return computeValueIncrement(lastPersistedCount.getComputedActiveTime(), receivedCount.getComputedActiveTime());
     }
 
     private Optional<CounterRecordEntity> findLastPersistedCount(CounterRecordEntity counterRecord) {
-        Long productionOrderId = counterRecord.getProductionOrder().getId();
-        Long equipmentOutputId = counterRecord.getEquipmentOutput().getId();
-        return repository.findLastByProductionOrderId(productionOrderId, equipmentOutputId);
+        if (counterRecord.getProductionOrder() == null || counterRecord.getEquipmentOutput() == null) {
+            return Optional.empty();
+        }
+
+        return repository.findLastByProductionOrderId(counterRecord.getProductionOrder().getId(),
+                counterRecord.getEquipmentOutput().getId());
     }
 
     public boolean areValidInitialCounts(String productionOrderCode) {
@@ -257,30 +281,19 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     }
 
     @Override
-    public long calculateActiveTimeByProductionOrderId(Long productionOrderId, long totalScheduledTime, Timestamp startDate,
-                                                       Timestamp endDate) {
+    public Integer sumIncrementActiveTimeByProductionOrderId(Long productionOrderId, Long equipmentOutputId, Timestamp startDate,
+                                                             Timestamp endDate) {
+
         if (productionOrderId == null) {
             throw new IllegalArgumentException("Production order cannot be null");
         }
 
-        List<Integer> productionOrderActiveTime = repository.getComputedActiveTimeByProductionOrderId(productionOrderId,
+        Integer activeTime = repository.sumIncrementActiveTimeByProductionOrderId(productionOrderId, equipmentOutputId,
                 startDate, endDate);
-
-        if (productionOrderActiveTime.isEmpty()) {
-            return 0L;
-        }
-
-        long lastActiveTime= productionOrderActiveTime.get(0);
-        long initialActiveTime = productionOrderActiveTime.get(productionOrderActiveTime.size() - 1);
-
-        long activeTimeInterval = lastActiveTime - initialActiveTime;
-        long inactiveTimeInterval = (int) (totalScheduledTime - activeTimeInterval);
-
-        return totalScheduledTime - inactiveTimeInterval;
+        return Optional.ofNullable(activeTime).orElse(0);
     }
 
-    private List<CounterRecordDto> saveAll(List<CounterRecordEntity> counterRecords) {
-        Iterable<CounterRecordEntity> counterRecordEntities = repository.saveAll(counterRecords);
-        return converter.toDto(counterRecordEntities);
+    private void saveAll(List<CounterRecordEntity> counterRecords) {
+        repository.saveAll(counterRecords);
     }
 }

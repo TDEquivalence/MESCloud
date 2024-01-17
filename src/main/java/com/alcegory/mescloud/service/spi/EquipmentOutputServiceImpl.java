@@ -44,4 +44,14 @@ public class EquipmentOutputServiceImpl implements EquipmentOutputService {
     public List<EquipmentOutputEntity> saveAll(List<EquipmentOutputEntity> equipmentOutputToUpdate) {
         return repository.saveAll(equipmentOutputToUpdate);
     }
+
+    @Override
+    public List<Long> findIdsByCountingEquipmentId(Long equipmentId) {
+        return repository.findIdsByCountingEquipmentId(equipmentId);
+    }
+
+    @Override
+    public Long findIdByCountingEquipmentId(Long equipmentId) {
+        return repository.findIdByCountingEquipmentId(equipmentId);
+    }
 }

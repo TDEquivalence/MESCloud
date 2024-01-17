@@ -4,10 +4,7 @@ import com.alcegory.mescloud.exception.IncompleteConfigurationException;
 import com.alcegory.mescloud.model.dto.*;
 import com.alcegory.mescloud.model.entity.ProductionOrderEntity;
 import com.alcegory.mescloud.model.filter.CounterRecordFilter;
-import com.alcegory.mescloud.service.CounterRecordService;
-import com.alcegory.mescloud.service.CountingEquipmentService;
-import com.alcegory.mescloud.service.KpiService;
-import com.alcegory.mescloud.service.ProductionOrderService;
+import com.alcegory.mescloud.service.*;
 import com.alcegory.mescloud.utility.DateUtil;
 import com.alcegory.mescloud.utility.DoubleUtil;
 import lombok.AllArgsConstructor;
@@ -29,21 +26,33 @@ public class KpiServiceImpl implements KpiService {
     private final CounterRecordService counterRecordService;
     private final ProductionOrderService productionOrderService;
     private final CountingEquipmentService countingEquipmentService;
+    private final EquipmentOutputService equipmentOutputService;
 
     @Override
-    public CountingEquipmentKpiDto[] computeEquipmentKpi(KpiFilterDto kpiFilter) {
+    public CountingEquipmentKpiDto[] getEquipmentOutputProductionPerDay(KpiFilterDto requestFilter) {
+        //Get max and min counterRecord per day per equipment.
 
-        List<CounterRecordDto> equipmentCounts = counterRecordService.filterConclusionRecordsKpi(kpiFilter);
+        //TODO: Implement
+        List<CounterRecordDto> equipmentCounts = counterRecordService.getEquipmentOutputProductionPerDay(requestFilter);
+        return sortPerDay(requestFilter, equipmentCounts);
+    }
 
+    @Override
+    public CountingEquipmentKpiDto[] computeEquipmentKpi(KpiFilterDto requestFilter) {
+        List<CounterRecordDto> equipmentCounts = counterRecordService.filterConclusionRecordsKpi(requestFilter);
+        return sortPerDay(requestFilter, equipmentCounts);
+    }
+
+    private CountingEquipmentKpiDto[] sortPerDay(KpiFilterDto requestFilter, List<CounterRecordDto> equipmentCounts) {
         if (equipmentCounts.isEmpty()) {
             return new CountingEquipmentKpiDto[0];
         }
 
         Map<String, CountingEquipmentKpiDto> equipmentKpiByEquipmentAlias = new LinkedHashMap<>();
 
-        Instant startDate = getPropertyAsInstant(kpiFilter, CounterRecordFilter.Property.START_DATE);
-        Instant endDate = getPropertyAsInstant(kpiFilter, CounterRecordFilter.Property.END_DATE);
-        //TODO: TimeMode should be applied here
+        Instant startDate = getPropertyAsInstant(requestFilter, CounterRecordFilter.Property.START_DATE);
+        Instant endDate = getPropertyAsInstant(requestFilter, CounterRecordFilter.Property.END_DATE);
+
         final int spanInDays = DateUtil.spanInDays(startDate, endDate);
 
         for (CounterRecordDto equipmentCount : equipmentCounts) {
@@ -121,20 +130,21 @@ public class KpiServiceImpl implements KpiService {
         List<ProductionOrderEntity> productionOrders = findByEquipmentAndPeriod(equipmentId, filter.getStartDate(),
                 filter.getEndDate());
 
-        Long totalScheduledTime = 0L;
-        Long totalActiveTime = 0L;
+        Long equipmentOutputId = equipmentOutputService.findIdByCountingEquipmentId(equipmentId);
+
+        long totalScheduledTime = 0L;
+        long totalActiveTime = 0L;
 
         for (ProductionOrderEntity productionOrder : productionOrders) {
             Instant adjustedStartDate = productionOrderService.getAdjustedStartDate(productionOrder, filter.getStartDate());
             Instant adjustedEndDate = productionOrderService.getAdjustedEndDate(productionOrder, filter.getEndDate());
 
             totalScheduledTime += getProductionOrderTotalScheduledTime(adjustedStartDate, adjustedEndDate);
-            totalActiveTime += calculateActiveTimeByProductionOrderId(productionOrder, totalScheduledTime,
-                    adjustedStartDate, adjustedEndDate);
+            totalActiveTime += calculateActiveTimeByProductionOrderId(productionOrder, equipmentOutputId, adjustedStartDate, adjustedEndDate);
         }
 
         log.info(String.format("Total schedule time [%s]", totalScheduledTime));
-        log.info(String.format("Total active time [%s]", totalScheduledTime));
+        log.info(String.format("Total active time [%s]", totalActiveTime));
 
         KpiDto kpi = new KpiDto(DoubleUtil.safeDoubleValue(totalActiveTime), DoubleUtil.safeDoubleValue(totalScheduledTime));
         kpi.setValueAsDivision();
@@ -151,14 +161,14 @@ public class KpiServiceImpl implements KpiService {
         return productionOrderService.calculateScheduledTimeInSeconds(startDate, endDate);
     }
 
-    private Long calculateActiveTimeByProductionOrderId(ProductionOrderEntity productionOrder, long totalScheduledTime,
-                                                        Instant startDateFilter,
-                                                        Instant endDateFilter) {
+    private Integer calculateActiveTimeByProductionOrderId(ProductionOrderEntity productionOrder, Long equipmentOutputId,
+                                                           Instant startDateFilter,
+                                                           Instant endDateFilter) {
 
         Timestamp startDate = Timestamp.from(startDateFilter);
         Timestamp endDate = Timestamp.from(endDateFilter);
 
-        return counterRecordService.calculateActiveTimeByProductionOrderId(productionOrder.getId(), totalScheduledTime,
+        return counterRecordService.sumIncrementActiveTimeByProductionOrderId(productionOrder.getId(), equipmentOutputId,
                 startDate, endDate);
     }
 
@@ -209,7 +219,7 @@ public class KpiServiceImpl implements KpiService {
     }
 
     private List<ProductionOrderEntity> findByEquipmentAndPeriod(Long equipmentId, Timestamp startDateFilter,
-                                                                          Timestamp endDateFilter) {
+                                                                 Timestamp endDateFilter) {
 
         return productionOrderService.findByEquipmentAndPeriod(equipmentId, startDateFilter, endDateFilter);
     }

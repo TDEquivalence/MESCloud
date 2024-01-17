@@ -11,13 +11,15 @@ import java.util.List;
 
 public interface CounterRecordService {
 
+    List<CounterRecordDto> getEquipmentOutputProductionPerDay(KpiFilterDto filter);
+
     List<CounterRecordDto> filterConclusionRecordsKpi(KpiFilterDto filterDto);
 
     PaginatedCounterRecordsDto filterConclusionRecordsPaginated(CounterRecordFilter filterDto);
 
     PaginatedCounterRecordsDto getFilteredAndPaginated(CounterRecordFilter filterDto);
 
-    List<CounterRecordDto> processCounterRecord(PlcMqttDto equipmentCountsMqttDTO);
+    void processCounterRecord(PlcMqttDto equipmentCountsMqttDTO);
 
     boolean areValidInitialCounts(String productionOrderCode);
 
@@ -27,6 +29,6 @@ public interface CounterRecordService {
 
     Integer sumCounterIncrement(Long countingEquipmentId, Timestamp startDateFilter, Timestamp endDateFilter);
 
-    long calculateActiveTimeByProductionOrderId(Long productionOrderId, long totalScheduledTime, Timestamp startDate,
-                                                Timestamp endDate);
+    Integer sumIncrementActiveTimeByProductionOrderId(Long productionOrderId, Long equipmentOutputId, Timestamp startDate,
+                                                      Timestamp endDate);
 }
