@@ -11,6 +11,8 @@ public interface KpiService {
 
     KpiDto computeEquipmentQuality(Long equipmentId, RequestKpiDto requestKpiDto);
 
+    Long getProductionOrderTotalScheduledTime(Long equipmentId, RequestKpiDto filter);
+
     KpiDto computeAvailability(Long equipmentId, RequestKpiDto filter);
 
     EquipmentKpiAggregatorDto getEquipmentKpiAggregator(Long equipmentId, RequestKpiDto requestKpiDto);

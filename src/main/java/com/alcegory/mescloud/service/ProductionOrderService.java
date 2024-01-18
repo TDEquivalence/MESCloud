@@ -40,7 +40,9 @@ public interface ProductionOrderService {
 
     void setProductionOrderApproval(Long composedOrderId, boolean isApproved);
 
-    Long calculateProductionOrderScheduledTime(Long productionOrderId, Instant startDate, Instant endDate);
+    Long calculateScheduledTimeInSeconds(Instant startDate, Instant endDate);
+
+    Long calculateScheduledTimeInSeconds(Long equipmentId, Instant startDate, Instant endDate);
 
     List<ProductionOrderDto> findByEquipmentAndPeriod(Long equipmentId, Date startDate, Date endDate);
 
