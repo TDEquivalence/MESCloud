@@ -28,11 +28,6 @@ public class KpiController {
         return new ResponseEntity<>(countingEquipmentKpiDto, HttpStatus.OK);
     }
 
-    public ResponseEntity<Long> getEquipmentScheduledTime(@RequestParam long equipmentId, @RequestBody RequestKpiDto filter) {
-        Long scheduledTime = kpiService.getProductionOrderTotalScheduledTime(equipmentId, filter);
-        return new ResponseEntity<>(scheduledTime, HttpStatus.OK);
-    }
-
     @PostMapping("/{equipmentId}/availability")
     public ResponseEntity<KpiDto> getEquipmentAvailability(@PathVariable long equipmentId, @RequestBody RequestKpiDto filter) {
         KpiDto kpiAvailabilityDto = kpiService.computeAvailability(equipmentId, filter);
