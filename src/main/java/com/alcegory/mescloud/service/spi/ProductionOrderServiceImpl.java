@@ -289,12 +289,13 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
 
     @Override
     public Long calculateScheduledTimeInSeconds(Instant startDate, Instant endDate) {
-        Duration totalActiveTime = Duration.ZERO;
+        Duration productionScheduleTime = calculateScheduledTime(startDate, endDate);
+        return productionScheduleTime.getSeconds();
+    }
 
-        Duration productionOrderActiveTime = calculateScheduledTime(startDate, endDate);
-        totalActiveTime = totalActiveTime.plus(productionOrderActiveTime);
-
-        return totalActiveTime.getSeconds();
+    private Duration calculateScheduledTime(Instant startDate, Instant endDate) {
+        Duration duration = Duration.between(startDate, endDate);
+        return duration.isNegative() ? Duration.ZERO : duration;
     }
 
     @Override
@@ -320,12 +321,6 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         }
 
         return totalActiveTime;
-    }
-
-    private Duration calculateScheduledTime(Instant startDate, Instant endDate) {
-        Duration duration = Duration.between(startDate, endDate);
-
-        return duration.isNegative() ? Duration.ZERO : duration;
     }
 
     @Override
