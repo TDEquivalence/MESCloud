@@ -163,7 +163,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         String codeWithYear = codePrefix + yearLastTwoDigits;
 
         return productionOrderOpt.isEmpty() ||
-                !hasYearChanged(productionOrderOpt.get().getCode(), yearLastTwoDigits, codePrefix) ?
+                hasYearChanged(productionOrderOpt.get().getCode(), yearLastTwoDigits, codePrefix) ?
                 codeWithYear + String.format(FIVE_DIGIT_NUMBER_FORMAT, FIRST_CODE_VALUE) :
                 codeWithYear + generateFormattedCodeValue(productionOrderOpt.get(), codeWithYear);
     }
@@ -184,7 +184,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
 
     private boolean hasYearChanged(String productionOrderCode, int yearDigits, String codePrefix) {
         String numericCode = productionOrderCode.substring(codePrefix.length());
-        return numericCode.startsWith(String.valueOf(yearDigits));
+        return !numericCode.startsWith(String.valueOf(yearDigits));
     }
 
     private void publishToPlc(ProductionOrderEntity productionOrderEntity) throws MesMqttException {
