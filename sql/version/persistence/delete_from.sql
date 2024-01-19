@@ -17,3 +17,4 @@ DELETE FROM factory_user;
 DELETE FROM users;
 DELETE FROM factory;
 DELETE FROM ims;
+DELETE FROM audit_script;

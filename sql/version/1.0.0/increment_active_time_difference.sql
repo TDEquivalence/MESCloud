@@ -1,6 +1,3 @@
-ALTER TABLE counter_record
-ADD COLUMN increment_active_time INT;
-
 UPDATE counter_record
 SET increment_active_time = CASE
     WHEN time_difference < 0 THEN 0
