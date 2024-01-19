@@ -24,7 +24,7 @@ public class KpiController {
 
     @PostMapping("/equipment-counts")
     public ResponseEntity<CountingEquipmentKpiDto[]> getCountingEquipmentKpi(@RequestBody KpiFilterDto filter) {
-        CountingEquipmentKpiDto[] countingEquipmentKpiDto = kpiService.computeEquipmentKpi(filter);
+        CountingEquipmentKpiDto[] countingEquipmentKpiDto = kpiService.getEquipmentOutputProductionPerDay(filter);
         return new ResponseEntity<>(countingEquipmentKpiDto, HttpStatus.OK);
     }
 
