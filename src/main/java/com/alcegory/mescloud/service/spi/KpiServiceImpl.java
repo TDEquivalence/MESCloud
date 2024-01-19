@@ -30,29 +30,26 @@ public class KpiServiceImpl implements KpiService {
 
 
     @Override
-    public CountingEquipmentKpiDto[] getEquipmentOutputProductionPerDay(KpiFilterDto requestFilter) {
-        //Get max and min counterRecord per day per equipment.
-
-        //TODO: Implement
-        List<CounterRecordDto> equipmentCounts = counterRecordService.getEquipmentOutputProductionPerDay(requestFilter);
-        return sortPerDay(requestFilter, equipmentCounts);
+    public CountingEquipmentKpiDto[] getEquipmentOutputProductionPerDay(KpiFilterDto filter) {
+        List<CounterRecordDto> equipmentCounts = counterRecordService.getEquipmentOutputProductionPerDay(filter);
+        return sortPerDay(filter, equipmentCounts);
     }
 
     @Override
-    public CountingEquipmentKpiDto[] computeEquipmentKpi(KpiFilterDto requestFilter) {
-        List<CounterRecordDto> equipmentCounts = counterRecordService.filterConclusionRecordsKpi(requestFilter);
-        return sortPerDay(requestFilter, equipmentCounts);
+    public CountingEquipmentKpiDto[] computeEquipmentKpi(KpiFilterDto filter) {
+        List<CounterRecordDto> equipmentCounts = counterRecordService.filterConclusionRecordsKpi(filter);
+        return sortPerDay(filter, equipmentCounts);
     }
 
-    private CountingEquipmentKpiDto[] sortPerDay(KpiFilterDto kpiFilter, List<CounterRecordDto> equipmentCounts) {
+    private CountingEquipmentKpiDto[] sortPerDay(KpiFilterDto filter, List<CounterRecordDto> equipmentCounts) {
         if (equipmentCounts.isEmpty()) {
             return new CountingEquipmentKpiDto[0];
         }
 
         Map<String, CountingEquipmentKpiDto> equipmentKpiByEquipmentAlias = new LinkedHashMap<>();
 
-        Instant startDate = getPropertyAsInstant(kpiFilter, CounterRecordFilter.Property.START_DATE);
-        Instant endDate = getPropertyAsInstant(kpiFilter, CounterRecordFilter.Property.END_DATE);
+        Instant startDate = getPropertyAsInstant(filter, CounterRecordFilter.Property.START_DATE);
+        Instant endDate = getPropertyAsInstant(filter, CounterRecordFilter.Property.END_DATE);
         //TODO: TimeMode should be applied here
         final int spanInDays = DateUtil.spanInDays(startDate, endDate);
 
