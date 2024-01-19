@@ -51,8 +51,12 @@ public class CounterRecordRepositoryImpl extends AbstractFilterRepository<Counte
                 root.get(IS_VALID_FOR_PRODUCTION_PROP)
         );
 
+        List<Predicate> predicates = new ArrayList<>();
         Predicate dateRangePredicate = criteriaBuilder.between(root.get(REGISTERED_AT_PROP), startDate, endDate);
-        criteriaQuery.where(dateRangePredicate);
+        predicates.add(dateRangePredicate);
+        addPredicates(filter, predicates, criteriaBuilder, root);
+
+        criteriaQuery.where(criteriaBuilder.and(predicates.toArray(new Predicate[0])));
 
         criteriaQuery.groupBy(
                 root.get(EQUIPMENT_OUTPUT_PROP),
