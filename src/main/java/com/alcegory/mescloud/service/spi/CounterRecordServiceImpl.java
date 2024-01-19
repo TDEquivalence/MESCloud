@@ -106,8 +106,8 @@ public class CounterRecordServiceImpl implements CounterRecordService {
 
         if (!isValid(equipmentCountsMqttDto)) {
             log.warning(() -> String.format("Received counts are invalid either because no Counting Equipment was found " +
-                    "with the code [%s] or because received equipment outputs number [%s] does not match " +
-                    "the Counting Equipment outputs number", equipmentCountsMqttDto.getEquipmentCode(),
+                            "with the code [%s] or because received equipment outputs number [%s] does not match " +
+                            "the Counting Equipment outputs number", equipmentCountsMqttDto.getEquipmentCode(),
                     equipmentCountsMqttDto.getCounters().length));
             return;
         }
@@ -124,7 +124,6 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     private CounterRecordEntity extractCounterRecordEntity(CounterMqttDto counterDto, PlcMqttDto equipmentCountsDto) {
 
         CounterRecordEntity counterRecord = new CounterRecordEntity();
-        //counterRecord.setRegisteredAt(DateUtil.getCurrentTime(factoryService.getTimeZone()));
         counterRecord.setRegisteredAt(new Date());
         counterRecord.setRealValue(counterDto.getValue());
         counterRecord.setActiveTime(equipmentCountsDto.getActiveTime());
