@@ -25,7 +25,7 @@ import java.util.Optional;
 @Log
 public class CounterRecordServiceImpl implements CounterRecordService {
 
-    private static final int INITIAL_COMPUTED_VALUE = 0;
+    private static final int INITIAL_VALUE = 0;
     private static final int ROLLOVER_OFFSET = 1;
     private static final int ROLLOVER_MAX_VALUE = 65535;
 
@@ -196,9 +196,10 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     }
 
     private void handleMissingLastPersistedCount(CounterRecordEntity receivedCount) {
-        receivedCount.setComputedValue(INITIAL_COMPUTED_VALUE);
-        receivedCount.setComputedActiveTime(INITIAL_COMPUTED_VALUE);
-        receivedCount.setIncrement(INITIAL_COMPUTED_VALUE);
+        receivedCount.setComputedValue(INITIAL_VALUE);
+        receivedCount.setComputedActiveTime(INITIAL_VALUE);
+        receivedCount.setIncrement(INITIAL_VALUE);
+        receivedCount.setIncrementActiveTime(INITIAL_VALUE);
     }
 
     private int calculate(int lastPersistedCount, int receivedCount, int computedPersisted) {
