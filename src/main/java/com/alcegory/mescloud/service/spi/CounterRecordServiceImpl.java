@@ -15,7 +15,10 @@ import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -99,13 +102,14 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     }
 
     @Override
-    public List<CounterRecordDto> processCounterRecord(PlcMqttDto equipmentCountsMqttDto) {
+    public void processCounterRecord(PlcMqttDto equipmentCountsMqttDto) {
 
         if (!isValid(equipmentCountsMqttDto)) {
             log.warning(() -> String.format("Received counts are invalid either because no Counting Equipment was found " +
                     "with the code [%s] or because received equipment outputs number [%s] does not match " +
-                    "the Counting Equipment outputs number", equipmentCountsMqttDto.getEquipmentCode(), equipmentCountsMqttDto.getCounters().length));
-            return Collections.emptyList();
+                    "the Counting Equipment outputs number", equipmentCountsMqttDto.getEquipmentCode(),
+                    equipmentCountsMqttDto.getCounters().length));
+            return;
         }
 
         List<CounterRecordEntity> counterRecords = new ArrayList<>(equipmentCountsMqttDto.getCounters().length);
@@ -114,7 +118,7 @@ public class CounterRecordServiceImpl implements CounterRecordService {
             counterRecords.add(counterRecord);
         }
 
-        return saveAll(counterRecords);
+        saveAll(counterRecords);
     }
 
     private CounterRecordEntity extractCounterRecordEntity(CounterMqttDto counterDto, PlcMqttDto equipmentCountsDto) {
@@ -150,7 +154,7 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     }
 
     private void setProductionOrder(CounterRecordEntity counterRecord, String productionOrderCode) {
-        Optional<ProductionOrderDto> productionOrderOpt = productionOrderService.findByCode(productionOrderCode);
+        Optional<ProductionOrderDto> productionOrderOpt = productionOrderService.findDtoByCode(productionOrderCode);
         if (productionOrderOpt.isEmpty()) {
             log.warning(() -> String.format("No Production Order found with the code [%s]", productionOrderCode));
             return;
@@ -278,19 +282,19 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     }
 
     @Override
-    public Integer sumIncrementActiveTimeByProductionOrderId(Long productionOrderId, Timestamp startDate,
+    public Integer sumIncrementActiveTimeByProductionOrderId(Long productionOrderId, Long equipmentOutputId, Timestamp startDate,
                                                              Timestamp endDate) {
 
         if (productionOrderId == null) {
             throw new IllegalArgumentException("Production order cannot be null");
         }
 
-        Integer activeTime = repository.sumIncrementActiveTimeByProductionOrderId(productionOrderId, startDate, endDate);
+        Integer activeTime = repository.sumIncrementActiveTimeByProductionOrderId(productionOrderId, equipmentOutputId,
+                startDate, endDate);
         return Optional.ofNullable(activeTime).orElse(0);
     }
 
-    private List<CounterRecordDto> saveAll(List<CounterRecordEntity> counterRecords) {
-        Iterable<CounterRecordEntity> counterRecordEntities = repository.saveAll(counterRecords);
-        return converter.toDto(counterRecordEntities);
+    private void saveAll(List<CounterRecordEntity> counterRecords) {
+        repository.saveAll(counterRecords);
     }
 }

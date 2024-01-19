@@ -27,9 +27,8 @@ public class EquipmentOutputAliasServiceImpl implements EquipmentOutputAliasServ
     }
 
     @Override
-    public boolean isAliasUnique(String alias) {
-        EquipmentOutputAliasEntity result = repository.findByAlias(alias);
-        return result == null;
+    public boolean existsByAlias(String alias) {
+        return repository.existsByAlias(alias);
     }
 
     @Override

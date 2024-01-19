@@ -49,23 +49,6 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     private final MesMqttSettings mqttSettings;
 
     @Override
-    public Optional<ProductionOrderDto> findByCode(String code) {
-        Optional<ProductionOrderEntity> persistedProductionOrderOpt = repository.findByCode(code);
-        if (persistedProductionOrderOpt.isEmpty()) {
-            return Optional.empty();
-        }
-
-        ProductionOrderDto productionOrder = converter.toDto(persistedProductionOrderOpt.get());
-        return Optional.of(productionOrder);
-    }
-
-    @Override
-    public boolean hasActiveProductionOrder(long countingEquipmentId) {
-        Optional<ProductionOrderEntity> productionOrderEntityOpt = repository.findActive(countingEquipmentId);
-        return productionOrderEntityOpt.isPresent();
-    }
-
-    @Override
     public Optional<ProductionOrderDto> complete(long equipmentId) {
         log.info(() -> String.format("Complete process Production Order started for equipmentId [%s]:", equipmentId));
 
@@ -75,7 +58,8 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
             return Optional.empty();
         }
 
-        CountingEquipmentDto countingEquipmentDto = setOperationStatus(countingEquipmentOpt.get(), CountingEquipmentEntity.OperationStatus.PENDING);
+        CountingEquipmentDto countingEquipmentDto = setOperationStatus(countingEquipmentOpt.get(),
+                CountingEquipmentEntity.OperationStatus.PENDING);
         log.info(() -> String.format("Change status to PENDING for Equipment with code [%s]", countingEquipmentDto.getCode()));
 
         Optional<ProductionOrderEntity> productionOrderEntityOpt = repository.findActive(equipmentId);
@@ -101,6 +85,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
 
     private void publishProductionOrderCompletionToPLC(CountingEquipmentEntity countingEquipment, ProductionOrderEntity productionOrder)
             throws MesMqttException {
+
         ProductionOrderMqttDto productionOrderMqttDto = new ProductionOrderMqttDto();
         productionOrderMqttDto.setJsonType(MqttDTOConstants.PRODUCTION_ORDER_CONCLUSION_DTO_NAME);
         productionOrderMqttDto.setEquipmentEnabled(false);
@@ -110,7 +95,21 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         mqttClient.publish(mqttSettings.getProtCountPlcTopic(), productionOrderMqttDto);
     }
 
+    @Override
+    public void completeByCode(String productionOrderCode) {
+
+        Optional<ProductionOrderEntity> productionOrderOpt = findByCode(productionOrderCode);
+        if (productionOrderOpt.isEmpty()) {
+            return;
+        }
+
+        ProductionOrderEntity productionOrder = productionOrderOpt.get();
+        productionOrder.setCompleted(true);
+        setCompleteDate(productionOrder);
+    }
+
     private Optional<ProductionOrderDto> setCompleteDate(ProductionOrderEntity productionOrderEntity) {
+
         productionOrderEntity.setCompletedAt(new Date());
         repository.save(productionOrderEntity);
         ProductionOrderDto productionOrderDto = converter.toDto(productionOrderEntity);
@@ -145,7 +144,6 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         setOperationStatus(countingEquipmentEntity, CountingEquipmentEntity.OperationStatus.IN_PROGRESS);
 
         try {
-            //TODO: remove to MesProtocolProcess level
             publishToPlc(persistedProductionOrder);
         } catch (MesMqttException e) {
             log.severe("Unable to publish Production Order over MQTT.");
@@ -160,11 +158,14 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     public String generateCode() {
 
         Optional<ProductionOrderEntity> productionOrderOpt = repository.findTopByOrderByIdDesc();
-        String codePrefix = OBO_SECTION_PREFIX + CODE_PREFIX + DateUtil.getCurrentYearLastTwoDigits();
+        int yearLastTwoDigits = DateUtil.getCurrentYearLastTwoDigits();
+        String codePrefix = OBO_SECTION_PREFIX + CODE_PREFIX;
+        String codeWithYear = codePrefix + yearLastTwoDigits;
 
-        return productionOrderOpt.isEmpty() ?
-                codePrefix + String.format(FIVE_DIGIT_NUMBER_FORMAT, FIRST_CODE_VALUE) :
-                codePrefix + generateFormattedCodeValue(productionOrderOpt.get(), codePrefix);
+        return productionOrderOpt.isEmpty() ||
+                !hasYearChanged(productionOrderOpt.get().getCode(), yearLastTwoDigits, codePrefix) ?
+                codeWithYear + String.format(FIVE_DIGIT_NUMBER_FORMAT, FIRST_CODE_VALUE) :
+                codeWithYear + generateFormattedCodeValue(productionOrderOpt.get(), codeWithYear);
     }
 
     private String generateFormattedCodeValue(ProductionOrderEntity productionOrder, String codePrefix) {
@@ -181,9 +182,39 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         return String.format(FIVE_DIGIT_NUMBER_FORMAT, ++lastCodeValue);
     }
 
+    private boolean hasYearChanged(String productionOrderCode, int yearDigits, String codePrefix) {
+        String numericCode = productionOrderCode.substring(codePrefix.length());
+        return numericCode.startsWith(String.valueOf(yearDigits));
+    }
+
     private void publishToPlc(ProductionOrderEntity productionOrderEntity) throws MesMqttException {
         ProductionOrderMqttDto productionOrderMqttDto = converter.toMqttDto(productionOrderEntity, true);
         mqttClient.publish(mqttSettings.getProtCountPlcTopic(), productionOrderMqttDto);
+    }
+
+    @Override
+    public Optional<ProductionOrderDto> findDtoByCode(String code) {
+        Optional<ProductionOrderEntity> persistedProductionOrderOpt = repository.findByCode(code);
+        if (persistedProductionOrderOpt.isEmpty()) {
+            return Optional.empty();
+        }
+
+        ProductionOrderDto productionOrder = converter.toDto(persistedProductionOrderOpt.get());
+        return Optional.of(productionOrder);
+    }
+
+    private Optional<ProductionOrderEntity> findByCode(String code) {
+        Optional<ProductionOrderEntity> persistedProductionOrderOpt = repository.findByCode(code);
+        if (persistedProductionOrderOpt.isEmpty()) {
+            return Optional.empty();
+        }
+
+        return persistedProductionOrderOpt;
+    }
+
+    @Override
+    public boolean hasActiveProductionOrder(long equipmentId) {
+        return repository.existsByEquipmentIdAndIsCompletedFalse(equipmentId);
     }
 
     @Override
@@ -194,11 +225,6 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     @Override
     public List<ProductionOrderEntity> saveAndUpdateAll(List<ProductionOrderEntity> productionOrder) {
         return repository.saveAll(productionOrder);
-    }
-
-    @Override
-    public void delete(ProductionOrderEntity productionOrder) {
-        repository.delete(productionOrder);
     }
 
     @Override
@@ -263,12 +289,13 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
 
     @Override
     public Long calculateScheduledTimeInSeconds(Instant startDate, Instant endDate) {
-        Duration totalActiveTime = Duration.ZERO;
+        Duration productionScheduleTime = calculateScheduledTime(startDate, endDate);
+        return productionScheduleTime.getSeconds();
+    }
 
-        Duration productionOrderActiveTime = calculateScheduledTime(startDate, endDate);
-        totalActiveTime = totalActiveTime.plus(productionOrderActiveTime);
-
-        return totalActiveTime.getSeconds();
+    private Duration calculateScheduledTime(Instant startDate, Instant endDate) {
+        Duration duration = Duration.between(startDate, endDate);
+        return duration.isNegative() ? Duration.ZERO : duration;
     }
 
     @Override
@@ -296,12 +323,6 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         return totalActiveTime;
     }
 
-    private Duration calculateScheduledTime(Instant startDate, Instant endDate) {
-        Duration duration = Duration.between(startDate, endDate);
-
-        return duration.isNegative() ? Duration.ZERO : duration;
-    }
-
     @Override
     public Instant getAdjustedStartDate(ProductionOrderEntity productionOrder, Timestamp startDate) {
         Instant createdAt = productionOrder.getCreatedAt().toInstant();
@@ -325,7 +346,23 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         return completedAtInstant;
     }
 
-    private CountingEquipmentDto setOperationStatus(CountingEquipmentEntity countingEquipment, CountingEquipmentEntity.OperationStatus status) {
+    @Override
+    public void deleteByCode(String productionOrderCode) {
+        Optional<ProductionOrderEntity> productionOrder = repository.findByCode(productionOrderCode);
+        if (productionOrder.isEmpty()) {
+            return;
+        }
+
+        repository.delete(productionOrder.get());
+    }
+
+    @Override
+    public void delete(ProductionOrderEntity productionOrder) {
+        repository.delete(productionOrder);
+    }
+
+    private CountingEquipmentDto setOperationStatus(CountingEquipmentEntity countingEquipment,
+                                                    CountingEquipmentEntity.OperationStatus status) {
         countingEquipmentService.setOperationStatus(countingEquipment, status);
         return equipmentConverter.toDto(countingEquipment, CountingEquipmentDto.class);
     }

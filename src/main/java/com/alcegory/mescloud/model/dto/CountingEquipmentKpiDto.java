@@ -7,16 +7,15 @@ import lombok.Setter;
 @Setter
 public class CountingEquipmentKpiDto {
 
+    private String equipmentAlias;
+    private int[] validCounts;
+    private int[] invalidCounts;
+
     public CountingEquipmentKpiDto(final String equipmentAlias, final int numberOfTimeUnits) {
         this.equipmentAlias = equipmentAlias;
         validCounts = new int[numberOfTimeUnits];
         invalidCounts = new int[numberOfTimeUnits];
     }
-
-    private String equipmentAlias;
-    private int[] validCounts;
-    private int[] invalidCounts;
-
 
     public void updateCounts(int timeUnitAsIndex, CounterRecordDto equipmentCount) {
         if (equipmentCount.isValidForProduction()) {

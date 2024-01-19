@@ -4,10 +4,7 @@ import com.alcegory.mescloud.exception.IncompleteConfigurationException;
 import com.alcegory.mescloud.model.dto.*;
 import com.alcegory.mescloud.model.entity.ProductionOrderEntity;
 import com.alcegory.mescloud.model.filter.CounterRecordFilter;
-import com.alcegory.mescloud.service.CounterRecordService;
-import com.alcegory.mescloud.service.CountingEquipmentService;
-import com.alcegory.mescloud.service.KpiService;
-import com.alcegory.mescloud.service.ProductionOrderService;
+import com.alcegory.mescloud.service.*;
 import com.alcegory.mescloud.utility.DateUtil;
 import com.alcegory.mescloud.utility.DoubleUtil;
 import lombok.AllArgsConstructor;
@@ -29,6 +26,7 @@ public class KpiServiceImpl implements KpiService {
     private final CounterRecordService counterRecordService;
     private final ProductionOrderService productionOrderService;
     private final CountingEquipmentService countingEquipmentService;
+    private final EquipmentOutputService equipmentOutputService;
 
 
     @Override
@@ -46,15 +44,15 @@ public class KpiServiceImpl implements KpiService {
         return sortPerDay(requestFilter, equipmentCounts);
     }
 
-    private CountingEquipmentKpiDto[] sortPerDay(KpiFilterDto requestFilter, List<CounterRecordDto> equipmentCounts) {
+    private CountingEquipmentKpiDto[] sortPerDay(KpiFilterDto kpiFilter, List<CounterRecordDto> equipmentCounts) {
         if (equipmentCounts.isEmpty()) {
             return new CountingEquipmentKpiDto[0];
         }
 
         Map<String, CountingEquipmentKpiDto> equipmentKpiByEquipmentAlias = new LinkedHashMap<>();
 
-        Instant startDate = getPropertyAsInstant(requestFilter, CounterRecordFilter.Property.START_DATE);
-        Instant endDate = getPropertyAsInstant(requestFilter, CounterRecordFilter.Property.END_DATE);
+        Instant startDate = getPropertyAsInstant(kpiFilter, CounterRecordFilter.Property.START_DATE);
+        Instant endDate = getPropertyAsInstant(kpiFilter, CounterRecordFilter.Property.END_DATE);
         //TODO: TimeMode should be applied here
         final int spanInDays = DateUtil.spanInDays(startDate, endDate);
 
@@ -133,6 +131,8 @@ public class KpiServiceImpl implements KpiService {
         List<ProductionOrderEntity> productionOrders = findByEquipmentAndPeriod(equipmentId, filter.getStartDate(),
                 filter.getEndDate());
 
+        Long equipmentOutputId = equipmentOutputService.findIdByCountingEquipmentId(equipmentId);
+
         long totalScheduledTime = 0L;
         long totalActiveTime = 0L;
 
@@ -141,7 +141,7 @@ public class KpiServiceImpl implements KpiService {
             Instant adjustedEndDate = productionOrderService.getAdjustedEndDate(productionOrder, filter.getEndDate());
 
             totalScheduledTime += getProductionOrderTotalScheduledTime(adjustedStartDate, adjustedEndDate);
-            totalActiveTime += calculateActiveTimeByProductionOrderId(productionOrder, adjustedStartDate, adjustedEndDate);
+            totalActiveTime += calculateActiveTimeByProductionOrderId(productionOrder, equipmentOutputId, adjustedStartDate, adjustedEndDate);
         }
 
         log.info(String.format("Total schedule time [%s]", totalScheduledTime));
@@ -162,14 +162,14 @@ public class KpiServiceImpl implements KpiService {
         return productionOrderService.calculateScheduledTimeInSeconds(startDate, endDate);
     }
 
-    private Integer calculateActiveTimeByProductionOrderId(ProductionOrderEntity productionOrder,
+    private Integer calculateActiveTimeByProductionOrderId(ProductionOrderEntity productionOrder, Long equipmentOutputId,
                                                            Instant startDateFilter,
                                                            Instant endDateFilter) {
 
         Timestamp startDate = Timestamp.from(startDateFilter);
         Timestamp endDate = Timestamp.from(endDateFilter);
 
-        return counterRecordService.sumIncrementActiveTimeByProductionOrderId(productionOrder.getId(),
+        return counterRecordService.sumIncrementActiveTimeByProductionOrderId(productionOrder.getId(), equipmentOutputId,
                 startDate, endDate);
     }
 

@@ -10,7 +10,7 @@ public interface EquipmentOutputAliasService {
 
     List<EquipmentOutputAliasEntity> saveAll(List<EquipmentOutputAliasEntity> aliasList);
 
-    boolean isAliasUnique(String alias);
+    boolean existsByAlias(String alias);
 
     EquipmentOutputAliasEntity findByAlias(String alias);
 }
