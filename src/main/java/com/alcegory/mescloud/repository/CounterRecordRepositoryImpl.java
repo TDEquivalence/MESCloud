@@ -7,16 +7,19 @@ import com.alcegory.mescloud.utility.DateUtil;
 import jakarta.persistence.EntityGraph;
 import jakarta.persistence.Tuple;
 import jakarta.persistence.criteria.*;
+import lombok.extern.java.Log;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
 import java.util.*;
 
 @Repository
+@Log
 public class CounterRecordRepositoryImpl extends AbstractFilterRepository<CounterRecordFilter.Property, CounterRecordEntity> {
 
     private static final String ID_PROP = "id";
     private static final String EQUIPMENT_OUTPUT_PROP = "equipmentOutput";
+    private static final String EQUIPMENT_OUTPUT_ALIAS = "equipmentOutputAlias";
     private static final String PRODUCTION_ORDER_PROP = "productionOrder";
     private static final String COUNTING_EQUIPMENT_PROP = "countingEquipment";
     private static final String PRODUCTION_ORDER_CODE_PROP = "code";
@@ -24,48 +27,48 @@ public class CounterRecordRepositoryImpl extends AbstractFilterRepository<Counte
     private static final String REGISTERED_AT_PROP = "registeredAt";
     private static final String IS_VALID_FOR_PRODUCTION_PROP = "isValidForProduction";
     private static final String INCREMENT_PROP = "increment";
-    private static final String EQUIPMENT_OUTPUT = "equipmentOutput";
+    private static final String COMPUTED_VALUE_PROP = "computedValue";
+    private static final String DATE_FUNCION = "DATE";
 
 
     public List<CounterRecordEntity> findLastPerProductionOrderAndEquipmentOutputPerDay(KpiFilterDto filter) {
-        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<CounterRecordEntity> criteriaQuery = criteriaBuilder.createQuery(CounterRecordEntity.class);
-        Root<CounterRecordEntity> root = criteriaQuery.from(CounterRecordEntity.class);
-
-        Subquery<Integer> subquery = criteriaQuery.subquery(Integer.class);
-        Root<CounterRecordEntity> subRoot = subquery.from(CounterRecordEntity.class);
-        subquery.select(criteriaBuilder.max(subRoot.get("computedValue")))
-                .where(
-                        criteriaBuilder.equal(root.get(EQUIPMENT_OUTPUT), subRoot.get(EQUIPMENT_OUTPUT)),
-                        criteriaBuilder.equal(criteriaBuilder.function("date", Date.class, subRoot.get(REGISTERED_AT_PROP)),
-                                criteriaBuilder.function("date", Date.class, root.get(REGISTERED_AT_PROP)))
-                );
-
-        List<Predicate> predicates = new ArrayList<>();
-        addPredicates(filter, predicates, criteriaBuilder, root);
-
-        EntityGraph<CounterRecordEntity> entityGraph = entityManager.createEntityGraph(CounterRecordEntity.class);
-        entityGraph.addSubgraph(PRODUCTION_ORDER_PROP);
-        entityGraph.addSubgraph(EQUIPMENT_OUTPUT_PROP).addSubgraph(COUNTING_EQUIPMENT_PROP);
-
         String startDateStr = filter.getSearch().getValue(CounterRecordFilter.Property.START_DATE);
         Date startDate = Date.from(DateUtil.convertToInstant(startDateStr));
         String endDateStr = filter.getSearch().getValue(CounterRecordFilter.Property.END_DATE);
         Date endDate = Date.from(DateUtil.convertToInstant(endDateStr));
 
-        criteriaQuery.select(root)
-                .where(
-                        criteriaBuilder.equal(root.get("computedValue"), subquery),
-                        criteriaBuilder.greaterThanOrEqualTo(root.get(REGISTERED_AT_PROP), startDate),
-                        criteriaBuilder.lessThan(root.get(REGISTERED_AT_PROP), endDate),
-                        criteriaBuilder.and(predicates.toArray(new Predicate[0]))
-                );
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<CounterRecordEntity> criteriaQuery = criteriaBuilder.createQuery(CounterRecordEntity.class);
+        Root<CounterRecordEntity> root = criteriaQuery.from(CounterRecordEntity.class);
 
-        return entityManager.createQuery(criteriaQuery)
-                .setHint(JAKARTA_FETCHGRAPH, entityGraph)
-                .getResultList();
+        criteriaQuery.multiselect(
+                criteriaBuilder.max(root.get(ID_PROP)),
+                root.get(EQUIPMENT_OUTPUT_PROP),
+                root.get(EQUIPMENT_OUTPUT_ALIAS),
+                criteriaBuilder.sum(root.get(INCREMENT_PROP)).alias(COMPUTED_VALUE_PROP),
+                root.get(PRODUCTION_ORDER_PROP),
+                criteriaBuilder.function(DATE_FUNCION, Date.class, root.get(REGISTERED_AT_PROP)),
+                root.get(IS_VALID_FOR_PRODUCTION_PROP)
+        );
+
+        List<Predicate> predicates = new ArrayList<>();
+        Predicate dateRangePredicate = criteriaBuilder.between(root.get(REGISTERED_AT_PROP), startDate, endDate);
+        predicates.add(dateRangePredicate);
+        addPredicates(filter, predicates, criteriaBuilder, root);
+
+        criteriaQuery.where(criteriaBuilder.and(predicates.toArray(new Predicate[0])));
+
+        criteriaQuery.groupBy(
+                root.get(EQUIPMENT_OUTPUT_PROP),
+                root.get(EQUIPMENT_OUTPUT_ALIAS),
+                root.get(PRODUCTION_ORDER_PROP),
+                criteriaBuilder.function(DATE_FUNCION, Date.class, root.get(REGISTERED_AT_PROP)),
+                root.get(IS_VALID_FOR_PRODUCTION_PROP),
+                root.get(ID_PROP)
+        );
+
+        return entityManager.createQuery(criteriaQuery).getResultList();
     }
-
 
     public List<CounterRecordEntity> getFilteredAndPaginated(CounterRecordFilter filterDto) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
