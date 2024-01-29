@@ -34,20 +34,15 @@ public class KpiController {
         return new ResponseEntity<>(countingEquipmentKpiDto, HttpStatus.OK);
     }
 
-    public ResponseEntity<Long> getEquipmentScheduledTime(@RequestParam long equipmentId, @RequestBody RequestKpiDto filter) {
-        Long scheduledTime = kpiService.getProductionOrderTotalScheduledTime(equipmentId, filter);
-        return new ResponseEntity<>(scheduledTime, HttpStatus.OK);
-    }
-
     @PostMapping("/{equipmentId}/availability")
-    public ResponseEntity<KpiDto> getEquipmentAvailability(@PathVariable long equipmentId, @RequestBody RequestKpiDto filter) {
+    public ResponseEntity<KpiDto> getEquipmentAvailability(@PathVariable long equipmentId, @RequestBody KpiFilterDto filter) {
         KpiDto kpiAvailabilityDto = kpiService.computeAvailability(equipmentId, filter);
         return new ResponseEntity<>(kpiAvailabilityDto, HttpStatus.OK);
     }
 
     @PostMapping("/{equipmentId}/aggregator")
     public ResponseEntity<EquipmentKpiAggregatorDto> getEquipmentKpiAggregator(@PathVariable long equipmentId,
-                                                                               @RequestBody RequestKpiDto filter) {
+                                                                               @RequestBody KpiFilterDto filter) {
         try {
             EquipmentKpiAggregatorDto kpiAggregatorDto = kpiService.getEquipmentKpiAggregator(equipmentId, filter);
             return new ResponseEntity<>(kpiAggregatorDto, HttpStatus.OK);
@@ -62,7 +57,7 @@ public class KpiController {
 
     @PostMapping("/{equipmentId}/daily-aggregator")
     public ResponseEntity<List<EquipmentKpiAggregatorDto>> getEquipmentKpiAggregatorPerDay(@PathVariable long equipmentId,
-                                                                                           @RequestBody RequestKpiDto filter) {
+                                                                                           @RequestBody KpiFilterDto filter) {
         try {
             List<EquipmentKpiAggregatorDto> kpiAggregatorsDto = kpiService.getEquipmentKpiAggregatorPerDay(equipmentId, filter);
             return new ResponseEntity<>(kpiAggregatorsDto, HttpStatus.OK);

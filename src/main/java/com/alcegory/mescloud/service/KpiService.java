@@ -10,13 +10,11 @@ public interface KpiService {
 
     CountingEquipmentKpiDto[] getEquipmentOutputProductionPerDay(KpiFilterDto filter);
 
-    KpiDto computeEquipmentQuality(Long equipmentId, RequestKpiDto requestKpiDto);
+    KpiDto computeEquipmentQuality(Long equipmentId, KpiFilterDto requestKpiDto);
 
-    Long getProductionOrderTotalScheduledTime(Long equipmentId, RequestKpiDto filter);
+    KpiDto computeAvailability(Long equipmentId, KpiFilterDto filter);
 
-    KpiDto computeAvailability(Long equipmentId, RequestKpiDto filter);
+    EquipmentKpiAggregatorDto getEquipmentKpiAggregator(Long equipmentId, KpiFilterDto requestKpiDto);
 
-    EquipmentKpiAggregatorDto getEquipmentKpiAggregator(Long equipmentId, RequestKpiDto requestKpiDto);
-
-    List<EquipmentKpiAggregatorDto> getEquipmentKpiAggregatorPerDay(Long equipmentId, RequestKpiDto kpiRequest);
+    List<EquipmentKpiAggregatorDto> getEquipmentKpiAggregatorPerDay(Long equipmentId, KpiFilterDto kpiRequest);
 }

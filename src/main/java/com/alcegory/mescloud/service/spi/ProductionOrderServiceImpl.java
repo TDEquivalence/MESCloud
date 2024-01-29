@@ -290,37 +290,20 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     @Override
     public Long calculateScheduledTimeInSeconds(Instant startDate, Instant endDate) {
         Duration productionScheduleTime = calculateScheduledTime(startDate, endDate);
+
+        if (isInclusiveEnd(endDate)) {
+            productionScheduleTime = productionScheduleTime.plusSeconds(1);
+        }
+
         return productionScheduleTime.getSeconds();
     }
 
+    private static boolean isInclusiveEnd(Instant endDate) {
+        return endDate.getNano() > 0 || endDate.getEpochSecond() % 60 > 0;
+    }
     private Duration calculateScheduledTime(Instant startDate, Instant endDate) {
         Duration duration = Duration.between(startDate, endDate);
         return duration.isNegative() ? Duration.ZERO : duration;
-    }
-
-    @Override
-    public Long calculateScheduledTimeInSeconds(Long equipmentId, Instant startDateFilter, Instant endDateFilter) {
-
-        Timestamp startDate = Timestamp.from(startDateFilter);
-        Timestamp endDate = Timestamp.from(endDateFilter);
-
-        List<ProductionOrderEntity> productionOrders = repository.findByEquipmentAndPeriod(equipmentId,
-                startDate,
-                endDate);
-
-        if (productionOrders.isEmpty()) {
-            return 0L;
-        }
-
-        long totalActiveTime = 0;
-        for (ProductionOrderEntity productionOrder : productionOrders) {
-            Instant adjustedStartDate = getAdjustedStartDate(productionOrder, startDate);
-            Instant adjustedEndDate = getAdjustedEndDate(productionOrder, endDate);
-            
-            totalActiveTime += calculateScheduledTimeInSeconds(adjustedStartDate, adjustedEndDate);
-        }
-
-        return totalActiveTime;
     }
 
     @Override
