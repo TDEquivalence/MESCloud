@@ -290,9 +290,17 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     @Override
     public Long calculateScheduledTimeInSeconds(Instant startDate, Instant endDate) {
         Duration productionScheduleTime = calculateScheduledTime(startDate, endDate);
+
+        if (isInclusiveEnd(endDate)) {
+            productionScheduleTime = productionScheduleTime.plusSeconds(1);
+        }
+
         return productionScheduleTime.getSeconds();
     }
 
+    private static boolean isInclusiveEnd(Instant endDate) {
+        return endDate.getNano() > 0 || endDate.getEpochSecond() % 60 > 0;
+    }
     private Duration calculateScheduledTime(Instant startDate, Instant endDate) {
         Duration duration = Duration.between(startDate, endDate);
         return duration.isNegative() ? Duration.ZERO : duration;
