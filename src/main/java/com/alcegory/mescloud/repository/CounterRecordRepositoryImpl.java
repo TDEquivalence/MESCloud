@@ -13,13 +13,15 @@ import org.springframework.stereotype.Repository;
 import java.sql.Timestamp;
 import java.util.*;
 
+import static com.alcegory.mescloud.model.filter.CounterRecordFilter.Property.*;
+
 @Repository
 @Log
 public class CounterRecordRepositoryImpl extends AbstractFilterRepository<CounterRecordFilter.Property, CounterRecordEntity> {
 
     private static final String ID_PROP = "id";
     private static final String EQUIPMENT_OUTPUT_PROP = "equipmentOutput";
-    private static final String EQUIPMENT_OUTPUT_ALIAS = "equipmentOutputAlias";
+    private static final String EQUIPMENT_OUTPUT_ALIAS_PROP = "equipmentOutputAlias";
     private static final String PRODUCTION_ORDER_PROP = "productionOrder";
     private static final String COUNTING_EQUIPMENT_PROP = "countingEquipment";
     private static final String PRODUCTION_ORDER_CODE_PROP = "code";
@@ -32,9 +34,9 @@ public class CounterRecordRepositoryImpl extends AbstractFilterRepository<Counte
 
 
     public List<CounterRecordEntity> findLastPerProductionOrderAndEquipmentOutputPerDay(KpiFilterDto filter) {
-        String startDateStr = filter.getSearch().getValue(CounterRecordFilter.Property.START_DATE);
+        String startDateStr = filter.getSearch().getValue(START_DATE);
         Date startDate = Date.from(DateUtil.convertToInstant(startDateStr));
-        String endDateStr = filter.getSearch().getValue(CounterRecordFilter.Property.END_DATE);
+        String endDateStr = filter.getSearch().getValue(END_DATE);
         Date endDate = Date.from(DateUtil.convertToInstant(endDateStr));
 
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
@@ -44,7 +46,7 @@ public class CounterRecordRepositoryImpl extends AbstractFilterRepository<Counte
         criteriaQuery.multiselect(
                 criteriaBuilder.max(root.get(ID_PROP)),
                 root.get(EQUIPMENT_OUTPUT_PROP),
-                root.get(EQUIPMENT_OUTPUT_ALIAS),
+                root.get(EQUIPMENT_OUTPUT_ALIAS_PROP),
                 criteriaBuilder.sum(root.get(INCREMENT_PROP)).alias(COMPUTED_VALUE_PROP),
                 root.get(PRODUCTION_ORDER_PROP),
                 criteriaBuilder.function(DATE_FUNCION, Date.class, root.get(REGISTERED_AT_PROP)),
@@ -60,7 +62,7 @@ public class CounterRecordRepositoryImpl extends AbstractFilterRepository<Counte
 
         criteriaQuery.groupBy(
                 root.get(EQUIPMENT_OUTPUT_PROP),
-                root.get(EQUIPMENT_OUTPUT_ALIAS),
+                root.get(EQUIPMENT_OUTPUT_ALIAS_PROP),
                 root.get(PRODUCTION_ORDER_PROP),
                 criteriaBuilder.function(DATE_FUNCION, Date.class, root.get(REGISTERED_AT_PROP)),
                 root.get(IS_VALID_FOR_PRODUCTION_PROP),
@@ -163,20 +165,25 @@ public class CounterRecordRepositoryImpl extends AbstractFilterRepository<Counte
                     return countingEquipmentJoin.get(COUNTING_EQUIPMENT_ALIAS_PROP);
                 });
 
-        pathByJointProperty.put(CounterRecordFilter.Property.PRODUCTION_ORDER_CODE.getEntityProperty(),
+        pathByJointProperty.put(PRODUCTION_ORDER_CODE.getEntityProperty(),
                 r -> {
                     Join<T, ProductionOrderEntity> productionOrderJoin = r.join(PRODUCTION_ORDER_PROP);
                     return productionOrderJoin.get(PRODUCTION_ORDER_CODE_PROP);
                 });
     }
 
-    public Integer sumCounterIncrement(Long countingEquipmentId, Timestamp startDateFilter, Timestamp endDateFilter) {
+    public Integer sumCounterIncrement(Long countingEquipmentId, KpiFilterDto filter) {
+
+        Timestamp startDateFilter = filter.getSearch().getTimestampValue(START_DATE);
+        Timestamp endDateFilter = filter.getSearch().getTimestampValue(END_DATE);
+
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Integer> query = cb.createQuery(Integer.class);
 
         Root<CounterRecordEntity> crRoot = query.from(CounterRecordEntity.class);
         Join<CounterRecordEntity, EquipmentOutputEntity> eoJoin = crRoot.join(EQUIPMENT_OUTPUT_PROP, JoinType.INNER);
         Join<EquipmentOutputEntity, CountingEquipmentEntity> countingEquipmentJoin = eoJoin.join(COUNTING_EQUIPMENT_PROP, JoinType.INNER);
+        Join<CounterRecordEntity, ProductionOrderEntity> productionOrderJoin = crRoot.join(PRODUCTION_ORDER_PROP, JoinType.INNER);
 
         Expression<Integer> sumIncrement = cb.sum(crRoot.get(INCREMENT_PROP));
 
@@ -185,30 +192,46 @@ public class CounterRecordRepositoryImpl extends AbstractFilterRepository<Counte
         predicateList.add(cb.greaterThan(crRoot.get(REGISTERED_AT_PROP), startDateFilter));
         predicateList.add(cb.lessThanOrEqualTo(crRoot.get(REGISTERED_AT_PROP), endDateFilter));
 
+        String productionOrderCode = filter.getSearch().getValue(PRODUCTION_ORDER_CODE);
+        if (productionOrderCode != null && !productionOrderCode.isEmpty()) {
+            predicateList.add(cb.equal(productionOrderJoin.get("code"), productionOrderCode));
+        }
+
+        String equipmentOutputAlias = filter.getSearch().getValue(EQUIPMENT_OUTPUT_ALIAS);
+        if (equipmentOutputAlias != null && !equipmentOutputAlias.isEmpty()) {
+            predicateList.add(cb.equal(crRoot.get(EQUIPMENT_OUTPUT_ALIAS_PROP), equipmentOutputAlias));
+        }
+
         query.select(sumIncrement).where(predicateList.toArray(new Predicate[0]));
 
         Integer sum = entityManager.createQuery(query).getSingleResult();
         return sum != null ? sum : 0;
     }
 
-    public Integer sumValidCounterIncrement(Long countingEquipmentId, Timestamp startDateFilter, Timestamp endDateFilter) {
-        Integer resultSumIncrement = sumValidCounterIncrementByPO(countingEquipmentId, startDateFilter, endDateFilter);
+    public Integer sumValidCounterIncrement(Long countingEquipmentId, KpiFilterDto filter) {
+        Integer resultSumIncrement = sumValidCounterIncrementByPO(countingEquipmentId, filter);
 
         return Objects.requireNonNullElse(resultSumIncrement, 0);
     }
 
 
-    public Integer sumValidCounterIncrementByPO(Long countingEquipmentId, Timestamp startDateFilter, Timestamp endDateFilter) {
+    public Integer sumValidCounterIncrementByPO(Long countingEquipmentId, KpiFilterDto filter) {
+
+        Timestamp startDateFilter = filter.getSearch().getTimestampValue(START_DATE);
+        Timestamp endDateFilter = filter.getSearch().getTimestampValue(END_DATE);
+
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Integer> query = cb.createQuery(Integer.class);
 
         Root<CounterRecordEntity> crRoot = query.from(CounterRecordEntity.class);
         Join<CounterRecordEntity, EquipmentOutputEntity> eoJoin = crRoot.join(EQUIPMENT_OUTPUT_PROP, JoinType.INNER);
         Join<EquipmentOutputEntity, CountingEquipmentEntity> countingEquipmentJoin = eoJoin.join(COUNTING_EQUIPMENT_PROP, JoinType.INNER);
+        Join<CounterRecordEntity, ProductionOrderEntity> productionOrderJoin = crRoot.join(PRODUCTION_ORDER_PROP, JoinType.INNER);
 
         Expression<Integer> sumIncrementByPO = cb.sum(crRoot.get(INCREMENT_PROP));
 
         List<Predicate> predicateList = new ArrayList<>();
+
         Predicate conditions = cb.and(
                 cb.isTrue(crRoot.get(IS_VALID_FOR_PRODUCTION_PROP)),
                 cb.equal(countingEquipmentJoin.get("id"), countingEquipmentId)
@@ -216,6 +239,17 @@ public class CounterRecordRepositoryImpl extends AbstractFilterRepository<Counte
 
         Predicate startDate = cb.greaterThan(crRoot.get(REGISTERED_AT_PROP), startDateFilter);
         Predicate endDate = cb.lessThanOrEqualTo(crRoot.get(REGISTERED_AT_PROP), endDateFilter);
+
+        String productionOrderCode = filter.getSearch().getValue(PRODUCTION_ORDER_CODE);
+        if (productionOrderCode != null && !productionOrderCode.isEmpty()) {
+            predicateList.add(cb.equal(productionOrderJoin.get(PRODUCTION_ORDER_CODE_PROP), productionOrderCode));
+        }
+
+        String equipmentOutputAlias = filter.getSearch().getValue(EQUIPMENT_OUTPUT_ALIAS);
+        if (equipmentOutputAlias != null && !equipmentOutputAlias.isEmpty()) {
+            predicateList.add(cb.equal(crRoot.get(EQUIPMENT_OUTPUT_ALIAS_PROP), equipmentOutputAlias));
+        }
+
         predicateList.add(conditions);
         predicateList.add(startDate);
         predicateList.add(endDate);

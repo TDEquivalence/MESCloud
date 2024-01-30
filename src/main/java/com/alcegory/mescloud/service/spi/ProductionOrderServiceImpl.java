@@ -278,7 +278,8 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
 
     @Override
     public List<ProductionOrderDto> findByEquipmentAndPeriod(Long equipmentId, Date startDate, Date endDate) {
-        List<ProductionOrderEntity> productionOrders = repository.findByEquipmentAndPeriod(equipmentId, startDate, endDate);
+        List<ProductionOrderEntity> productionOrders = repository.findByEquipmentAndPeriod(equipmentId, null,
+                startDate, endDate);
         return converter.toDto(productionOrders);
     }
 
@@ -351,8 +352,9 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     }
 
     @Override
-    public List<ProductionOrderEntity> findByEquipmentAndPeriod(Long equipmentId, Timestamp startDate, Timestamp endDate) {
-        return repository.findByEquipmentAndPeriod(equipmentId, startDate, endDate);
+    public List<ProductionOrderEntity> findByEquipmentAndPeriod(Long equipmentId, String productionOrderCode,
+                                                                Timestamp startDate, Timestamp endDate) {
+        return repository.findByEquipmentAndPeriod(equipmentId, productionOrderCode, startDate, endDate);
     }
 
 }

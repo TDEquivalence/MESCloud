@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-import static com.alcegory.mescloud.model.dto.RequestKpiDto.createRequestKpiForDay;
+import static com.alcegory.mescloud.model.filter.CounterRecordFilter.Property.*;
 
 @Service
 @AllArgsConstructor
@@ -50,8 +50,8 @@ public class KpiServiceImpl implements KpiService {
 
         Map<String, CountingEquipmentKpiDto> equipmentKpiByEquipmentAlias = new LinkedHashMap<>();
 
-        Instant startDate = getPropertyAsInstant(filter, CounterRecordFilter.Property.START_DATE);
-        Instant endDate = getPropertyAsInstant(filter, CounterRecordFilter.Property.END_DATE);
+        Instant startDate = getPropertyAsInstant(filter, START_DATE);
+        Instant endDate = getPropertyAsInstant(filter, END_DATE);
 
         final int spanInDays = DateUtil.spanInDays(startDate, endDate);
 
@@ -105,8 +105,8 @@ public class KpiServiceImpl implements KpiService {
 
     @Override
     public List<EquipmentKpiAggregatorDto> getEquipmentKpiAggregatorPerDay(Long equipmentId, KpiFilterDto filter) {
-        Timestamp startDate = filter.getSearch().getTimestampValue(CounterRecordFilter.Property.START_DATE);
-        Timestamp endDate = filter.getSearch().getTimestampValue(CounterRecordFilter.Property.END_DATE);
+        Timestamp startDate = filter.getSearch().getTimestampValue(START_DATE);
+        Timestamp endDate = filter.getSearch().getTimestampValue(END_DATE);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
         List<EquipmentKpiAggregatorDto> equipmentKpiAggregators = new ArrayList<>();
@@ -119,8 +119,8 @@ public class KpiServiceImpl implements KpiService {
             String startDateFilter = currentDay.atStartOfDay().format(formatter);
             String endDateTimeFilter = currentDay.plusDays(1).atStartOfDay().minusNanos(1).format(formatter);
 
-            filter.getSearch().setSearchValueByName(CounterRecordFilter.Property.START_DATE, startDateFilter);
-            filter.getSearch().setSearchValueByName(CounterRecordFilter.Property.END_DATE, endDateTimeFilter);
+            filter.getSearch().setSearchValueByName(START_DATE, startDateFilter);
+            filter.getSearch().setSearchValueByName(END_DATE, endDateTimeFilter);
 
             EquipmentKpiAggregatorDto aggregator = getEquipmentKpiAggregator(equipmentId, filter);
             equipmentKpiAggregators.add(aggregator);
@@ -136,11 +136,17 @@ public class KpiServiceImpl implements KpiService {
     @Override
     public KpiDto computeAvailability(Long equipmentId, KpiFilterDto filter) {
 
-        Timestamp startDate = filter.getSearch().getTimestampValue(CounterRecordFilter.Property.START_DATE);
-        Timestamp endDate = filter.getSearch().getTimestampValue(CounterRecordFilter.Property.END_DATE);
+        Timestamp startDate = filter.getSearch().getTimestampValue(START_DATE);
+        Timestamp endDate = filter.getSearch().getTimestampValue(END_DATE);
 
-        List<ProductionOrderEntity> productionOrders = findByEquipmentAndPeriod(equipmentId, startDate,
-                endDate);
+        List<ProductionOrderEntity> productionOrders = new ArrayList<>();
+        if (filter.getSearch().getValue(PRODUCTION_ORDER_CODE) != null) {
+            productionOrders = findByEquipmentAndPeriod(equipmentId, filter.getSearch().getValue(PRODUCTION_ORDER_CODE),
+                    startDate, endDate);
+        } else {
+            productionOrders = findByEquipmentAndPeriod(equipmentId, null, startDate,
+                    endDate);
+        }
 
         Long equipmentOutputId = equipmentOutputService.findIdByCountingEquipmentId(equipmentId);
 
@@ -152,7 +158,8 @@ public class KpiServiceImpl implements KpiService {
             Instant adjustedEndDate = productionOrderService.getAdjustedEndDate(productionOrder, endDate);
 
             totalScheduledTime += getProductionOrderTotalScheduledTime(adjustedStartDate, adjustedEndDate);
-            totalActiveTime += calculateActiveTimeByProductionOrderId(productionOrder, equipmentOutputId, adjustedStartDate, adjustedEndDate);
+            totalActiveTime += calculateActiveTimeByProductionOrderId(productionOrder, equipmentOutputId, adjustedStartDate,
+                    adjustedEndDate);
         }
 
         log.info(String.format("Total schedule time [%s]", totalScheduledTime));
@@ -181,12 +188,8 @@ public class KpiServiceImpl implements KpiService {
     @Override
     public KpiDto computeEquipmentQuality(Long equipmentId, KpiFilterDto filter) {
 
-        Timestamp startDate = filter.getSearch().getTimestampValue(CounterRecordFilter.Property.START_DATE);
-        Timestamp endDate = filter.getSearch().getTimestampValue(CounterRecordFilter.Property.END_DATE);
-
-        Integer validCounter = counterRecordService.sumValidCounterIncrement(equipmentId, startDate, endDate);
-
-        Integer totalCounter = counterRecordService.sumCounterIncrement(equipmentId, startDate, endDate);
+        Integer validCounter = counterRecordService.sumValidCounterIncrement(equipmentId, filter);
+        Integer totalCounter = counterRecordService.sumCounterIncrement(equipmentId, filter);
 
         KpiDto kpi = new KpiDto(validCounter, totalCounter);
         kpi.setValueAsDivision();
@@ -226,9 +229,9 @@ public class KpiServiceImpl implements KpiService {
         return kpiDto == null || kpiDto.getValue() == null || kpiDto.getValue() == 0;
     }
 
-    private List<ProductionOrderEntity> findByEquipmentAndPeriod(Long equipmentId, Timestamp startDateFilter,
-                                                                 Timestamp endDateFilter) {
+    private List<ProductionOrderEntity> findByEquipmentAndPeriod(Long equipmentId, String productionOrderCode,
+                                                                 Timestamp startDateFilter, Timestamp endDateFilter) {
 
-        return productionOrderService.findByEquipmentAndPeriod(equipmentId, startDateFilter, endDateFilter);
+        return productionOrderService.findByEquipmentAndPeriod(equipmentId, productionOrderCode, startDateFilter, endDateFilter);
     }
 }

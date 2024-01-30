@@ -272,13 +272,13 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     }
 
     @Override
-    public Integer sumValidCounterIncrement(Long countingEquipmentId, Timestamp startDateFilter, Timestamp endDateFilter) {
-        return repository.sumValidCounterIncrement(countingEquipmentId, startDateFilter, endDateFilter);
+    public Integer sumValidCounterIncrement(Long countingEquipmentId, KpiFilterDto filter) {
+        return repository.sumValidCounterIncrement(countingEquipmentId, filter);
     }
 
     @Override
-    public Integer sumCounterIncrement(Long countingEquipmentId, Timestamp startDateFilter, Timestamp endDateFilter) {
-        return repository.sumCounterIncrement(countingEquipmentId, startDateFilter, endDateFilter);
+    public Integer sumCounterIncrement(Long countingEquipmentId, KpiFilterDto filter) {
+        return repository.sumCounterIncrement(countingEquipmentId, filter);
     }
 
     @Override
