@@ -25,9 +25,9 @@ public interface CounterRecordService {
 
     boolean areValidContinuationCounts(String productionOrderCode);
 
-    Integer sumValidCounterIncrement(Long countingEquipmentId, Timestamp startDateFilter, Timestamp endDateFilter);
+    Integer sumValidCounterIncrement(Long countingEquipmentId, KpiFilterDto filter);
 
-    Integer sumCounterIncrement(Long countingEquipmentId, Timestamp startDateFilter, Timestamp endDateFilter);
+    Integer sumCounterIncrement(Long countingEquipmentId, KpiFilterDto filter);
 
     Integer sumIncrementActiveTimeByProductionOrderId(Long productionOrderId, Long equipmentOutputId, Timestamp startDate,
                                                       Timestamp endDate);

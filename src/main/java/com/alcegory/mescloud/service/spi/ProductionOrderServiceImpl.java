@@ -278,7 +278,8 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
 
     @Override
     public List<ProductionOrderDto> findByEquipmentAndPeriod(Long equipmentId, Date startDate, Date endDate) {
-        List<ProductionOrderEntity> productionOrders = repository.findByEquipmentAndPeriod(equipmentId, startDate, endDate);
+        List<ProductionOrderEntity> productionOrders = repository.findByEquipmentAndPeriod(equipmentId, null,
+                startDate, endDate);
         return converter.toDto(productionOrders);
     }
 
@@ -304,31 +305,6 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     private Duration calculateScheduledTime(Instant startDate, Instant endDate) {
         Duration duration = Duration.between(startDate, endDate);
         return duration.isNegative() ? Duration.ZERO : duration;
-    }
-
-    @Override
-    public Long calculateScheduledTimeInSeconds(Long equipmentId, Instant startDateFilter, Instant endDateFilter) {
-
-        Timestamp startDate = Timestamp.from(startDateFilter);
-        Timestamp endDate = Timestamp.from(endDateFilter);
-
-        List<ProductionOrderEntity> productionOrders = repository.findByEquipmentAndPeriod(equipmentId,
-                startDate,
-                endDate);
-
-        if (productionOrders.isEmpty()) {
-            return 0L;
-        }
-
-        long totalActiveTime = 0;
-        for (ProductionOrderEntity productionOrder : productionOrders) {
-            Instant adjustedStartDate = getAdjustedStartDate(productionOrder, startDate);
-            Instant adjustedEndDate = getAdjustedEndDate(productionOrder, endDate);
-            
-            totalActiveTime += calculateScheduledTimeInSeconds(adjustedStartDate, adjustedEndDate);
-        }
-
-        return totalActiveTime;
     }
 
     @Override
@@ -376,8 +352,9 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     }
 
     @Override
-    public List<ProductionOrderEntity> findByEquipmentAndPeriod(Long equipmentId, Timestamp startDate, Timestamp endDate) {
-        return repository.findByEquipmentAndPeriod(equipmentId, startDate, endDate);
+    public List<ProductionOrderEntity> findByEquipmentAndPeriod(Long equipmentId, String productionOrderCode,
+                                                                Timestamp startDate, Timestamp endDate) {
+        return repository.findByEquipmentAndPeriod(equipmentId, productionOrderCode, startDate, endDate);
     }
 
 }

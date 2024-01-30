@@ -32,11 +32,11 @@ public interface CounterRecordRepository extends CrudRepository<CounterRecordEnt
     //    @EntityGraph(attributePaths = { "equipmentOutput", "equipmentOutput.countingEquipment", "productionOrder" })
     List<CounterRecordEntity> getFilteredAndPaginated(CounterRecordFilter filterDto);
 
-    Integer sumValidCounterIncrement(Long countingEquipmentId, Timestamp startDateFilter, Timestamp endDateFilter);
+    Integer sumValidCounterIncrement(Long countingEquipmentId, KpiFilterDto filter);
 
     Integer sumValidCounterIncrementForApprovedPO(Long countingEquipmentId, Timestamp startDateFilter, Timestamp endDateFilter);
 
-    Integer sumCounterIncrement(Long countingEquipmentId, Timestamp startDateFilter, Timestamp endDateFilter);
+    Integer sumCounterIncrement(Long countingEquipmentId, KpiFilterDto filter);
 
     @Query(value = "SELECT SUM(cr.increment_active_time) AS sum_increment_active_time " +
             "FROM counter_record cr " +
