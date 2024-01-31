@@ -17,6 +17,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.alcegory.mescloud.model.filter.CounterRecordFilter.Property.*;
 
@@ -73,21 +74,16 @@ public class KpiServiceImpl implements KpiService {
             throws NoSuchElementException, IncompleteConfigurationException, ArithmeticException {
 
         String equipmentAlias = filter.getSearch().getValue(EQUIPMENT_ALIAS);
-        Long equipmentId = countingEquipmentService.findIdByAlias(equipmentAlias);
+        Long equipmentId = (equipmentAlias != null && !equipmentAlias.isEmpty())
+                ? countingEquipmentService.findIdByAlias(equipmentAlias)
+                : null;
 
-        List<Long> equipmentIds = new ArrayList<>();
-
-        if (equipmentId != null) {
-            equipmentIds.add(equipmentId);
-        } else {
-            equipmentIds = countingEquipmentService.findAllIds();
-        }
-
-        List<EquipmentKpiAggregatorDto> equipmentKpiAggregator = new ArrayList<>();
-
-        for (Long id : equipmentIds) {
-            equipmentKpiAggregator.add(getEquipmentKpiAggregator(id, filter));
-        }
+        List<EquipmentKpiAggregatorDto> equipmentKpiAggregator = Optional.ofNullable(equipmentId)
+                .map(Collections::singletonList)
+                .orElseGet(countingEquipmentService::findAllIds)
+                .stream()
+                .map(id -> getEquipmentKpiAggregator(id, filter))
+                .toList();
 
         return sumEquipmentKpiAggregators(equipmentKpiAggregator);
     }
