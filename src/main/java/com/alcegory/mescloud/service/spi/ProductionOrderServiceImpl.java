@@ -289,7 +289,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     }
 
     @Override
-    public Long calculateScheduledTimeInSeconds(Instant startDate, Instant endDate) {
+    public Long calculateScheduledTimeInSeconds(Timestamp startDate, Timestamp endDate) {
         Duration productionScheduleTime = calculateScheduledTime(startDate, endDate);
 
         if (isInclusiveEnd(endDate)) {
@@ -299,22 +299,27 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         return productionScheduleTime.getSeconds();
     }
 
-    private static boolean isInclusiveEnd(Instant endDate) {
-        return endDate.getNano() > 0 || endDate.getEpochSecond() % 60 > 0;
+    private static boolean isInclusiveEnd(Timestamp endDate) {
+        Instant endInstant = endDate.toInstant();
+        return endInstant.getNano() > 0 || endInstant.getEpochSecond() % 60 > 0;
     }
-    private Duration calculateScheduledTime(Instant startDate, Instant endDate) {
-        Duration duration = Duration.between(startDate, endDate);
+
+    private Duration calculateScheduledTime(Timestamp startDate, Timestamp endDate) {
+        Instant startInstant = startDate.toInstant();
+        Instant endInstant = endDate.toInstant();
+        Duration duration = Duration.between(startInstant, endInstant);
         return duration.isNegative() ? Duration.ZERO : duration;
     }
 
     @Override
-    public Instant getAdjustedStartDate(ProductionOrderEntity productionOrder, Timestamp startDate) {
+    public Timestamp getAdjustedStartDate(ProductionOrderEntity productionOrder, Timestamp startDate) {
         Instant createdAt = productionOrder.getCreatedAt().toInstant();
-        return (createdAt.isAfter(startDate.toInstant()) ? createdAt : startDate.toInstant());
+        Instant adjustedStartDate = createdAt.isAfter(startDate.toInstant()) ? createdAt : startDate.toInstant();
+        return Timestamp.from(adjustedStartDate);
     }
 
     @Override
-    public Instant getAdjustedEndDate(ProductionOrderEntity productionOrder, Timestamp endDate) {
+    public Timestamp getAdjustedEndDate(ProductionOrderEntity productionOrder, Timestamp endDate) {
         Date completedAtDate = productionOrder.getCompletedAt();
         Instant completedAtInstant = (completedAtDate != null) ? completedAtDate.toInstant() : null;
 
@@ -327,7 +332,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
             completedAtInstant = nowTime;
         }
 
-        return completedAtInstant;
+        return Timestamp.from(completedAtInstant);
     }
 
     @Override
