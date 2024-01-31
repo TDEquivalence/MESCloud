@@ -72,11 +72,21 @@ public class KpiServiceImpl implements KpiService {
     public EquipmentKpiAggregatorDto getAllEquipmentKpiAggregator(KpiFilterDto filter)
             throws NoSuchElementException, IncompleteConfigurationException, ArithmeticException {
 
-        List<Long> equipmentIds = countingEquipmentService.findAllIds();
+        String equipmentAlias = filter.getSearch().getValue(EQUIPMENT_ALIAS);
+        Long equipmentId = countingEquipmentService.findIdByAlias(equipmentAlias);
+
+        List<Long> equipmentIds = new ArrayList<>();
+
+        if (equipmentId != null) {
+            equipmentIds.add(equipmentId);
+        } else {
+            equipmentIds = countingEquipmentService.findAllIds();
+        }
+
         List<EquipmentKpiAggregatorDto> equipmentKpiAggregator = new ArrayList<>();
 
-        for (Long equipmentId : equipmentIds) {
-            equipmentKpiAggregator.add(getEquipmentKpiAggregator(equipmentId, filter));
+        for (Long id : equipmentIds) {
+            equipmentKpiAggregator.add(getEquipmentKpiAggregator(id, filter));
         }
 
         return sumEquipmentKpiAggregators(equipmentKpiAggregator);
@@ -251,9 +261,12 @@ public class KpiServiceImpl implements KpiService {
             sumEquipmentKpiDto(result.getQualityKpi(), aggregator.getQualityKpi());
             sumEquipmentKpiDto(result.getAvailabilityKpi(), aggregator.getAvailabilityKpi());
             sumEquipmentKpiDto(result.getPerformanceKpi(), aggregator.getPerformanceKpi());
-            sumEquipmentKpiDto(result.getOverallEquipmentEffectivenessKpi(), aggregator.getOverallEquipmentEffectivenessKpi());
         }
 
+        EquipmentKpiDto overallEquipmentEffectivenessKpi = result.getOverallEquipmentEffectivenessKpi();
+        overallEquipmentEffectivenessKpi.setKpiValue(result.getQualityKpi().getKpiValue() * result.getAvailabilityKpi().getKpiValue() *
+                result.getPerformanceKpi().getKpiValue());
+        result.setOverallEquipmentEffectivenessKpi(overallEquipmentEffectivenessKpi);
         return result;
     }
 
@@ -264,6 +277,7 @@ public class KpiServiceImpl implements KpiService {
         
         resultDto.setKpiDividend(nullToZero(resultDto.getKpiDividend()) + nullToZero(inputDto.getKpiDividend()));
         resultDto.setKpiDivider(nullToZero(resultDto.getKpiDivider()) + nullToZero(inputDto.getKpiDivider()));
+        resultDto.setKpiValue(resultDto.getKpiDividend()/resultDto.getKpiDivider());
     }
 
     private double nullToZero(Double value) {

@@ -31,4 +31,7 @@ public interface CountingEquipmentRepository extends CrudRepository<CountingEqui
 
     @Query("SELECT ce.id FROM counting_equipment ce")
     List<Long> findAllIds();
+
+    @Query("SELECT ce.id FROM counting_equipment ce WHERE ce.alias = :alias")
+    Long findIdByAlias(String alias);
 }

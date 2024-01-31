@@ -34,4 +34,6 @@ public interface CountingEquipmentService {
     void setOperationStatusByCode(String equipmentCode, CountingEquipmentEntity.OperationStatus idle);
 
     List<Long> findAllIds();
+
+    Long findIdByAlias(String alias);
 }

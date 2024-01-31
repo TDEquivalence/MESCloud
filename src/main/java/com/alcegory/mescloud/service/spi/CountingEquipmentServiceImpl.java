@@ -328,4 +328,9 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
     public List<Long> findAllIds() {
         return repository.findAllIds();
     }
+
+    @Override
+    public Long findIdByAlias(String alias) {
+        return repository.findIdByAlias(alias);
+    }
 }
