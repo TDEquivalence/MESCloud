@@ -245,12 +245,7 @@ public class KpiServiceImpl implements KpiService {
             return aggregatorList.get(0);
         }
 
-        EquipmentKpiAggregatorDto result = EquipmentKpiAggregatorDto.builder()
-                .qualityKpi(new EquipmentKpiDto())
-                .availabilityKpi(new EquipmentKpiDto())
-                .performanceKpi(new EquipmentKpiDto())
-                .overallEquipmentEffectivenessKpi(new EquipmentKpiDto())
-                .build();
+        EquipmentKpiAggregatorDto result = initializeResultAggregator();
 
         for (EquipmentKpiAggregatorDto aggregator : aggregatorList) {
             sumEquipmentKpiDto(result.getQualityKpi(), aggregator.getQualityKpi());
@@ -258,11 +253,31 @@ public class KpiServiceImpl implements KpiService {
             sumEquipmentKpiDto(result.getPerformanceKpi(), aggregator.getPerformanceKpi());
         }
 
+        updateTargets(result, aggregatorList.size());
+        calculateOverallEffectivenessAllEquipments(result);
+        return result;
+    }
+
+    private EquipmentKpiAggregatorDto initializeResultAggregator() {
+        return EquipmentKpiAggregatorDto.builder()
+                .qualityKpi(new EquipmentKpiDto())
+                .availabilityKpi(new EquipmentKpiDto())
+                .performanceKpi(new EquipmentKpiDto())
+                .overallEquipmentEffectivenessKpi(new EquipmentKpiDto())
+                .build();
+    }
+
+    private void updateTargets(EquipmentKpiAggregatorDto result, int size) {
+        result.getQualityKpi().setKpiTarget(result.getQualityKpi().getKpiTarget() / size);
+        result.getAvailabilityKpi().setKpiTarget(result.getAvailabilityKpi().getKpiTarget() / size);
+        result.getPerformanceKpi().setKpiTarget(result.getPerformanceKpi().getKpiTarget() / size);
+    }
+
+    private void calculateOverallEffectivenessAllEquipments(EquipmentKpiAggregatorDto result) {
         EquipmentKpiDto overallEquipmentEffectivenessKpi = result.getOverallEquipmentEffectivenessKpi();
         overallEquipmentEffectivenessKpi.setKpiValue(result.getQualityKpi().getKpiValue() * result.getAvailabilityKpi().getKpiValue() *
                 result.getPerformanceKpi().getKpiValue());
         result.setOverallEquipmentEffectivenessKpi(overallEquipmentEffectivenessKpi);
-        return result;
     }
 
     private void sumEquipmentKpiDto(EquipmentKpiDto resultDto, EquipmentKpiDto inputDto) {
@@ -272,6 +287,7 @@ public class KpiServiceImpl implements KpiService {
 
         resultDto.setKpiDividend(nullToZero(resultDto.getKpiDividend()) + nullToZero(inputDto.getKpiDividend()));
         resultDto.setKpiDivider(nullToZero(resultDto.getKpiDivider()) + nullToZero(inputDto.getKpiDivider()));
+        resultDto.setKpiTarget(nullToZero(resultDto.getKpiTarget()) + nullToZero(inputDto.getKpiTarget()));
         resultDto.setKpiValue(resultDto.getKpiDividend() / resultDto.getKpiDivider());
     }
 
