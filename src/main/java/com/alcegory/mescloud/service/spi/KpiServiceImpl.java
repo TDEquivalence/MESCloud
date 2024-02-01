@@ -251,6 +251,7 @@ public class KpiServiceImpl implements KpiService {
             sumEquipmentKpiDto(result.getQualityKpi(), aggregator.getQualityKpi());
             sumEquipmentKpiDto(result.getAvailabilityKpi(), aggregator.getAvailabilityKpi());
             sumEquipmentKpiDto(result.getPerformanceKpi(), aggregator.getPerformanceKpi());
+            sumEquipmentKpiDto(result.getOverallEquipmentEffectivenessKpi(), aggregator.getOverallEquipmentEffectivenessKpi());
         }
 
         updateTargets(result, aggregatorList.size());
@@ -271,6 +272,7 @@ public class KpiServiceImpl implements KpiService {
         result.getQualityKpi().setKpiTarget(result.getQualityKpi().getKpiTarget() / size);
         result.getAvailabilityKpi().setKpiTarget(result.getAvailabilityKpi().getKpiTarget() / size);
         result.getPerformanceKpi().setKpiTarget(result.getPerformanceKpi().getKpiTarget() / size);
+        result.getOverallEquipmentEffectivenessKpi().setKpiTarget(result.getOverallEquipmentEffectivenessKpi().getKpiTarget() / size);
     }
 
     private void calculateOverallEffectivenessAllEquipments(EquipmentKpiAggregatorDto result) {
