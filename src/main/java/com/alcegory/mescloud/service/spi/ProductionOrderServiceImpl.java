@@ -296,7 +296,14 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
             productionScheduleTime = productionScheduleTime.plusSeconds(1);
         }
 
-        return productionScheduleTime.getSeconds();
+        long seconds = productionScheduleTime.getSeconds();
+        long nanos = productionScheduleTime.getNano();
+
+        if (nanos > 0) {
+            seconds++;
+        }
+
+        return seconds;
     }
 
     private static boolean isInclusiveEnd(Timestamp endDate) {

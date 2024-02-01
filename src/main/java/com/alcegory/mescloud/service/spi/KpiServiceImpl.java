@@ -17,7 +17,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static com.alcegory.mescloud.model.filter.CounterRecordFilter.Property.*;
 
@@ -168,7 +167,7 @@ public class KpiServiceImpl implements KpiService {
             Timestamp adjustedStartDate = productionOrderService.getAdjustedStartDate(productionOrder, startDate);
             Timestamp adjustedEndDate = productionOrderService.getAdjustedEndDate(productionOrder, endDate);
 
-            totalScheduledTime += getProductionOrderTotalScheduledTime(adjustedStartDate, adjustedEndDate);
+            totalScheduledTime += calculateProductionOrderTotalScheduledTime(adjustedStartDate, adjustedEndDate);
             totalActiveTime += calculateActiveTimeByProductionOrderId(productionOrder, equipmentOutputId, adjustedStartDate, adjustedEndDate);
         }
 
@@ -177,7 +176,7 @@ public class KpiServiceImpl implements KpiService {
         return kpi;
     }
 
-    private Long getProductionOrderTotalScheduledTime(Timestamp startDate, Timestamp endDate) {
+    private Long calculateProductionOrderTotalScheduledTime(Timestamp startDate, Timestamp endDate) {
         return productionOrderService.calculateScheduledTimeInSeconds(startDate, endDate);
     }
 
@@ -270,10 +269,10 @@ public class KpiServiceImpl implements KpiService {
         if (resultDto == null || inputDto == null) {
             return;
         }
-        
+
         resultDto.setKpiDividend(nullToZero(resultDto.getKpiDividend()) + nullToZero(inputDto.getKpiDividend()));
         resultDto.setKpiDivider(nullToZero(resultDto.getKpiDivider()) + nullToZero(inputDto.getKpiDivider()));
-        resultDto.setKpiValue(resultDto.getKpiDividend()/resultDto.getKpiDivider());
+        resultDto.setKpiValue(resultDto.getKpiDividend() / resultDto.getKpiDivider());
     }
 
     private double nullToZero(Double value) {
