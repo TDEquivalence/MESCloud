@@ -5,7 +5,6 @@ import com.alcegory.mescloud.model.dto.ProductionOrderSummaryDto;
 import com.alcegory.mescloud.model.entity.ProductionOrderEntity;
 
 import java.sql.Timestamp;
-import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -40,7 +39,7 @@ public interface ProductionOrderService {
 
     void setProductionOrderApproval(Long composedOrderId, boolean isApproved);
 
-    Long calculateScheduledTimeInSeconds(Instant startDate, Instant endDate);
+    Long calculateScheduledTimeInSeconds(Timestamp startDate, Timestamp endDate);
 
     List<ProductionOrderDto> findByEquipmentAndPeriod(Long equipmentId, Date startDate, Date endDate);
 
@@ -51,7 +50,7 @@ public interface ProductionOrderService {
     List<ProductionOrderEntity> findByEquipmentAndPeriod(Long equipmentId, String productionOrderCode, Timestamp startDate,
                                                          Timestamp endDate);
 
-    Instant getAdjustedStartDate(ProductionOrderEntity productionOrder, Timestamp startDate);
+    Timestamp getAdjustedStartDate(ProductionOrderEntity productionOrder, Timestamp startDate);
 
-    Instant getAdjustedEndDate(ProductionOrderEntity productionOrder, Timestamp endDate);
+    Timestamp getAdjustedEndDate(ProductionOrderEntity productionOrder, Timestamp endDate);
 }

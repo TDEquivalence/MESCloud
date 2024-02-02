@@ -1,7 +1,10 @@
 package com.alcegory.mescloud.api.rest;
 
 import com.alcegory.mescloud.exception.IncompleteConfigurationException;
-import com.alcegory.mescloud.model.dto.*;
+import com.alcegory.mescloud.model.dto.CountingEquipmentKpiDto;
+import com.alcegory.mescloud.model.dto.EquipmentKpiAggregatorDto;
+import com.alcegory.mescloud.model.dto.KpiDto;
+import com.alcegory.mescloud.model.dto.KpiFilterDto;
 import com.alcegory.mescloud.service.KpiService;
 import com.alcegory.mescloud.utility.HttpUtil;
 import lombok.AllArgsConstructor;
@@ -45,6 +48,20 @@ public class KpiController {
                                                                                @RequestBody KpiFilterDto filter) {
         try {
             EquipmentKpiAggregatorDto kpiAggregatorDto = kpiService.getEquipmentKpiAggregator(equipmentId, filter);
+            return new ResponseEntity<>(kpiAggregatorDto, HttpStatus.OK);
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        } catch (IncompleteConfigurationException e) {
+            return HttpUtil.responseWithHeaders(HttpStatus.CONFLICT, EQUIPMENT_ERROR_CAUSE, e);
+        } catch (ArithmeticException e) {
+            return HttpUtil.responseWithHeaders(HttpStatus.CONFLICT, KPI_ERROR_CAUSE, e);
+        }
+    }
+
+    @PostMapping("/aggregator")
+    public ResponseEntity<EquipmentKpiAggregatorDto> getAllEquipmentKpiAggregator(@RequestBody KpiFilterDto filter) {
+        try {
+            EquipmentKpiAggregatorDto kpiAggregatorDto = kpiService.getAllEquipmentKpiAggregator(filter);
             return new ResponseEntity<>(kpiAggregatorDto, HttpStatus.OK);
         } catch (NoSuchElementException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
