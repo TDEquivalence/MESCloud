@@ -37,11 +37,21 @@ public interface CounterRecordRepository extends CrudRepository<CounterRecordEnt
 
     Integer sumCounterIncrement(Long countingEquipmentId, KpiFilterDto filter);
 
-    @Query(value = "SELECT SUM(cr.increment_active_time) AS sum_increment_active_time " +
+    @Query(value = "SELECT " +
+            "SUM(cr.increment_active_time) - COALESCE((" +
+            "    SELECT cr_sub.increment_active_time " +
+            "    FROM counter_record cr_sub " +
+            "    WHERE cr_sub.production_order_id = :productionOrderId " +
+            "        AND cr_sub.equipment_output_id = :equipmentOutputId " +
+            "        AND cr_sub.registered_at BETWEEN :startDate AND :endDate " +
+            "    ORDER BY cr_sub.registered_at " +
+            "    LIMIT 1" +
+            "), 0) AS sum_increment_active_time " +
             "FROM counter_record cr " +
-            "WHERE cr.production_order_id = :productionOrderId " +
-            "AND cr.equipment_output_id = :equipmentOutputId " +
-            "AND cr.registered_at BETWEEN :startDate AND :endDate " +
+            "WHERE " +
+            "    cr.production_order_id = :productionOrderId " +
+            "    AND cr.equipment_output_id = :equipmentOutputId " +
+            "    AND cr.registered_at BETWEEN :startDate AND :endDate " +
             "GROUP BY cr.production_order_id", nativeQuery = true)
     Integer sumIncrementActiveTimeByProductionOrderId(
             @Param("productionOrderId") Long productionOrderId,
