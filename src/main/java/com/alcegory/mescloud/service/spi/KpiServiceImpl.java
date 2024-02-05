@@ -168,8 +168,8 @@ public class KpiServiceImpl implements KpiService {
             Timestamp adjustedStartDate = getAdjustedStartDate(productionOrder, startDate);
             Timestamp adjustedEndDate = getAdjustedEndDate(productionOrder, endDate);
 
-            totalScheduledTime += calculateScheduledTimeInSeconds(adjustedStartDate, adjustedEndDate);
             totalActiveTime += calculateActiveTimeByProductionOrderId(productionOrder, equipmentOutputId, adjustedStartDate, adjustedEndDate);
+            totalScheduledTime += calculateScheduledTimeInSeconds(adjustedStartDate, adjustedEndDate);
         }
 
         KpiDto kpi = new KpiDto(DoubleUtil.safeDoubleValue(totalActiveTime), DoubleUtil.safeDoubleValue(totalScheduledTime));
@@ -249,7 +249,7 @@ public class KpiServiceImpl implements KpiService {
 
         Instant nowTime = Instant.now();
         if (completedAtInstant.isAfter(nowTime)) {
-            completedAtInstant = counterRecordService.getLastRegisteredAtByProductionOrder(productionOrder);
+            completedAtInstant = counterRecordService.getLastRegisteredAtByProductionOrderId(productionOrder.getId());
         }
 
         return Timestamp.from(completedAtInstant);

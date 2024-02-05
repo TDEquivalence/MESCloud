@@ -296,8 +296,8 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     }
 
     @Override
-    public Instant getLastRegisteredAtByProductionOrder(ProductionOrderEntity productionOrder) {
-        Timestamp registeredAt = repository.findLatestRegisteredAtByProductionOrderId(productionOrder.getId());
+    public Instant getLastRegisteredAtByProductionOrderId(Long productionOrderId) {
+        Timestamp registeredAt = repository.findLatestRegisteredAtByProductionOrderId(productionOrderId);
         return registeredAt.toInstant();
     }
 
