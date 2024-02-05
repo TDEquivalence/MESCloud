@@ -70,7 +70,7 @@ public class KpiServiceImpl implements KpiService {
                 .toArray(new CountingEquipmentKpiDto[equipmentKpiByEquipmentAlias.size()]);
     }
 
-    public EquipmentKpiAggregatorDto getEquipmentKpiAggregator(KpiFilterDto filter)
+    public EquipmentKpiAggregatorDto computeEquipmentKpiAggregator(KpiFilterDto filter)
             throws NoSuchElementException, IncompleteConfigurationException, ArithmeticException {
 
         String equipmentAlias = filter.getSearch().getValue(EQUIPMENT_ALIAS);
@@ -82,14 +82,14 @@ public class KpiServiceImpl implements KpiService {
                 .map(Collections::singletonList)
                 .orElseGet(countingEquipmentService::findAllIds)
                 .stream()
-                .map(id -> getEquipmentKpiAggregatorById(id, filter))
+                .map(id -> computeEquipmentKpiAggregatorById(id, filter))
                 .toList();
 
         return sumEquipmentKpiAggregators(equipmentKpiAggregator);
     }
 
     @Override
-    public EquipmentKpiAggregatorDto getEquipmentKpiAggregatorById(Long equipmentId, KpiFilterDto filter)
+    public EquipmentKpiAggregatorDto computeEquipmentKpiAggregatorById(Long equipmentId, KpiFilterDto filter)
             throws NoSuchElementException, IncompleteConfigurationException, ArithmeticException {
 
         Optional<CountingEquipmentDto> countingEquipmentDtoOpt = countingEquipmentService.findById(equipmentId);
@@ -123,16 +123,16 @@ public class KpiServiceImpl implements KpiService {
     }
 
     @Override
-    public List<EquipmentKpiAggregatorDto> getEquipmentKpiAggregatorPerDay(KpiFilterDto filter) {
-        return getEquipmentKpiAggregators(filter, null);
+    public List<EquipmentKpiAggregatorDto> computeEquipmentKpiAggregatorPerDay(KpiFilterDto filter) {
+        return computeEquipmentKpiAggregators(filter, null);
     }
 
     @Override
-    public List<EquipmentKpiAggregatorDto> getEquipmentKpiAggregatorPerDayById(Long equipmentId, KpiFilterDto filter) {
-        return getEquipmentKpiAggregators(filter, equipmentId);
+    public List<EquipmentKpiAggregatorDto> computeEquipmentKpiAggregatorPerDayById(Long equipmentId, KpiFilterDto filter) {
+        return computeEquipmentKpiAggregators(filter, equipmentId);
     }
 
-    private List<EquipmentKpiAggregatorDto> getEquipmentKpiAggregators(KpiFilterDto filter, Long equipmentId) {
+    private List<EquipmentKpiAggregatorDto> computeEquipmentKpiAggregators(KpiFilterDto filter, Long equipmentId) {
         Timestamp startDate = filter.getSearch().getTimestampValue(START_DATE);
         Timestamp endDate = filter.getSearch().getTimestampValue(END_DATE);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -151,8 +151,8 @@ public class KpiServiceImpl implements KpiService {
             filter.getSearch().setSearchValueByName(END_DATE, endDateTimeFilter);
 
             EquipmentKpiAggregatorDto aggregator = (equipmentId != null)
-                    ? getEquipmentKpiAggregatorById(equipmentId, filter)
-                    : getEquipmentKpiAggregator(filter);
+                    ? computeEquipmentKpiAggregatorById(equipmentId, filter)
+                    : computeEquipmentKpiAggregator(filter);
 
             equipmentKpiAggregators.add(aggregator);
         }
@@ -251,19 +251,30 @@ public class KpiServiceImpl implements KpiService {
     }
 
     public Timestamp calculateAdjustedEndDate(ProductionOrderEntity productionOrder, Timestamp endDate) {
-        Date completedAtDate = productionOrder.getCompletedAt();
-        Instant completedAtInstant = (completedAtDate != null) ? completedAtDate.toInstant() : null;
+        Instant completedAtInstant = getCompletedAtInstant(productionOrder, endDate);
 
-        if (completedAtInstant == null) {
-            completedAtInstant = endDate.toInstant();
-        }
-
-        Instant nowTime = Instant.now();
-        if (completedAtInstant.isAfter(nowTime)) {
+        if (completedAtInstant.isAfter(Instant.now())) {
             completedAtInstant = counterRecordService.getLastRegisteredAtByProductionOrderId(productionOrder.getId());
         }
 
         return Timestamp.from(completedAtInstant);
+    }
+
+    private Instant getCompletedAtInstant(ProductionOrderEntity productionOrder, Timestamp endDate) {
+        Date completedAtDate = productionOrder.getCompletedAt();
+        Instant completedAtInstant;
+
+        if (completedAtDate != null) {
+            completedAtInstant = completedAtDate.toInstant();
+
+            if (completedAtDate.toInstant().isAfter(endDate.toInstant())) {
+                completedAtInstant = endDate.toInstant();
+            }
+        } else {
+            completedAtInstant = endDate.toInstant();
+        }
+
+        return completedAtInstant;
     }
 
     public Long calculateScheduledTimeInSeconds(Timestamp startDate, Timestamp endDate) {

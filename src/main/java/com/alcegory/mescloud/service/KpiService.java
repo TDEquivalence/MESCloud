@@ -17,11 +17,11 @@ public interface KpiService {
 
     KpiDto computeAvailability(Long equipmentId, KpiFilterDto filter);
 
-    EquipmentKpiAggregatorDto getEquipmentKpiAggregator(KpiFilterDto filter);
+    EquipmentKpiAggregatorDto computeEquipmentKpiAggregator(KpiFilterDto filter);
 
-    EquipmentKpiAggregatorDto getEquipmentKpiAggregatorById(Long equipmentId, KpiFilterDto requestKpiDto);
+    EquipmentKpiAggregatorDto computeEquipmentKpiAggregatorById(Long equipmentId, KpiFilterDto requestKpiDto);
 
-    List<EquipmentKpiAggregatorDto> getEquipmentKpiAggregatorPerDayById(Long equipmentId, KpiFilterDto kpiRequest);
+    List<EquipmentKpiAggregatorDto> computeEquipmentKpiAggregatorPerDayById(Long equipmentId, KpiFilterDto kpiRequest);
 
-    List<EquipmentKpiAggregatorDto> getEquipmentKpiAggregatorPerDay(KpiFilterDto filter);
+    List<EquipmentKpiAggregatorDto> computeEquipmentKpiAggregatorPerDay(KpiFilterDto filter);
 }
