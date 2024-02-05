@@ -165,8 +165,8 @@ public class KpiServiceImpl implements KpiService {
         long totalActiveTime = 0L;
 
         for (ProductionOrderEntity productionOrder : productionOrders) {
-            Timestamp adjustedStartDate = getAdjustedStartDate(productionOrder, startDate);
-            Timestamp adjustedEndDate = getAdjustedEndDate(productionOrder, endDate);
+            Timestamp adjustedStartDate = calculateAdjustedStartDate(productionOrder, startDate);
+            Timestamp adjustedEndDate = calculateAdjustedEndDate(productionOrder, endDate);
 
             totalActiveTime += calculateActiveTimeByProductionOrderId(productionOrder, equipmentOutputId, adjustedStartDate, adjustedEndDate);
             totalScheduledTime += calculateScheduledTimeInSeconds(adjustedStartDate, adjustedEndDate);
@@ -223,7 +223,6 @@ public class KpiServiceImpl implements KpiService {
 
     private List<ProductionOrderEntity> findByEquipmentAndPeriod(Long equipmentId, String productionOrderCode,
                                                                  Timestamp startDateFilter, Timestamp endDateFilter) {
-
         return productionOrderService.findByEquipmentAndPeriod(equipmentId, productionOrderCode, startDateFilter, endDateFilter);
     }
 
@@ -233,13 +232,13 @@ public class KpiServiceImpl implements KpiService {
                 startDate, endDate);
     }
 
-    public Timestamp getAdjustedStartDate(ProductionOrderEntity productionOrder, Timestamp startDate) {
+    public Timestamp calculateAdjustedStartDate(ProductionOrderEntity productionOrder, Timestamp startDate) {
         Instant createdAt = productionOrder.getCreatedAt().toInstant();
         Instant adjustedStartDate = createdAt.isAfter(startDate.toInstant()) ? createdAt : startDate.toInstant();
         return Timestamp.from(adjustedStartDate);
     }
 
-    public Timestamp getAdjustedEndDate(ProductionOrderEntity productionOrder, Timestamp endDate) {
+    public Timestamp calculateAdjustedEndDate(ProductionOrderEntity productionOrder, Timestamp endDate) {
         Date completedAtDate = productionOrder.getCompletedAt();
         Instant completedAtInstant = (completedAtDate != null) ? completedAtDate.toInstant() : null;
 
