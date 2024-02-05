@@ -70,7 +70,7 @@ public class KpiServiceImpl implements KpiService {
                 .toArray(new CountingEquipmentKpiDto[equipmentKpiByEquipmentAlias.size()]);
     }
 
-    public EquipmentKpiAggregatorDto getAllEquipmentKpiAggregator(KpiFilterDto filter)
+    public EquipmentKpiAggregatorDto getEquipmentKpiAggregator(KpiFilterDto filter)
             throws NoSuchElementException, IncompleteConfigurationException, ArithmeticException {
 
         String equipmentAlias = filter.getSearch().getValue(EQUIPMENT_ALIAS);
@@ -82,14 +82,14 @@ public class KpiServiceImpl implements KpiService {
                 .map(Collections::singletonList)
                 .orElseGet(countingEquipmentService::findAllIds)
                 .stream()
-                .map(id -> getEquipmentKpiAggregator(id, filter))
+                .map(id -> getEquipmentKpiAggregatorById(id, filter))
                 .toList();
 
         return sumEquipmentKpiAggregators(equipmentKpiAggregator);
     }
 
     @Override
-    public EquipmentKpiAggregatorDto getEquipmentKpiAggregator(Long equipmentId, KpiFilterDto filter)
+    public EquipmentKpiAggregatorDto getEquipmentKpiAggregatorById(Long equipmentId, KpiFilterDto filter)
             throws NoSuchElementException, IncompleteConfigurationException, ArithmeticException {
 
         Optional<CountingEquipmentDto> countingEquipmentDtoOpt = countingEquipmentService.findById(equipmentId);
@@ -123,7 +123,16 @@ public class KpiServiceImpl implements KpiService {
     }
 
     @Override
-    public List<EquipmentKpiAggregatorDto> getEquipmentKpiAggregatorPerDay(Long equipmentId, KpiFilterDto filter) {
+    public List<EquipmentKpiAggregatorDto> getEquipmentKpiAggregatorPerDay(KpiFilterDto filter) {
+        return getEquipmentKpiAggregators(filter, null);
+    }
+
+    @Override
+    public List<EquipmentKpiAggregatorDto> getEquipmentKpiAggregatorPerDayById(Long equipmentId, KpiFilterDto filter) {
+        return getEquipmentKpiAggregators(filter, equipmentId);
+    }
+
+    private List<EquipmentKpiAggregatorDto> getEquipmentKpiAggregators(KpiFilterDto filter, Long equipmentId) {
         Timestamp startDate = filter.getSearch().getTimestampValue(START_DATE);
         Timestamp endDate = filter.getSearch().getTimestampValue(END_DATE);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -141,7 +150,10 @@ public class KpiServiceImpl implements KpiService {
             filter.getSearch().setSearchValueByName(START_DATE, startDateFilter);
             filter.getSearch().setSearchValueByName(END_DATE, endDateTimeFilter);
 
-            EquipmentKpiAggregatorDto aggregator = getEquipmentKpiAggregator(equipmentId, filter);
+            EquipmentKpiAggregatorDto aggregator = (equipmentId != null)
+                    ? getEquipmentKpiAggregatorById(equipmentId, filter)
+                    : getEquipmentKpiAggregator(filter);
+
             equipmentKpiAggregators.add(aggregator);
         }
 
@@ -330,7 +342,8 @@ public class KpiServiceImpl implements KpiService {
         resultDto.setKpiDividend(nullToZero(resultDto.getKpiDividend()) + nullToZero(inputDto.getKpiDividend()));
         resultDto.setKpiDivider(nullToZero(resultDto.getKpiDivider()) + nullToZero(inputDto.getKpiDivider()));
         resultDto.setKpiTarget(nullToZero(resultDto.getKpiTarget()) + nullToZero(inputDto.getKpiTarget()));
-        resultDto.setKpiValue(resultDto.getKpiDividend() / resultDto.getKpiDivider());
+        double divisor = resultDto.getKpiDivider();
+        resultDto.setKpiValue(divisor != 0.0 && !Double.isNaN(divisor) ? resultDto.getKpiDividend() / divisor : 0.0);
     }
 
     private double nullToZero(Double value) {
