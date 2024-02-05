@@ -4,9 +4,11 @@ import com.alcegory.mescloud.model.dto.CounterRecordDto;
 import com.alcegory.mescloud.model.dto.KpiFilterDto;
 import com.alcegory.mescloud.model.dto.PaginatedCounterRecordsDto;
 import com.alcegory.mescloud.model.dto.PlcMqttDto;
+import com.alcegory.mescloud.model.entity.ProductionOrderEntity;
 import com.alcegory.mescloud.model.filter.CounterRecordFilter;
 
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.List;
 
 public interface CounterRecordService {
@@ -31,4 +33,6 @@ public interface CounterRecordService {
 
     Integer sumIncrementActiveTimeByProductionOrderId(Long productionOrderId, Long equipmentOutputId, Timestamp startDate,
                                                       Timestamp endDate);
+
+    Instant getLastRegisteredAtByProductionOrder(ProductionOrderEntity productionOrder);
 }

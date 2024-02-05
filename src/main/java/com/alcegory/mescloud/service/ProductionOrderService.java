@@ -39,8 +39,6 @@ public interface ProductionOrderService {
 
     void setProductionOrderApproval(Long composedOrderId, boolean isApproved);
 
-    Long calculateScheduledTimeInSeconds(Timestamp startDate, Timestamp endDate);
-
     List<ProductionOrderDto> findByEquipmentAndPeriod(Long equipmentId, Date startDate, Date endDate);
 
     void completeByCode(String productionOrderCode);
@@ -50,7 +48,4 @@ public interface ProductionOrderService {
     List<ProductionOrderEntity> findByEquipmentAndPeriod(Long equipmentId, String productionOrderCode, Timestamp startDate,
                                                          Timestamp endDate);
 
-    Timestamp getAdjustedStartDate(ProductionOrderEntity productionOrder, Timestamp startDate);
-
-    Timestamp getAdjustedEndDate(ProductionOrderEntity productionOrder, Timestamp endDate);
 }

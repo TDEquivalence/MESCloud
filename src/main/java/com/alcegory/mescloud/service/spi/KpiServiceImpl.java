@@ -12,6 +12,7 @@ import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -164,26 +165,16 @@ public class KpiServiceImpl implements KpiService {
         long totalActiveTime = 0L;
 
         for (ProductionOrderEntity productionOrder : productionOrders) {
-            Timestamp adjustedStartDate = productionOrderService.getAdjustedStartDate(productionOrder, startDate);
-            Timestamp adjustedEndDate = productionOrderService.getAdjustedEndDate(productionOrder, endDate);
+            Timestamp adjustedStartDate = getAdjustedStartDate(productionOrder, startDate);
+            Timestamp adjustedEndDate = getAdjustedEndDate(productionOrder, endDate);
 
-            totalScheduledTime += calculateProductionOrderTotalScheduledTime(adjustedStartDate, adjustedEndDate);
+            totalScheduledTime += calculateScheduledTimeInSeconds(adjustedStartDate, adjustedEndDate);
             totalActiveTime += calculateActiveTimeByProductionOrderId(productionOrder, equipmentOutputId, adjustedStartDate, adjustedEndDate);
         }
 
         KpiDto kpi = new KpiDto(DoubleUtil.safeDoubleValue(totalActiveTime), DoubleUtil.safeDoubleValue(totalScheduledTime));
         kpi.setValueAsDivision();
         return kpi;
-    }
-
-    private Long calculateProductionOrderTotalScheduledTime(Timestamp startDate, Timestamp endDate) {
-        return productionOrderService.calculateScheduledTimeInSeconds(startDate, endDate);
-    }
-
-    private Integer calculateActiveTimeByProductionOrderId(ProductionOrderEntity productionOrder, Long equipmentOutputId,
-                                                           Timestamp startDate, Timestamp endDate) {
-        return counterRecordService.sumIncrementActiveTimeByProductionOrderId(productionOrder.getId(), equipmentOutputId,
-                startDate, endDate);
     }
 
     @Override
@@ -234,6 +225,56 @@ public class KpiServiceImpl implements KpiService {
                                                                  Timestamp startDateFilter, Timestamp endDateFilter) {
 
         return productionOrderService.findByEquipmentAndPeriod(equipmentId, productionOrderCode, startDateFilter, endDateFilter);
+    }
+
+    private Integer calculateActiveTimeByProductionOrderId(ProductionOrderEntity productionOrder, Long equipmentOutputId,
+                                                           Timestamp startDate, Timestamp endDate) {
+        return counterRecordService.sumIncrementActiveTimeByProductionOrderId(productionOrder.getId(), equipmentOutputId,
+                startDate, endDate);
+    }
+
+    public Timestamp getAdjustedStartDate(ProductionOrderEntity productionOrder, Timestamp startDate) {
+        Instant createdAt = productionOrder.getCreatedAt().toInstant();
+        Instant adjustedStartDate = createdAt.isAfter(startDate.toInstant()) ? createdAt : startDate.toInstant();
+        return Timestamp.from(adjustedStartDate);
+    }
+
+    public Timestamp getAdjustedEndDate(ProductionOrderEntity productionOrder, Timestamp endDate) {
+        Date completedAtDate = productionOrder.getCompletedAt();
+        Instant completedAtInstant = (completedAtDate != null) ? completedAtDate.toInstant() : null;
+
+        if (completedAtInstant == null) {
+            completedAtInstant = endDate.toInstant();
+        }
+
+        Instant nowTime = Instant.now();
+        if (completedAtInstant.isAfter(nowTime)) {
+            completedAtInstant = counterRecordService.getLastRegisteredAtByProductionOrder(productionOrder);
+        }
+
+        return Timestamp.from(completedAtInstant);
+    }
+
+    public Long calculateScheduledTimeInSeconds(Timestamp startDate, Timestamp endDate) {
+        Duration productionScheduleTime = calculateScheduledTime(startDate, endDate);
+
+        if (isInclusiveEnd(endDate)) {
+            productionScheduleTime = productionScheduleTime.plusSeconds(1);
+        }
+
+        return productionScheduleTime.toSeconds();
+    }
+
+    private boolean isInclusiveEnd(Timestamp endDate) {
+        Instant endInstant = endDate.toInstant();
+        return endInstant.getNano() > 0 || endInstant.getEpochSecond() % 60 > 0;
+    }
+
+    private Duration calculateScheduledTime(Timestamp startDate, Timestamp endDate) {
+        Instant startInstant = startDate.toInstant();
+        Instant endInstant = endDate.toInstant();
+        Duration duration = Duration.between(startInstant, endInstant);
+        return duration.isNegative() ? Duration.ZERO : duration;
     }
 
     public EquipmentKpiAggregatorDto sumEquipmentKpiAggregators(List<EquipmentKpiAggregatorDto> aggregatorList) {

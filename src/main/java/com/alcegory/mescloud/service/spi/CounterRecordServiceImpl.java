@@ -15,6 +15,7 @@ import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -292,6 +293,12 @@ public class CounterRecordServiceImpl implements CounterRecordService {
         Integer activeTime = repository.sumIncrementActiveTimeByProductionOrderId(productionOrderId, equipmentOutputId,
                 startDate, endDate);
         return Optional.ofNullable(activeTime).orElse(0);
+    }
+
+    @Override
+    public Instant getLastRegisteredAtByProductionOrder(ProductionOrderEntity productionOrder) {
+        Timestamp registeredAt = repository.findLatestRegisteredAtByProductionOrderId(productionOrder.getId());
+        return registeredAt.toInstant();
     }
 
     private void saveAll(List<CounterRecordEntity> counterRecords) {

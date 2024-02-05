@@ -23,8 +23,6 @@ import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -286,53 +284,6 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     @Override
     public boolean isCompleted(String productionOrderCode) {
         return repository.isCompleted(productionOrderCode);
-    }
-
-    @Override
-    public Long calculateScheduledTimeInSeconds(Timestamp startDate, Timestamp endDate) {
-        Duration productionScheduleTime = calculateScheduledTime(startDate, endDate);
-
-        if (isInclusiveEnd(endDate)) {
-            productionScheduleTime = productionScheduleTime.plusSeconds(1);
-        }
-
-        return productionScheduleTime.toSeconds();
-    }
-
-    private static boolean isInclusiveEnd(Timestamp endDate) {
-        Instant endInstant = endDate.toInstant();
-        return endInstant.getNano() > 0 || endInstant.getEpochSecond() % 60 > 0;
-    }
-
-    private Duration calculateScheduledTime(Timestamp startDate, Timestamp endDate) {
-        Instant startInstant = startDate.toInstant();
-        Instant endInstant = endDate.toInstant();
-        Duration duration = Duration.between(startInstant, endInstant);
-        return duration.isNegative() ? Duration.ZERO : duration;
-    }
-
-    @Override
-    public Timestamp getAdjustedStartDate(ProductionOrderEntity productionOrder, Timestamp startDate) {
-        Instant createdAt = productionOrder.getCreatedAt().toInstant();
-        Instant adjustedStartDate = createdAt.isAfter(startDate.toInstant()) ? createdAt : startDate.toInstant();
-        return Timestamp.from(adjustedStartDate);
-    }
-
-    @Override
-    public Timestamp getAdjustedEndDate(ProductionOrderEntity productionOrder, Timestamp endDate) {
-        Date completedAtDate = productionOrder.getCompletedAt();
-        Instant completedAtInstant = (completedAtDate != null) ? completedAtDate.toInstant() : null;
-
-        if (completedAtInstant == null) {
-            completedAtInstant = endDate.toInstant();
-        }
-
-        Instant nowTime = Instant.now();
-        if (completedAtInstant.isAfter(nowTime)) {
-            completedAtInstant = nowTime;
-        }
-
-        return Timestamp.from(completedAtInstant);
     }
 
     @Override

@@ -9,7 +9,6 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
 import java.sql.Timestamp;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -49,4 +48,10 @@ public interface CounterRecordRepository extends CrudRepository<CounterRecordEnt
             @Param("equipmentOutputId") Long equipmentOutputId,
             @Param("startDate") Timestamp startDate,
             @Param("endDate") Timestamp endDate);
+
+    @Query(value = "SELECT cr.registered_at " +
+            "FROM counter_record cr " +
+            "WHERE cr.production_order_id = :productionOrderId " +
+            "ORDER BY cr.registered_at DESC LIMIT 1", nativeQuery = true)
+    Timestamp findLatestRegisteredAtByProductionOrderId(@Param("productionOrderId") Long productionOrderId);
 }
