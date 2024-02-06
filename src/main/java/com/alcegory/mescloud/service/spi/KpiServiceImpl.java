@@ -12,7 +12,6 @@ import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
-import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -178,10 +177,10 @@ public class KpiServiceImpl implements KpiService {
 
         for (ProductionOrderEntity productionOrder : productionOrders) {
             Timestamp adjustedStartDate = calculateAdjustedStartDate(productionOrder, startDate);
-            Timestamp adjustedEndDate = calculateAdjustedEndDate(productionOrder, endDate);
+            Timestamp adjustedEndDate = calculateAdjustedEndDate(productionOrder.getCompletedAt(), endDate, productionOrder.getId());
 
             totalActiveTime += calculateActiveTimeByProductionOrderId(productionOrder, equipmentOutputId, adjustedStartDate, adjustedEndDate);
-            totalScheduledTime += calculateScheduledTimeInSeconds(adjustedStartDate, adjustedEndDate);
+            totalScheduledTime += DateUtil.calculateScheduledTimeInSeconds(adjustedStartDate, adjustedEndDate);
         }
 
         KpiDto kpi = new KpiDto(DoubleUtil.safeDoubleValue(totalActiveTime), DoubleUtil.safeDoubleValue(totalScheduledTime));
@@ -250,53 +249,14 @@ public class KpiServiceImpl implements KpiService {
         return Timestamp.from(adjustedStartDate);
     }
 
-    public Timestamp calculateAdjustedEndDate(ProductionOrderEntity productionOrder, Timestamp endDate) {
-        Instant completedAtInstant = getCompletedAtInstant(productionOrder, endDate);
+    public Timestamp calculateAdjustedEndDate(Date completedAtDate, Timestamp endDate, Long productionOrderId) {
+        Instant completedAtInstant = DateUtil.determineCompletedAt(completedAtDate, endDate);
 
         if (completedAtInstant.isAfter(Instant.now())) {
-            completedAtInstant = counterRecordService.getLastRegisteredAtByProductionOrderId(productionOrder.getId());
+            completedAtInstant = counterRecordService.getLastRegisteredAtByProductionOrderId(productionOrderId);
         }
 
         return Timestamp.from(completedAtInstant);
-    }
-
-    private Instant getCompletedAtInstant(ProductionOrderEntity productionOrder, Timestamp endDate) {
-        Date completedAtDate = productionOrder.getCompletedAt();
-        Instant completedAtInstant;
-
-        if (completedAtDate != null) {
-            completedAtInstant = completedAtDate.toInstant();
-
-            if (completedAtDate.toInstant().isAfter(endDate.toInstant())) {
-                completedAtInstant = endDate.toInstant();
-            }
-        } else {
-            completedAtInstant = endDate.toInstant();
-        }
-
-        return completedAtInstant;
-    }
-
-    public Long calculateScheduledTimeInSeconds(Timestamp startDate, Timestamp endDate) {
-        Duration productionScheduleTime = calculateScheduledTime(startDate, endDate);
-
-        if (isInclusiveEnd(endDate)) {
-            productionScheduleTime = productionScheduleTime.plusSeconds(1);
-        }
-
-        return productionScheduleTime.toSeconds();
-    }
-
-    private boolean isInclusiveEnd(Timestamp endDate) {
-        Instant endInstant = endDate.toInstant();
-        return endInstant.getNano() > 0 || endInstant.getEpochSecond() % 60 > 0;
-    }
-
-    private Duration calculateScheduledTime(Timestamp startDate, Timestamp endDate) {
-        Instant startInstant = startDate.toInstant();
-        Instant endInstant = endDate.toInstant();
-        Duration duration = Duration.between(startInstant, endInstant);
-        return duration.isNegative() ? Duration.ZERO : duration;
     }
 
     public EquipmentKpiAggregatorDto sumEquipmentKpiAggregators(List<EquipmentKpiAggregatorDto> aggregatorList) {
