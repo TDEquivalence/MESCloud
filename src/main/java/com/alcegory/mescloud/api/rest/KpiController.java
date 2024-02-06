@@ -1,7 +1,10 @@
 package com.alcegory.mescloud.api.rest;
 
 import com.alcegory.mescloud.exception.IncompleteConfigurationException;
-import com.alcegory.mescloud.model.dto.*;
+import com.alcegory.mescloud.model.dto.CountingEquipmentKpiDto;
+import com.alcegory.mescloud.model.dto.EquipmentKpiAggregatorDto;
+import com.alcegory.mescloud.model.dto.KpiDto;
+import com.alcegory.mescloud.model.dto.KpiFilterDto;
 import com.alcegory.mescloud.service.KpiService;
 import com.alcegory.mescloud.utility.HttpUtil;
 import lombok.AllArgsConstructor;
@@ -28,22 +31,37 @@ public class KpiController {
         return new ResponseEntity<>(countingEquipmentKpiDto, HttpStatus.OK);
     }
 
-    public ResponseEntity<Long> getEquipmentScheduledTime(@RequestParam long equipmentId, @RequestBody RequestKpiDto filter) {
-        Long scheduledTime = kpiService.getProductionOrderTotalScheduledTime(equipmentId, filter);
-        return new ResponseEntity<>(scheduledTime, HttpStatus.OK);
+    @PostMapping("/equipment-daily-counts")
+    public ResponseEntity<CountingEquipmentKpiDto[]> getEquipmentOutputProductionPerDay(@RequestBody KpiFilterDto filter) {
+        CountingEquipmentKpiDto[] countingEquipmentKpiDto = kpiService.getEquipmentOutputProductionPerDay(filter);
+        return new ResponseEntity<>(countingEquipmentKpiDto, HttpStatus.OK);
     }
 
     @PostMapping("/{equipmentId}/availability")
-    public ResponseEntity<KpiDto> getEquipmentAvailability(@PathVariable long equipmentId, @RequestBody RequestKpiDto filter) {
+    public ResponseEntity<KpiDto> getEquipmentAvailability(@PathVariable long equipmentId, @RequestBody KpiFilterDto filter) {
         KpiDto kpiAvailabilityDto = kpiService.computeAvailability(equipmentId, filter);
         return new ResponseEntity<>(kpiAvailabilityDto, HttpStatus.OK);
     }
 
     @PostMapping("/{equipmentId}/aggregator")
     public ResponseEntity<EquipmentKpiAggregatorDto> getEquipmentKpiAggregator(@PathVariable long equipmentId,
-                                                                               @RequestBody RequestKpiDto filter) {
+                                                                               @RequestBody KpiFilterDto filter) {
         try {
-            EquipmentKpiAggregatorDto kpiAggregatorDto = kpiService.getEquipmentKpiAggregator(equipmentId, filter);
+            EquipmentKpiAggregatorDto kpiAggregatorDto = kpiService.computeEquipmentKpiAggregatorById(equipmentId, filter);
+            return new ResponseEntity<>(kpiAggregatorDto, HttpStatus.OK);
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        } catch (IncompleteConfigurationException e) {
+            return HttpUtil.responseWithHeaders(HttpStatus.CONFLICT, EQUIPMENT_ERROR_CAUSE, e);
+        } catch (ArithmeticException e) {
+            return HttpUtil.responseWithHeaders(HttpStatus.CONFLICT, KPI_ERROR_CAUSE, e);
+        }
+    }
+
+    @PostMapping("/aggregator")
+    public ResponseEntity<EquipmentKpiAggregatorDto> getEquipmentKpiAggregator(@RequestBody KpiFilterDto filter) {
+        try {
+            EquipmentKpiAggregatorDto kpiAggregatorDto = kpiService.computeEquipmentKpiAggregator(filter);
             return new ResponseEntity<>(kpiAggregatorDto, HttpStatus.OK);
         } catch (NoSuchElementException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -55,10 +73,20 @@ public class KpiController {
     }
 
     @PostMapping("/{equipmentId}/daily-aggregator")
-    public ResponseEntity<List<EquipmentKpiAggregatorDto>> getEquipmentKpiAggregatorPerDay(@PathVariable long equipmentId,
-                                                                                           @RequestBody RequestKpiDto filter) {
+    public ResponseEntity<List<EquipmentKpiAggregatorDto>> getEquipmentKpiAggregatorPerDayById(@PathVariable long equipmentId,
+                                                                                               @RequestBody KpiFilterDto filter) {
         try {
-            List<EquipmentKpiAggregatorDto> kpiAggregatorsDto = kpiService.getEquipmentKpiAggregatorPerDay(equipmentId, filter);
+            List<EquipmentKpiAggregatorDto> kpiAggregatorsDto = kpiService.computeEquipmentKpiAggregatorPerDayById(equipmentId, filter);
+            return new ResponseEntity<>(kpiAggregatorsDto, HttpStatus.OK);
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping("/daily-aggregator")
+    public ResponseEntity<List<EquipmentKpiAggregatorDto>> getEquipmentKpiAggregatorPerDay(@RequestBody KpiFilterDto filter) {
+        try {
+            List<EquipmentKpiAggregatorDto> kpiAggregatorsDto = kpiService.computeEquipmentKpiAggregatorPerDay(filter);
             return new ResponseEntity<>(kpiAggregatorsDto, HttpStatus.OK);
         } catch (NoSuchElementException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

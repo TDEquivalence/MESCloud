@@ -14,9 +14,11 @@ import org.springframework.stereotype.Service;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-import static com.alcegory.mescloud.model.dto.RequestKpiDto.createRequestKpiForDay;
+import static com.alcegory.mescloud.model.filter.CounterRecordFilter.Property.*;
 
 @Service
 @AllArgsConstructor
@@ -28,19 +30,29 @@ public class KpiServiceImpl implements KpiService {
     private final CountingEquipmentService countingEquipmentService;
     private final EquipmentOutputService equipmentOutputService;
 
+
     @Override
-    public CountingEquipmentKpiDto[] computeEquipmentKpi(KpiFilterDto kpiFilter) {
+    public CountingEquipmentKpiDto[] getEquipmentOutputProductionPerDay(KpiFilterDto filter) {
+        List<CounterRecordDto> equipmentCounts = counterRecordService.getEquipmentOutputProductionPerDay(filter);
+        return sortPerDay(filter, equipmentCounts);
+    }
 
-        List<CounterRecordDto> equipmentCounts = counterRecordService.filterConclusionRecordsKpi(kpiFilter);
+    @Override
+    public CountingEquipmentKpiDto[] computeEquipmentKpi(KpiFilterDto filter) {
+        List<CounterRecordDto> equipmentCounts = counterRecordService.filterConclusionRecordsKpi(filter);
+        return sortPerDay(filter, equipmentCounts);
+    }
 
+    private CountingEquipmentKpiDto[] sortPerDay(KpiFilterDto filter, List<CounterRecordDto> equipmentCounts) {
         if (equipmentCounts.isEmpty()) {
             return new CountingEquipmentKpiDto[0];
         }
 
         Map<String, CountingEquipmentKpiDto> equipmentKpiByEquipmentAlias = new LinkedHashMap<>();
 
-        Instant startDate = getPropertyAsInstant(kpiFilter, CounterRecordFilter.Property.START_DATE);
-        Instant endDate = getPropertyAsInstant(kpiFilter, CounterRecordFilter.Property.END_DATE);
+        Instant startDate = getPropertyAsInstant(filter, START_DATE);
+        Instant endDate = getPropertyAsInstant(filter, END_DATE);
+
         final int spanInDays = DateUtil.spanInDays(startDate, endDate);
 
         for (CounterRecordDto equipmentCount : equipmentCounts) {
@@ -57,8 +69,26 @@ public class KpiServiceImpl implements KpiService {
                 .toArray(new CountingEquipmentKpiDto[equipmentKpiByEquipmentAlias.size()]);
     }
 
+    public EquipmentKpiAggregatorDto computeEquipmentKpiAggregator(KpiFilterDto filter)
+            throws NoSuchElementException, IncompleteConfigurationException, ArithmeticException {
+
+        String equipmentAlias = filter.getSearch().getValue(EQUIPMENT_ALIAS);
+        Long equipmentId = (equipmentAlias != null && !equipmentAlias.isEmpty())
+                ? countingEquipmentService.findIdByAlias(equipmentAlias)
+                : null;
+
+        List<EquipmentKpiAggregatorDto> equipmentKpiAggregator = Optional.ofNullable(equipmentId)
+                .map(Collections::singletonList)
+                .orElseGet(countingEquipmentService::findAllIds)
+                .stream()
+                .map(id -> computeEquipmentKpiAggregatorById(id, filter))
+                .toList();
+
+        return sumEquipmentKpiAggregators(equipmentKpiAggregator);
+    }
+
     @Override
-    public EquipmentKpiAggregatorDto getEquipmentKpiAggregator(Long equipmentId, RequestKpiDto requestKpiDto)
+    public EquipmentKpiAggregatorDto computeEquipmentKpiAggregatorById(Long equipmentId, KpiFilterDto filter)
             throws NoSuchElementException, IncompleteConfigurationException, ArithmeticException {
 
         Optional<CountingEquipmentDto> countingEquipmentDtoOpt = countingEquipmentService.findById(equipmentId);
@@ -70,10 +100,10 @@ public class KpiServiceImpl implements KpiService {
 
         CountingEquipmentDto countingEquipment = countingEquipmentDtoOpt.get();
 
-        KpiDto qualityKpi = computeEquipmentQuality(equipmentId, requestKpiDto);
+        KpiDto qualityKpi = computeEquipmentQuality(equipmentId, filter);
         EquipmentKpiDto quality = new EquipmentKpiDto(countingEquipment.getQualityTarget(), qualityKpi);
 
-        KpiDto availabilityKpi = computeAvailability(equipmentId, requestKpiDto);
+        KpiDto availabilityKpi = computeAvailability(equipmentId, filter);
         EquipmentKpiDto availability = new EquipmentKpiDto(countingEquipment.getAvailabilityTarget(), availabilityKpi);
 
         KpiDto performanceKpi = computePerformance(qualityKpi, availabilityKpi, countingEquipment);
@@ -92,16 +122,37 @@ public class KpiServiceImpl implements KpiService {
     }
 
     @Override
-    public List<EquipmentKpiAggregatorDto> getEquipmentKpiAggregatorPerDay(Long equipmentId, RequestKpiDto kpiRequest) {
-        LocalDate startDate = kpiRequest.getStartDateAsLocalDate();
-        LocalDate endDate = kpiRequest.getEndDateAsLocalDate();
+    public List<EquipmentKpiAggregatorDto> computeEquipmentKpiAggregatorPerDay(KpiFilterDto filter) {
+        return computeEquipmentKpiAggregators(filter, null);
+    }
+
+    @Override
+    public List<EquipmentKpiAggregatorDto> computeEquipmentKpiAggregatorPerDayById(Long equipmentId, KpiFilterDto filter) {
+        return computeEquipmentKpiAggregators(filter, equipmentId);
+    }
+
+    private List<EquipmentKpiAggregatorDto> computeEquipmentKpiAggregators(KpiFilterDto filter, Long equipmentId) {
+        Timestamp startDate = filter.getSearch().getTimestampValue(START_DATE);
+        Timestamp endDate = filter.getSearch().getTimestampValue(END_DATE);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
         List<EquipmentKpiAggregatorDto> equipmentKpiAggregators = new ArrayList<>();
 
-        for (LocalDate currentDay = startDate; !currentDay.isAfter(endDate); currentDay = currentDay.plusDays(1)) {
-            RequestKpiDto currentKpiRequest = createRequestKpiForDay(currentDay);
+        LocalDateTime startLocalDateTime = startDate.toLocalDateTime();
+        LocalDateTime endLocalDateTime = endDate.toLocalDateTime();
 
-            EquipmentKpiAggregatorDto aggregator = getEquipmentKpiAggregator(equipmentId, currentKpiRequest);
+        for (LocalDateTime currentDateTime = startLocalDateTime; !currentDateTime.isAfter(endLocalDateTime); currentDateTime = currentDateTime.plusDays(1)) {
+            LocalDate currentDay = currentDateTime.toLocalDate();
+            String startDateFilter = currentDay.atStartOfDay().format(formatter);
+            String endDateTimeFilter = currentDay.plusDays(1).atStartOfDay().minusNanos(1).format(formatter);
+
+            filter.getSearch().setSearchValueByName(START_DATE, startDateFilter);
+            filter.getSearch().setSearchValueByName(END_DATE, endDateTimeFilter);
+
+            EquipmentKpiAggregatorDto aggregator = (equipmentId != null)
+                    ? computeEquipmentKpiAggregatorById(equipmentId, filter)
+                    : computeEquipmentKpiAggregator(filter);
+
             equipmentKpiAggregators.add(aggregator);
         }
 
@@ -113,26 +164,24 @@ public class KpiServiceImpl implements KpiService {
     }
 
     @Override
-    public KpiDto computeAvailability(Long equipmentId, RequestKpiDto filter) {
+    public KpiDto computeAvailability(Long equipmentId, KpiFilterDto filter) {
+        Timestamp startDate = filter.getSearch().getTimestampValue(START_DATE);
+        Timestamp endDate = filter.getSearch().getTimestampValue(END_DATE);
+        String productionOrderCode = filter.getSearch().getValue(PRODUCTION_ORDER_CODE);
 
-        List<ProductionOrderEntity> productionOrders = findByEquipmentAndPeriod(equipmentId, filter.getStartDate(),
-                filter.getEndDate());
-
+        List<ProductionOrderEntity> productionOrders = findByEquipmentAndPeriod(equipmentId, productionOrderCode, startDate, endDate);
         Long equipmentOutputId = equipmentOutputService.findIdByCountingEquipmentId(equipmentId);
 
         long totalScheduledTime = 0L;
         long totalActiveTime = 0L;
 
         for (ProductionOrderEntity productionOrder : productionOrders) {
-            Instant adjustedStartDate = productionOrderService.getAdjustedStartDate(productionOrder, filter.getStartDate());
-            Instant adjustedEndDate = productionOrderService.getAdjustedEndDate(productionOrder, filter.getEndDate());
+            Timestamp adjustedStartDate = calculateAdjustedStartDate(productionOrder, startDate);
+            Timestamp adjustedEndDate = calculateAdjustedEndDate(productionOrder, endDate);
 
-            totalScheduledTime += getProductionOrderTotalScheduledTime(adjustedStartDate, adjustedEndDate);
             totalActiveTime += calculateActiveTimeByProductionOrderId(productionOrder, equipmentOutputId, adjustedStartDate, adjustedEndDate);
+            totalScheduledTime += DateUtil.calculateScheduledTimeInSeconds(adjustedStartDate, adjustedEndDate);
         }
-
-        log.info(String.format("Total schedule time [%s]", totalScheduledTime));
-        log.info(String.format("Total active time [%s]", totalActiveTime));
 
         KpiDto kpi = new KpiDto(DoubleUtil.safeDoubleValue(totalActiveTime), DoubleUtil.safeDoubleValue(totalScheduledTime));
         kpi.setValueAsDivision();
@@ -140,33 +189,10 @@ public class KpiServiceImpl implements KpiService {
     }
 
     @Override
-    public Long getProductionOrderTotalScheduledTime(Long equipmentId, RequestKpiDto filter) {
-        return productionOrderService.calculateScheduledTimeInSeconds(equipmentId, filter.getStartDateInstant(),
-                filter.getEndDateInstant());
-    }
+    public KpiDto computeEquipmentQuality(Long equipmentId, KpiFilterDto filter) {
 
-    private Long getProductionOrderTotalScheduledTime(Instant startDate, Instant endDate) {
-        return productionOrderService.calculateScheduledTimeInSeconds(startDate, endDate);
-    }
-
-    private Integer calculateActiveTimeByProductionOrderId(ProductionOrderEntity productionOrder, Long equipmentOutputId,
-                                                           Instant startDateFilter,
-                                                           Instant endDateFilter) {
-
-        Timestamp startDate = Timestamp.from(startDateFilter);
-        Timestamp endDate = Timestamp.from(endDateFilter);
-
-        return counterRecordService.sumIncrementActiveTimeByProductionOrderId(productionOrder.getId(), equipmentOutputId,
-                startDate, endDate);
-    }
-
-    @Override
-    public KpiDto computeEquipmentQuality(Long equipmentId, RequestKpiDto requestKpiDto) {
-        Integer validCounter = counterRecordService.sumValidCounterIncrement(equipmentId,
-                requestKpiDto.getStartDate(), requestKpiDto.getEndDate());
-
-        Integer totalCounter = counterRecordService.sumCounterIncrement(equipmentId, requestKpiDto.getStartDate(),
-                requestKpiDto.getEndDate());
+        Integer validCounter = counterRecordService.sumValidCounterIncrement(equipmentId, filter);
+        Integer totalCounter = counterRecordService.sumCounterIncrement(equipmentId, filter);
 
         KpiDto kpi = new KpiDto(validCounter, totalCounter);
         kpi.setValueAsDivision();
@@ -206,9 +232,92 @@ public class KpiServiceImpl implements KpiService {
         return kpiDto == null || kpiDto.getValue() == null || kpiDto.getValue() == 0;
     }
 
-    private List<ProductionOrderEntity> findByEquipmentAndPeriod(Long equipmentId, Timestamp startDateFilter,
-                                                                 Timestamp endDateFilter) {
+    private List<ProductionOrderEntity> findByEquipmentAndPeriod(Long equipmentId, String productionOrderCode,
+                                                                 Timestamp startDateFilter, Timestamp endDateFilter) {
+        return productionOrderService.findByEquipmentAndPeriod(equipmentId, productionOrderCode, startDateFilter, endDateFilter);
+    }
 
-        return productionOrderService.findByEquipmentAndPeriod(equipmentId, startDateFilter, endDateFilter);
+    private Integer calculateActiveTimeByProductionOrderId(ProductionOrderEntity productionOrder, Long equipmentOutputId,
+                                                           Timestamp startDate, Timestamp endDate) {
+        return counterRecordService.sumIncrementActiveTimeByProductionOrderId(productionOrder.getId(), equipmentOutputId,
+                startDate, endDate);
+    }
+
+    public Timestamp calculateAdjustedStartDate(ProductionOrderEntity productionOrder, Timestamp startDate) {
+        Instant createdAt = productionOrder.getCreatedAt().toInstant();
+        Instant adjustedStartDate = createdAt.isAfter(startDate.toInstant()) ? createdAt : startDate.toInstant();
+        return Timestamp.from(adjustedStartDate);
+    }
+
+    public Timestamp calculateAdjustedEndDate(ProductionOrderEntity productionOrder, Timestamp endDate) {
+        Instant completedAtInstant = DateUtil.determineCompletedAt(productionOrder.getCompletedAt(), endDate);
+
+        if (completedAtInstant.isAfter(Instant.now())) {
+            completedAtInstant = counterRecordService.getLastRegisteredAtByProductionOrderId(productionOrder.getId());
+        }
+
+        return Timestamp.from(completedAtInstant);
+    }
+
+    public EquipmentKpiAggregatorDto sumEquipmentKpiAggregators(List<EquipmentKpiAggregatorDto> aggregatorList) {
+        if (aggregatorList == null || aggregatorList.isEmpty()) {
+            return null;
+        }
+
+        if (aggregatorList.size() == 1) {
+            return aggregatorList.get(0);
+        }
+
+        EquipmentKpiAggregatorDto result = initializeResultAggregator();
+
+        for (EquipmentKpiAggregatorDto aggregator : aggregatorList) {
+            sumEquipmentKpiDto(result.getQualityKpi(), aggregator.getQualityKpi());
+            sumEquipmentKpiDto(result.getAvailabilityKpi(), aggregator.getAvailabilityKpi());
+            sumEquipmentKpiDto(result.getPerformanceKpi(), aggregator.getPerformanceKpi());
+            sumEquipmentKpiDto(result.getOverallEquipmentEffectivenessKpi(), aggregator.getOverallEquipmentEffectivenessKpi());
+        }
+
+        updateTargets(result, aggregatorList.size());
+        calculateOverallEquipmentEffectiveness(result);
+        return result;
+    }
+
+    private EquipmentKpiAggregatorDto initializeResultAggregator() {
+        return EquipmentKpiAggregatorDto.builder()
+                .qualityKpi(new EquipmentKpiDto())
+                .availabilityKpi(new EquipmentKpiDto())
+                .performanceKpi(new EquipmentKpiDto())
+                .overallEquipmentEffectivenessKpi(new EquipmentKpiDto())
+                .build();
+    }
+
+    private void updateTargets(EquipmentKpiAggregatorDto result, int size) {
+        result.getQualityKpi().setKpiTarget(result.getQualityKpi().getKpiTarget() / size);
+        result.getAvailabilityKpi().setKpiTarget(result.getAvailabilityKpi().getKpiTarget() / size);
+        result.getPerformanceKpi().setKpiTarget(result.getPerformanceKpi().getKpiTarget() / size);
+        result.getOverallEquipmentEffectivenessKpi().setKpiTarget(result.getOverallEquipmentEffectivenessKpi().getKpiTarget() / size);
+    }
+
+    private void calculateOverallEquipmentEffectiveness(EquipmentKpiAggregatorDto result) {
+        EquipmentKpiDto overallEquipmentEffectivenessKpi = result.getOverallEquipmentEffectivenessKpi();
+        overallEquipmentEffectivenessKpi.setKpiValue(result.getQualityKpi().getKpiValue() * result.getAvailabilityKpi().getKpiValue() *
+                result.getPerformanceKpi().getKpiValue());
+        result.setOverallEquipmentEffectivenessKpi(overallEquipmentEffectivenessKpi);
+    }
+
+    private void sumEquipmentKpiDto(EquipmentKpiDto resultDto, EquipmentKpiDto inputDto) {
+        if (resultDto == null || inputDto == null) {
+            return;
+        }
+
+        resultDto.setKpiDividend(nullToZero(resultDto.getKpiDividend()) + nullToZero(inputDto.getKpiDividend()));
+        resultDto.setKpiDivider(nullToZero(resultDto.getKpiDivider()) + nullToZero(inputDto.getKpiDivider()));
+        resultDto.setKpiTarget(nullToZero(resultDto.getKpiTarget()) + nullToZero(inputDto.getKpiTarget()));
+        double divisor = resultDto.getKpiDivider();
+        resultDto.setKpiValue(divisor != 0.0 && !Double.isNaN(divisor) ? resultDto.getKpiDividend() / divisor : 0.0);
+    }
+
+    private double nullToZero(Double value) {
+        return value != null ? value : 0;
     }
 }

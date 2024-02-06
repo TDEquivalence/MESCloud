@@ -28,4 +28,10 @@ public interface CountingEquipmentRepository extends CrudRepository<CountingEqui
             "WHERE po IS NULL OR po.id = (SELECT MAX(p.id) FROM production_order p WHERE p.equipment = ce)" +
             "ORDER BY ce.id")
     List<CountingEquipmentEntity> findAllWithLastProductionOrder();
+
+    @Query("SELECT ce.id FROM counting_equipment ce")
+    List<Long> findAllIds();
+
+    @Query("SELECT ce.id FROM counting_equipment ce WHERE ce.alias = :alias")
+    Long findIdByAlias(String alias);
 }

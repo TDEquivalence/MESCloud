@@ -15,6 +15,7 @@ import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -38,6 +39,11 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     private final FactoryService factoryService;
 
 
+    @Override
+    public List<CounterRecordDto> getEquipmentOutputProductionPerDay(KpiFilterDto filter) {
+        List<CounterRecordEntity> equipmentOutputProductionPerDay = repository.findLastPerProductionOrderAndEquipmentOutputPerDay(filter);
+        return converter.toDto(equipmentOutputProductionPerDay);
+    }
 
     @Override
     public List<CounterRecordDto> filterConclusionRecordsKpi(KpiFilterDto filter) {
@@ -101,8 +107,8 @@ public class CounterRecordServiceImpl implements CounterRecordService {
 
         if (!isValid(equipmentCountsMqttDto)) {
             log.warning(() -> String.format("Received counts are invalid either because no Counting Equipment was found " +
-                    "with the code [%s] or because received equipment outputs number [%s] does not match " +
-                    "the Counting Equipment outputs number", equipmentCountsMqttDto.getEquipmentCode(),
+                            "with the code [%s] or because received equipment outputs number [%s] does not match " +
+                            "the Counting Equipment outputs number", equipmentCountsMqttDto.getEquipmentCode(),
                     equipmentCountsMqttDto.getCounters().length));
             return;
         }
@@ -267,13 +273,13 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     }
 
     @Override
-    public Integer sumValidCounterIncrement(Long countingEquipmentId, Timestamp startDateFilter, Timestamp endDateFilter) {
-        return repository.sumValidCounterIncrement(countingEquipmentId, startDateFilter, endDateFilter);
+    public Integer sumValidCounterIncrement(Long countingEquipmentId, KpiFilterDto filter) {
+        return repository.sumValidCounterIncrement(countingEquipmentId, filter);
     }
 
     @Override
-    public Integer sumCounterIncrement(Long countingEquipmentId, Timestamp startDateFilter, Timestamp endDateFilter) {
-        return repository.sumCounterIncrement(countingEquipmentId, startDateFilter, endDateFilter);
+    public Integer sumCounterIncrement(Long countingEquipmentId, KpiFilterDto filter) {
+        return repository.sumCounterIncrement(countingEquipmentId, filter);
     }
 
     @Override
@@ -287,6 +293,12 @@ public class CounterRecordServiceImpl implements CounterRecordService {
         Integer activeTime = repository.sumIncrementActiveTimeByProductionOrderId(productionOrderId, equipmentOutputId,
                 startDate, endDate);
         return Optional.ofNullable(activeTime).orElse(0);
+    }
+
+    @Override
+    public Instant getLastRegisteredAtByProductionOrderId(Long productionOrderId) {
+        Timestamp registeredAt = repository.findLatestRegisteredAtByProductionOrderId(productionOrderId);
+        return registeredAt.toInstant();
     }
 
     private void saveAll(List<CounterRecordEntity> counterRecords) {

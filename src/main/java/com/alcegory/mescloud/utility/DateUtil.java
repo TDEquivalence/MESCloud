@@ -2,6 +2,8 @@ package com.alcegory.mescloud.utility;
 
 import lombok.extern.java.Log;
 
+import java.sql.Timestamp;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -45,5 +47,43 @@ public class DateUtil {
     public static LocalDateTime getCurrentTime(String timeZoneId) {
         ZoneId zoneId = ZoneId.of(timeZoneId);
         return LocalDateTime.now(zoneId);
+    }
+
+    public static Instant determineCompletedAt(Date completedAtDate, Timestamp endDate) {
+        Instant completedAtInstant;
+
+        if (completedAtDate != null) {
+            completedAtInstant = completedAtDate.toInstant();
+
+            if (completedAtDate.toInstant().isAfter(endDate.toInstant())) {
+                completedAtInstant = endDate.toInstant();
+            }
+        } else {
+            completedAtInstant = endDate.toInstant();
+        }
+
+        return completedAtInstant;
+    }
+
+    public static Long calculateScheduledTimeInSeconds(Timestamp startDate, Timestamp endDate) {
+        Duration productionScheduleTime = calculateScheduledTime(startDate, endDate);
+
+        if (isInclusiveEnd(endDate)) {
+            productionScheduleTime = productionScheduleTime.plusSeconds(1);
+        }
+
+        return productionScheduleTime.toSeconds();
+    }
+
+    private static boolean isInclusiveEnd(Timestamp endDate) {
+        Instant endInstant = endDate.toInstant();
+        return endInstant.getNano() > 0 || endInstant.getEpochSecond() % 60 > 0;
+    }
+
+    private static Duration calculateScheduledTime(Timestamp startDate, Timestamp endDate) {
+        Instant startInstant = startDate.toInstant();
+        Instant endInstant = endDate.toInstant();
+        Duration duration = Duration.between(startInstant, endInstant);
+        return duration.isNegative() ? Duration.ZERO : duration;
     }
 }
