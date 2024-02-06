@@ -13,7 +13,7 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.IOException;
-import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -29,28 +29,17 @@ public class ExcelExportUtil {
     }
 
     private void createCell(Row row, int columnCount, Object value, CellStyle style) {
-        sheet.autoSizeColumn(columnCount);
         Cell cell = row.createCell(columnCount);
 
-        if (value instanceof Integer) {
-            cell.setCellValue((Integer) value);
-        } else if (value instanceof Double) {
-            cell.setCellValue((Double) value);
-        } else if (value instanceof Boolean) {
-            cell.setCellValue((Boolean) value);
-        } else if (value instanceof Long) {
-            cell.setCellValue((Long) value);
-        } else if (value instanceof Timestamp) {
-            Timestamp timestamp = (Timestamp) value;
-            String formattedDateTime = timestamp.toString(); // Convert Timestamp to String
-            cell.setCellValue(formattedDateTime);
+        if (value instanceof Integer || value instanceof Double || value instanceof Boolean || value instanceof Long) {
+            cell.setCellValue(value.toString());
         } else if (value instanceof Date) {
-            Date date = (Date) value;
-            String formattedDateTime = date.toString(); // Convert Date to String
-            cell.setCellValue(formattedDateTime);
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            cell.setCellValue(dateFormat.format((Date) value));
         } else {
-            cell.setCellValue((String) value);
+            cell.setCellValue(value != null ? value.toString() : "");
         }
+
         cell.setCellStyle(style);
     }
 
@@ -71,7 +60,7 @@ public class ExcelExportUtil {
         font.setBold(true);
         font.setFontHeight(16);
         style.setFont(font);
-        createCell(row, 0, "Máquina", style);
+        createCell(row, 0, "Equipamento", style);
         createCell(row, 1, "Ordem de Produção", style);
         createCell(row, 2, "IMS", style);
         createCell(row, 3, "Lote de Entrada", style);
@@ -116,6 +105,4 @@ public class ExcelExportUtil {
         workbook.close();
         outputStream.close();
     }
-
-
 }
