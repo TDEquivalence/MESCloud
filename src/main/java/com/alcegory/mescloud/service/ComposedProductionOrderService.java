@@ -2,6 +2,7 @@ package com.alcegory.mescloud.service;
 
 import com.alcegory.mescloud.model.dto.ComposedProductionOrderDto;
 import com.alcegory.mescloud.model.dto.ComposedSummaryDto;
+import com.alcegory.mescloud.model.dto.ProductionOrderDto;
 import com.alcegory.mescloud.model.dto.RequestComposedDto;
 import com.alcegory.mescloud.model.entity.ComposedProductionOrderEntity;
 
@@ -37,4 +38,6 @@ public interface ComposedProductionOrderService {
     void setProductionOrderApproval(ComposedProductionOrderEntity composed, boolean isApproved);
 
     void setHitInsertAtInComposed(ComposedProductionOrderEntity composed);
+
+    List<ProductionOrderDto> getProductionOrderByComposedId(Long composedId);
 }

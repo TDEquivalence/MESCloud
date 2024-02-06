@@ -1,6 +1,5 @@
 package com.alcegory.mescloud.service.spi;
 
-import com.alcegory.mescloud.repository.ComposedProductionOrderRepository;
 import com.alcegory.mescloud.model.converter.GenericConverter;
 import com.alcegory.mescloud.model.dto.ComposedProductionOrderDto;
 import com.alcegory.mescloud.model.dto.ComposedSummaryDto;
@@ -8,6 +7,7 @@ import com.alcegory.mescloud.model.dto.ProductionOrderDto;
 import com.alcegory.mescloud.model.dto.RequestComposedDto;
 import com.alcegory.mescloud.model.entity.ComposedProductionOrderEntity;
 import com.alcegory.mescloud.model.entity.ComposedSummaryEntity;
+import com.alcegory.mescloud.repository.ComposedProductionOrderRepository;
 import com.alcegory.mescloud.service.ComposedProductionOrderService;
 import com.alcegory.mescloud.service.ProductionOrderService;
 import com.alcegory.mescloud.utility.DateUtil;
@@ -206,5 +206,13 @@ public class ComposedProductionOrderServiceImpl implements ComposedProductionOrd
         }
         composed.setHitInsertedAt(new Date());
         repository.save(composed);
+    }
+
+    @Override
+    public List<ProductionOrderDto> getProductionOrderByComposedId(Long composedId) {
+        if (composedId == null) {
+            throw new IllegalArgumentException("Cannot get PO's, because composed id is null");
+        }
+        return productionOrderService.getProductionOrderByComposedId(composedId);
     }
 }

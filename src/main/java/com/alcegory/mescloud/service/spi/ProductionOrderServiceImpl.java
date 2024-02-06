@@ -313,4 +313,13 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         return repository.findByEquipmentAndPeriod(equipmentId, productionOrderCode, startDate, endDate);
     }
 
+    @Override
+    public List<ProductionOrderDto> getProductionOrderByComposedId(Long composedId) {
+        if (composedId == null) {
+            throw new IllegalArgumentException("Composed ID cannot be null");
+        }
+        List<ProductionOrderEntity> productionOrderEntities = repository.findByComposedProductionOrderId(composedId);
+        return converter.toDto(productionOrderEntities);
+    }
+
 }
