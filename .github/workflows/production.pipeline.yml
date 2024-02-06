@@ -34,7 +34,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: ['java']
+        language: [ 'java' ]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -194,4 +194,4 @@ jobs:
           version_label: ${{ github.SHA }}
           region: eu-west-3
           deployment_package: mescloud-0.0.1-SNAPSHOT.jar
-        if: github.ref == 'refs/heads/feature/MES-423_RELEASE'
+        if: github.ref == 'refs/heads/development'
