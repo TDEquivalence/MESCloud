@@ -177,7 +177,7 @@ public class KpiServiceImpl implements KpiService {
 
         for (ProductionOrderEntity productionOrder : productionOrders) {
             Timestamp adjustedStartDate = calculateAdjustedStartDate(productionOrder, startDate);
-            Timestamp adjustedEndDate = calculateAdjustedEndDate(productionOrder.getCompletedAt(), endDate, productionOrder.getId());
+            Timestamp adjustedEndDate = calculateAdjustedEndDate(productionOrder, endDate);
 
             totalActiveTime += calculateActiveTimeByProductionOrderId(productionOrder, equipmentOutputId, adjustedStartDate, adjustedEndDate);
             totalScheduledTime += DateUtil.calculateScheduledTimeInSeconds(adjustedStartDate, adjustedEndDate);
@@ -249,11 +249,11 @@ public class KpiServiceImpl implements KpiService {
         return Timestamp.from(adjustedStartDate);
     }
 
-    public Timestamp calculateAdjustedEndDate(Date completedAtDate, Timestamp endDate, Long productionOrderId) {
-        Instant completedAtInstant = DateUtil.determineCompletedAt(completedAtDate, endDate);
+    public Timestamp calculateAdjustedEndDate(ProductionOrderEntity productionOrder, Timestamp endDate) {
+        Instant completedAtInstant = DateUtil.determineCompletedAt(productionOrder.getCompletedAt(), endDate);
 
         if (completedAtInstant.isAfter(Instant.now())) {
-            completedAtInstant = counterRecordService.getLastRegisteredAtByProductionOrderId(productionOrderId);
+            completedAtInstant = counterRecordService.getLastRegisteredAtByProductionOrderId(productionOrder.getId());
         }
 
         return Timestamp.from(completedAtInstant);
