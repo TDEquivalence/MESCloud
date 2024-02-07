@@ -314,12 +314,11 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     }
 
     @Override
-    public List<ProductionOrderDto> getProductionOrderByComposedId(Long composedId) {
+    public List<ProductionOrderSummaryDto> getProductionOrderByComposedId(Long composedId) {
         if (composedId == null) {
             throw new IllegalArgumentException("Composed ID cannot be null");
         }
-        List<ProductionOrderEntity> productionOrderEntities = repository.findByComposedProductionOrderId(composedId);
-        return converter.toDto(productionOrderEntities);
+        List<ProductionOrderSummaryEntity> productionOrderSummaryEntities = repository.findProductionOrderSummaryByComposedId(composedId);
+        return summaryConverter.toDto(productionOrderSummaryEntities, ProductionOrderSummaryDto.class);
     }
-
 }
