@@ -24,12 +24,15 @@ public class ProductionOrderRepositoryImpl {
         Root<ProductionOrderSummaryEntity> root = query.from(ProductionOrderSummaryEntity.class);
         query.select(root);
 
+        // Add predicate to filter by composedProductionOrder == null
+        Predicate composedProductionOrderIsNull = criteriaBuilder.isNull(root.get("composedProductionOrder"));
+        query.where(composedProductionOrderIsNull);
+
         List<Order> orders = new ArrayList<>();
         Order newestOrder = criteriaBuilder.desc(root.get(PROP_ID));
         orders.add(newestOrder);
 
-        query.select(root)
-                .orderBy(orders);
+        query.orderBy(orders);
 
         return entityManager.createQuery(query).getResultList();
     }

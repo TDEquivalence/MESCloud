@@ -53,13 +53,13 @@ public class ComposedProductionOrderController {
     }
 
     @PostMapping("/production-orders")
-    public ResponseEntity<List<ProductionOrderSummaryDto>> getProductionOrderSummaryByComposedId(@RequestBody Long composedId) {
-        if (composedId == null) {
+    public ResponseEntity<List<ProductionOrderSummaryDto>> getProductionOrderSummaryByComposedId(@RequestBody RequestById request) {
+        if (request == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
         try {
-            List<ProductionOrderSummaryDto> productionOrderSummary = composedService.getProductionOrderSummaryByComposedId(composedId);
+            List<ProductionOrderSummaryDto> productionOrderSummary = composedService.getProductionOrderSummaryByComposedId(request.getId());
             return new ResponseEntity<>(productionOrderSummary, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

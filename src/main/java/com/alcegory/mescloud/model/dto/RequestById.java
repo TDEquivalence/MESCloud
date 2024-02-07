@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class RequestImsDto {
+public class RequestById {
 
-    private Long imsId;
+    private Long id;
 }
