@@ -1,6 +1,6 @@
 package com.alcegory.mescloud.api.rest;
 
-import com.alcegory.mescloud.service.ProductionOrderViewService;
+import com.alcegory.mescloud.service.ExportExcelService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 @AllArgsConstructor
 public class ExcelExportController {
 
-    private final ProductionOrderViewService productionOrderViewService;
+    private final ExportExcelService exportExcelService;
 
     @GetMapping("production-orders")
     public void exportToExcel(HttpServletResponse response) {
@@ -21,6 +21,6 @@ public class ExcelExportController {
         String headerValue = "attachment; filename=Ordens_de_Produção_Info.xlsx";
 
         response.setHeader(headerKey, headerValue);
-        productionOrderViewService.exportProductionOrderViewToExcel(response);
+        exportExcelService.exportProductionOrderViewToExcel(response);
     }
 }

@@ -1,8 +1,8 @@
 package com.alcegory.mescloud.service.spi;
 
-import com.alcegory.mescloud.model.entity.ProductionOrderView;
-import com.alcegory.mescloud.repository.ProductionOrderViewRepository;
-import com.alcegory.mescloud.service.ProductionOrderViewService;
+import com.alcegory.mescloud.model.entity.ProductionOrderSummaryEntity;
+import com.alcegory.mescloud.repository.ProductionOrderRepository;
+import com.alcegory.mescloud.service.ExportExcelService;
 import com.alcegory.mescloud.utility.ExcelExportUtil;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
@@ -15,12 +15,12 @@ import java.util.List;
 @Service
 @AllArgsConstructor
 @Log
-public class ProductionOrderViewServiceImpl implements ProductionOrderViewService {
+public class ExportExcelServiceImpl implements ExportExcelService {
 
-    private ProductionOrderViewRepository repository;
+    private ProductionOrderRepository repository;
 
-    public List<ProductionOrderView> exportProductionOrderViewToExcel(HttpServletResponse response) {
-        List<ProductionOrderView> productionOrderViews = repository.findAll();
+    public List<ProductionOrderSummaryEntity> exportProductionOrderViewToExcel(HttpServletResponse response) {
+        List<ProductionOrderSummaryEntity> productionOrderViews = repository.findCompletedWithoutComposed();
         ExcelExportUtil excelExportUtil = new ExcelExportUtil(productionOrderViews);
         try {
             excelExportUtil.exportDataToExcel(response);

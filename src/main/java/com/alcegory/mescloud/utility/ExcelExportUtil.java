@@ -1,6 +1,6 @@
 package com.alcegory.mescloud.utility;
 
-import com.alcegory.mescloud.model.entity.ProductionOrderView;
+import com.alcegory.mescloud.model.entity.ProductionOrderSummaryEntity;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.poi.ss.usermodel.*;
@@ -24,7 +24,7 @@ public class ExcelExportUtil {
 
     private final XSSFWorkbook workbook;
     private XSSFSheet sheet;
-    private final List<ProductionOrderView> productionOrders;
+    private final List<ProductionOrderSummaryEntity> productionOrders;
     private final String[] headers = {
             "Equipamento",
             "Ordem de Produção",
@@ -38,7 +38,7 @@ public class ExcelExportUtil {
             "Início de Produção",
             "Término de Produção"};
 
-    public ExcelExportUtil(List<ProductionOrderView> productionOrders) {
+    public ExcelExportUtil(List<ProductionOrderSummaryEntity> productionOrders) {
         this.productionOrders = productionOrders;
         workbook = new XSSFWorkbook();
     }
@@ -82,12 +82,12 @@ public class ExcelExportUtil {
         font.setFontHeight(14);
         style.setFont(font);
 
-        for (ProductionOrderView po : productionOrders) {
+        for (ProductionOrderSummaryEntity po : productionOrders) {
             Row row = sheet.createRow(rowCount++);
             int columnCount = 0;
-            createCell(row, columnCount++, po.getCountingEquipmentAlias(), style);
-            createCell(row, columnCount++, po.getProductionOrderCode(), style);
-            createCell(row, columnCount++, po.getImsCode(), style);
+            createCell(row, columnCount++, po.getEquipment() != null ? po.getEquipment().getAlias() : null, style);
+            createCell(row, columnCount++, po.getCode(), style);
+            createCell(row, columnCount++, po.getIms() != null ? po.getIms().getCode() : null, style);
             createCell(row, columnCount++, po.getInputBatch(), style);
             createCell(row, columnCount++, po.getSource(), style);
             createCell(row, columnCount++, po.getGauge(), style);
