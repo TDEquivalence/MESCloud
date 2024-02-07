@@ -34,7 +34,7 @@ public class AlarmServiceImpl implements AlarmService {
 
     private final GenericConverter<AlarmEntity, AlarmDto> converter;
     private final AlarmRepository repository;
-    private final AlarmConfigurationService alarmCodeService;
+    private final AlarmConfigurationService alarmConfigurationService;
     private final ProductionOrderService productionOrderService;
     private final GenericConverter<ProductionOrderEntity, ProductionOrderDto> productionOrderConverter;
     private final CountingEquipmentService countingEquipmentService;
@@ -130,7 +130,7 @@ public class AlarmServiceImpl implements AlarmService {
             throws AlarmConfigurationNotFoundException {
 
         int binaryBitIndex = BinaryUtil.flipIndex(PLC_BITS_PER_WORD - ZERO_BASED_OFFSET, bitIndex);
-        AlarmConfigurationEntity alarmConfig = findAlarmConfiguration(wordIndex, binaryBitIndex);
+        AlarmConfigurationEntity alarmConfig = findAlarmConfiguration(equipment.getId(), wordIndex, binaryBitIndex);
         AlarmEntity activeAlarm = activeAlarmByConfigId.get(alarmConfig.getId());
 
         if (activeAlarm == null) {
@@ -156,8 +156,8 @@ public class AlarmServiceImpl implements AlarmService {
         });
     }
 
-    private AlarmConfigurationEntity findAlarmConfiguration(int wordIndex, int bitIndex) throws AlarmConfigurationNotFoundException {
-        Optional<AlarmConfigurationEntity> alarmConfigurationOpt = alarmCodeService.findByWordAndBitIndexes(wordIndex, bitIndex);
+    private AlarmConfigurationEntity findAlarmConfiguration(Long equipmentId, int wordIndex, int bitIndex) throws AlarmConfigurationNotFoundException {
+        Optional<AlarmConfigurationEntity> alarmConfigurationOpt = alarmConfigurationService.findByEquipmentAndWordAndBitIndexes(equipmentId, wordIndex, bitIndex);
         if (alarmConfigurationOpt.isEmpty()) {
             String message = String.format("Unable to find an Alarm Configuration for word index [%s] and bit index [%s]", wordIndex, bitIndex);
             log.warning(message);

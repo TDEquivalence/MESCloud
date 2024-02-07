@@ -5,6 +5,6 @@ import com.alcegory.mescloud.model.entity.AlarmConfigurationEntity;
 import java.util.Optional;
 
 public interface AlarmConfigurationService {
-
-    Optional<AlarmConfigurationEntity> findByWordAndBitIndexes(int wordIndex, int bitIndex);
+    
+    Optional<AlarmConfigurationEntity> findByEquipmentAndWordAndBitIndexes(Long equipmentId, int wordIndex, int bitIndex);
 }
