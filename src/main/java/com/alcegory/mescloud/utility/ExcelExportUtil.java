@@ -22,6 +22,11 @@ import java.util.List;
 
 public class ExcelExportUtil {
 
+    private static final String SHEET_NAME = "Ordens de Produção";
+
+    private static final String TABLE_NAME = "ProductionOrdersTable";
+    private static final String TABLE_STYLE = "TableStyleMedium9";
+
     private final XSSFWorkbook workbook;
     private XSSFSheet sheet;
     private final List<ProductionOrderSummaryEntity> productionOrders;
@@ -51,7 +56,7 @@ public class ExcelExportUtil {
     }
 
     private void createHeaderRow() {
-        sheet = workbook.createSheet("Ordens de Produção");
+        sheet = workbook.createSheet(SHEET_NAME);
         Row headerRow = sheet.createRow(0);
         CellStyle headerStyle = createHeaderStyle();
         for (int i = 0; i < headers.length; i++) {
@@ -122,7 +127,7 @@ public class ExcelExportUtil {
 
         XSSFSheet sheetTable = workbook.getSheetAt(0);
         XSSFTable table = createTableObject(sheetTable, firstRow, lastRow, firstCol, lastCol);
-        setTableProperties(table, "ProductionOrdersTable", "TableStyleMedium9");
+        setTableProperties(table, TABLE_NAME, TABLE_STYLE);
         defineTableColumns(table);
         addAutoFilter(table, firstRow, lastCol);
         showStripes(table);
@@ -149,8 +154,8 @@ public class ExcelExportUtil {
         AreaReference areaReference = new AreaReference(new CellReference(firstRow, firstCol),
                 new CellReference(lastRow, lastCol), workbook.getSpreadsheetVersion());
         XSSFTable table = sheet.createTable(areaReference);
-        table.setDisplayName("ProductionOrdersTable");
-        table.setName("ProductionOrdersTable");
+        table.setDisplayName(TABLE_NAME);
+        table.setName(TABLE_NAME);
         return table;
     }
 
