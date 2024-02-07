@@ -48,4 +48,5 @@ public interface ProductionOrderService {
     List<ProductionOrderEntity> findByEquipmentAndPeriod(Long equipmentId, String productionOrderCode, Timestamp startDate,
                                                          Timestamp endDate);
 
+    List<ProductionOrderSummaryDto> getProductionOrderByComposedId(Long composedId);
 }

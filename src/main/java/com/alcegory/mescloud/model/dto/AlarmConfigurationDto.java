@@ -8,6 +8,7 @@ import lombok.Setter;
 public class AlarmConfigurationDto {
 
     private Long id;
+    private Long equipmentOutputId;
     private int wordIndex;
     private int bitIndex;
     private String code;

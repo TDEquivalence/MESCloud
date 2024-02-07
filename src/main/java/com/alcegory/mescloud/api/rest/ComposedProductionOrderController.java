@@ -1,8 +1,7 @@
 package com.alcegory.mescloud.api.rest;
 
-import com.alcegory.mescloud.model.dto.ComposedProductionOrderDto;
-import com.alcegory.mescloud.model.dto.ComposedSummaryDto;
-import com.alcegory.mescloud.model.dto.RequestComposedDto;
+import com.alcegory.mescloud.model.dto.*;
+import com.alcegory.mescloud.model.entity.ProductionOrderSummaryEntity;
 import com.alcegory.mescloud.service.ComposedProductionOrderService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -51,5 +50,19 @@ public class ComposedProductionOrderController {
     public ResponseEntity<List<ComposedSummaryDto>> findCompleted() {
         List<ComposedSummaryDto> composedCompleted = composedService.findCompleted();
         return new ResponseEntity<>(composedCompleted, HttpStatus.OK);
+    }
+
+    @PostMapping("/production-orders")
+    public ResponseEntity<List<ProductionOrderSummaryDto>> getProductionOrderSummaryByComposedId(@RequestBody RequestById request) {
+        if (request == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        try {
+            List<ProductionOrderSummaryDto> productionOrderSummary = composedService.getProductionOrderSummaryByComposedId(request.getId());
+            return new ResponseEntity<>(productionOrderSummary, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }

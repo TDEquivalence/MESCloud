@@ -3,7 +3,7 @@ package com.alcegory.mescloud.api.rest;
 import com.alcegory.mescloud.exception.*;
 import com.alcegory.mescloud.model.dto.CountingEquipmentDto;
 import com.alcegory.mescloud.model.dto.RequestConfigurationDto;
-import com.alcegory.mescloud.model.dto.RequestImsDto;
+import com.alcegory.mescloud.model.dto.RequestById;
 import com.alcegory.mescloud.service.CountingEquipmentService;
 import com.alcegory.mescloud.utility.HttpUtil;
 import lombok.AllArgsConstructor;
@@ -44,9 +44,9 @@ public class CountingEquipmentController {
     }
 
     @PutMapping("/{equipmentId}/ims")
-    public ResponseEntity<CountingEquipmentDto> updateIms(@PathVariable long equipmentId, @RequestBody RequestImsDto request) {
+    public ResponseEntity<CountingEquipmentDto> updateIms(@PathVariable long equipmentId, @RequestBody RequestById request) {
         try {
-            CountingEquipmentDto updatedIms = service.updateIms(equipmentId, request.getImsId());
+            CountingEquipmentDto updatedIms = service.updateIms(equipmentId, request.getId());
             return new ResponseEntity<>(updatedIms, HttpStatus.OK);
         } catch (EquipmentNotFoundException e) {
             return HttpUtil.responseWithHeaders(HttpStatus.NOT_FOUND, IMS_ERROR_CAUSE, e);

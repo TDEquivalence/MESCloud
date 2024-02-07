@@ -1,11 +1,9 @@
 package com.alcegory.mescloud.repository;
 
+import com.alcegory.mescloud.model.entity.ComposedProductionOrderEntity;
 import com.alcegory.mescloud.model.entity.ProductionOrderSummaryEntity;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Order;
-import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.*;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -26,12 +24,27 @@ public class ProductionOrderRepositoryImpl {
         Root<ProductionOrderSummaryEntity> root = query.from(ProductionOrderSummaryEntity.class);
         query.select(root);
 
+        // Add predicate to filter by composedProductionOrder == null
+        Predicate composedProductionOrderIsNull = criteriaBuilder.isNull(root.get("composedProductionOrder"));
+        query.where(composedProductionOrderIsNull);
+
         List<Order> orders = new ArrayList<>();
         Order newestOrder = criteriaBuilder.desc(root.get(PROP_ID));
         orders.add(newestOrder);
 
+        query.orderBy(orders);
+
+        return entityManager.createQuery(query).getResultList();
+    }
+
+    public List<ProductionOrderSummaryEntity> findProductionOrderSummaryByComposedId(Long composedProductionOrderId) {
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<ProductionOrderSummaryEntity> query = criteriaBuilder.createQuery(ProductionOrderSummaryEntity.class);
+        Root<ProductionOrderSummaryEntity> root = query.from(ProductionOrderSummaryEntity.class);
+        Join<ProductionOrderSummaryEntity, ComposedProductionOrderEntity> joinComposedProductionOrder = root.join("composedProductionOrder", JoinType.LEFT);
+
         query.select(root)
-                .orderBy(orders);
+                .where(criteriaBuilder.equal(joinComposedProductionOrder.get("id"), composedProductionOrderId));
 
         return entityManager.createQuery(query).getResultList();
     }

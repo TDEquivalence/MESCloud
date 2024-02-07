@@ -15,7 +15,7 @@ public class AlarmConfigurationServiceImpl implements AlarmConfigurationService 
     private final AlarmConfigurationRepository repository;
 
     @Override
-    public Optional<AlarmConfigurationEntity> findByWordAndBitIndexes(int wordIndex, int bitIndex) {
-        return repository.findByWordIndexAndBitIndex(wordIndex, bitIndex);
+    public Optional<AlarmConfigurationEntity> findByEquipmentAndWordAndBitIndexes(Long equipmentId, int wordIndex, int bitIndex) {
+        return repository.findByEquipmentIdAndWordIndexAndBitIndex(equipmentId, wordIndex, bitIndex);
     }
 }
