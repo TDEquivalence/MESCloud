@@ -120,17 +120,18 @@ public class ExcelExportUtil {
         int firstCol = 0;
         int lastCol = headers.length - 1;
 
-        XSSFSheet sheet = workbook.getSheetAt(0);
-        XSSFTable table = createTableObject(sheet, firstRow, lastRow, firstCol, lastCol);
-        setTableProperties(table);
+        XSSFSheet sheetTable = workbook.getSheetAt(0);
+        XSSFTable table = createTableObject(sheetTable, firstRow, lastRow, firstCol, lastCol);
+        setTableProperties(table, "ProductionOrdersTable", "TableStyleMedium9");
         defineTableColumns(table);
-        addAutoFilter(table);
+        addAutoFilter(table, firstRow, lastCol);
         showStripes(table);
     }
 
-    private void addAutoFilter(XSSFTable table) {
+    private void addAutoFilter(XSSFTable table, int firstRow, int lastCol) {
         CTTable ctTable = table.getCTTable();
-        ctTable.addNewAutoFilter().setRef("A1:" + CellReference.convertNumToColString(headers.length - 1) + "1");
+        String range = "A1:" + CellReference.convertNumToColString(lastCol) + (firstRow + 1);
+        ctTable.addNewAutoFilter().setRef(range);
     }
 
     private void showStripes(XSSFTable table) {
@@ -153,11 +154,13 @@ public class ExcelExportUtil {
         return table;
     }
 
-    private void setTableProperties(XSSFTable table) {
+    private void setTableProperties(XSSFTable table, String tableName, String tableStyle) {
         CTTable ctTable = table.getCTTable();
-        CTTableStyleInfo tableStyle = ctTable.addNewTableStyleInfo();
-        tableStyle.setName("TableStyleMedium9");
-        ctTable.setTableStyleInfo(tableStyle);
+        CTTableStyleInfo tableStyleInfo = ctTable.addNewTableStyleInfo();
+        tableStyleInfo.setName(tableStyle);
+        ctTable.setTableStyleInfo(tableStyleInfo);
+        table.setDisplayName(tableName);
+        table.setName(tableName);
     }
 
     private void defineTableColumns(XSSFTable table) {
@@ -166,14 +169,15 @@ public class ExcelExportUtil {
         for (int i = 0; i < headers.length; i++) {
             CTTableColumn ctTableColumn = ctTableColumns.addNewTableColumn();
             ctTableColumn.setName(headers[i]);
-            ctTableColumn.setId(i + 1); // Column IDs start from 1
+            ctTableColumn.setId((long) i + 1); // Column IDs start from 1
         }
     }
 
     private void writeWorkbookToResponse(HttpServletResponse response) throws IOException {
-        ServletOutputStream outputStream = response.getOutputStream();
-        workbook.write(outputStream);
-        workbook.close();
-        outputStream.close();
+        try (ServletOutputStream outputStream = response.getOutputStream()) {
+            workbook.write(outputStream);
+        } finally {
+            workbook.close();
+        }
     }
 }
