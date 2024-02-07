@@ -18,7 +18,7 @@ public class ExcelExportController {
     public void exportToExcel(HttpServletResponse response) {
         response.setContentType("application/octet-stream");
         String headerKey = "Content-Disposition";
-        String headerValue = "attachment; filename=Ordens_de_Produção_Info-xlsx";
+        String headerValue = "attachment; filename=Ordens_de_Produção_Info.xlsx";
 
         response.setHeader(headerKey, headerValue);
         productionOrderViewService.exportProductionOrderViewToExcel(response);
