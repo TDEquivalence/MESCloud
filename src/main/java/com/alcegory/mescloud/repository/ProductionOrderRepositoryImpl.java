@@ -1,11 +1,9 @@
 package com.alcegory.mescloud.repository;
 
+import com.alcegory.mescloud.model.entity.ComposedProductionOrderEntity;
 import com.alcegory.mescloud.model.entity.ProductionOrderSummaryEntity;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Order;
-import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.*;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -32,6 +30,18 @@ public class ProductionOrderRepositoryImpl {
 
         query.select(root)
                 .orderBy(orders);
+
+        return entityManager.createQuery(query).getResultList();
+    }
+
+    public List<ProductionOrderSummaryEntity> findProductionOrderSummaryByComposedId(Long composedProductionOrderId) {
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<ProductionOrderSummaryEntity> query = criteriaBuilder.createQuery(ProductionOrderSummaryEntity.class);
+        Root<ProductionOrderSummaryEntity> root = query.from(ProductionOrderSummaryEntity.class);
+        Join<ProductionOrderSummaryEntity, ComposedProductionOrderEntity> joinComposedProductionOrder = root.join("composedProductionOrder", JoinType.LEFT);
+
+        query.select(root)
+                .where(criteriaBuilder.equal(joinComposedProductionOrder.get("id"), composedProductionOrderId));
 
         return entityManager.createQuery(query).getResultList();
     }

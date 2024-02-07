@@ -44,4 +44,6 @@ public interface ProductionOrderRepository extends JpaRepository<ProductionOrder
     boolean isCompleted(String productionOrderCode);
 
     boolean existsByEquipmentIdAndIsCompletedFalse(long equipmentId);
+
+    List<ProductionOrderSummaryEntity> findProductionOrderSummaryByComposedId(Long composedProductionOrderId);
 }

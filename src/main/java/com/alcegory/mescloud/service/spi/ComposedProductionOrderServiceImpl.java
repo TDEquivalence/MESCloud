@@ -1,10 +1,7 @@
 package com.alcegory.mescloud.service.spi;
 
 import com.alcegory.mescloud.model.converter.GenericConverter;
-import com.alcegory.mescloud.model.dto.ComposedProductionOrderDto;
-import com.alcegory.mescloud.model.dto.ComposedSummaryDto;
-import com.alcegory.mescloud.model.dto.ProductionOrderDto;
-import com.alcegory.mescloud.model.dto.RequestComposedDto;
+import com.alcegory.mescloud.model.dto.*;
 import com.alcegory.mescloud.model.entity.ComposedProductionOrderEntity;
 import com.alcegory.mescloud.model.entity.ComposedSummaryEntity;
 import com.alcegory.mescloud.repository.ComposedProductionOrderRepository;
@@ -209,7 +206,7 @@ public class ComposedProductionOrderServiceImpl implements ComposedProductionOrd
     }
 
     @Override
-    public List<ProductionOrderDto> getProductionOrderByComposedId(Long composedId) {
+    public List<ProductionOrderSummaryDto> getProductionOrderSummaryByComposedId(Long composedId) {
         if (composedId == null) {
             throw new IllegalArgumentException("Cannot get PO's, because composed id is null");
         }
