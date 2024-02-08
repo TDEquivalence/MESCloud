@@ -29,9 +29,12 @@ public class ExportExcelServiceImpl implements ExportExcelService {
     private static final String COMPOSED_PRODUCTION_ORDERS_WITH_HITS = "Produções_Compostas_Hits_Info.xlsx";
     private static final String COMPOSED_PRODUCTION_ORDERS_COMPLETED = "Produções_Compostas_Completas_Info.xlsx";
 
+    private static final String ERROR_MESSAGE = "Error exporting data to Excel";
+
     private ProductionOrderRepository productionOrderRepository;
     private ComposedProductionOrderRepository composedRepository;
 
+    @Override
     public void exportAllProductionOrderViewToExcel(HttpServletResponse response) {
         setExcelResponseHeaders(response, PRODUCTION_ORDERS);
         List<ProductionOrderSummaryEntity> productionOrderViews = productionOrderRepository.findCompletedWithoutComposed();
@@ -39,7 +42,7 @@ public class ExportExcelServiceImpl implements ExportExcelService {
         try {
             abstractExcelExport.exportDataToExcel(response);
         } catch (IOException e) {
-            throw new ExcelExportException("Error exporting data to Excel", e);
+            throw new ExcelExportException(ERROR_MESSAGE, e);
         }
     }
 
@@ -51,7 +54,7 @@ public class ExportExcelServiceImpl implements ExportExcelService {
         try {
             excelExportComposed.exportDataToExcel(response);
         } catch (IOException e) {
-            throw new ExcelExportException("Error exporting data to Excel", e);
+            throw new ExcelExportException(ERROR_MESSAGE, e);
         }
     }
 
@@ -63,7 +66,7 @@ public class ExportExcelServiceImpl implements ExportExcelService {
         try {
             excelExportComposed.exportDataToExcel(response);
         } catch (IOException e) {
-            throw new ExcelExportException("Error exporting data to Excel", e);
+            throw new ExcelExportException(ERROR_MESSAGE, e);
         }
     }
 
