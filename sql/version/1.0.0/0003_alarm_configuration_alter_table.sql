@@ -1,3 +1,5 @@
+DELETE FROM alarm_configuration;
+
 ALTER TABLE alarm_configuration
 DROP CONSTRAINT word_bit_indexes_unique,
 DROP CONSTRAINT alarm_configuration_code_key,
