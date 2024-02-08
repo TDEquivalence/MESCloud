@@ -1,12 +1,10 @@
-package com.alcegory.mescloud.utility;
+package com.alcegory.mescloud.utility.export;
 
-import com.alcegory.mescloud.model.entity.ProductionOrderSummaryEntity;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.AreaReference;
 import org.apache.poi.ss.util.CellReference;
-import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFTable;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -20,31 +18,24 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-public class ExcelExportUtil {
+public abstract class AbstractExcelExport {
 
-    private static final String SHEET_NAME = "Ordens de Produção";
+    protected final XSSFWorkbook workbook;
 
-    private static final String TABLE_NAME = "ProductionOrdersTable";
-    private static final String TABLE_STYLE = "TableStyleMedium9";
+    protected XSSFSheet sheet;
+    private final List<?> data;
+    private final String[] headers;
+    private final String tableName;
+    private final String tableStyle;
+    private final String sheetName;
 
-    private final XSSFWorkbook workbook;
-    private XSSFSheet sheet;
-    private final List<ProductionOrderSummaryEntity> productionOrders;
-    private final String[] headers = {
-            "Equipamento",
-            "Ordem de Produção",
-            "IMS",
-            "Lote de Entrada",
-            "Proveniência",
-            "Calibre",
-            "Classe",
-            "Lavação",
-            "Quantidade",
-            "Início de Produção",
-            "Término de Produção"};
 
-    public ExcelExportUtil(List<ProductionOrderSummaryEntity> productionOrders) {
-        this.productionOrders = productionOrders;
+    protected AbstractExcelExport(List<?> data, String[] headers, String tableName, String tableStyle, String sheetName) {
+        this.data = data;
+        this.headers = headers;
+        this.tableName = tableName;
+        this.tableStyle = tableStyle;
+        this.sheetName = sheetName;
         workbook = new XSSFWorkbook();
     }
 
@@ -56,7 +47,7 @@ public class ExcelExportUtil {
     }
 
     private void createHeaderRow() {
-        sheet = workbook.createSheet(SHEET_NAME);
+        sheet = workbook.createSheet(sheetName);
         Row headerRow = sheet.createRow(0);
         CellStyle headerStyle = createHeaderStyle();
         for (int i = 0; i < headers.length; i++) {
@@ -80,31 +71,10 @@ public class ExcelExportUtil {
         return style;
     }
 
-    private void writeData() {
-        int rowCount = 1; // Start from row 1 (row 0 is header)
-        CellStyle style = workbook.createCellStyle();
-        XSSFFont font = workbook.createFont();
-        font.setFontHeight(14);
-        style.setFont(font);
-
-        for (ProductionOrderSummaryEntity po : productionOrders) {
-            Row row = sheet.createRow(rowCount++);
-            int columnCount = 0;
-            createCell(row, columnCount++, po.getEquipment() != null ? po.getEquipment().getAlias() : null, style);
-            createCell(row, columnCount++, po.getCode(), style);
-            createCell(row, columnCount++, po.getIms() != null ? po.getIms().getCode() : null, style);
-            createCell(row, columnCount++, po.getInputBatch(), style);
-            createCell(row, columnCount++, po.getSource(), style);
-            createCell(row, columnCount++, po.getGauge(), style);
-            createCell(row, columnCount++, po.getCategory(), style);
-            createCell(row, columnCount++, po.getWashingProcess(), style);
-            createCell(row, columnCount++, po.getValidAmount(), style);
-            createCell(row, columnCount++, po.getCreatedAt(), style);
-            createCell(row, columnCount++, po.getCompletedAt(), style);
-        }
+    protected void writeData() {
     }
 
-    private void createCell(Row row, int columnCount, Object value, CellStyle style) {
+    protected void createCell(Row row, int columnCount, Object value, CellStyle style) {
         Cell cell = row.createCell(columnCount);
 
         if (value instanceof Number) {
@@ -121,13 +91,13 @@ public class ExcelExportUtil {
 
     private void createTable() {
         int firstRow = 0;
-        int lastRow = productionOrders.size();
+        int lastRow = data.size();
         int firstCol = 0;
         int lastCol = headers.length - 1;
 
         XSSFSheet sheetTable = workbook.getSheetAt(0);
         XSSFTable table = createTableObject(sheetTable, firstRow, lastRow, firstCol, lastCol);
-        setTableProperties(table, TABLE_NAME, TABLE_STYLE);
+        setTableProperties(table, tableName, tableStyle);
         defineTableColumns(table);
         addAutoFilter(table, firstRow, lastCol);
         showStripes(table);
@@ -154,8 +124,8 @@ public class ExcelExportUtil {
         AreaReference areaReference = new AreaReference(new CellReference(firstRow, firstCol),
                 new CellReference(lastRow, lastCol), workbook.getSpreadsheetVersion());
         XSSFTable table = sheet.createTable(areaReference);
-        table.setDisplayName(TABLE_NAME);
-        table.setName(TABLE_NAME);
+        table.setDisplayName(tableName);
+        table.setName(tableName);
         return table;
     }
 
