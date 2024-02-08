@@ -8,4 +8,6 @@ import java.util.List;
 public interface ExportExcelService {
 
     List<ProductionOrderSummaryEntity> exportProductionOrderViewToExcel(HttpServletResponse response);
+
+    void setExcelResponseHeaders(HttpServletResponse response, String filename);
 }

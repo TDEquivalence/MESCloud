@@ -29,4 +29,10 @@ public class ExportExcelServiceImpl implements ExportExcelService {
         }
         return productionOrderViews;
     }
+
+    @Override
+    public void setExcelResponseHeaders(HttpServletResponse response, String filename) {
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        response.setHeader("Content-Disposition", "attachment; filename=" + filename);
+    }
 }
