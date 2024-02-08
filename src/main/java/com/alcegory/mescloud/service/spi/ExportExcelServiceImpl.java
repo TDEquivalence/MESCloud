@@ -1,10 +1,12 @@
 package com.alcegory.mescloud.service.spi;
 
 import com.alcegory.mescloud.exception.ExcelExportException;
+import com.alcegory.mescloud.model.entity.ComposedSummaryEntity;
 import com.alcegory.mescloud.model.entity.ProductionOrderSummaryEntity;
+import com.alcegory.mescloud.repository.ComposedProductionOrderRepository;
 import com.alcegory.mescloud.repository.ProductionOrderRepository;
 import com.alcegory.mescloud.service.ExportExcelService;
-import com.alcegory.mescloud.utility.export.AbstractExcelExport;
+import com.alcegory.mescloud.utility.export.ExcelExportComposed;
 import com.alcegory.mescloud.utility.export.ExcelExportProductionOrder;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
@@ -20,19 +22,34 @@ import java.util.List;
 public class ExportExcelServiceImpl implements ExportExcelService {
 
     private static final String PRODUCTION_ORDERS = "Ordens_de_Produção_Info.xlsx";
+    private static final String COMPOSED_PRODUCTION_ORDERS = "Produções_Compostas_Info.xlsx";
 
-    private ProductionOrderRepository repository;
+    private ProductionOrderRepository productionOrderRepository;
+    private ComposedProductionOrderRepository composedRepository;
 
     public List<ProductionOrderSummaryEntity> exportProductionOrderViewToExcel(HttpServletResponse response) {
         setExcelResponseHeaders(response, PRODUCTION_ORDERS);
-        List<ProductionOrderSummaryEntity> productionOrderViews = repository.findCompletedWithoutComposed();
-        AbstractExcelExport abstractExcelExport = new ExcelExportProductionOrder(productionOrderViews);
+        List<ProductionOrderSummaryEntity> productionOrderViews = productionOrderRepository.findCompletedWithoutComposed();
+        ExcelExportProductionOrder abstractExcelExport = new ExcelExportProductionOrder(productionOrderViews);
         try {
             abstractExcelExport.exportDataToExcel(response);
         } catch (IOException e) {
             throw new ExcelExportException("Error exporting data to Excel", e);
         }
         return productionOrderViews;
+    }
+
+    @Override
+    public List<ComposedSummaryEntity> exportComposedWithoutHitsToExcel(HttpServletResponse response, boolean withHits) {
+        setExcelResponseHeaders(response, COMPOSED_PRODUCTION_ORDERS);
+        List<ComposedSummaryEntity> composedList = composedRepository.getOpenComposedSummaries(withHits);
+        ExcelExportComposed excelExportComposed = new ExcelExportComposed(composedList);
+        try {
+            excelExportComposed.exportDataToExcel(response);
+        } catch (IOException e) {
+            throw new ExcelExportException("Error exporting data to Excel", e);
+        }
+        return composedList;
     }
 
     @Override

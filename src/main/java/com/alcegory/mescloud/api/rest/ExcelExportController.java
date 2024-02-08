@@ -15,7 +15,12 @@ public class ExcelExportController {
     private final ExportExcelService exportExcelService;
 
     @GetMapping("production-orders")
-    public void exportToExcel(HttpServletResponse response) {
+    public void exportProductionOrderToExcel(HttpServletResponse response) {
         exportExcelService.exportProductionOrderViewToExcel(response);
+    }
+
+    @GetMapping("composed-production-orders")
+    public void exportComposedWithoutHitsToExcel(HttpServletResponse response) {
+        exportExcelService.exportComposedWithoutHitsToExcel(response, false);
     }
 }
