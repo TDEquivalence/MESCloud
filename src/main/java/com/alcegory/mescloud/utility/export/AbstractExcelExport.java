@@ -21,6 +21,9 @@ import java.util.List;
 
 public abstract class AbstractExcelExport {
 
+    private static final String DECIMAL_FORMAT_PATTERN = "#0.00%";
+    private static final String DATE_FORMAT_PATTERN = "yyyy-MM-dd HH:mm:ss";
+
     protected final XSSFWorkbook workbook;
 
     protected XSSFSheet sheet;
@@ -80,14 +83,14 @@ public abstract class AbstractExcelExport {
 
         if (value instanceof Number) {
             if (value instanceof Double) {
-                double numericValue = ((Number) value).doubleValue();
-                DecimalFormat decimalFormat = new DecimalFormat("#0.00"); // Format to two decimal places
+                double numericValue = ((Number) value).doubleValue() / 100.0; // Divide by 100
+                DecimalFormat decimalFormat = new DecimalFormat(DECIMAL_FORMAT_PATTERN); // Format as percentage with two decimal places
                 cell.setCellValue(decimalFormat.format(numericValue));
             } else {
                 cell.setCellValue(((Number) value).doubleValue());
             }
         } else if (value instanceof Date) {
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT_PATTERN);
             cell.setCellValue(dateFormat.format((Date) value)); // Apply date format
         } else if (value instanceof Boolean) {
             boolean booleanValue = (Boolean) value;
