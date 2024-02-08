@@ -30,15 +30,15 @@ public abstract class AbstractExcelExport {
     private final List<?> data;
     private final String[] headers;
     private final String tableName;
-    private final String tableStyle;
+    private final String tableStyleStr;
     private final String sheetName;
 
 
-    protected AbstractExcelExport(List<?> data, String[] headers, String tableName, String tableStyle, String sheetName) {
+    protected AbstractExcelExport(List<?> data, String[] headers, String tableName, String tableStyleStr, String sheetName) {
         this.data = data;
         this.headers = headers;
         this.tableName = tableName;
-        this.tableStyle = tableStyle;
+        this.tableStyleStr = tableStyleStr;
         this.sheetName = sheetName;
         workbook = new XSSFWorkbook();
     }
@@ -81,20 +81,17 @@ public abstract class AbstractExcelExport {
     protected void createCell(Row row, int columnCount, Object value, CellStyle style) {
         Cell cell = row.createCell(columnCount);
 
-        if (value instanceof Number) {
-            if (value instanceof Double) {
-                double numericValue = ((Number) value).doubleValue() / 100.0; // Divide by 100
-                DecimalFormat decimalFormat = new DecimalFormat(DECIMAL_FORMAT_PATTERN); // Format as percentage with two decimal places
-                cell.setCellValue(decimalFormat.format(numericValue));
-            } else {
-                cell.setCellValue(((Number) value).doubleValue());
-            }
-        } else if (value instanceof Date) {
+        if (value instanceof Double doubleValue) {
+            double numericValue = doubleValue / 100.0;
+            DecimalFormat decimalFormat = new DecimalFormat(DECIMAL_FORMAT_PATTERN);
+            cell.setCellValue(decimalFormat.format(numericValue));
+        } else if (value instanceof Number numberValue) {
+            cell.setCellValue(numberValue.doubleValue());
+        } else if (value instanceof Date dateValue) {
             SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT_PATTERN);
-            cell.setCellValue(dateFormat.format((Date) value)); // Apply date format
-        } else if (value instanceof Boolean) {
-            boolean booleanValue = (Boolean) value;
-            cell.setCellValue(booleanValue ? "Aprovado" : "Reprovado");
+            cell.setCellValue(dateFormat.format(dateValue));
+        } else if (value instanceof Boolean booleanValue) {
+            cell.setCellValue(Boolean.TRUE.equals(booleanValue) ? "Aprovado" : "Reprovado");
         } else {
             cell.setCellValue(value != null ? value.toString() : "");
         }
@@ -111,7 +108,7 @@ public abstract class AbstractExcelExport {
 
         XSSFSheet sheetTable = workbook.getSheetAt(0);
         XSSFTable table = createTableObject(sheetTable, firstRow, lastRow, firstCol, lastCol);
-        setTableProperties(table, tableName, tableStyle);
+        setTableProperties(table, tableName, tableStyleStr);
         defineTableColumns(table);
         addAutoFilter(table, firstRow, lastCol);
         showStripes(table);
