@@ -26,7 +26,7 @@ public class ExcelExportProductionOrder extends AbstractExcelExport {
                 "Lavação",
                 "Quantidade",
                 "Início de Produção",
-                "Término de Produção"
+                "Conclusão de Produção"
         }, TABLE_NAME, TABLE_STYLE, sheetName);
         this.productionOrders = productionOrders;
     }

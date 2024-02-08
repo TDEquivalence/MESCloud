@@ -42,18 +42,18 @@ public class ExcelExportComposed extends AbstractExcelExport {
                 "Lavação",
                 "Quantidade",
                 "Amostra",
-                "Composta criada"
+                "Criação da composta"
         };
 
         headersList.addAll(Arrays.asList(commonHeaders));
 
         if (withHits) {
-            headersList.addAll(Arrays.asList("Hits", "Fiabilidade", "Hit inserido em"));
+            headersList.addAll(Arrays.asList("Hits", "Fiabilidade", "Hits inseridos em"));
         }
 
         if (isCompleted) {
-            headersList.add("Aprovado em");
             headersList.add("Status");
+            headersList.add("Resolvido em");
         }
 
         return headersList.toArray(new String[0]);
@@ -92,8 +92,8 @@ public class ExcelExportComposed extends AbstractExcelExport {
             }
 
             if (isCompleted) {
-                createCell(row, columnCount++, composed.getApprovedAt(), style);
                 createCell(row, columnCount++, composed.getIsBatchApproved(), style);
+                createCell(row, columnCount++, composed.getApprovedAt(), style);
             }
         }
     }
