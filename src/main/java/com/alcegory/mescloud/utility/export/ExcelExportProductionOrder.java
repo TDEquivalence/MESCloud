@@ -9,13 +9,12 @@ import java.util.List;
 
 public class ExcelExportProductionOrder extends AbstractExcelExport {
 
-    private static final String SHEET_NAME = "Ordens de Produção";
     private static final String TABLE_NAME = "ProductionOrdersTable";
     private static final String TABLE_STYLE = "TableStyleMedium9";
 
     private final List<ProductionOrderSummaryEntity> productionOrders;
 
-    public ExcelExportProductionOrder(List<ProductionOrderSummaryEntity> productionOrders) {
+    public ExcelExportProductionOrder(List<ProductionOrderSummaryEntity> productionOrders, String sheetName) {
         super(productionOrders, new String[]{
                 "Equipamento",
                 "Ordem de Produção",
@@ -28,7 +27,7 @@ public class ExcelExportProductionOrder extends AbstractExcelExport {
                 "Quantidade",
                 "Início de Produção",
                 "Término de Produção"
-        }, TABLE_NAME, TABLE_STYLE, SHEET_NAME);
+        }, TABLE_NAME, TABLE_STYLE, sheetName);
         this.productionOrders = productionOrders;
     }
 

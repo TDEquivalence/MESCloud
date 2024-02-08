@@ -14,6 +14,7 @@ import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTTableColumns;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTTableStyleInfo;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -78,14 +79,24 @@ public abstract class AbstractExcelExport {
         Cell cell = row.createCell(columnCount);
 
         if (value instanceof Number) {
-            cell.setCellValue(((Number) value).doubleValue());
+            if (value instanceof Double) {
+                double numericValue = ((Number) value).doubleValue();
+                DecimalFormat decimalFormat = new DecimalFormat("#0.00"); // Format to two decimal places
+                cell.setCellValue(decimalFormat.format(numericValue));
+            } else {
+                cell.setCellValue(((Number) value).doubleValue());
+            }
         } else if (value instanceof Date) {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            cell.setCellValue(dateFormat.format((Date) value));// Apply date format
+            cell.setCellValue(dateFormat.format((Date) value)); // Apply date format
+        } else if (value instanceof Boolean) {
+            boolean booleanValue = (Boolean) value;
+            cell.setCellValue(booleanValue ? "Aprovado" : "Reprovado");
         } else {
             cell.setCellValue(value != null ? value.toString() : "");
         }
 
+        style.setAlignment(HorizontalAlignment.LEFT);
         cell.setCellStyle(style);
     }
 

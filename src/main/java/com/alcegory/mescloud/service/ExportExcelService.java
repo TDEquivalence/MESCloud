@@ -1,16 +1,12 @@
 package com.alcegory.mescloud.service;
 
-import com.alcegory.mescloud.model.entity.ComposedSummaryEntity;
-import com.alcegory.mescloud.model.entity.ProductionOrderSummaryEntity;
 import jakarta.servlet.http.HttpServletResponse;
-
-import java.util.List;
 
 public interface ExportExcelService {
 
-    List<ProductionOrderSummaryEntity> exportProductionOrderViewToExcel(HttpServletResponse response);
+    void exportAllProductionOrderViewToExcel(HttpServletResponse response);
 
-    void setExcelResponseHeaders(HttpServletResponse response, String filename);
+    void exportAllComposedToExcel(HttpServletResponse response, boolean withHits);
 
-    List<ComposedSummaryEntity> exportComposedWithoutHitsToExcel(HttpServletResponse response, boolean withHits);
+    void exportAllCompletedComposedToExcel(HttpServletResponse response, boolean withHits);
 }

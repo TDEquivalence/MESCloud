@@ -21,39 +21,53 @@ import java.util.List;
 @Log
 public class ExportExcelServiceImpl implements ExportExcelService {
 
+    private static final String SHEET_NAME_PRODUCTION_ORDERS = "Ordens de Produção";
+    private static final String SHEET_NAME_COMPOSED = "Produções Compostas";
+    private static final String SHEET_NAME_COMPLETED = "Produções Concluídas";
     private static final String PRODUCTION_ORDERS = "Ordens_de_Produção_Info.xlsx";
     private static final String COMPOSED_PRODUCTION_ORDERS = "Produções_Compostas_Info.xlsx";
+    private static final String COMPOSED_PRODUCTION_ORDERS_WITH_HITS = "Produções_Compostas_Hits_Info.xlsx";
+    private static final String COMPOSED_PRODUCTION_ORDERS_COMPLETED = "Produções_Compostas_Completas_Info.xlsx";
 
     private ProductionOrderRepository productionOrderRepository;
     private ComposedProductionOrderRepository composedRepository;
 
-    public List<ProductionOrderSummaryEntity> exportProductionOrderViewToExcel(HttpServletResponse response) {
+    public void exportAllProductionOrderViewToExcel(HttpServletResponse response) {
         setExcelResponseHeaders(response, PRODUCTION_ORDERS);
         List<ProductionOrderSummaryEntity> productionOrderViews = productionOrderRepository.findCompletedWithoutComposed();
-        ExcelExportProductionOrder abstractExcelExport = new ExcelExportProductionOrder(productionOrderViews);
+        ExcelExportProductionOrder abstractExcelExport = new ExcelExportProductionOrder(productionOrderViews, SHEET_NAME_PRODUCTION_ORDERS);
         try {
             abstractExcelExport.exportDataToExcel(response);
         } catch (IOException e) {
             throw new ExcelExportException("Error exporting data to Excel", e);
         }
-        return productionOrderViews;
     }
 
     @Override
-    public List<ComposedSummaryEntity> exportComposedWithoutHitsToExcel(HttpServletResponse response, boolean withHits) {
-        setExcelResponseHeaders(response, COMPOSED_PRODUCTION_ORDERS);
+    public void exportAllComposedToExcel(HttpServletResponse response, boolean withHits) {
+        setExcelResponseHeaders(response, withHits ? COMPOSED_PRODUCTION_ORDERS_WITH_HITS : COMPOSED_PRODUCTION_ORDERS);
         List<ComposedSummaryEntity> composedList = composedRepository.getOpenComposedSummaries(withHits);
-        ExcelExportComposed excelExportComposed = new ExcelExportComposed(composedList);
+        ExcelExportComposed excelExportComposed = new ExcelExportComposed(composedList, withHits, SHEET_NAME_COMPOSED, false);
         try {
             excelExportComposed.exportDataToExcel(response);
         } catch (IOException e) {
             throw new ExcelExportException("Error exporting data to Excel", e);
         }
-        return composedList;
     }
 
     @Override
-    public void setExcelResponseHeaders(HttpServletResponse response, String filename) {
+    public void exportAllCompletedComposedToExcel(HttpServletResponse response, boolean withHits) {
+        setExcelResponseHeaders(response, COMPOSED_PRODUCTION_ORDERS_COMPLETED);
+        List<ComposedSummaryEntity> composedList = composedRepository.findCompleted();
+        ExcelExportComposed excelExportComposed = new ExcelExportComposed(composedList, withHits, SHEET_NAME_COMPLETED, true);
+        try {
+            excelExportComposed.exportDataToExcel(response);
+        } catch (IOException e) {
+            throw new ExcelExportException("Error exporting data to Excel", e);
+        }
+    }
+
+    private void setExcelResponseHeaders(HttpServletResponse response, String filename) {
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         response.setHeader("Content-Disposition", "attachment; filename=" + filename);
     }

@@ -16,11 +16,21 @@ public class ExcelExportController {
 
     @GetMapping("production-orders")
     public void exportProductionOrderToExcel(HttpServletResponse response) {
-        exportExcelService.exportProductionOrderViewToExcel(response);
+        exportExcelService.exportAllProductionOrderViewToExcel(response);
     }
 
-    @GetMapping("composed-production-orders")
+    @GetMapping("composed-production-orders/without-hits")
     public void exportComposedWithoutHitsToExcel(HttpServletResponse response) {
-        exportExcelService.exportComposedWithoutHitsToExcel(response, false);
+        exportExcelService.exportAllComposedToExcel(response, false);
+    }
+
+    @GetMapping("composed-production-orders/with-hits")
+    public void exportComposedWithHitsToExcel(HttpServletResponse response) {
+        exportExcelService.exportAllComposedToExcel(response, true);
+    }
+
+    @GetMapping("composed-production-orders/completed")
+    public void exportCompletedComposedToExcel(HttpServletResponse response) {
+        exportExcelService.exportAllCompletedComposedToExcel(response, true);
     }
 }
