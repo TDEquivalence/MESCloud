@@ -4,6 +4,7 @@ import com.alcegory.mescloud.model.entity.ProductionOrderEntity;
 import com.alcegory.mescloud.model.entity.ProductionOrderSummaryEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
@@ -27,14 +28,22 @@ public interface ProductionOrderRepository extends JpaRepository<ProductionOrder
 
     List<ProductionOrderEntity> findByComposedProductionOrderId(Long composedProductionOrderId);
 
-    @Query("SELECT p FROM production_order p " +
-            "WHERE (p.completedAt > :startDate OR p.completedAt IS NULL) " +
-            "AND p.createdAt < :endDate " +
-            "AND (p.equipment.id = :equipmentId)")
-    List<ProductionOrderEntity> findByEquipmentAndPeriod(Long equipmentId, Date startDate, Date endDate);
+    @Query(value = "SELECT * FROM production_order p " +
+            "WHERE (p.completed_at > :startDate OR p.completed_at IS NULL) " +
+            "AND p.created_at < :endDate " +
+            "AND (p.equipment_id = :equipmentId) " +
+            "AND (:productionOrderCode IS NULL OR p.code = :productionOrderCode)", nativeQuery = true)
+    List<ProductionOrderEntity> findByEquipmentAndPeriod(
+            @Param("equipmentId") Long equipmentId,
+            @Param("productionOrderCode") String productionOrderCode,
+            @Param("startDate") Date startDate,
+            @Param("endDate") Date endDate
+    );
 
     @Query("SELECT po.isCompleted FROM production_order po WHERE po.code = :productionOrderCode")
     boolean isCompleted(String productionOrderCode);
 
     boolean existsByEquipmentIdAndIsCompletedFalse(long equipmentId);
+
+    List<ProductionOrderSummaryEntity> findProductionOrderSummaryByComposedId(Long composedProductionOrderId);
 }

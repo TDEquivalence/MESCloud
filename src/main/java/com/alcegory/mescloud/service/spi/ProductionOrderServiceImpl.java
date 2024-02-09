@@ -23,8 +23,6 @@ import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -163,7 +161,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         String codeWithYear = codePrefix + yearLastTwoDigits;
 
         return productionOrderOpt.isEmpty() ||
-                !hasYearChanged(productionOrderOpt.get().getCode(), yearLastTwoDigits, codePrefix) ?
+                hasYearChanged(productionOrderOpt.get().getCode(), yearLastTwoDigits, codePrefix) ?
                 codeWithYear + String.format(FIVE_DIGIT_NUMBER_FORMAT, FIRST_CODE_VALUE) :
                 codeWithYear + generateFormattedCodeValue(productionOrderOpt.get(), codeWithYear);
     }
@@ -184,7 +182,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
 
     private boolean hasYearChanged(String productionOrderCode, int yearDigits, String codePrefix) {
         String numericCode = productionOrderCode.substring(codePrefix.length());
-        return numericCode.startsWith(String.valueOf(yearDigits));
+        return !numericCode.startsWith(String.valueOf(yearDigits));
     }
 
     private void publishToPlc(ProductionOrderEntity productionOrderEntity) throws MesMqttException {
@@ -278,80 +276,14 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
 
     @Override
     public List<ProductionOrderDto> findByEquipmentAndPeriod(Long equipmentId, Date startDate, Date endDate) {
-        List<ProductionOrderEntity> productionOrders = repository.findByEquipmentAndPeriod(equipmentId, startDate, endDate);
+        List<ProductionOrderEntity> productionOrders = repository.findByEquipmentAndPeriod(equipmentId, null,
+                startDate, endDate);
         return converter.toDto(productionOrders);
     }
 
     @Override
     public boolean isCompleted(String productionOrderCode) {
         return repository.isCompleted(productionOrderCode);
-    }
-
-    @Override
-    public Long calculateScheduledTimeInSeconds(Instant startDate, Instant endDate) {
-        Duration productionScheduleTime = calculateScheduledTime(startDate, endDate);
-
-        if (isInclusiveEnd(endDate)) {
-            productionScheduleTime = productionScheduleTime.plusSeconds(1);
-        }
-
-        return productionScheduleTime.getSeconds();
-    }
-
-    private static boolean isInclusiveEnd(Instant endDate) {
-        return endDate.getNano() > 0 || endDate.getEpochSecond() % 60 > 0;
-    }
-    private Duration calculateScheduledTime(Instant startDate, Instant endDate) {
-        Duration duration = Duration.between(startDate, endDate);
-        return duration.isNegative() ? Duration.ZERO : duration;
-    }
-
-    @Override
-    public Long calculateScheduledTimeInSeconds(Long equipmentId, Instant startDateFilter, Instant endDateFilter) {
-
-        Timestamp startDate = Timestamp.from(startDateFilter);
-        Timestamp endDate = Timestamp.from(endDateFilter);
-
-        List<ProductionOrderEntity> productionOrders = repository.findByEquipmentAndPeriod(equipmentId,
-                startDate,
-                endDate);
-
-        if (productionOrders.isEmpty()) {
-            return 0L;
-        }
-
-        long totalActiveTime = 0;
-        for (ProductionOrderEntity productionOrder : productionOrders) {
-            Instant adjustedStartDate = getAdjustedStartDate(productionOrder, startDate);
-            Instant adjustedEndDate = getAdjustedEndDate(productionOrder, endDate);
-            
-            totalActiveTime += calculateScheduledTimeInSeconds(adjustedStartDate, adjustedEndDate);
-        }
-
-        return totalActiveTime;
-    }
-
-    @Override
-    public Instant getAdjustedStartDate(ProductionOrderEntity productionOrder, Timestamp startDate) {
-        Instant createdAt = productionOrder.getCreatedAt().toInstant();
-        return (createdAt.isAfter(startDate.toInstant()) ? createdAt : startDate.toInstant());
-    }
-
-    @Override
-    public Instant getAdjustedEndDate(ProductionOrderEntity productionOrder, Timestamp endDate) {
-        Date completedAtDate = productionOrder.getCompletedAt();
-        Instant completedAtInstant = (completedAtDate != null) ? completedAtDate.toInstant() : null;
-
-        if (completedAtInstant == null) {
-            completedAtInstant = endDate.toInstant();
-        }
-
-        Instant nowTime = Instant.now();
-        if (completedAtInstant.isAfter(nowTime)) {
-            completedAtInstant = nowTime;
-        }
-
-        return completedAtInstant;
     }
 
     @Override
@@ -376,8 +308,17 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     }
 
     @Override
-    public List<ProductionOrderEntity> findByEquipmentAndPeriod(Long equipmentId, Timestamp startDate, Timestamp endDate) {
-        return repository.findByEquipmentAndPeriod(equipmentId, startDate, endDate);
+    public List<ProductionOrderEntity> findByEquipmentAndPeriod(Long equipmentId, String productionOrderCode,
+                                                                Timestamp startDate, Timestamp endDate) {
+        return repository.findByEquipmentAndPeriod(equipmentId, productionOrderCode, startDate, endDate);
     }
 
+    @Override
+    public List<ProductionOrderSummaryDto> getProductionOrderByComposedId(Long composedId) {
+        if (composedId == null) {
+            throw new IllegalArgumentException("Composed ID cannot be null");
+        }
+        List<ProductionOrderSummaryEntity> productionOrderSummaryEntities = repository.findProductionOrderSummaryByComposedId(composedId);
+        return summaryConverter.toDto(productionOrderSummaryEntities, ProductionOrderSummaryDto.class);
+    }
 }

@@ -9,5 +9,5 @@ import java.util.Optional;
 @Repository
 public interface AlarmConfigurationRepository extends JpaRepository<AlarmConfigurationEntity, Long> {
 
-    Optional<AlarmConfigurationEntity> findByWordIndexAndBitIndex(int wordIndex, int bitIndex);
+    Optional<AlarmConfigurationEntity> findByEquipmentIdAndWordIndexAndBitIndex(Long equipmentId, int wordIndex, int bitIndex);
 }

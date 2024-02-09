@@ -1,57 +1,3 @@
-INSERT INTO users (first_name, last_name, username, email, password, role, created_at, is_active, is_not_locked)
-VALUES
-('alcina', 'toto', 'admin', 'pepe@email.com', '$2a$10$kpCZJKj.gmCOVbxs1XNDY.w/cY405lZtoW7ciWRYPy2F38MayZzMS', 'ADMIN', '2023-06-18 22:50:06.035', true, true),
-('Post', 'Man', 'postman', 'postman@example.com', '$2a$10$d3RKgivqOkHQw9b/x4Hnpec.7jwLdIpIYCDKAeiTLWAZAcsn7Z9GS', 'SUPER_ADMIN', '2023-06-23 10:56:53.167', true, true);
-
-INSERT INTO factory
-(name)
-VALUES
-('Test Factory');
-
-INSERT INTO section
-(factory_id, name)
-VALUES
-(1, 'OBO');
-
-INSERT INTO counting_equipment
-(code, alias, section_id, equipment_status, p_timer_communication_cycle)
-VALUES
-('OBO001', 'Máquina 1', 1, 0, 0),
-('OBO002', 'Máquina 2', 1, 0, 0),
-('OBO003', 'Máquina 3', 1, 0, 0),
-('OBO004', 'Máquina 4', 1, 0, 0),
-('OBO005', 'Máquina 5', 1, 0, 0),
-('OBO006', 'Máquina 6', 1, 0, 0),
-('OBO007', 'Máquina 7', 1, 0, 0),
-('OBO008', 'Máquina 8', 1, 0, 0);
-
-INSERT INTO equipment_output_alias
-(alias)
-VALUES
-('OK'),
-('NOTOK');
-
-INSERT INTO equipment_output
-(counting_equipment_id, code, equipment_output_alias_id, is_valid_for_production)
-VALUES
-(1, 'OBO001-001', 1, true),
-(1, 'OBO001-002', 2, false),
-(2, 'OBO002-001', 1, true),
-(2, 'OBO002-002', 2, false),
-(3, 'OBO003-001', 1, true),
-(3, 'OBO003-002', 2, false),
-(4, 'OBO004-001', 1, true),
-(4, 'OBO004-002', 2, false),
-(5, 'OBO005-001', 1, true),
-(5, 'OBO005-002', 2, false),
-(6, 'OBO006-001', 1, true),
-(6, 'OBO006-002', 2, false),
-(7, 'OBO007-001', 1, true),
-(7, 'OBO007-002', 2, false),
-(8, 'OBO008-001', 1, true),
-(8, 'OBO008-002', 2, false);
-
-
 INSERT INTO alarm_configuration (equipment_id, word_index, bit_index, code, description)
 VALUES
 (1, 0, 0, 'PLC01', 'Falha de Comunicação com PLC'),
@@ -566,3 +512,7 @@ VALUES
 (8, 3, 13, 'PLC126', 'MESA 2 : BLOCO 10 Temperatura Alta'),
 (8, 3, 14, 'PLC127', 'MESA 2 : BLOCO 11 Temperatura Alta'),
 (8, 3, 15, 'PLC128', 'MESA 2 : BLOCO 12 Temperatura Alta');
+
+INSERT INTO audit_script (run_date, process, version, schema)
+VALUES
+    (CURRENT_DATE, '0005_insert_alarm_config_data', '1.0.0', '1.0.0_0005');

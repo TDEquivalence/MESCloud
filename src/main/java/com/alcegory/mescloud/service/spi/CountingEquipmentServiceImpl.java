@@ -5,8 +5,14 @@ import com.alcegory.mescloud.exception.*;
 import com.alcegory.mescloud.model.converter.CountingEquipmentConverter;
 import com.alcegory.mescloud.model.converter.GenericConverter;
 import com.alcegory.mescloud.model.converter.PlcMqttConverter;
-import com.alcegory.mescloud.model.dto.*;
-import com.alcegory.mescloud.model.entity.*;
+import com.alcegory.mescloud.model.dto.CountingEquipmentDto;
+import com.alcegory.mescloud.model.dto.EquipmentConfigMqttDto;
+import com.alcegory.mescloud.model.dto.ImsDto;
+import com.alcegory.mescloud.model.dto.RequestConfigurationDto;
+import com.alcegory.mescloud.model.entity.CountingEquipmentEntity;
+import com.alcegory.mescloud.model.entity.EquipmentOutputAliasEntity;
+import com.alcegory.mescloud.model.entity.EquipmentOutputEntity;
+import com.alcegory.mescloud.model.entity.ImsEntity;
 import com.alcegory.mescloud.protocol.MesMqttSettings;
 import com.alcegory.mescloud.repository.CountingEquipmentRepository;
 import com.alcegory.mescloud.service.*;
@@ -316,5 +322,15 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
     private void ensureMinimumPTimer(CountingEquipmentEntity countingEquipmentEntity) {
         int currentPTimer = countingEquipmentEntity.getPTimerCommunicationCycle();
         countingEquipmentEntity.setPTimerCommunicationCycle(Math.max(MIN_P_TIMER_IN_MINUTES, currentPTimer));
+    }
+
+    @Override
+    public List<Long> findAllIds() {
+        return repository.findAllIds();
+    }
+
+    @Override
+    public Long findIdByAlias(String alias) {
+        return repository.findIdByAlias(alias);
     }
 }
