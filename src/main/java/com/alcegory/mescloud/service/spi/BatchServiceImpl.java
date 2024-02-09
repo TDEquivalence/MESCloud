@@ -1,9 +1,8 @@
 package com.alcegory.mescloud.service.spi;
 
+import com.alcegory.mescloud.model.dto.*;
 import com.alcegory.mescloud.repository.BatchRepository;
 import com.alcegory.mescloud.model.converter.GenericConverter;
-import com.alcegory.mescloud.model.dto.BatchDto;
-import com.alcegory.mescloud.model.dto.RequestBatchDto;
 import com.alcegory.mescloud.model.entity.BatchEntity;
 import com.alcegory.mescloud.model.entity.ComposedProductionOrderEntity;
 import com.alcegory.mescloud.service.BatchService;
@@ -37,6 +36,18 @@ public class BatchServiceImpl implements BatchService {
         BatchEntity batch = converter.toEntity(requestBatch.getBatch(), BatchEntity.class);
         batch.setComposedProductionOrder(getComposedById(requestBatch.getComposedId()));
         return batch;
+    }
+
+    public BatchDto rejectComposed(RejectRequestDto rejectRequestDto) {
+        Optional<ComposedProductionOrderDto> composedProductionOrderDto = composedService.create(rejectRequestDto.getProductionOrderIds());
+
+        if (composedProductionOrderDto.isEmpty()) {
+            throw new IllegalArgumentException("Composed production order not created");
+        }
+
+        ComposedProductionOrderDto composed = composedProductionOrderDto.get();
+        rejectRequestDto.getRequestBatchDto().setComposedId(composed.getId());
+        return create(rejectRequestDto.getRequestBatchDto());
     }
 
     private ComposedProductionOrderEntity getComposedById(Long composedId) {
