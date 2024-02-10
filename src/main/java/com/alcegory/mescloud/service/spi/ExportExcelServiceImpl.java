@@ -36,7 +36,7 @@ public class ExportExcelServiceImpl implements ExportExcelService {
 
     @Override
     public void exportAllProductionOrderViewToExcel(HttpServletResponse response) {
-        setCsvResponseHeaders(response, PRODUCTION_ORDERS);
+        setExcelResponseHeaders(response, PRODUCTION_ORDERS);
         List<ProductionOrderSummaryEntity> productionOrderViews = productionOrderRepository.findCompletedWithoutComposed();
         ExcelExportProductionOrder abstractExcelExport = new ExcelExportProductionOrder(productionOrderViews, SHEET_NAME_PRODUCTION_ORDERS);
         try {
@@ -48,8 +48,8 @@ public class ExportExcelServiceImpl implements ExportExcelService {
 
     @Override
     public void exportAllComposedToExcel(HttpServletResponse response, boolean withHits) {
-        setCsvResponseHeaders(response, withHits ? COMPOSED_PRODUCTION_ORDERS_WITH_HITS : COMPOSED_PRODUCTION_ORDERS);
-        List<ComposedSummaryEntity> composedList = composedRepository.getOpenComposedSummaries(withHits, null, null);
+        setExcelResponseHeaders(response, withHits ? COMPOSED_PRODUCTION_ORDERS_WITH_HITS : COMPOSED_PRODUCTION_ORDERS);
+        List<ComposedSummaryEntity> composedList = composedRepository.getOpenComposedSummaries(withHits);
         ExcelExportComposed excelExportComposed = new ExcelExportComposed(composedList, withHits, SHEET_NAME_COMPOSED, false);
         try {
             excelExportComposed.exportDataToExcel(response);
@@ -60,7 +60,7 @@ public class ExportExcelServiceImpl implements ExportExcelService {
 
     @Override
     public void exportAllCompletedComposedToExcel(HttpServletResponse response, boolean withHits) {
-        setCsvResponseHeaders(response, COMPOSED_PRODUCTION_ORDERS_COMPLETED);
+        setExcelResponseHeaders(response, COMPOSED_PRODUCTION_ORDERS_COMPLETED);
         List<ComposedSummaryEntity> composedList = composedRepository.findCompleted();
         ExcelExportComposed excelExportComposed = new ExcelExportComposed(composedList, withHits, SHEET_NAME_COMPLETED, true);
         try {
@@ -70,8 +70,8 @@ public class ExportExcelServiceImpl implements ExportExcelService {
         }
     }
 
-    private void setCsvResponseHeaders(HttpServletResponse response, String filename) {
-        response.setContentType("text/csv");
-        response.setHeader("Content-Disposition", "attachment; filename=" + filename + ".csv");
+    private void setExcelResponseHeaders(HttpServletResponse response, String filename) {
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        response.setHeader("Content-Disposition", "attachment; filename=" + filename);
     }
 }
