@@ -49,7 +49,7 @@ public class ExportExcelServiceImpl implements ExportExcelService {
     @Override
     public void exportAllComposedToExcel(HttpServletResponse response, boolean withHits) {
         setExcelResponseHeaders(response, withHits ? COMPOSED_PRODUCTION_ORDERS_WITH_HITS : COMPOSED_PRODUCTION_ORDERS);
-        List<ComposedSummaryEntity> composedList = composedRepository.getOpenComposedSummaries(withHits);
+        List<ComposedSummaryEntity> composedList = composedRepository.getOpenComposedSummaries(withHits, null, null);
         ExcelExportComposed excelExportComposed = new ExcelExportComposed(composedList, withHits, SHEET_NAME_COMPOSED, false);
         try {
             excelExportComposed.exportDataToExcel(response);
