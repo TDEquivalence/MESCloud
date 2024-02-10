@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,7 +18,7 @@ public interface ComposedProductionOrderRepository extends JpaRepository<Compose
 
     Optional<ComposedProductionOrderEntity> findTopByOrderByIdDesc();
 
-    List<ComposedSummaryEntity> getOpenComposedSummaries(boolean withHits);
+    List<ComposedSummaryEntity> getOpenComposedSummaries(boolean withHits, Timestamp startDate, Timestamp endDate);
 
     List<ComposedSummaryEntity> findCompleted();
 }

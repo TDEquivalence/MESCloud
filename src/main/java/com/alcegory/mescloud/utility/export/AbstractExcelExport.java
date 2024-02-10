@@ -1,5 +1,6 @@
 package com.alcegory.mescloud.utility.export;
 
+import com.alcegory.mescloud.exception.ExcelExportException;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.poi.ss.usermodel.*;
@@ -160,10 +161,20 @@ public abstract class AbstractExcelExport {
     }
 
     private void writeWorkbookToResponse(HttpServletResponse response) throws IOException {
-        try (ServletOutputStream outputStream = response.getOutputStream()) {
+        try {
+            ServletOutputStream outputStream = response.getOutputStream();
             workbook.write(outputStream);
+        } catch (IOException e) {
+            // Log the exception
+            e.printStackTrace();
+            throw new ExcelExportException("ERROR while exporting excel", e);
         } finally {
-            workbook.close();
+            try {
+                workbook.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+                }
         }
     }
+
 }

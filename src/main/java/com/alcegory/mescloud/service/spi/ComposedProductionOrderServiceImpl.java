@@ -13,11 +13,15 @@ import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.logging.Logger;
+
+import static com.alcegory.mescloud.model.filter.CounterRecordFilter.Property.END_DATE;
+import static com.alcegory.mescloud.model.filter.CounterRecordFilter.Property.START_DATE;
 
 @Service
 @AllArgsConstructor
@@ -163,13 +167,24 @@ public class ComposedProductionOrderServiceImpl implements ComposedProductionOrd
     }
 
     @Override
-    public List<ComposedSummaryDto> findSummarized(boolean withHits) {
-        List<ComposedSummaryEntity> composedWithoutHits = repository.getOpenComposedSummaries(withHits);
+    public List<ComposedSummaryDto> findAllSummarized(boolean withHits) {
+        return getOpenComposedSummaries(withHits, null, null);
+    }
+
+    @Override
+    public List<ComposedSummaryDto> findSummarizedFiltered(boolean withHits, KpiFilterDto filter) {
+        Timestamp startDate = filter.getSearch().getTimestampValue(START_DATE);
+        Timestamp endDate = filter.getSearch().getTimestampValue(END_DATE);
+        return getOpenComposedSummaries(withHits, startDate, endDate);
+    }
+
+    private List<ComposedSummaryDto> getOpenComposedSummaries(boolean withHits, Timestamp startDate, Timestamp endDate) {
+        List<ComposedSummaryEntity> composedWithoutHits = repository.getOpenComposedSummaries(withHits, startDate, endDate);
         return summaryConverter.toDto(composedWithoutHits, ComposedSummaryDto.class);
     }
 
     @Override
-    public List<ComposedSummaryDto> findCompleted() {
+    public List<ComposedSummaryDto> findAllCompleted() {
         List<ComposedSummaryEntity> composedCompleted = repository.findCompleted();
         return summaryConverter.toDto(composedCompleted, ComposedSummaryDto.class);
     }
