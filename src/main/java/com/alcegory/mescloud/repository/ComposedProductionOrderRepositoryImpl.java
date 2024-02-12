@@ -25,7 +25,7 @@ public class ComposedProductionOrderRepositoryImpl {
     private final EntityManager entityManager;
 
 
-    public List<ComposedSummaryEntity> findCompleted() {
+    public List<ComposedSummaryEntity> findCompleted(Timestamp startDate, Timestamp endDate) {
 
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<ComposedSummaryEntity> query = criteriaBuilder.createQuery(ComposedSummaryEntity.class);
@@ -37,6 +37,16 @@ public class ComposedProductionOrderRepositoryImpl {
         List<Order> orders = new ArrayList<>();
         Order newestOrder = criteriaBuilder.desc(root.get(PROP_ID));
         orders.add(newestOrder);
+
+        // Predicates for startDate and endDate
+        if (startDate != null) {
+            Predicate startDatePredicate = criteriaBuilder.greaterThanOrEqualTo(root.get(CREATED_AT), startDate);
+            predicates.add(startDatePredicate);
+        }
+        if (endDate != null) {
+            Predicate endDatePredicate = criteriaBuilder.lessThanOrEqualTo(root.get(CREATED_AT), endDate);
+            predicates.add(endDatePredicate);
+        }
 
         query.select(root)
                 .where(criteriaBuilder.and(predicates.toArray(new Predicate[0])))

@@ -37,7 +37,7 @@ public class ExportExcelServiceImpl implements ExportExcelService {
     @Override
     public void exportAllProductionOrderViewToExcel(HttpServletResponse response) {
         setExcelResponseHeaders(response, PRODUCTION_ORDERS);
-        List<ProductionOrderSummaryEntity> productionOrderViews = productionOrderRepository.findCompletedWithoutComposed();
+        List<ProductionOrderSummaryEntity> productionOrderViews = productionOrderRepository.findCompletedWithoutComposed(null, null);
         ExcelExportProductionOrder abstractExcelExport = new ExcelExportProductionOrder(productionOrderViews, SHEET_NAME_PRODUCTION_ORDERS);
         try {
             abstractExcelExport.exportDataToExcel(response);
@@ -61,7 +61,7 @@ public class ExportExcelServiceImpl implements ExportExcelService {
     @Override
     public void exportAllCompletedComposedToExcel(HttpServletResponse response, boolean withHits) {
         setExcelResponseHeaders(response, COMPOSED_PRODUCTION_ORDERS_COMPLETED);
-        List<ComposedSummaryEntity> composedList = composedRepository.findCompleted();
+        List<ComposedSummaryEntity> composedList = composedRepository.findCompleted(null, null);
         ExcelExportComposed excelExportComposed = new ExcelExportComposed(composedList, withHits, SHEET_NAME_COMPLETED, true);
         try {
             excelExportComposed.exportDataToExcel(response);

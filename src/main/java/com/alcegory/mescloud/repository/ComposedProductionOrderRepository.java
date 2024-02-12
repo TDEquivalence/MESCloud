@@ -20,5 +20,5 @@ public interface ComposedProductionOrderRepository extends JpaRepository<Compose
 
     List<ComposedSummaryEntity> getOpenComposedSummaries(boolean withHits, Timestamp startDate, Timestamp endDate);
 
-    List<ComposedSummaryEntity> findCompleted();
+    List<ComposedSummaryEntity> findCompleted(Timestamp startDate, Timestamp endDate);
 }

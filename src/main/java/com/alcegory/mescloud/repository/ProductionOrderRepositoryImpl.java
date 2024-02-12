@@ -7,6 +7,7 @@ import jakarta.persistence.criteria.*;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,7 +19,7 @@ public class ProductionOrderRepositoryImpl {
 
     private final EntityManager entityManager;
 
-    public List<ProductionOrderSummaryEntity> findCompletedWithoutComposed() {
+    public List<ProductionOrderSummaryEntity> findCompletedWithoutComposed(Timestamp startDate, Timestamp endDate) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<ProductionOrderSummaryEntity> query = criteriaBuilder.createQuery(ProductionOrderSummaryEntity.class);
         Root<ProductionOrderSummaryEntity> root = query.from(ProductionOrderSummaryEntity.class);
@@ -26,7 +27,21 @@ public class ProductionOrderRepositoryImpl {
 
         // Add predicate to filter by composedProductionOrder == null
         Predicate composedProductionOrderIsNull = criteriaBuilder.isNull(root.get("composedProductionOrder"));
-        query.where(composedProductionOrderIsNull);
+
+        List<Predicate> predicates = new ArrayList<>();
+        predicates.add(composedProductionOrderIsNull);
+
+        if (startDate != null) {
+            Predicate startDatePredicate = criteriaBuilder.greaterThanOrEqualTo(root.get("createdAt"), startDate);
+            predicates.add(startDatePredicate);
+        }
+
+        if (endDate != null) {
+            Predicate endDatePredicate = criteriaBuilder.lessThanOrEqualTo(root.get("createdAt"), endDate);
+            predicates.add(endDatePredicate);
+        }
+
+        query.where(predicates.toArray(new Predicate[0]));
 
         List<Order> orders = new ArrayList<>();
         Order newestOrder = criteriaBuilder.desc(root.get(PROP_ID));
@@ -36,6 +51,7 @@ public class ProductionOrderRepositoryImpl {
 
         return entityManager.createQuery(query).getResultList();
     }
+
 
     public List<ProductionOrderSummaryEntity> findProductionOrderSummaryByComposedId(Long composedProductionOrderId) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();

@@ -39,19 +39,19 @@ public class ComposedProductionOrderController {
         return new ResponseEntity<>(composedWithoutHits, HttpStatus.OK);
     }
 
+    @PostMapping("/insert-hits/filtered")
+    public ResponseEntity<List<ComposedSummaryDto>> findToInsertHitsFiltered(@RequestBody KpiFilterDto filter) {
+        List<ComposedSummaryDto> composedWithoutHits = composedService.findSummarizedWithoutHitsFiltered(filter);
+        return new ResponseEntity<>(composedWithoutHits, HttpStatus.OK);
+    }
+
     @GetMapping("/approval")
     public ResponseEntity<List<ComposedSummaryDto>> findAllForApproval() {
         List<ComposedSummaryDto> composedWithoutHits = composedService.findAllSummarizedWithHits();
         return new ResponseEntity<>(composedWithoutHits, HttpStatus.OK);
     }
 
-    @PostMapping("/insert-hits/filter")
-    public ResponseEntity<List<ComposedSummaryDto>> findToInsertHitsFiltered(@RequestBody KpiFilterDto filter) {
-        List<ComposedSummaryDto> composedWithoutHits = composedService.findSummarizedWithoutHitsFiltered(filter);
-        return new ResponseEntity<>(composedWithoutHits, HttpStatus.OK);
-    }
-
-    @PostMapping("/approval/filter")
+    @PostMapping("/approval/filtered")
     public ResponseEntity<List<ComposedSummaryDto>> findForApprovalFiltered(@RequestBody KpiFilterDto filter) {
         List<ComposedSummaryDto> composedWithoutHits = composedService.findSummarizedWithHitsFiltered(filter);
         return new ResponseEntity<>(composedWithoutHits, HttpStatus.OK);
@@ -60,6 +60,12 @@ public class ComposedProductionOrderController {
     @GetMapping("/completed")
     public ResponseEntity<List<ComposedSummaryDto>> findAllCompleted() {
         List<ComposedSummaryDto> composedCompleted = composedService.findAllCompleted();
+        return new ResponseEntity<>(composedCompleted, HttpStatus.OK);
+    }
+
+    @PostMapping("/completed/filtered")
+    public ResponseEntity<List<ComposedSummaryDto>> findCompletedFiltered(@RequestBody KpiFilterDto filter) {
+        List<ComposedSummaryDto> composedCompleted = composedService.findCompletedFiltered(filter);
         return new ResponseEntity<>(composedCompleted, HttpStatus.OK);
     }
 

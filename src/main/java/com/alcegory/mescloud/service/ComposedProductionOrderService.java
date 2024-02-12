@@ -3,6 +3,7 @@ package com.alcegory.mescloud.service;
 import com.alcegory.mescloud.model.dto.*;
 import com.alcegory.mescloud.model.entity.ComposedProductionOrderEntity;
 
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 
@@ -41,6 +42,8 @@ public interface ComposedProductionOrderService {
     List<ComposedSummaryDto> findAllSummarized(boolean withHits);
 
     List<ComposedSummaryDto> findAllCompleted();
+
+    List<ComposedSummaryDto> findCompletedFiltered(KpiFilterDto filter);
 
     void setProductionOrderApproval(ComposedProductionOrderEntity composed, boolean isApproved);
 

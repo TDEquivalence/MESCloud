@@ -5,10 +5,7 @@ import com.alcegory.mescloud.constant.MqttDTOConstants;
 import com.alcegory.mescloud.exception.MesMqttException;
 import com.alcegory.mescloud.model.converter.GenericConverter;
 import com.alcegory.mescloud.model.converter.ProductionOrderConverter;
-import com.alcegory.mescloud.model.dto.CountingEquipmentDto;
-import com.alcegory.mescloud.model.dto.ProductionOrderDto;
-import com.alcegory.mescloud.model.dto.ProductionOrderMqttDto;
-import com.alcegory.mescloud.model.dto.ProductionOrderSummaryDto;
+import com.alcegory.mescloud.model.dto.*;
 import com.alcegory.mescloud.model.entity.CountingEquipmentEntity;
 import com.alcegory.mescloud.model.entity.ProductionOrderEntity;
 import com.alcegory.mescloud.model.entity.ProductionOrderSummaryEntity;
@@ -26,6 +23,9 @@ import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+
+import static com.alcegory.mescloud.model.filter.CounterRecordFilter.Property.END_DATE;
+import static com.alcegory.mescloud.model.filter.CounterRecordFilter.Property.START_DATE;
 
 @Service
 @AllArgsConstructor
@@ -249,8 +249,16 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     }
 
     @Override
-    public List<ProductionOrderSummaryDto> getCompletedWithoutComposed() {
-        List<ProductionOrderSummaryEntity> persistedProductionOrders = repository.findCompletedWithoutComposed();
+    public List<ProductionOrderSummaryDto> getCompletedWithoutComposedFiltered() {
+        List<ProductionOrderSummaryEntity> persistedProductionOrders = repository.findCompletedWithoutComposed(null, null);
+        return summaryConverter.toDto(persistedProductionOrders, ProductionOrderSummaryDto.class);
+    }
+
+    @Override
+    public List<ProductionOrderSummaryDto> getCompletedWithoutComposedFiltered(KpiFilterDto filter) {
+        Timestamp startDate = filter.getSearch().getTimestampValue(START_DATE);
+        Timestamp endDate = filter.getSearch().getTimestampValue(END_DATE);
+        List<ProductionOrderSummaryEntity> persistedProductionOrders = repository.findCompletedWithoutComposed(startDate, endDate);
         return summaryConverter.toDto(persistedProductionOrders, ProductionOrderSummaryDto.class);
     }
 

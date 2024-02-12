@@ -185,7 +185,15 @@ public class ComposedProductionOrderServiceImpl implements ComposedProductionOrd
 
     @Override
     public List<ComposedSummaryDto> findAllCompleted() {
-        List<ComposedSummaryEntity> composedCompleted = repository.findCompleted();
+        List<ComposedSummaryEntity> composedCompleted = repository.findCompleted(null, null);
+        return summaryConverter.toDto(composedCompleted, ComposedSummaryDto.class);
+    }
+
+    @Override
+    public List<ComposedSummaryDto> findCompletedFiltered(KpiFilterDto filter) {
+        Timestamp startDate = filter.getSearch().getTimestampValue(START_DATE);
+        Timestamp endDate = filter.getSearch().getTimestampValue(END_DATE);
+        List<ComposedSummaryEntity> composedCompleted = repository.findCompleted(startDate, endDate);
         return summaryConverter.toDto(composedCompleted, ComposedSummaryDto.class);
     }
 
