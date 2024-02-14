@@ -33,7 +33,7 @@ public class ExcelExportController {
 
     @PostMapping("composed-production-orders/without-hits")
     public void exportComposedWithoutHitsToExcel(HttpServletResponse response, KpiFilterDto filter) {
-        exportExcelService.exportComposedToExcel(response, false, null);
+        exportExcelService.exportComposedToExcel(response, false, filter);
     }
 
     @GetMapping("composed-production-orders/with-hits")
@@ -43,7 +43,7 @@ public class ExcelExportController {
 
     @PostMapping("composed-production-orders/with-hits")
     public void exportComposedWithHitsToExcel(HttpServletResponse response, KpiFilterDto filter) {
-        exportExcelService.exportComposedToExcel(response, true, null);
+        exportExcelService.exportComposedToExcel(response, true, filter);
     }
 
     @GetMapping("composed-production-orders/completed")
