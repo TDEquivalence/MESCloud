@@ -46,7 +46,8 @@ public class ExportExcelServiceImpl implements ExportExcelService {
         Timestamp endDate = getDate(filter, END_DATE);
         setExcelResponseHeaders(response, PRODUCTION_ORDERS);
         List<ProductionOrderSummaryEntity> productionOrderViews = productionOrderRepository.findCompletedWithoutComposed(startDate, endDate);
-        ExcelExportProductionOrder abstractExcelExport = new ExcelExportProductionOrder(productionOrderViews, SHEET_NAME_PRODUCTION_ORDERS);
+        ExcelExportProductionOrder abstractExcelExport = new ExcelExportProductionOrder(productionOrderViews, SHEET_NAME_PRODUCTION_ORDERS,
+                false);
         try {
             abstractExcelExport.exportDataToExcel(response);
         } catch (IOException e) {

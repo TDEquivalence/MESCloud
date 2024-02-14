@@ -5,6 +5,8 @@ import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFFont;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class ExcelExportProductionOrder extends AbstractExcelExport {
@@ -14,8 +16,18 @@ public class ExcelExportProductionOrder extends AbstractExcelExport {
 
     private final List<ProductionOrderSummaryEntity> productionOrders;
 
-    public ExcelExportProductionOrder(List<ProductionOrderSummaryEntity> productionOrders, String sheetName) {
-        super(productionOrders, new String[]{
+    private final boolean isCompleted;
+
+    public ExcelExportProductionOrder(List<ProductionOrderSummaryEntity> productionOrders, String sheetName, boolean isCompleted) {
+        super(productionOrders, getHeaders(isCompleted), TABLE_NAME, TABLE_STYLE, sheetName);
+        this.productionOrders = productionOrders;
+        this.isCompleted = isCompleted;
+    }
+
+    private static String[] getHeaders(boolean isCompleted) {
+        List<String> headersList = new ArrayList<>();
+
+        String[] commonHeaders = {
                 "Equipamento",
                 "Ordem de Produção",
                 "IMS",
@@ -27,9 +39,18 @@ public class ExcelExportProductionOrder extends AbstractExcelExport {
                 "Quantidade",
                 "Início de Produção",
                 "Conclusão de Produção"
-        }, TABLE_NAME, TABLE_STYLE, sheetName);
-        this.productionOrders = productionOrders;
+        };
+
+        // Add common headers
+        headersList.addAll(Arrays.asList(commonHeaders));
+
+        if (isCompleted) {
+            headersList.add(1, "Produção Composta");
+        }
+
+        return headersList.toArray(new String[0]);
     }
+
 
     @Override
     protected void writeData() {
@@ -43,6 +64,12 @@ public class ExcelExportProductionOrder extends AbstractExcelExport {
             Row row = sheet.createRow(rowCount++);
             int columnCount = 0;
             createCell(row, columnCount++, po.getEquipment() != null ? po.getEquipment().getAlias() : null, style);
+
+            if (isCompleted) {
+                createCell(row, columnCount++, po.getComposedProductionOrder() != null ? po.getComposedProductionOrder()
+                        .getCode() : null, style);
+            }
+
             createCell(row, columnCount++, po.getCode(), style);
             createCell(row, columnCount++, po.getIms() != null ? po.getIms().getCode() : null, style);
             createCell(row, columnCount++, po.getInputBatch(), style);
