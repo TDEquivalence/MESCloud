@@ -1,7 +1,7 @@
 package com.alcegory.mescloud.model.converter;
 
 import com.alcegory.mescloud.model.dto.CountingEquipmentDto;
-import com.alcegory.mescloud.model.dto.RequestConfigurationDto;
+import com.alcegory.mescloud.model.request.RequestConfigurationDto;
 import com.alcegory.mescloud.model.entity.CountingEquipmentEntity;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;

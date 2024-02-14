@@ -9,6 +9,7 @@ import com.alcegory.mescloud.model.converter.GenericConverter;
 import com.alcegory.mescloud.model.dto.*;
 import com.alcegory.mescloud.model.entity.*;
 import com.alcegory.mescloud.model.filter.Filter;
+import com.alcegory.mescloud.model.request.RequestAlarmRecognitionDto;
 import com.alcegory.mescloud.repository.AlarmRepository;
 import com.alcegory.mescloud.service.AlarmConfigurationService;
 import com.alcegory.mescloud.service.AlarmService;

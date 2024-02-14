@@ -1,6 +1,6 @@
 package com.alcegory.mescloud.service;
 
-import com.alcegory.mescloud.model.dto.RequestSampleDto;
+import com.alcegory.mescloud.model.request.RequestSampleDto;
 import com.alcegory.mescloud.model.dto.SampleDto;
 import com.alcegory.mescloud.model.entity.SampleEntity;
 

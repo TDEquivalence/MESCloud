@@ -7,7 +7,7 @@ import com.alcegory.mescloud.exception.EquipmentNotFoundException;
 import com.alcegory.mescloud.exception.IllegalAlarmStatusException;
 import com.alcegory.mescloud.model.dto.AlarmDto;
 import com.alcegory.mescloud.model.dto.PlcMqttDto;
-import com.alcegory.mescloud.model.dto.RequestAlarmRecognitionDto;
+import com.alcegory.mescloud.model.request.RequestAlarmRecognitionDto;
 import com.alcegory.mescloud.model.entity.AlarmCounts;
 import com.alcegory.mescloud.model.filter.Filter;
 import org.springframework.security.core.Authentication;

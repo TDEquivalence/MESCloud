@@ -1,6 +1,6 @@
 package com.alcegory.mescloud.api.rest;
 
-import com.alcegory.mescloud.model.dto.RequestSampleDto;
+import com.alcegory.mescloud.model.request.RequestSampleDto;
 import com.alcegory.mescloud.model.dto.SampleDto;
 import com.alcegory.mescloud.service.SampleService;
 import lombok.AllArgsConstructor;

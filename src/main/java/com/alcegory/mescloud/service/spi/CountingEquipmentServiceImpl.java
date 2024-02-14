@@ -8,7 +8,7 @@ import com.alcegory.mescloud.model.converter.PlcMqttConverter;
 import com.alcegory.mescloud.model.dto.CountingEquipmentDto;
 import com.alcegory.mescloud.model.dto.EquipmentConfigMqttDto;
 import com.alcegory.mescloud.model.dto.ImsDto;
-import com.alcegory.mescloud.model.dto.RequestConfigurationDto;
+import com.alcegory.mescloud.model.request.RequestConfigurationDto;
 import com.alcegory.mescloud.model.entity.CountingEquipmentEntity;
 import com.alcegory.mescloud.model.entity.EquipmentOutputAliasEntity;
 import com.alcegory.mescloud.model.entity.EquipmentOutputEntity;

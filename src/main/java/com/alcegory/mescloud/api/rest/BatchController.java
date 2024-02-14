@@ -1,7 +1,7 @@
 package com.alcegory.mescloud.api.rest;
 
 import com.alcegory.mescloud.model.dto.BatchDto;
-import com.alcegory.mescloud.model.dto.RequestBatchDto;
+import com.alcegory.mescloud.model.request.RequestBatchDto;
 import com.alcegory.mescloud.service.BatchService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;

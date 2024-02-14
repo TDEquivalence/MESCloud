@@ -1,7 +1,7 @@
 package com.alcegory.mescloud.service;
 
 import com.alcegory.mescloud.model.dto.BatchDto;
-import com.alcegory.mescloud.model.dto.RequestBatchDto;
+import com.alcegory.mescloud.model.request.RequestBatchDto;
 import com.alcegory.mescloud.model.entity.BatchEntity;
 
 import java.util.List;
