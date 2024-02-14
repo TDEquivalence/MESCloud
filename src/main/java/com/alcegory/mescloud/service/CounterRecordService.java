@@ -4,7 +4,7 @@ import com.alcegory.mescloud.model.dto.CounterRecordDto;
 import com.alcegory.mescloud.model.dto.KpiFilterDto;
 import com.alcegory.mescloud.model.dto.PaginatedCounterRecordsDto;
 import com.alcegory.mescloud.model.dto.PlcMqttDto;
-import com.alcegory.mescloud.model.filter.CounterRecordFilter;
+import com.alcegory.mescloud.model.filter.Filter;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -16,9 +16,9 @@ public interface CounterRecordService {
 
     List<CounterRecordDto> filterConclusionRecordsKpi(KpiFilterDto filterDto);
 
-    PaginatedCounterRecordsDto filterConclusionRecordsPaginated(CounterRecordFilter filterDto);
+    PaginatedCounterRecordsDto filterConclusionRecordsPaginated(Filter filterDto);
 
-    PaginatedCounterRecordsDto getFilteredAndPaginated(CounterRecordFilter filterDto);
+    PaginatedCounterRecordsDto getFilteredAndPaginated(Filter filterDto);
 
     void processCounterRecord(PlcMqttDto equipmentCountsMqttDTO);
 

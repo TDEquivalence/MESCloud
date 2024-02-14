@@ -1,12 +1,13 @@
 package com.alcegory.mescloud.service;
 
+import com.alcegory.mescloud.model.dto.KpiFilterDto;
 import jakarta.servlet.http.HttpServletResponse;
 
 public interface ExportExcelService {
 
-    void exportAllProductionOrderViewToExcel(HttpServletResponse response);
+    void exportProductionOrderViewToExcel(HttpServletResponse response, KpiFilterDto filter);
 
-    void exportAllComposedToExcel(HttpServletResponse response, boolean withHits);
+    void exportComposedToExcel(HttpServletResponse response, boolean withHits, KpiFilterDto filter);
 
-    void exportAllCompletedComposedToExcel(HttpServletResponse response, boolean withHits);
+    void exportCompletedComposedToExcel(HttpServletResponse response, boolean withHits, KpiFilterDto filter);
 }

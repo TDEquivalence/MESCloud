@@ -9,9 +9,10 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class CounterRecordFilter extends AbstractPaginatedFilter<CounterRecordFilter.Property> {
+public class Filter extends AbstractPaginatedFilter<Filter.Property> {
 
     private static final String REGISTERED_AT_PROP = "registeredAt";
+    private static final String CREATED_AT_PROP = "createdAt";
 
     @AllArgsConstructor
     @Getter
@@ -23,7 +24,19 @@ public class CounterRecordFilter extends AbstractPaginatedFilter<CounterRecordFi
         EQUIPMENT_ALIAS("equipmentAlias", FilterDataTypeOperation.STRING_EQUAL),
         AMOUNT("computedValue", FilterDataTypeOperation.INTEGER_GREATER_OR_EQUAL),
         START_DATE("startDate", REGISTERED_AT_PROP, FilterDataTypeOperation.DATE_GREATER_OR_EQUAL),
-        END_DATE("endDate", REGISTERED_AT_PROP, FilterDataTypeOperation.DATE_LESS_OR_EQUAL);
+        END_DATE("endDate", REGISTERED_AT_PROP, FilterDataTypeOperation.DATE_LESS_OR_EQUAL),
+
+        //User Filter
+        FIRST_NAME("firstName", "firstName", FilterDataTypeOperation.STRING_EQUAL),
+        LAST_NAME("lastName", "lastName", FilterDataTypeOperation.STRING_EQUAL),
+        EMAIL("email", "email", FilterDataTypeOperation.STRING_EQUAL),
+        ROLE("role", "role", FilterDataTypeOperation.STRING_EQUAL),
+
+        //Alarm
+        STATUS("status", FilterDataTypeOperation.STRING_EQUAL),
+        COMPLETED_AT("completedAt", FilterDataTypeOperation.DATE_LESS_OR_EQUAL),
+        RECOGNIZED_AT("recognizedAt", FilterDataTypeOperation.DATE_LESS_OR_EQUAL);
+
 
         Property(String name, FilterDataTypeOperation dataTypeOperation) {
             this.name = name;

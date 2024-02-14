@@ -20,8 +20,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.logging.Logger;
 
-import static com.alcegory.mescloud.model.filter.CounterRecordFilter.Property.END_DATE;
-import static com.alcegory.mescloud.model.filter.CounterRecordFilter.Property.START_DATE;
+import static com.alcegory.mescloud.model.filter.Filter.Property.END_DATE;
+import static com.alcegory.mescloud.model.filter.Filter.Property.START_DATE;
 
 @Service
 @AllArgsConstructor

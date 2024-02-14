@@ -3,7 +3,7 @@ package com.alcegory.mescloud.service.spi;
 import com.alcegory.mescloud.exception.IncompleteConfigurationException;
 import com.alcegory.mescloud.model.dto.*;
 import com.alcegory.mescloud.model.entity.ProductionOrderEntity;
-import com.alcegory.mescloud.model.filter.CounterRecordFilter;
+import com.alcegory.mescloud.model.filter.Filter;
 import com.alcegory.mescloud.service.*;
 import com.alcegory.mescloud.utility.DateUtil;
 import com.alcegory.mescloud.utility.DoubleUtil;
@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-import static com.alcegory.mescloud.model.filter.CounterRecordFilter.Property.*;
+import static com.alcegory.mescloud.model.filter.Filter.Property.*;
 
 @Service
 @AllArgsConstructor
@@ -159,7 +159,7 @@ public class KpiServiceImpl implements KpiService {
         return equipmentKpiAggregators;
     }
 
-    private Instant getPropertyAsInstant(KpiFilterDto filter, CounterRecordFilter.Property counterRecordProperty) {
+    private Instant getPropertyAsInstant(KpiFilterDto filter, Filter.Property counterRecordProperty) {
         return DateUtil.convertToInstant(filter.getSearch().getValue(counterRecordProperty));
     }
 

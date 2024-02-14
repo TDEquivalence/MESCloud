@@ -1,7 +1,7 @@
 package com.alcegory.mescloud.repository;
 
-import com.alcegory.mescloud.model.filter.UserFilter;
 import com.alcegory.mescloud.model.entity.UserEntity;
+import com.alcegory.mescloud.model.filter.Filter;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -17,5 +17,5 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
 
     UserEntity findUserById(Long id);
 
-    List<UserEntity> getFilteredUsers(UserFilter filter);
+    List<UserEntity> getFilteredUsers(Filter filter);
 }

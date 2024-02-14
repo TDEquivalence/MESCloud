@@ -1,6 +1,6 @@
 package com.alcegory.mescloud.repository;
 
-import com.alcegory.mescloud.utility.filter.Filter;
+import com.alcegory.mescloud.model.filter.Filter;
 import com.alcegory.mescloud.utility.filter.FilterProperty;
 import com.alcegory.mescloud.utility.filter.Searchable;
 import com.alcegory.mescloud.utility.filter.Sortable;
@@ -26,7 +26,7 @@ public abstract class AbstractFilterRepository<F extends FilterProperty, E> {
     protected Map<String, Function<Root<?>, Path<?>>> pathByJointProperty = new HashMap<>();
 
 
-    public List<E> findAllWithFilter(Filter<F> filter, Class<E> entityClass) {
+    public List<E> findAllWithFilter(Filter filter, Class<E> entityClass) {
 
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<E> query = criteriaBuilder.createQuery(entityClass);

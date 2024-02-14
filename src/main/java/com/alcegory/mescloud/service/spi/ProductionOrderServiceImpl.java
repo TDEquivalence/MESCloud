@@ -24,8 +24,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-import static com.alcegory.mescloud.model.filter.CounterRecordFilter.Property.END_DATE;
-import static com.alcegory.mescloud.model.filter.CounterRecordFilter.Property.START_DATE;
+import static com.alcegory.mescloud.model.filter.Filter.Property.END_DATE;
+import static com.alcegory.mescloud.model.filter.Filter.Property.START_DATE;
 
 @Service
 @AllArgsConstructor

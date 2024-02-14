@@ -3,7 +3,7 @@ package com.alcegory.mescloud.repository;
 import com.alcegory.mescloud.model.dto.KpiFilterDto;
 import com.alcegory.mescloud.model.entity.CounterRecordConclusionEntity;
 import com.alcegory.mescloud.model.entity.CounterRecordEntity;
-import com.alcegory.mescloud.model.filter.CounterRecordFilter;
+import com.alcegory.mescloud.model.filter.Filter;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -20,7 +20,7 @@ public interface CounterRecordRepository extends CrudRepository<CounterRecordEnt
     @Query(value = "SELECT * FROM counter_record cr WHERE (cr.production_order_id = :productionOrderId) LIMIT 1", nativeQuery = true)
     Optional<CounterRecordEntity> findLastByProductionOrderId(Long productionOrderId);
 
-    List<CounterRecordConclusionEntity> findLastPerProductionOrder(CounterRecordFilter filterDto);
+    List<CounterRecordConclusionEntity> findLastPerProductionOrder(Filter filterDto);
 
     List<CounterRecordConclusionEntity> findLastPerProductionOrder(KpiFilterDto filterDto);
 
@@ -29,7 +29,7 @@ public interface CounterRecordRepository extends CrudRepository<CounterRecordEnt
 
 
     //    @EntityGraph(attributePaths = { "equipmentOutput", "equipmentOutput.countingEquipment", "productionOrder" })
-    List<CounterRecordEntity> getFilteredAndPaginated(CounterRecordFilter filterDto);
+    List<CounterRecordEntity> getFilteredAndPaginated(Filter filterDto);
 
     Integer sumValidCounterIncrement(Long countingEquipmentId, KpiFilterDto filter);
 
