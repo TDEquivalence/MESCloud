@@ -1,9 +1,9 @@
 package com.alcegory.mescloud.service;
 
 import com.alcegory.mescloud.model.dto.BatchDto;
-import com.alcegory.mescloud.model.dto.RejectRequestDto;
 import com.alcegory.mescloud.model.entity.BatchEntity;
 import com.alcegory.mescloud.model.request.RequestBatchDto;
+import com.alcegory.mescloud.model.request.RequestToRejectBatchDto;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,5 +20,5 @@ public interface BatchService {
 
     List<BatchDto> getAll();
 
-    BatchDto rejectComposed(RejectRequestDto rejectRequestDto);
+    BatchDto rejectComposed(RequestToRejectBatchDto requestToRejectBatchDto);
 }

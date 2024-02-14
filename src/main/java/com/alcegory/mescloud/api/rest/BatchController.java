@@ -1,8 +1,8 @@
 package com.alcegory.mescloud.api.rest;
 
 import com.alcegory.mescloud.model.dto.BatchDto;
-import com.alcegory.mescloud.model.dto.RejectRequestDto;
 import com.alcegory.mescloud.model.request.RequestBatchDto;
+import com.alcegory.mescloud.model.request.RequestToRejectBatchDto;
 import com.alcegory.mescloud.service.BatchService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -35,7 +35,7 @@ public class BatchController {
     }
 
     @PostMapping("/reject")
-    public ResponseEntity<BatchDto> rejected(@RequestBody RejectRequestDto requestBatchDto) {
+    public ResponseEntity<BatchDto> rejected(@RequestBody RequestToRejectBatchDto requestBatchDto) {
         BatchDto batchDto = batchService.rejectComposed(requestBatchDto);
         if (batchDto == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
