@@ -10,8 +10,6 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFTable;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTTable;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTTableColumn;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTTableColumns;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTTableStyleInfo;
 
 import java.io.IOException;
@@ -110,7 +108,6 @@ public abstract class AbstractExcelExport {
         XSSFSheet sheetTable = workbook.getSheetAt(0);
         XSSFTable table = createTableObject(sheetTable, firstRow, lastRow, firstCol, lastCol);
         setTableProperties(table, tableName, tableStyleStr);
-        defineTableColumns(table);
         addAutoFilter(table, firstRow, lastCol);
         showStripes(table);
     }
@@ -150,16 +147,6 @@ public abstract class AbstractExcelExport {
         table.setName(tableName);
     }
 
-    private void defineTableColumns(XSSFTable table) {
-        CTTable ctTable = table.getCTTable();
-        CTTableColumns ctTableColumns = ctTable.getTableColumns();
-        for (int i = 0; i < headers.length; i++) {
-            CTTableColumn ctTableColumn = ctTableColumns.addNewTableColumn();
-            ctTableColumn.setName(headers[i]);
-            ctTableColumn.setId((long) i + 1); // Column IDs start from 1
-        }
-    }
-
     private void writeWorkbookToResponse(HttpServletResponse response) throws IOException {
         try {
             ServletOutputStream outputStream = response.getOutputStream();
@@ -173,7 +160,7 @@ public abstract class AbstractExcelExport {
                 workbook.close();
             } catch (IOException e) {
                 e.printStackTrace();
-                }
+            }
         }
     }
 
