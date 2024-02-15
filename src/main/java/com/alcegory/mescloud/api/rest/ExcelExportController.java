@@ -16,43 +16,53 @@ public class ExcelExportController {
 
     private final ExportExcelService exportExcelService;
 
-    @GetMapping("production-orders")
+    @GetMapping("production-orders/all")
     public void exportAllProductionOrderToExcel(HttpServletResponse response) {
-        exportExcelService.exportProductionOrderViewToExcel(response, null);
+        exportExcelService.exportAllProductionOrderViewToExcel(response);
     }
 
     @PostMapping("production-orders")
     public void exportProductionOrderToExcel(HttpServletResponse response, KpiFilterDto filter) {
-        exportExcelService.exportProductionOrderViewToExcel(response, filter);
+        exportExcelService.exportProductionOrderViewToExcelFiltered(response, filter);
     }
 
-    @GetMapping("composed-production-orders/without-hits")
+    @GetMapping("composed-production-orders/without-hits/all")
     public void exportAllComposedWithoutHitsToExcel(HttpServletResponse response) {
-        exportExcelService.exportComposedToExcel(response, false, null);
+        exportExcelService.exportAllComposedToExcel(response, false);
     }
 
     @PostMapping("composed-production-orders/without-hits")
     public void exportComposedWithoutHitsToExcel(HttpServletResponse response, KpiFilterDto filter) {
-        exportExcelService.exportComposedToExcel(response, false, filter);
+        exportExcelService.exportComposedToExcelFiltered(response, false, filter);
     }
 
-    @GetMapping("composed-production-orders/with-hits")
+    @GetMapping("composed-production-orders/with-hits/all")
     public void exportAllComposedWithHitsToExcel(HttpServletResponse response) {
-        exportExcelService.exportComposedToExcel(response, true, null);
+        exportExcelService.exportAllComposedToExcel(response, true);
     }
 
     @PostMapping("composed-production-orders/with-hits")
     public void exportComposedWithHitsToExcel(HttpServletResponse response, KpiFilterDto filter) {
-        exportExcelService.exportComposedToExcel(response, true, filter);
+        exportExcelService.exportComposedToExcelFiltered(response, true, filter);
     }
 
-    @GetMapping("composed-production-orders/completed")
+    @GetMapping("composed-production-orders/completed/all")
     public void exportAllCompletedComposedToExcel(HttpServletResponse response) {
-        exportExcelService.exportCompletedComposedToExcel(response, true, null);
+        exportExcelService.exportAllCompletedComposedToExcel(response, true);
     }
 
     @PostMapping("composed-production-orders/completed")
     public void exportCompletedComposedToExcel(HttpServletResponse response, KpiFilterDto filter) {
-        exportExcelService.exportCompletedComposedToExcel(response, true, filter);
+        exportExcelService.exportCompletedComposedToExcelFiltered(response, true, filter);
+    }
+
+    @GetMapping("composed-and-production-orders/completed/all")
+    public void exportAllCompletedComposedAndProductionToExcel(HttpServletResponse response) {
+        exportExcelService.exportAllProductionAndComposedToExcel(response);
+    }
+
+    @PostMapping("composed-and-production-orders/completed")
+    public void exportCompletedComposedAndProductionToExcel(HttpServletResponse response, KpiFilterDto filter) {
+        exportExcelService.exportProductionAndComposedToExcelFiltered(response, filter);
     }
 }

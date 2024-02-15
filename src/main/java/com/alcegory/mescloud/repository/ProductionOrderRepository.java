@@ -27,6 +27,8 @@ public interface ProductionOrderRepository extends JpaRepository<ProductionOrder
 
     List<ProductionOrderSummaryEntity> findCompletedWithoutComposed(Timestamp startDate, Timestamp endDate);
 
+    List<ProductionOrderSummaryEntity> findCompleted(Timestamp startDate, Timestamp endDate);
+
     List<ProductionOrderEntity> findByComposedProductionOrderId(Long composedProductionOrderId);
 
     @Query(value = "SELECT * FROM production_order p " +

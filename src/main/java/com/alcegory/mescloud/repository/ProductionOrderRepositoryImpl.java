@@ -52,6 +52,35 @@ public class ProductionOrderRepositoryImpl {
         return entityManager.createQuery(query).getResultList();
     }
 
+    public List<ProductionOrderSummaryEntity> findCompleted(Timestamp startDate, Timestamp endDate) {
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<ProductionOrderSummaryEntity> query = criteriaBuilder.createQuery(ProductionOrderSummaryEntity.class);
+        Root<ProductionOrderSummaryEntity> root = query.from(ProductionOrderSummaryEntity.class);
+        query.select(root);
+
+        List<Predicate> predicates = new ArrayList<>();
+
+        if (startDate != null) {
+            Predicate startDatePredicate = criteriaBuilder.greaterThanOrEqualTo(root.get("createdAt"), startDate);
+            predicates.add(startDatePredicate);
+        }
+
+        if (endDate != null) {
+            Predicate endDatePredicate = criteriaBuilder.lessThanOrEqualTo(root.get("createdAt"), endDate);
+            predicates.add(endDatePredicate);
+        }
+
+        query.where(predicates.toArray(new Predicate[0]));
+
+        List<Order> orders = new ArrayList<>();
+        Order newestOrder = criteriaBuilder.desc(root.get(PROP_ID));
+        orders.add(newestOrder);
+
+        query.orderBy(orders);
+
+        return entityManager.createQuery(query).getResultList();
+    }
+
 
     public List<ProductionOrderSummaryEntity> findProductionOrderSummaryByComposedId(Long composedProductionOrderId) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
