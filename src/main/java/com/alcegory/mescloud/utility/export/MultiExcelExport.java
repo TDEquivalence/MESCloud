@@ -37,11 +37,11 @@ public class MultiExcelExport extends AbstractExcelExport {
 
         XSSFSheet composedSheet = createSheet(SHEET_NAME_COMPOSED);
         createHeaderRow(composedSheet, getComposedHeaders(withHits, isCompleted));
-        writeDataToComposed(composedSheet, composedList, isCompleted, withHits);
+        writeDataToComposed(composedSheet, composedList);
 
         XSSFSheet productionSheet = createSheet(SHEET_NAME_PRODUCTION_ORDERS);
         createHeaderRow(productionSheet, getProductionOrderHeaders());
-        writeDataToProduction(productionSheet, productionOrders, isCompleted);
+        writeDataToProduction(productionSheet, productionOrders);
 
         createTable(composedSheet, TABLE_NAME_COMPOSED, getComposedHeaders(withHits, isCompleted).length - 1);
         createTable(productionSheet, TABLE_NAME_PRODUCTION, getProductionOrderHeaders().length - 1);
@@ -61,8 +61,7 @@ public class MultiExcelExport extends AbstractExcelExport {
         }
     }
 
-    protected void writeDataToComposed(XSSFSheet sheet, List<ComposedSummaryEntity> composedList,
-                                       boolean isCompleted, boolean withHits) {
+    protected void writeDataToComposed(XSSFSheet sheet, List<ComposedSummaryEntity> composedList) {
         int rowCount = 1; // Start from row 1 (row 0 is header)
         CellStyle style = workbook.createCellStyle();
         XSSFFont font = workbook.createFont();
@@ -73,10 +72,7 @@ public class MultiExcelExport extends AbstractExcelExport {
             Row row = sheet.createRow(rowCount++);
             int columnCount = 0;
 
-            if (isCompleted) {
-                createCell(row, columnCount++, composed.getBatchCode(), style);
-            }
-
+            createCell(row, columnCount++, composed.getBatchCode(), style);
             createCell(row, columnCount++, composed.getCode(), style);
             createCell(row, columnCount++, composed.getInputBatch(), style);
             createCell(row, columnCount++, composed.getSource(), style);
@@ -86,21 +82,15 @@ public class MultiExcelExport extends AbstractExcelExport {
             createCell(row, columnCount++, composed.getValidAmount(), style);
             createCell(row, columnCount++, composed.getSampleAmount(), style);
             createCell(row, columnCount++, composed.getCreatedAt(), style);
-
-            if (withHits) {
-                createCell(row, columnCount++, composed.getAmountOfHits(), style);
-                createCell(row, columnCount++, composed.getReliability(), style);
-                createCell(row, columnCount++, composed.getHitInsertedAt(), style);
-            }
-
-            if (isCompleted) {
-                createCell(row, columnCount++, composed.getIsBatchApproved(), style);
-                createCell(row, columnCount++, composed.getApprovedAt(), style);
-            }
+            createCell(row, columnCount++, composed.getAmountOfHits(), style);
+            createCell(row, columnCount++, composed.getReliability(), style);
+            createCell(row, columnCount++, composed.getHitInsertedAt(), style);
+            createCell(row, columnCount++, composed.getIsBatchApproved(), style);
+            createCell(row, columnCount++, composed.getApprovedAt(), style);
         }
     }
 
-    protected void writeDataToProduction(XSSFSheet sheet, List<ProductionOrderSummaryEntity> productionOrders, boolean isCompleted) {
+    protected void writeDataToProduction(XSSFSheet sheet, List<ProductionOrderSummaryEntity> productionOrders) {
         int rowCount = 1; // Start from row 1 (row 0 is header)
         CellStyle style = workbook.createCellStyle();
         XSSFFont font = workbook.createFont();
@@ -111,12 +101,8 @@ public class MultiExcelExport extends AbstractExcelExport {
             Row row = sheet.createRow(rowCount++);
             int columnCount = 0;
             createCell(row, columnCount++, po.getEquipment() != null ? po.getEquipment().getAlias() : null, style);
-
-            if (isCompleted) {
-                createCell(row, columnCount++, po.getComposedProductionOrder() != null ? po.getComposedProductionOrder()
-                        .getCode() : null, style);
-            }
-
+            createCell(row, columnCount++, po.getComposedProductionOrder() != null ? po.getComposedProductionOrder()
+                    .getCode() : null, style);
             createCell(row, columnCount++, po.getCode(), style);
             createCell(row, columnCount++, po.getIms() != null ? po.getIms().getCode() : null, style);
             createCell(row, columnCount++, po.getInputBatch(), style);
