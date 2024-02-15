@@ -1,7 +1,7 @@
 package com.alcegory.mescloud.api.rest;
 
 import com.alcegory.mescloud.model.dto.UserDto;
-import com.alcegory.mescloud.model.filter.UserFilter;
+import com.alcegory.mescloud.model.filter.Filter;
 import com.alcegory.mescloud.security.exception.UserNotFoundException;
 import com.alcegory.mescloud.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +32,7 @@ public class UserController {
     }
 
     @PostMapping("/filter")
-    public ResponseEntity<List<UserDto>> getFilteredUsers(@RequestBody UserFilter filter) {
+    public ResponseEntity<List<UserDto>> getFilteredUsers(@RequestBody Filter filter) {
         List<UserDto> users = userService.getFilteredUsers(filter);
         return new ResponseEntity<>(users, HttpStatus.OK);
     }

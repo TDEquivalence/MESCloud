@@ -2,8 +2,8 @@ package com.alcegory.mescloud.api.rest;
 
 import com.alcegory.mescloud.exception.*;
 import com.alcegory.mescloud.model.dto.CountingEquipmentDto;
-import com.alcegory.mescloud.model.dto.RequestConfigurationDto;
-import com.alcegory.mescloud.model.dto.RequestById;
+import com.alcegory.mescloud.model.request.RequestConfigurationDto;
+import com.alcegory.mescloud.model.request.RequestById;
 import com.alcegory.mescloud.service.CountingEquipmentService;
 import com.alcegory.mescloud.utility.HttpUtil;
 import lombok.AllArgsConstructor;

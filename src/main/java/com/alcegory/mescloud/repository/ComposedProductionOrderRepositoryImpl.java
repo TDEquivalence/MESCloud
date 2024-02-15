@@ -8,6 +8,7 @@ import jakarta.persistence.criteria.*;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,11 +19,13 @@ public class ComposedProductionOrderRepositoryImpl {
     private static final String PROP_ID = "id";
     private static final String PROP_SAMPLE = "sample";
     private static final String PROP_COMPOSED_PO = "composedProductionOrder";
+    private static final String CREATED_AT = "createdAt";
+    private static final String APPROVED_AT = "approvedAt";
 
     private final EntityManager entityManager;
 
 
-    public List<ComposedSummaryEntity> findCompleted() {
+    public List<ComposedSummaryEntity> findCompleted(Timestamp startDate, Timestamp endDate) {
 
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<ComposedSummaryEntity> query = criteriaBuilder.createQuery(ComposedSummaryEntity.class);
@@ -34,6 +37,16 @@ public class ComposedProductionOrderRepositoryImpl {
         List<Order> orders = new ArrayList<>();
         Order newestOrder = criteriaBuilder.desc(root.get(PROP_ID));
         orders.add(newestOrder);
+
+        // Predicates for startDate and endDate
+        if (startDate != null) {
+            Predicate startDatePredicate = criteriaBuilder.greaterThanOrEqualTo(root.get(CREATED_AT), startDate);
+            predicates.add(startDatePredicate);
+        }
+        if (endDate != null) {
+            Predicate endDatePredicate = criteriaBuilder.lessThanOrEqualTo(root.get(CREATED_AT), endDate);
+            predicates.add(endDatePredicate);
+        }
 
         query.select(root)
                 .where(criteriaBuilder.and(predicates.toArray(new Predicate[0])))
@@ -52,13 +65,15 @@ public class ComposedProductionOrderRepositoryImpl {
         return root.get(PROP_ID).in(subquery);
     }
 
-    public List<ComposedSummaryEntity> getOpenComposedSummaries(boolean withHits) {
+    public List<ComposedSummaryEntity> getOpenComposedSummaries(boolean withHits, Timestamp startDate, Timestamp endDate) {
 
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<ComposedSummaryEntity> query = criteriaBuilder.createQuery(ComposedSummaryEntity.class);
         Root<ComposedSummaryEntity> root = query.from(ComposedSummaryEntity.class);
 
         List<Predicate> predicates = new ArrayList<>();
+
+        // Predicate for withHits condition
         if (!withHits) {
             Subquery<Integer> subquery = query.subquery(Integer.class);
             Root<HitEntity> subRoot = subquery.from(HitEntity.class);
@@ -75,21 +90,24 @@ public class ComposedProductionOrderRepositoryImpl {
             predicates.add(hitsPredicate);
         }
 
-        Subquery<Integer> batchSubquery = query.subquery(Integer.class);
-        Root<BatchEntity> batchRoot = batchSubquery.from(BatchEntity.class);
-        batchSubquery.select(batchRoot.get(PROP_COMPOSED_PO).get(PROP_ID));
+        // Predicates for startDate and endDate
+        if (startDate != null) {
+            Predicate startDatePredicate = criteriaBuilder.greaterThanOrEqualTo(root.get(CREATED_AT), startDate);
+            predicates.add(startDatePredicate);
+        }
+        if (endDate != null) {
+            Predicate endDatePredicate = criteriaBuilder.lessThanOrEqualTo(root.get(CREATED_AT), endDate);
+            predicates.add(endDatePredicate);
+        }
 
-        Predicate noBatchPredicate = criteriaBuilder.not(root.get(PROP_ID).in(batchSubquery));
-        predicates.add(noBatchPredicate);
+        // Predicate to exclude instances where approvedAt is not null
+        Predicate approvedAtIsNullPredicate = criteriaBuilder.isNull(root.get(APPROVED_AT));
+        predicates.add(approvedAtIsNullPredicate);
 
-        List<Order> orders = new ArrayList<>();
-        Order newestOrder = criteriaBuilder.desc(root.get(PROP_ID));
-        orders.add(newestOrder);
+        // Constructing the final query
+        query.where(predicates.toArray(new Predicate[0]));
 
-        query.select(root)
-                .where(criteriaBuilder.and(predicates.toArray(new Predicate[0])))
-                .orderBy(orders);
-
+        // Execute the query and return results
         return entityManager.createQuery(query).getResultList();
     }
 }

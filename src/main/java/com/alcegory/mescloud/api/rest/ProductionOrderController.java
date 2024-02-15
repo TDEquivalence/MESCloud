@@ -1,5 +1,6 @@
 package com.alcegory.mescloud.api.rest;
 
+import com.alcegory.mescloud.model.dto.KpiFilterDto;
 import com.alcegory.mescloud.model.dto.ProductionOrderDto;
 import com.alcegory.mescloud.model.dto.ProductionOrderSummaryDto;
 import com.alcegory.mescloud.service.ProductionOrderService;
@@ -40,8 +41,14 @@ public class ProductionOrderController {
     }
 
     @GetMapping("/completed")
-    public ResponseEntity<List<ProductionOrderSummaryDto>> getCompleted() {
-        List<ProductionOrderSummaryDto> completedOrders = service.getCompletedWithoutComposed();
+    public ResponseEntity<List<ProductionOrderSummaryDto>> getAllCompleted() {
+        List<ProductionOrderSummaryDto> completedOrders = service.getCompletedWithoutComposedFiltered();
+        return new ResponseEntity<>(completedOrders, HttpStatus.OK);
+    }
+
+    @PostMapping("/completed/filtered")
+    public ResponseEntity<List<ProductionOrderSummaryDto>> getCompletedFiltered(@RequestBody KpiFilterDto filter) {
+        List<ProductionOrderSummaryDto> completedOrders = service.getCompletedWithoutComposedFiltered(filter);
         return new ResponseEntity<>(completedOrders, HttpStatus.OK);
     }
 }

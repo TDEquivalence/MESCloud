@@ -2,9 +2,10 @@ package com.alcegory.mescloud.service;
 
 import com.alcegory.mescloud.model.dto.ComposedProductionOrderDto;
 import com.alcegory.mescloud.model.dto.ComposedSummaryDto;
+import com.alcegory.mescloud.model.dto.KpiFilterDto;
 import com.alcegory.mescloud.model.dto.ProductionOrderSummaryDto;
-import com.alcegory.mescloud.model.dto.RequestComposedDto;
 import com.alcegory.mescloud.model.entity.ComposedProductionOrderEntity;
+import com.alcegory.mescloud.model.request.RequestComposedDto;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,17 +24,29 @@ public interface ComposedProductionOrderService {
 
     List<ComposedProductionOrderDto> getAll();
 
-    default List<ComposedSummaryDto> findSummarizedWithHits() {
-        return findSummarized(true);
+    default List<ComposedSummaryDto> findAllSummarizedWithHits() {
+        return findAllSummarized(true);
     }
 
-    default List<ComposedSummaryDto> findSummarizedWithoutHits() {
-        return findSummarized(false);
+    default List<ComposedSummaryDto> findAllSummarizedWithoutHits() {
+        return findAllSummarized(false);
     }
 
-    List<ComposedSummaryDto> findSummarized(boolean withHits);
+    default List<ComposedSummaryDto> findSummarizedWithHitsFiltered(KpiFilterDto filter) {
+        return findSummarizedFiltered(true, filter);
+    }
 
-    List<ComposedSummaryDto> findCompleted();
+    default List<ComposedSummaryDto> findSummarizedWithoutHitsFiltered(KpiFilterDto filter) {
+        return findSummarizedFiltered(false, filter);
+    }
+
+    List<ComposedSummaryDto> findSummarizedFiltered(boolean withHits, KpiFilterDto filter);
+
+    List<ComposedSummaryDto> findAllSummarized(boolean withHits);
+
+    List<ComposedSummaryDto> findAllCompleted();
+
+    List<ComposedSummaryDto> findCompletedFiltered(KpiFilterDto filter);
 
     void setProductionOrderApproval(ComposedProductionOrderEntity composed, boolean isApproved);
 

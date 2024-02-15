@@ -6,7 +6,7 @@ import com.alcegory.mescloud.model.entity.CounterRecordConclusionEntity;
 import com.alcegory.mescloud.model.entity.CounterRecordEntity;
 import com.alcegory.mescloud.model.entity.EquipmentOutputEntity;
 import com.alcegory.mescloud.model.entity.ProductionOrderEntity;
-import com.alcegory.mescloud.model.filter.CounterRecordFilter;
+import com.alcegory.mescloud.model.filter.Filter;
 import com.alcegory.mescloud.repository.CounterRecordRepository;
 import com.alcegory.mescloud.repository.ProductionOrderRepository;
 import com.alcegory.mescloud.service.*;
@@ -52,7 +52,7 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     }
 
     @Override
-    public PaginatedCounterRecordsDto filterConclusionRecordsPaginated(CounterRecordFilter filter) {
+    public PaginatedCounterRecordsDto filterConclusionRecordsPaginated(Filter filter) {
         int requestedRecords = filter.getTake();
         filter.setTake(filter.getTake() + 1);
 
@@ -73,7 +73,7 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     }
 
     @Override
-    public PaginatedCounterRecordsDto getFilteredAndPaginated(CounterRecordFilter filterDto) {
+    public PaginatedCounterRecordsDto getFilteredAndPaginated(Filter filterDto) {
         int requestedRecords = filterDto.getTake();
         filterDto.setTake(filterDto.getTake() + 1);
 

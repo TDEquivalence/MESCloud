@@ -1,7 +1,7 @@
 package com.alcegory.mescloud.service;
 
 import com.alcegory.mescloud.model.dto.HitDto;
-import com.alcegory.mescloud.model.dto.RequestHitDto;
+import com.alcegory.mescloud.model.request.RequestHitDto;
 import com.alcegory.mescloud.model.entity.HitEntity;
 
 import java.util.List;

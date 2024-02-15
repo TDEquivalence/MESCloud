@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -24,7 +25,9 @@ public interface ProductionOrderRepository extends JpaRepository<ProductionOrder
 
     List<ProductionOrderEntity> findByIdIn(List<Long> ids);
 
-    List<ProductionOrderSummaryEntity> findCompletedWithoutComposed();
+    List<ProductionOrderSummaryEntity> findCompletedWithoutComposed(Timestamp startDate, Timestamp endDate);
+
+    List<ProductionOrderSummaryEntity> findCompleted(Timestamp startDate, Timestamp endDate);
 
     List<ProductionOrderEntity> findByComposedProductionOrderId(Long composedProductionOrderId);
 

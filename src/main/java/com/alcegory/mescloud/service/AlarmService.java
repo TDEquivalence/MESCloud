@@ -7,23 +7,23 @@ import com.alcegory.mescloud.exception.EquipmentNotFoundException;
 import com.alcegory.mescloud.exception.IllegalAlarmStatusException;
 import com.alcegory.mescloud.model.dto.AlarmDto;
 import com.alcegory.mescloud.model.dto.PlcMqttDto;
-import com.alcegory.mescloud.model.dto.RequestAlarmRecognitionDto;
+import com.alcegory.mescloud.model.request.RequestAlarmRecognitionDto;
 import com.alcegory.mescloud.model.entity.AlarmCounts;
-import com.alcegory.mescloud.model.filter.AlarmFilter;
+import com.alcegory.mescloud.model.filter.Filter;
 import org.springframework.security.core.Authentication;
 
 import java.util.List;
 
 public interface AlarmService {
 
-    List<AlarmDto> findByFilter(AlarmFilter filter);
+    List<AlarmDto> findByFilter(Filter filter);
 
     List<AlarmDto> findByEquipmentIdAndStatus(Long equipmentId, AlarmStatus status);
 
     AlarmDto recognizeAlarm(Long alarmId, RequestAlarmRecognitionDto alarmRecognition, Authentication authentication)
             throws AlarmNotFoundException, IllegalAlarmStatusException;
 
-    AlarmCounts getAlarmCounts(AlarmFilter filter);
+    AlarmCounts getAlarmCounts(Filter filter);
 
     void processAlarms(PlcMqttDto plcMqttDto) throws AlarmConfigurationNotFoundException, EquipmentNotFoundException;
 }

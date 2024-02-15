@@ -3,7 +3,7 @@ package com.alcegory.mescloud.repository;
 import com.alcegory.mescloud.constant.AlarmStatus;
 import com.alcegory.mescloud.model.entity.AlarmCounts;
 import com.alcegory.mescloud.model.entity.AlarmEntity;
-import com.alcegory.mescloud.model.filter.AlarmFilter;
+import com.alcegory.mescloud.model.filter.Filter;
 import jakarta.persistence.criteria.*;
 import org.springframework.stereotype.Repository;
 
@@ -11,13 +11,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Repository
-public class AlarmRepositoryImpl extends AbstractFilterRepository<AlarmFilter.Property, AlarmEntity> {
+public class AlarmRepositoryImpl extends AbstractFilterRepository<Filter.Property, AlarmEntity> {
 
-    public List<AlarmEntity> findByFilter(AlarmFilter filter) {
+    public List<AlarmEntity> findByFilter(Filter filter) {
         return super.findAllWithFilter(filter, AlarmEntity.class);
     }
 
-    public AlarmCounts getAlarmCounts(AlarmFilter filter) {
+    public AlarmCounts getAlarmCounts(Filter filter) {
 
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<AlarmCounts> query = criteriaBuilder.createQuery(AlarmCounts.class);

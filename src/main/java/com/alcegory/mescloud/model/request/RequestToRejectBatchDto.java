@@ -1,11 +1,11 @@
-package com.alcegory.mescloud.model.dto;
+package com.alcegory.mescloud.model.request;
 
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class RejectRequestDto {
+public class RequestToRejectBatchDto {
 
     private RequestComposedDto productionOrderIds;
     private RequestBatchDto requestBatchDto;
