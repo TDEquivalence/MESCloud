@@ -250,7 +250,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
 
     @Override
     public List<ProductionOrderSummaryDto> getCompletedWithoutComposedFiltered() {
-        List<ProductionOrderSummaryEntity> persistedProductionOrders = repository.findCompletedWithoutComposed(null, null);
+        List<ProductionOrderSummaryEntity> persistedProductionOrders = repository.findCompleted(null, null, true);
         return summaryConverter.toDto(persistedProductionOrders, ProductionOrderSummaryDto.class);
     }
 
@@ -258,7 +258,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     public List<ProductionOrderSummaryDto> getCompletedWithoutComposedFiltered(KpiFilterDto filter) {
         Timestamp startDate = filter.getSearch().getTimestampValue(START_DATE);
         Timestamp endDate = filter.getSearch().getTimestampValue(END_DATE);
-        List<ProductionOrderSummaryEntity> persistedProductionOrders = repository.findCompletedWithoutComposed(startDate, endDate);
+        List<ProductionOrderSummaryEntity> persistedProductionOrders = repository.findCompleted(startDate, endDate, true);
         return summaryConverter.toDto(persistedProductionOrders, ProductionOrderSummaryDto.class);
     }
 

@@ -22,22 +22,18 @@ public abstract class AbstractExcelExport {
 
     private static final String DECIMAL_FORMAT_PATTERN = "#0.00%";
     private static final String DATE_FORMAT_PATTERN = "yyyy-MM-dd HH:mm:ss";
-
-    protected final XSSFWorkbook workbook;
-
+    private static final String TABLE_STYLE = "TableStyleMedium9";
+    protected XSSFWorkbook workbook;
     protected XSSFSheet sheet;
     private final List<?> data;
     private final String[] headers;
     private final String tableName;
-    private final String tableStyleStr;
     private final String sheetName;
 
-
-    protected AbstractExcelExport(List<?> data, String[] headers, String tableName, String tableStyleStr, String sheetName) {
+    protected AbstractExcelExport(List<?> data, String[] headers, String tableName, String sheetName) {
         this.data = data;
         this.headers = headers;
         this.tableName = tableName;
-        this.tableStyleStr = tableStyleStr;
         this.sheetName = sheetName;
         workbook = new XSSFWorkbook();
     }
@@ -49,7 +45,7 @@ public abstract class AbstractExcelExport {
         writeWorkbookToResponse(response);
     }
 
-    private void createHeaderRow() {
+    protected void createHeaderRow() {
         sheet = workbook.createSheet(sheetName);
         Row headerRow = sheet.createRow(0);
         CellStyle headerStyle = createHeaderStyle();
@@ -58,7 +54,7 @@ public abstract class AbstractExcelExport {
         }
     }
 
-    private CellStyle createHeaderStyle() {
+    protected CellStyle createHeaderStyle() {
         CellStyle style = workbook.createCellStyle();
         Font font = workbook.createFont();
         font.setBold(true);
@@ -99,7 +95,7 @@ public abstract class AbstractExcelExport {
         cell.setCellStyle(style);
     }
 
-    private void createTable() {
+    protected void createTable() {
         int firstRow = 0;
         int lastRow = data.size();
         int firstCol = 0;
@@ -107,18 +103,18 @@ public abstract class AbstractExcelExport {
 
         XSSFSheet sheetTable = workbook.getSheetAt(0);
         XSSFTable table = createTableObject(sheetTable, firstRow, lastRow, firstCol, lastCol);
-        setTableProperties(table, tableName, tableStyleStr);
+        setTableProperties(table, tableName, TABLE_STYLE);
         addAutoFilter(table, firstRow, lastCol);
         showStripes(table);
     }
 
-    private void addAutoFilter(XSSFTable table, int firstRow, int lastCol) {
+    protected void addAutoFilter(XSSFTable table, int firstRow, int lastCol) {
         CTTable ctTable = table.getCTTable();
         String range = "A1:" + CellReference.convertNumToColString(lastCol) + (firstRow + 1);
         ctTable.addNewAutoFilter().setRef(range);
     }
 
-    private void showStripes(XSSFTable table) {
+    protected void showStripes(XSSFTable table) {
         CTTable ctTable = table.getCTTable();
         CTTableStyleInfo tableStyle = ctTable.getTableStyleInfo();
 
@@ -129,7 +125,7 @@ public abstract class AbstractExcelExport {
         tableStyle.setShowRowStripes(true);
     }
 
-    private XSSFTable createTableObject(XSSFSheet sheet, int firstRow, int lastRow, int firstCol, int lastCol) {
+    protected XSSFTable createTableObject(XSSFSheet sheet, int firstRow, int lastRow, int firstCol, int lastCol) {
         AreaReference areaReference = new AreaReference(new CellReference(firstRow, firstCol),
                 new CellReference(lastRow, lastCol), workbook.getSpreadsheetVersion());
         XSSFTable table = sheet.createTable(areaReference);
@@ -138,7 +134,7 @@ public abstract class AbstractExcelExport {
         return table;
     }
 
-    private void setTableProperties(XSSFTable table, String tableName, String tableStyle) {
+    protected void setTableProperties(XSSFTable table, String tableName, String tableStyle) {
         CTTable ctTable = table.getCTTable();
         CTTableStyleInfo tableStyleInfo = ctTable.addNewTableStyleInfo();
         tableStyleInfo.setName(tableStyle);
@@ -147,7 +143,7 @@ public abstract class AbstractExcelExport {
         table.setName(tableName);
     }
 
-    private void writeWorkbookToResponse(HttpServletResponse response) throws IOException {
+    protected void writeWorkbookToResponse(HttpServletResponse response) throws IOException {
         try {
             ServletOutputStream outputStream = response.getOutputStream();
             workbook.write(outputStream);

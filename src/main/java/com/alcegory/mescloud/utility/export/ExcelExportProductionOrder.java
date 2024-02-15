@@ -12,14 +12,13 @@ import java.util.List;
 public class ExcelExportProductionOrder extends AbstractExcelExport {
 
     private static final String TABLE_NAME = "ProductionOrdersTable";
-    private static final String TABLE_STYLE = "TableStyleMedium9";
 
     private final List<ProductionOrderSummaryEntity> productionOrders;
 
     private final boolean isCompleted;
 
     public ExcelExportProductionOrder(List<ProductionOrderSummaryEntity> productionOrders, String sheetName, boolean isCompleted) {
-        super(productionOrders, getHeaders(isCompleted), TABLE_NAME, TABLE_STYLE, sheetName);
+        super(productionOrders, getHeaders(isCompleted), TABLE_NAME, sheetName);
         this.productionOrders = productionOrders;
         this.isCompleted = isCompleted;
     }

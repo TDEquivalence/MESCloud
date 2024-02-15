@@ -12,15 +12,12 @@ import java.util.List;
 public class ExcelExportComposed extends AbstractExcelExport {
 
     private static final String TABLE_NAME = "ComposedProductionOrdersTable";
-    private static final String TABLE_STYLE = "TableStyleMedium9";
-
     private final List<ComposedSummaryEntity> composedList;
     private final boolean withHits;
-
     private final boolean isCompleted;
 
     public ExcelExportComposed(List<ComposedSummaryEntity> composedList, boolean withHits, String sheetName, boolean isCompleted) {
-        super(composedList, getHeaders(withHits, isCompleted), TABLE_NAME, TABLE_STYLE, sheetName);
+        super(composedList, getHeaders(withHits, isCompleted), TABLE_NAME, sheetName);
         this.composedList = composedList;
         this.withHits = withHits;
         this.isCompleted = isCompleted;

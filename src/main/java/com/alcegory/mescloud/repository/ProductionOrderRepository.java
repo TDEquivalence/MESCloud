@@ -25,9 +25,7 @@ public interface ProductionOrderRepository extends JpaRepository<ProductionOrder
 
     List<ProductionOrderEntity> findByIdIn(List<Long> ids);
 
-    List<ProductionOrderSummaryEntity> findCompletedWithoutComposed(Timestamp startDate, Timestamp endDate);
-
-    List<ProductionOrderSummaryEntity> findCompleted(Timestamp startDate, Timestamp endDate);
+    List<ProductionOrderSummaryEntity> findCompleted(Timestamp startDate, Timestamp endDate, boolean withoutComposed);
 
     List<ProductionOrderEntity> findByComposedProductionOrderId(Long composedProductionOrderId);
 

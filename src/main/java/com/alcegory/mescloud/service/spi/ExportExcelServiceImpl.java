@@ -44,8 +44,10 @@ public class ExportExcelServiceImpl implements ExportExcelService {
     @Override
     public void exportAllProductionOrderViewToExcel(HttpServletResponse response) {
         setExcelResponseHeaders(response, PRODUCTION_ORDERS);
-        List<ProductionOrderSummaryEntity> productionOrderViews = productionOrderRepository.findCompletedWithoutComposed(null, null);
-        ExcelExportProductionOrder abstractExcelExport = new ExcelExportProductionOrder(productionOrderViews, SHEET_NAME_PRODUCTION_ORDERS,
+        List<ProductionOrderSummaryEntity> productionOrderViews = productionOrderRepository.findCompleted(null,
+                null, true);
+        ExcelExportProductionOrder abstractExcelExport = new ExcelExportProductionOrder(productionOrderViews,
+                SHEET_NAME_PRODUCTION_ORDERS,
                 false);
         try {
             abstractExcelExport.exportDataToExcel(response);
@@ -59,9 +61,10 @@ public class ExportExcelServiceImpl implements ExportExcelService {
         Timestamp startDate = getDate(filter, START_DATE);
         Timestamp endDate = getDate(filter, END_DATE);
         setExcelResponseHeaders(response, PRODUCTION_ORDERS);
-        List<ProductionOrderSummaryEntity> productionOrderViews = productionOrderRepository.findCompletedWithoutComposed(startDate, endDate);
-        ExcelExportProductionOrder abstractExcelExport = new ExcelExportProductionOrder(productionOrderViews, SHEET_NAME_PRODUCTION_ORDERS,
-                false);
+        List<ProductionOrderSummaryEntity> productionOrderViews = productionOrderRepository.findCompleted(startDate, endDate,
+                true);
+        ExcelExportProductionOrder abstractExcelExport = new ExcelExportProductionOrder(productionOrderViews,
+                SHEET_NAME_PRODUCTION_ORDERS, false);
         try {
             abstractExcelExport.exportDataToExcel(response);
         } catch (IOException e) {
@@ -126,10 +129,11 @@ public class ExportExcelServiceImpl implements ExportExcelService {
     @Override
     public void exportAllProductionAndComposedToExcel(HttpServletResponse response) {
         setExcelResponseHeaders(response, COMPOSED_PRODUCTION_ORDERS_COMPLETED);
-        List<ProductionOrderSummaryEntity> productionOrderViews = productionOrderRepository.findCompleted(null, null);
+        List<ProductionOrderSummaryEntity> productionOrderViews = productionOrderRepository.findCompleted(null,
+                null, false);
         List<ComposedSummaryEntity> composedList = composedRepository.findCompleted(null, null);
 
-        MultiExcelExport multiExcelExport = new MultiExcelExport(true, true);
+        MultiExcelExport multiExcelExport = new MultiExcelExport();
         try {
             multiExcelExport.exportDataToExcel(response, composedList, productionOrderViews, true, true);
         } catch (IOException e) {
@@ -143,10 +147,11 @@ public class ExportExcelServiceImpl implements ExportExcelService {
         Timestamp endDate = getDate(filter, END_DATE);
 
         setExcelResponseHeaders(response, COMPOSED_PRODUCTION_ORDERS_COMPLETED);
-        List<ProductionOrderSummaryEntity> productionOrderViews = productionOrderRepository.findCompleted(startDate, endDate);
+        List<ProductionOrderSummaryEntity> productionOrderViews = productionOrderRepository.findCompleted(startDate,
+                endDate, false);
         List<ComposedSummaryEntity> composedList = composedRepository.findCompleted(startDate, endDate);
 
-        MultiExcelExport multiExcelExport = new MultiExcelExport(true, true);
+        MultiExcelExport multiExcelExport = new MultiExcelExport();
         try {
             multiExcelExport.exportDataToExcel(response, composedList, productionOrderViews, true, true);
         } catch (IOException e) {

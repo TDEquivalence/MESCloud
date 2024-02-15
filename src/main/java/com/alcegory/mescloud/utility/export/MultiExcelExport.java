@@ -2,41 +2,31 @@ package com.alcegory.mescloud.utility.export;
 
 import com.alcegory.mescloud.model.entity.ComposedSummaryEntity;
 import com.alcegory.mescloud.model.entity.ProductionOrderSummaryEntity;
-import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletResponse;
-import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.util.AreaReference;
 import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFTable;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTTable;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTTableStyleInfo;
 
 import java.io.IOException;
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
-public class MultiExcelExport {
+public class MultiExcelExport extends AbstractExcelExport {
 
     private static final String SHEET_NAME_PRODUCTION_ORDERS = "Ordens de Produção";
     private static final String SHEET_NAME_COMPOSED = "Produções Compostas";
     private static final String TABLE_NAME_PRODUCTION = "ProductionOrdersTable";
     private static final String TABLE_NAME_COMPOSED = "ComposedProductionOrdersTable";
-    private static final String DECIMAL_FORMAT_PATTERN = "#0.00%";
-    private static final String DATE_FORMAT_PATTERN = "yyyy-MM-dd HH:mm:ss";
-    protected final XSSFWorkbook workbook;
-    private final boolean withHits;
-    private final boolean isCompleted;
+    private static final String TABLE_STYLE = "TableStyleMedium9";
 
-    public MultiExcelExport(boolean withHits, boolean isCompleted) {
-        this.withHits = withHits;
-        this.isCompleted = isCompleted;
+    public MultiExcelExport() {
+        super(null, null, null, null);
         this.workbook = new XSSFWorkbook();
     }
 
@@ -50,11 +40,11 @@ public class MultiExcelExport {
         writeDataToComposed(composedSheet, composedList, isCompleted, withHits);
 
         XSSFSheet productionSheet = createSheet(SHEET_NAME_PRODUCTION_ORDERS);
-        createHeaderRow(productionSheet, getProductionOrderHeaders(isCompleted));
+        createHeaderRow(productionSheet, getProductionOrderHeaders());
         writeDataToProduction(productionSheet, productionOrders, isCompleted);
 
-        createTable(composedSheet, TABLE_NAME_COMPOSED, "TableStyleMedium9", getComposedHeaders(withHits, isCompleted).length);
-        createTable(productionSheet, TABLE_NAME_PRODUCTION, "TableStyleMedium9", getProductionOrderHeaders(isCompleted).length);
+        createTable(composedSheet, TABLE_NAME_COMPOSED, getComposedHeaders(withHits, isCompleted).length - 1);
+        createTable(productionSheet, TABLE_NAME_PRODUCTION, getProductionOrderHeaders().length - 1);
 
         writeWorkbookToResponse(response);
     }
@@ -140,94 +130,22 @@ public class MultiExcelExport {
         }
     }
 
-    private void createTable(XSSFSheet sheet, String tableName, String tableStyleStr, int lastCol) {
+    private void createTable(XSSFSheet sheet, String tableName, int lastCol) {
         int firstRow = 0;
         int lastRow = sheet.getLastRowNum();
         int firstCol = 0;
 
         XSSFTable table = createTableObject(sheet, firstRow, lastRow, firstCol, lastCol);
-        setTableProperties(table, tableName, tableStyleStr);
+        setTableProperties(table, tableName, TABLE_STYLE);
         addAutoFilter(table, firstRow, lastCol);
         showStripes(table);
     }
 
-    private XSSFTable createTableObject(XSSFSheet sheet, int firstRow, int lastRow, int firstCol, int lastCol) {
+    @Override
+    protected XSSFTable createTableObject(XSSFSheet sheet, int firstRow, int lastRow, int firstCol, int lastCol) {
         AreaReference areaReference = new AreaReference(new CellReference(firstRow, firstCol),
                 new CellReference(lastRow, lastCol), sheet.getWorkbook().getSpreadsheetVersion());
         return sheet.createTable(areaReference);
-    }
-
-    private void setTableProperties(XSSFTable table, String tableName, String tableStyle) {
-        CTTable ctTable = table.getCTTable();
-        CTTableStyleInfo tableStyleInfo = ctTable.addNewTableStyleInfo();
-        tableStyleInfo.setName(tableStyle);
-        ctTable.setTableStyleInfo(tableStyleInfo);
-        table.setDisplayName(tableName);
-        table.setName(tableName);
-    }
-
-    private void addAutoFilter(XSSFTable table, int firstRow, int lastCol) {
-        CTTable ctTable = table.getCTTable();
-        String range = "A1:" + CellReference.convertNumToColString(lastCol) + (firstRow + 1);
-        ctTable.addNewAutoFilter().setRef(range);
-    }
-
-    private void showStripes(XSSFTable table) {
-        CTTable ctTable = table.getCTTable();
-        CTTableStyleInfo tableStyle = ctTable.getTableStyleInfo();
-
-        if (tableStyle == null) {
-            tableStyle = ctTable.addNewTableStyleInfo();
-        }
-
-        tableStyle.setShowRowStripes(true);
-    }
-
-    private CellStyle createHeaderStyle() {
-        XSSFWorkbook wb = workbook;
-        CellStyle style = wb.createCellStyle();
-        Font font = wb.createFont();
-        font.setBold(true);
-        font.setFontHeightInPoints((short) 12);
-        style.setFont(font);
-        style.setAlignment(HorizontalAlignment.CENTER);
-        style.setFillForegroundColor(IndexedColors.LIGHT_BLUE.getIndex());
-        style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-        style.setBorderTop(BorderStyle.THIN);
-        style.setBorderBottom(BorderStyle.THIN);
-        style.setBorderLeft(BorderStyle.THIN);
-        style.setBorderRight(BorderStyle.THIN);
-        return style;
-    }
-
-    protected void createCell(Row row, int columnCount, Object value, CellStyle style) {
-        Cell cell = row.createCell(columnCount);
-
-        if (value instanceof Double doubleValue) {
-            double numericValue = doubleValue / 100.0;
-            DecimalFormat decimalFormat = new DecimalFormat(DECIMAL_FORMAT_PATTERN);
-            cell.setCellValue(decimalFormat.format(numericValue));
-        } else if (value instanceof Number numberValue) {
-            cell.setCellValue(numberValue.doubleValue());
-        } else if (value instanceof Date dateValue) {
-            SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT_PATTERN);
-            cell.setCellValue(dateFormat.format(dateValue));
-        } else if (value instanceof Boolean booleanValue) {
-            cell.setCellValue(Boolean.TRUE.equals(booleanValue) ? "Aprovado" : "Reprovado");
-        } else {
-            cell.setCellValue(value != null ? value.toString() : "");
-        }
-
-        style.setAlignment(HorizontalAlignment.LEFT);
-        cell.setCellStyle(style);
-    }
-
-    private void writeWorkbookToResponse(HttpServletResponse response) throws IOException {
-        try (ServletOutputStream outputStream = response.getOutputStream()) {
-            workbook.write(outputStream);
-        } finally {
-            workbook.close();
-        }
     }
 
     private static String[] getComposedHeaders(boolean withHits, boolean isCompleted) {
@@ -263,10 +181,9 @@ public class MultiExcelExport {
         return headersList.toArray(new String[0]);
     }
 
-    private static String[] getProductionOrderHeaders(boolean isCompleted) {
-        List<String> headersList = new ArrayList<>();
-
-        String[] commonHeaders = {
+    private static String[] getProductionOrderHeaders() {
+        return new String[]{
+                "Produção Composta",
                 "Equipamento",
                 "Ordem de Produção",
                 "IMS",
@@ -279,14 +196,5 @@ public class MultiExcelExport {
                 "Início de Produção",
                 "Conclusão de Produção"
         };
-
-        // Add common headers
-        headersList.addAll(Arrays.asList(commonHeaders));
-
-        if (isCompleted) {
-            headersList.add(1, "Produção Composta");
-        }
-
-        return headersList.toArray(new String[0]);
     }
 }
