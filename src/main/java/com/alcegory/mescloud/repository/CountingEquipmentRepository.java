@@ -34,10 +34,4 @@ public interface CountingEquipmentRepository extends CrudRepository<CountingEqui
 
     @Query("SELECT ce.id FROM counting_equipment ce WHERE ce.alias = :alias")
     Long findIdByAlias(String alias);
-
-    @Query(value = "SELECT CASE WHEN COUNT(*) > 0 THEN true ELSE false END " +
-            "FROM production_order " +
-            "WHERE equipment_id = :equipmentId AND is_completed = false",
-            nativeQuery = true)
-    boolean hasActiveProductionOrder(@Param("equipmentId") Long equipmentId);
 }
