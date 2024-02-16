@@ -107,6 +107,12 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
             return Optional.empty();
         }
 
+        if (countingEquipmentService.hasActiveProductionOrder(countingEquipmentEntityOpt.get().getId())) {
+            log.warning(() -> String.format("Unable to create Production Order - Equipment with id [%s] still has an " +
+                    "uncompleted production order", productionOrder.getEquipmentId()));
+            return Optional.empty();
+        }
+
         ProductionOrderEntity productionOrderEntity = converter.toEntity(productionOrder);
         productionOrderEntity.setCreatedAt(new Date());
         productionOrderEntity.setCompleted(false);

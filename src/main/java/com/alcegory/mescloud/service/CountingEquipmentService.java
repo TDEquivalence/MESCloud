@@ -38,4 +38,6 @@ public interface CountingEquipmentService {
     Long findIdByAlias(String alias);
 
     Optional<CountingEquipmentDto> findEquipmentWithProductionOrderById(long id);
+
+    boolean hasActiveProductionOrder(Long equipmentId);
 }

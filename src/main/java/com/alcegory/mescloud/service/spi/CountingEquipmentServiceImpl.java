@@ -363,4 +363,9 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
     public Long findIdByAlias(String alias) {
         return repository.findIdByAlias(alias);
     }
+
+    @Override
+    public boolean hasActiveProductionOrder(Long equipmentId) {
+        return repository.hasActiveProductionOrder(equipmentId);
+    }
 }
