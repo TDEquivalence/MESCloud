@@ -44,8 +44,6 @@ public interface ProductionOrderService {
 
     List<ProductionOrderDto> findByEquipmentAndPeriod(Long equipmentId, Date startDate, Date endDate);
 
-    void completeByCode(String productionOrderCode);
-
     boolean isCompleted(String productionOrderCode);
 
     List<ProductionOrderEntity> findByEquipmentAndPeriod(Long equipmentId, String productionOrderCode, Timestamp startDate,

@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.Optional;
 
 @Service
@@ -87,6 +88,7 @@ public class ProductionOrderConclusionProcess extends AbstractMesProtocolProcess
 
     private void completeProductionOrder(ProductionOrderEntity productionOrder) {
         log.info(() -> String.format("Set and save production order as completed, with code [%s]", productionOrder.getCode()));
+        productionOrder.setCompletedAt(new Date());
         productionOrder.setCompleted(true);
         repository.save(productionOrder);
     }

@@ -41,6 +41,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     private final ProductionOrderConverter converter;
     private final GenericConverter<ProductionOrderSummaryEntity, ProductionOrderSummaryDto> summaryConverter;
     private final GenericConverter<CountingEquipmentEntity, CountingEquipmentDto> equipmentConverter;
+    private final ProductionOrderConverter productionOrderConverter;
     private final CountingEquipmentService countingEquipmentService;
     private final CountingEquipmentRepository countingEquipmentRepository;
     private final MqttClient mqttClient;
@@ -69,7 +70,9 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         publishProductionOrderCompletion(countingEquipmentOpt.get(), productionOrderEntityOpt.get());
         log.info(() -> String.format("Production Order Conclusion already publish for equipmentId [%s]:", equipmentId));
 
-        return setCompleteDate(productionOrderEntityOpt.get());
+        ProductionOrderEntity productionOrder = productionOrderEntityOpt.get();
+        ProductionOrderDto productionOrderDto = productionOrderConverter.toDto(productionOrder);
+        return Optional.of(productionOrderDto);
     }
 
     public void publishProductionOrderCompletion(CountingEquipmentEntity countingEquipment, ProductionOrderEntity productionOrder) {
@@ -91,28 +94,6 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         productionOrderMqttDto.setTargetAmount(0);
         productionOrderMqttDto.setEquipmentCode(countingEquipment.getCode());
         mqttClient.publish(mqttSettings.getProtCountPlcTopic(), productionOrderMqttDto);
-    }
-
-    @Override
-    public void completeByCode(String productionOrderCode) {
-
-        Optional<ProductionOrderEntity> productionOrderOpt = findByCode(productionOrderCode);
-        if (productionOrderOpt.isEmpty()) {
-            return;
-        }
-
-        ProductionOrderEntity productionOrder = productionOrderOpt.get();
-        productionOrder.setCompleted(true);
-        setCompleteDate(productionOrder);
-    }
-
-    private Optional<ProductionOrderDto> setCompleteDate(ProductionOrderEntity productionOrderEntity) {
-
-        productionOrderEntity.setCompletedAt(new Date());
-        repository.save(productionOrderEntity);
-        ProductionOrderDto productionOrderDto = converter.toDto(productionOrderEntity);
-
-        return Optional.of(productionOrderDto);
     }
 
     @Override
