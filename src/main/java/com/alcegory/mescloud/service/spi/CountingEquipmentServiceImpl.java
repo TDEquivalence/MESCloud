@@ -363,4 +363,5 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
     public Long findIdByAlias(String alias) {
         return repository.findIdByAlias(alias);
     }
+    
 }

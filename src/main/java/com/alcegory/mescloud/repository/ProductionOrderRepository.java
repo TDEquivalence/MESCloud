@@ -44,7 +44,13 @@ public interface ProductionOrderRepository extends JpaRepository<ProductionOrder
     @Query("SELECT po.isCompleted FROM production_order po WHERE po.code = :productionOrderCode")
     boolean isCompleted(String productionOrderCode);
 
-    boolean existsByEquipmentIdAndIsCompletedFalse(long equipmentId);
+    @Query(value = "SELECT CASE WHEN COUNT(*) > 0 THEN true ELSE false END " +
+            "FROM production_order po " +
+            "WHERE po.equipment_id = :equipmentId " +
+            "AND po.id = (SELECT MAX(p.id) FROM production_order p WHERE p.equipment_id = :equipmentId) " +
+            "AND po.is_completed = false",
+            nativeQuery = true)
+    boolean existsByEquipmentIdAndIsCompletedFalse(@Param("equipmentId") Long equipmentId);
 
     List<ProductionOrderSummaryEntity> findProductionOrderSummaryByComposedId(Long composedProductionOrderId);
 }
