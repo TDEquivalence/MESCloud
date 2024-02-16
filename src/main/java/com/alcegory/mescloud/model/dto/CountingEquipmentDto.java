@@ -32,5 +32,5 @@ public class CountingEquipmentDto {
     @Enumerated(EnumType.STRING)
     private CountingEquipmentEntity.OperationStatus operationStatus;
 
-    private ProductionOrderDto productionOrderDto;
+    private ProductionOrderDto productionOrder;
 }

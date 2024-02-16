@@ -120,7 +120,7 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
         }
 
         ProductionOrderDto productionOrderDto = productionOrderConverter.toDto(productionOrder.get());
-        dto.setProductionOrderDto(productionOrderDto);
+        dto.setProductionOrder(productionOrderDto);
 
         return Optional.of(dto);
     }
