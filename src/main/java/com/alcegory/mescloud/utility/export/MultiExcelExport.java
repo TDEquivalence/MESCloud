@@ -13,8 +13,6 @@ import org.apache.poi.xssf.usermodel.XSSFTable;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class MultiExcelExport extends AbstractExcelExport {
@@ -31,19 +29,18 @@ public class MultiExcelExport extends AbstractExcelExport {
     }
 
     public void exportDataToExcel(HttpServletResponse response, List<ComposedSummaryEntity> composedList,
-                                  List<ProductionOrderSummaryEntity> productionOrders,
-                                  boolean withHits, boolean isCompleted)
+                                  List<ProductionOrderSummaryEntity> productionOrders)
             throws IOException {
 
         XSSFSheet composedSheet = createSheet(SHEET_NAME_COMPOSED);
-        createHeaderRow(composedSheet, getComposedHeaders(withHits, isCompleted));
+        createHeaderRow(composedSheet, getComposedHeaders());
         writeDataToComposed(composedSheet, composedList);
 
         XSSFSheet productionSheet = createSheet(SHEET_NAME_PRODUCTION_ORDERS);
         createHeaderRow(productionSheet, getProductionOrderHeaders());
         writeDataToProduction(productionSheet, productionOrders);
 
-        createTable(composedSheet, TABLE_NAME_COMPOSED, getComposedHeaders(withHits, isCompleted).length - 1);
+        createTable(composedSheet, TABLE_NAME_COMPOSED, getComposedHeaders().length - 1);
         createTable(productionSheet, TABLE_NAME_PRODUCTION, getProductionOrderHeaders().length - 1);
 
         writeWorkbookToResponse(response);
@@ -134,15 +131,10 @@ public class MultiExcelExport extends AbstractExcelExport {
         return sheet.createTable(areaReference);
     }
 
-    private static String[] getComposedHeaders(boolean withHits, boolean isCompleted) {
-        List<String> headersList = new ArrayList<>();
-
-        if (isCompleted) {
-            headersList.add("Lote Final");
-        }
-
-        String[] commonHeaders = {
-                "Produção Composta",
+    private static String[] getComposedHeaders() {
+        return new String[]{
+                "Lote Final",
+                "Lote Final2",
                 "Lote de Entrada",
                 "Proveniência",
                 "Calibre",
@@ -150,27 +142,19 @@ public class MultiExcelExport extends AbstractExcelExport {
                 "Lavação",
                 "Quantidade",
                 "Amostra",
-                "Criação da composta"
+                "Criação da composta",
+                "Hits",
+                "Fiabilidade",
+                "Hits inseridos em",
+                "Status",
+                "Resolvido em"
         };
-
-        headersList.addAll(Arrays.asList(commonHeaders));
-
-        if (withHits) {
-            headersList.addAll(Arrays.asList("Hits", "Fiabilidade", "Hits inseridos em"));
-        }
-
-        if (isCompleted) {
-            headersList.add("Status");
-            headersList.add("Resolvido em");
-        }
-
-        return headersList.toArray(new String[0]);
     }
 
     private static String[] getProductionOrderHeaders() {
         return new String[]{
-                "Produção Composta",
                 "Equipamento",
+                "Produção Composta",
                 "Ordem de Produção",
                 "IMS",
                 "Lote de Entrada",

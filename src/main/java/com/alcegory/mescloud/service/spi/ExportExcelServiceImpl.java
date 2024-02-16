@@ -135,7 +135,7 @@ public class ExportExcelServiceImpl implements ExportExcelService {
 
         MultiExcelExport multiExcelExport = new MultiExcelExport();
         try {
-            multiExcelExport.exportDataToExcel(response, composedList, productionOrderViews, true, true);
+            multiExcelExport.exportDataToExcel(response, composedList, productionOrderViews);
         } catch (IOException e) {
             throw new ExcelExportException(ERROR_MESSAGE, e);
         }
@@ -153,7 +153,7 @@ public class ExportExcelServiceImpl implements ExportExcelService {
 
         MultiExcelExport multiExcelExport = new MultiExcelExport();
         try {
-            multiExcelExport.exportDataToExcel(response, composedList, productionOrderViews, true, true);
+            multiExcelExport.exportDataToExcel(response, composedList, productionOrderViews);
         } catch (IOException e) {
             throw new ExcelExportException(ERROR_MESSAGE, e);
         }
