@@ -5,16 +5,16 @@ import com.alcegory.mescloud.exception.*;
 import com.alcegory.mescloud.model.converter.CountingEquipmentConverter;
 import com.alcegory.mescloud.model.converter.GenericConverter;
 import com.alcegory.mescloud.model.converter.PlcMqttConverter;
+import com.alcegory.mescloud.model.converter.ProductionOrderConverter;
 import com.alcegory.mescloud.model.dto.CountingEquipmentDto;
 import com.alcegory.mescloud.model.dto.EquipmentConfigMqttDto;
 import com.alcegory.mescloud.model.dto.ImsDto;
+import com.alcegory.mescloud.model.dto.ProductionOrderDto;
+import com.alcegory.mescloud.model.entity.*;
 import com.alcegory.mescloud.model.request.RequestConfigurationDto;
-import com.alcegory.mescloud.model.entity.CountingEquipmentEntity;
-import com.alcegory.mescloud.model.entity.EquipmentOutputAliasEntity;
-import com.alcegory.mescloud.model.entity.EquipmentOutputEntity;
-import com.alcegory.mescloud.model.entity.ImsEntity;
 import com.alcegory.mescloud.protocol.MesMqttSettings;
 import com.alcegory.mescloud.repository.CountingEquipmentRepository;
+import com.alcegory.mescloud.repository.ProductionOrderRepository;
 import com.alcegory.mescloud.service.*;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
@@ -36,11 +36,14 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
     private final EquipmentOutputAliasService aliasService;
     private final CountingEquipmentConverter converter;
     private final ImsService imsService;
-    private final GenericConverter<ImsEntity, ImsDto> imsConverter;
     private final EquipmentStatusRecordService statusRecordService;
-    private final PlcMqttConverter plcConverter;
     private final MqttClient mqttClient;
     private final MesMqttSettings mqttSettings;
+    private final ProductionOrderRepository productionOrderRepository;
+
+    private final PlcMqttConverter plcConverter;
+    private final GenericConverter<ImsEntity, ImsDto> imsConverter;
+    private final ProductionOrderConverter productionOrderConverter;
 
     @Override
     public List<CountingEquipmentDto> findAllWithLastProductionOrder() {
@@ -92,6 +95,33 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
         }
 
         CountingEquipmentDto dto = convertToDtoWithActiveProductionOrder(countingEquipment);
+        return Optional.of(dto);
+    }
+
+    @Override
+    public Optional<CountingEquipmentDto> findEquipmentWithProductionOrderById(long id) {
+        Optional<CountingEquipmentEntity> countingEquipmentOpt = repository.findByIdWithLastProductionOrder(id);
+        if (countingEquipmentOpt.isEmpty()) {
+            log.warning(() -> String.format("No Counting Equipment found for id: [%s]", id));
+            return Optional.empty();
+        }
+
+        CountingEquipmentEntity countingEquipment = countingEquipmentOpt.get();
+        if (countingEquipment.getOutputs().isEmpty()) {
+            log.warning(() -> String.format("No Counting Equipment found for id: [%s]", id));
+            return Optional.empty();
+        }
+
+        CountingEquipmentDto dto = convertToDtoWithActiveProductionOrder(countingEquipment);
+        Optional<ProductionOrderEntity> productionOrder = productionOrderRepository.findActiveByEquipmentId(id);
+
+        if (productionOrder.isEmpty()) {
+            return Optional.of(dto);
+        }
+
+        ProductionOrderDto productionOrderDto = productionOrderConverter.toDto(productionOrder.get());
+        dto.setProductionOrderDto(productionOrderDto);
+
         return Optional.of(dto);
     }
 

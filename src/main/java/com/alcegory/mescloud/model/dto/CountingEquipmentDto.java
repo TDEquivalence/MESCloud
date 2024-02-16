@@ -31,4 +31,6 @@ public class CountingEquipmentDto {
     private Double overallEquipmentEffectivenessTarget;
     @Enumerated(EnumType.STRING)
     private CountingEquipmentEntity.OperationStatus operationStatus;
+
+    private ProductionOrderDto productionOrderDto;
 }

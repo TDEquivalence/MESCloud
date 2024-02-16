@@ -60,7 +60,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
                 CountingEquipmentEntity.OperationStatus.PENDING);
         log.info(() -> String.format("Change status to PENDING for Equipment with code [%s]", countingEquipmentDto.getCode()));
 
-        Optional<ProductionOrderEntity> productionOrderEntityOpt = repository.findActive(equipmentId);
+        Optional<ProductionOrderEntity> productionOrderEntityOpt = repository.findActiveByEquipmentId(equipmentId);
         if (productionOrderEntityOpt.isEmpty()) {
             log.warning(() -> String.format("No active Production Order found for Equipment with id [%s]", equipmentId));
             return Optional.empty();
