@@ -29,32 +29,13 @@ import static com.alcegory.mescloud.model.filter.Filter.Property.START_DATE;
 public class ExportExcelServiceImpl implements ExportExcelService {
 
     private static final String SHEET_NAME_PRODUCTION_ORDERS = "Ordens de Produção";
-    private static final String SHEET_NAME_COMPOSED = "Produções Compostas";
     private static final String SHEET_NAME_COMPLETED = "Produções Concluídas";
     private static final String PRODUCTION_ORDERS = "Ordens_de_Produção_Info.xlsx";
-    private static final String COMPOSED_PRODUCTION_ORDERS = "Produções_Compostas_Info.xlsx";
-    private static final String COMPOSED_PRODUCTION_ORDERS_WITH_HITS = "Produções_Compostas_Hits_Info.xlsx";
     private static final String COMPOSED_PRODUCTION_ORDERS_COMPLETED = "Produções_Compostas_Completas_Info.xlsx";
-
     private static final String ERROR_MESSAGE = "Error exporting data to Excel";
 
     private final ProductionOrderRepository productionOrderRepository;
     private final ComposedProductionOrderRepository composedRepository;
-
-    @Override
-    public void exportAllProductionOrderViewToExcel(HttpServletResponse response) {
-        setExcelResponseHeaders(response, PRODUCTION_ORDERS);
-        List<ProductionOrderSummaryEntity> productionOrderViews = productionOrderRepository.findCompleted(null,
-                null, true);
-        ExcelExportProductionOrder abstractExcelExport = new ExcelExportProductionOrder(productionOrderViews,
-                SHEET_NAME_PRODUCTION_ORDERS,
-                false);
-        try {
-            abstractExcelExport.exportDataToExcel(response);
-        } catch (IOException e) {
-            throw new ExcelExportException(ERROR_MESSAGE, e);
-        }
-    }
 
     @Override
     public void exportProductionOrderViewToExcelFiltered(HttpServletResponse response, KpiFilterDto filter) {
@@ -65,50 +46,7 @@ public class ExportExcelServiceImpl implements ExportExcelService {
                 true);
         ExcelExportProductionOrder abstractExcelExport = new ExcelExportProductionOrder(productionOrderViews,
                 SHEET_NAME_PRODUCTION_ORDERS, false);
-        try {
-            abstractExcelExport.exportDataToExcel(response);
-        } catch (IOException e) {
-            throw new ExcelExportException(ERROR_MESSAGE, e);
-        }
-    }
-
-    @Override
-    public void exportAllComposedToExcel(HttpServletResponse response, boolean withHits) {
-        setExcelResponseHeaders(response, withHits ? COMPOSED_PRODUCTION_ORDERS_WITH_HITS : COMPOSED_PRODUCTION_ORDERS);
-        List<ComposedSummaryEntity> composedList = composedRepository.getOpenComposedSummaries(withHits, null, null);
-        ExcelExportComposed excelExportComposed = new ExcelExportComposed(composedList, withHits, SHEET_NAME_COMPOSED, false);
-        try {
-            excelExportComposed.exportDataToExcel(response);
-        } catch (IOException e) {
-            throw new ExcelExportException(ERROR_MESSAGE, e);
-        }
-    }
-
-    @Override
-    public void exportComposedToExcelFiltered(HttpServletResponse response, boolean withHits, KpiFilterDto filter) {
-        Timestamp startDate = getDate(filter, START_DATE);
-        Timestamp endDate = getDate(filter, END_DATE);
-
-        setExcelResponseHeaders(response, withHits ? COMPOSED_PRODUCTION_ORDERS_WITH_HITS : COMPOSED_PRODUCTION_ORDERS);
-        List<ComposedSummaryEntity> composedList = composedRepository.getOpenComposedSummaries(withHits, startDate, endDate);
-        ExcelExportComposed excelExportComposed = new ExcelExportComposed(composedList, withHits, SHEET_NAME_COMPOSED, false);
-        try {
-            excelExportComposed.exportDataToExcel(response);
-        } catch (IOException e) {
-            throw new ExcelExportException(ERROR_MESSAGE, e);
-        }
-    }
-
-    @Override
-    public void exportAllCompletedComposedToExcel(HttpServletResponse response, boolean withHits) {
-        setExcelResponseHeaders(response, COMPOSED_PRODUCTION_ORDERS_COMPLETED);
-        List<ComposedSummaryEntity> composedList = composedRepository.findCompleted(null, null);
-        ExcelExportComposed excelExportComposed = new ExcelExportComposed(composedList, withHits, SHEET_NAME_COMPLETED, true);
-        try {
-            excelExportComposed.exportDataToExcel(response);
-        } catch (IOException e) {
-            throw new ExcelExportException(ERROR_MESSAGE, e);
-        }
+        abstractExcelExport.exportDataToExcel(response);
     }
 
     @Override
@@ -119,11 +57,7 @@ public class ExportExcelServiceImpl implements ExportExcelService {
         setExcelResponseHeaders(response, COMPOSED_PRODUCTION_ORDERS_COMPLETED);
         List<ComposedSummaryEntity> composedList = composedRepository.findCompleted(startDate, endDate);
         ExcelExportComposed excelExportComposed = new ExcelExportComposed(composedList, withHits, SHEET_NAME_COMPLETED, true);
-        try {
-            excelExportComposed.exportDataToExcel(response);
-        } catch (IOException e) {
-            throw new ExcelExportException(ERROR_MESSAGE, e);
-        }
+        excelExportComposed.exportDataToExcel(response);
     }
 
     @Override

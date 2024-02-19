@@ -3,12 +3,11 @@ package com.alcegory.mescloud.utility.export;
 import com.alcegory.mescloud.exception.ExcelExportException;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.AreaReference;
 import org.apache.poi.ss.util.CellReference;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFTable;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.xssf.usermodel.*;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTTable;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTTableStyleInfo;
 
@@ -18,6 +17,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+@Slf4j
 public abstract class AbstractExcelExport {
 
     private static final String DECIMAL_FORMAT_PATTERN = "#0.00%";
@@ -38,7 +38,7 @@ public abstract class AbstractExcelExport {
         workbook = new XSSFWorkbook();
     }
 
-    public void exportDataToExcel(HttpServletResponse response) throws IOException {
+    public void exportDataToExcel(HttpServletResponse response) {
         createHeaderRow();
         writeData();
         createTable();
@@ -61,7 +61,6 @@ public abstract class AbstractExcelExport {
         font.setFontHeightInPoints((short) 12);
         style.setFont(font);
         style.setAlignment(HorizontalAlignment.CENTER);
-        style.setFillForegroundColor(IndexedColors.LIGHT_BLUE.getIndex());
         style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
         style.setBorderTop(BorderStyle.THIN);
         style.setBorderBottom(BorderStyle.THIN);
@@ -106,6 +105,12 @@ public abstract class AbstractExcelExport {
         setTableProperties(table, tableName, TABLE_STYLE);
         addAutoFilter(table, firstRow, lastCol);
         showStripes(table);
+
+        // Setting light orange color for the header
+        setHeaderColor(workbook, table, 255, 239, 219); // Adjust RGB values as needed
+
+        // Setting very light orange color for the stripes
+        setStripeColor(sheetTable, firstRow, lastRow, 255, 255, 255); // Adjust RGB values as needed
     }
 
     protected void addAutoFilter(XSSFTable table, int firstRow, int lastCol) {
@@ -123,6 +128,58 @@ public abstract class AbstractExcelExport {
         }
 
         tableStyle.setShowRowStripes(true);
+    }
+
+    protected XSSFColor getCustomColor(int red, int green, int blue) {
+        byte[] rgb = new byte[3];
+        rgb[0] = (byte) red;
+        rgb[1] = (byte) green;
+        rgb[2] = (byte) blue;
+        return new XSSFColor(rgb, new DefaultIndexedColorMap());
+    }
+
+    protected void setStripeColor(XSSFSheet sheet, int startRowIndex, int endRowIndex, int red, int green, int blue) {
+        XSSFColor stripeColor = getCustomColor(red, green, blue);
+
+        for (int i = startRowIndex + 1; i <= endRowIndex; i += 2) {
+            XSSFRow row = sheet.getRow(i);
+
+            if (row == null) {
+                row = sheet.createRow(i);
+            }
+
+            for (int j = row.getFirstCellNum(); j < row.getLastCellNum(); j++) {
+                XSSFCell cell = row.getCell(j);
+
+                if (cell == null) {
+                    cell = row.createCell(j);
+                }
+
+                XSSFCellStyle style = cell.getCellStyle();
+                if (style == null) {
+                    style = row.getSheet().getWorkbook().createCellStyle();
+                }
+
+                style.setFillForegroundColor(stripeColor);
+                style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+                cell.setCellStyle(style);
+            }
+        }
+    }
+
+    protected void setHeaderColor(XSSFWorkbook workbook, XSSFTable table, int red, int green, int blue) {
+        XSSFSheet sheetToColored = table.getXSSFSheet();
+        XSSFRow headerRow = sheetToColored.getRow(table.getStartRowIndex());
+        XSSFCellStyle style = workbook.createCellStyle();
+        XSSFColor color = getCustomColor(red, green, blue);
+        style.setFillForegroundColor(color);
+        style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
+        if (headerRow != null) {
+            for (Cell cell : headerRow) {
+                cell.setCellStyle(style);
+            }
+        }
     }
 
     protected XSSFTable createTableObject(XSSFSheet sheet, int firstRow, int lastRow, int firstCol, int lastCol) {
@@ -143,19 +200,18 @@ public abstract class AbstractExcelExport {
         table.setName(tableName);
     }
 
-    protected void writeWorkbookToResponse(HttpServletResponse response) throws IOException {
+    protected void writeWorkbookToResponse(HttpServletResponse response) {
         try {
             ServletOutputStream outputStream = response.getOutputStream();
             workbook.write(outputStream);
         } catch (IOException e) {
-            // Log the exception
-            e.printStackTrace();
+            log.error("ERROR while exporting excel", e);
             throw new ExcelExportException("ERROR while exporting excel", e);
         } finally {
             try {
                 workbook.close();
             } catch (IOException e) {
-                e.printStackTrace();
+                log.error("Error while closing workbook", e);
             }
         }
     }

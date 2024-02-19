@@ -122,6 +122,8 @@ public class MultiExcelExport extends AbstractExcelExport {
         setTableProperties(table, tableName, TABLE_STYLE);
         addAutoFilter(table, firstRow, lastCol);
         showStripes(table);
+
+        setHeaderColor(workbook, table, 255, 239, 219); // Adjust RGB values as needed
     }
 
     @Override
