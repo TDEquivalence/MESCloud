@@ -43,8 +43,23 @@ public class AlarmServiceImpl implements AlarmService {
 
     @Override
     public List<AlarmDto> findByFilter(Filter filter) {
+        int requestAlarm = filter.getTake();
+        filter.setTake(filter.getTake() + 1);
+
         List<AlarmEntity> alarms = repository.findByFilter(filter);
-        return converter.toDto(alarms, AlarmDto.class);
+        boolean hasNextPage = alarms.size() > requestAlarm;
+
+        if (hasNextPage) {
+            alarms.remove(alarms.size() - 1);
+        }
+
+        List<AlarmDto> alarmDtos = converter.toDto(alarms, AlarmDto.class);
+
+        PaginatedAlarmsDto paginatedAlarmsDto = new PaginatedAlarmsDto();
+        paginatedAlarmsDto.setHasNextPage(hasNextPage);
+        paginatedAlarmsDto.setCounterRecords(alarmDtos);
+
+        return alarmDtos;
     }
 
     @Override

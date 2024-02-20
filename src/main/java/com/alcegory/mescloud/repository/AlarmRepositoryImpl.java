@@ -16,6 +16,7 @@ import java.util.List;
 @Repository
 public class AlarmRepositoryImpl extends AbstractFilterRepository<Filter.Property, AlarmEntity> {
 
+    private static final String ID_PROP = "id";
     private static final String CREATED_AT_PROP = "createdAt";
     private static final String STATUS_PROP = "status";
 
@@ -27,9 +28,12 @@ public class AlarmRepositoryImpl extends AbstractFilterRepository<Filter.Propert
         List<Predicate> predicates = buildPredicates(criteriaBuilder, root, filter);
 
         query.select(root)
-                .where(criteriaBuilder.and(predicates.toArray(new Predicate[0])));
+                .where(criteriaBuilder.and(predicates.toArray(new Predicate[0])))
+                .orderBy(criteriaBuilder.asc(root.get(ID_PROP)));
 
-        return entityManager.createQuery(query).getResultList();
+        return entityManager.createQuery(query).setFirstResult(filter.getSkip())
+                .setMaxResults(filter.getTake())
+                .getResultList();
     }
 
     public AlarmCounts getAlarmCounts(Filter filter) {
