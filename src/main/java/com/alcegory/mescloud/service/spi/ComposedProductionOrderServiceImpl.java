@@ -96,7 +96,7 @@ public class ComposedProductionOrderServiceImpl implements ComposedProductionOrd
         String codePrefix = OBO_SECTION_PREFIX + CODE_PREFIX + DateUtil.getCurrentYearLastTwoDigits();
 
         return composedProductionOrderOpt.isEmpty() ?
-                codePrefix + FIRST_CODE_VALUE :
+                codePrefix + String.format(FIVE_DIGIT_NUMBER_FORMAT, FIRST_CODE_VALUE) :
                 codePrefix + generateFormattedCodeValue(composedProductionOrderOpt.get(), codePrefix);
     }
 
