@@ -34,19 +34,18 @@ public class ComposedProductionOrderRepositoryImpl {
         List<Predicate> predicates = new ArrayList<>();
         predicates.add(hasAssociatedBatchPredicate(query, root));
 
-        List<Order> orders = new ArrayList<>();
-        Order newestOrder = criteriaBuilder.desc(root.get(PROP_ID));
-        orders.add(newestOrder);
-
         // Predicates for startDate and endDate
         if (startDate != null) {
-            Predicate startDatePredicate = criteriaBuilder.greaterThanOrEqualTo(root.get(CREATED_AT), startDate);
+            Predicate startDatePredicate = criteriaBuilder.greaterThanOrEqualTo(root.get(APPROVED_AT), startDate);
             predicates.add(startDatePredicate);
         }
         if (endDate != null) {
-            Predicate endDatePredicate = criteriaBuilder.lessThanOrEqualTo(root.get(CREATED_AT), endDate);
+            Predicate endDatePredicate = criteriaBuilder.lessThanOrEqualTo(root.get(APPROVED_AT), endDate);
             predicates.add(endDatePredicate);
         }
+        List<Order> orders = new ArrayList<>();
+        Order approvedAtDescOrder = criteriaBuilder.desc(root.get(APPROVED_AT)); // Order by APPROVED_AT desc
+        orders.add(approvedAtDescOrder);
 
         query.select(root)
                 .where(criteriaBuilder.and(predicates.toArray(new Predicate[0])))

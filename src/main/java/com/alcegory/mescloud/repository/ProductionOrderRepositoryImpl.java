@@ -15,6 +15,9 @@ import java.util.List;
 @Repository
 public class ProductionOrderRepositoryImpl {
 
+    private static final String CREATED_AT = "createdAt";
+    private static final String COMPOSED_PRODUCTION_ORDER = "composedProductionOrder";
+    private static final String IS_COMPLETED = "isCompleted";
     private static final String PROP_ID = "id";
 
     private final EntityManager entityManager;
@@ -29,19 +32,23 @@ public class ProductionOrderRepositoryImpl {
 
         if (withoutComposed) {
             // Add predicate to filter by composedProductionOrder == null
-            Predicate composedProductionOrderIsNull = criteriaBuilder.isNull(root.get("composedProductionOrder"));
+            Predicate composedProductionOrderIsNull = criteriaBuilder.isNull(root.get(COMPOSED_PRODUCTION_ORDER));
             predicates.add(composedProductionOrderIsNull);
         }
 
         if (startDate != null) {
-            Predicate startDatePredicate = criteriaBuilder.greaterThanOrEqualTo(root.get("createdAt"), startDate);
+            Predicate startDatePredicate = criteriaBuilder.greaterThanOrEqualTo(root.get(CREATED_AT), startDate);
             predicates.add(startDatePredicate);
         }
 
         if (endDate != null) {
-            Predicate endDatePredicate = criteriaBuilder.lessThanOrEqualTo(root.get("createdAt"), endDate);
+            Predicate endDatePredicate = criteriaBuilder.lessThanOrEqualTo(root.get(CREATED_AT), endDate);
             predicates.add(endDatePredicate);
         }
+
+        // Add predicate for isCompleted = true
+        Predicate isCompletedPredicate = criteriaBuilder.isTrue(root.get(IS_COMPLETED));
+        predicates.add(isCompletedPredicate);
 
         query.where(predicates.toArray(new Predicate[0]));
 
@@ -53,7 +60,7 @@ public class ProductionOrderRepositoryImpl {
 
         return entityManager.createQuery(query).getResultList();
     }
-    
+
     public List<ProductionOrderSummaryEntity> findProductionOrderSummaryByComposedId(Long composedProductionOrderId) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<ProductionOrderSummaryEntity> query = criteriaBuilder.createQuery(ProductionOrderSummaryEntity.class);

@@ -35,7 +35,7 @@ public interface ProductionOrderService {
     Optional<ProductionOrderDto> findDtoById(Long id);
 
     List<Long> findExistingIds(List<Long> ids);
-
+    
     List<ProductionOrderSummaryDto> getCompletedWithoutComposedFiltered();
 
     List<ProductionOrderSummaryDto> getCompletedWithoutComposedFiltered(KpiFilterDto filter);
