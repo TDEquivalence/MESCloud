@@ -2,7 +2,7 @@ package com.alcegory.mescloud.api.rest;
 
 import com.alcegory.mescloud.model.dto.ComposedProductionOrderDto;
 import com.alcegory.mescloud.model.dto.ComposedSummaryDto;
-import com.alcegory.mescloud.model.dto.KpiFilterDto;
+import com.alcegory.mescloud.model.dto.FilterDto;
 import com.alcegory.mescloud.model.dto.ProductionOrderSummaryDto;
 import com.alcegory.mescloud.model.request.RequestById;
 import com.alcegory.mescloud.model.request.RequestComposedDto;
@@ -45,7 +45,7 @@ public class ComposedProductionOrderController {
     }
 
     @PostMapping("/insert-hits/filtered")
-    public ResponseEntity<List<ComposedSummaryDto>> findToInsertHitsFiltered(@RequestBody KpiFilterDto filter) {
+    public ResponseEntity<List<ComposedSummaryDto>> findToInsertHitsFiltered(@RequestBody FilterDto filter) {
         List<ComposedSummaryDto> composedWithoutHits = composedService.findSummarizedWithoutHitsFiltered(filter);
         return new ResponseEntity<>(composedWithoutHits, HttpStatus.OK);
     }
@@ -57,7 +57,7 @@ public class ComposedProductionOrderController {
     }
 
     @PostMapping("/approval/filtered")
-    public ResponseEntity<List<ComposedSummaryDto>> findForApprovalFiltered(@RequestBody KpiFilterDto filter) {
+    public ResponseEntity<List<ComposedSummaryDto>> findForApprovalFiltered(@RequestBody FilterDto filter) {
         List<ComposedSummaryDto> composedWithoutHits = composedService.findSummarizedWithHitsFiltered(filter);
         return new ResponseEntity<>(composedWithoutHits, HttpStatus.OK);
     }
@@ -69,7 +69,7 @@ public class ComposedProductionOrderController {
     }
 
     @PostMapping("/completed/filtered")
-    public ResponseEntity<List<ComposedSummaryDto>> findCompletedFiltered(@RequestBody KpiFilterDto filter) {
+    public ResponseEntity<List<ComposedSummaryDto>> findCompletedFiltered(@RequestBody FilterDto filter) {
         List<ComposedSummaryDto> composedCompleted = composedService.findCompletedFiltered(filter);
         return new ResponseEntity<>(composedCompleted, HttpStatus.OK);
     }

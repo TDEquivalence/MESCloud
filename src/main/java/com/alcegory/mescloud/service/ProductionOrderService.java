@@ -1,6 +1,6 @@
 package com.alcegory.mescloud.service;
 
-import com.alcegory.mescloud.model.dto.KpiFilterDto;
+import com.alcegory.mescloud.model.dto.FilterDto;
 import com.alcegory.mescloud.model.dto.ProductionOrderDto;
 import com.alcegory.mescloud.model.dto.ProductionOrderSummaryDto;
 import com.alcegory.mescloud.model.entity.ProductionOrderEntity;
@@ -35,10 +35,10 @@ public interface ProductionOrderService {
     Optional<ProductionOrderDto> findDtoById(Long id);
 
     List<Long> findExistingIds(List<Long> ids);
-    
+
     List<ProductionOrderSummaryDto> getCompletedWithoutComposedFiltered();
 
-    List<ProductionOrderSummaryDto> getCompletedWithoutComposedFiltered(KpiFilterDto filter);
+    List<ProductionOrderSummaryDto> getCompletedWithoutComposedFiltered(FilterDto filter);
 
     void setProductionOrderApproval(Long composedOrderId, boolean isApproved);
 

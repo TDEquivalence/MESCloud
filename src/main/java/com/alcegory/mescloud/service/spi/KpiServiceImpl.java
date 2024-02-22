@@ -32,18 +32,18 @@ public class KpiServiceImpl implements KpiService {
 
 
     @Override
-    public CountingEquipmentKpiDto[] getEquipmentOutputProductionPerDay(KpiFilterDto filter) {
+    public CountingEquipmentKpiDto[] getEquipmentOutputProductionPerDay(FilterDto filter) {
         List<CounterRecordDto> equipmentCounts = counterRecordService.getEquipmentOutputProductionPerDay(filter);
         return sortPerDay(filter, equipmentCounts);
     }
 
     @Override
-    public CountingEquipmentKpiDto[] computeEquipmentKpi(KpiFilterDto filter) {
+    public CountingEquipmentKpiDto[] computeEquipmentKpi(FilterDto filter) {
         List<CounterRecordDto> equipmentCounts = counterRecordService.filterConclusionRecordsKpi(filter);
         return sortPerDay(filter, equipmentCounts);
     }
 
-    private CountingEquipmentKpiDto[] sortPerDay(KpiFilterDto filter, List<CounterRecordDto> equipmentCounts) {
+    private CountingEquipmentKpiDto[] sortPerDay(FilterDto filter, List<CounterRecordDto> equipmentCounts) {
         if (equipmentCounts.isEmpty()) {
             return new CountingEquipmentKpiDto[0];
         }
@@ -69,7 +69,7 @@ public class KpiServiceImpl implements KpiService {
                 .toArray(new CountingEquipmentKpiDto[equipmentKpiByEquipmentAlias.size()]);
     }
 
-    public EquipmentKpiAggregatorDto computeEquipmentKpiAggregator(KpiFilterDto filter)
+    public EquipmentKpiAggregatorDto computeEquipmentKpiAggregator(FilterDto filter)
             throws NoSuchElementException, IncompleteConfigurationException, ArithmeticException {
 
         String equipmentAlias = filter.getSearch().getValue(EQUIPMENT_ALIAS);
@@ -88,7 +88,7 @@ public class KpiServiceImpl implements KpiService {
     }
 
     @Override
-    public EquipmentKpiAggregatorDto computeEquipmentKpiAggregatorById(Long equipmentId, KpiFilterDto filter)
+    public EquipmentKpiAggregatorDto computeEquipmentKpiAggregatorById(Long equipmentId, FilterDto filter)
             throws NoSuchElementException, IncompleteConfigurationException, ArithmeticException {
 
         Optional<CountingEquipmentDto> countingEquipmentDtoOpt = countingEquipmentService.findById(equipmentId);
@@ -122,16 +122,16 @@ public class KpiServiceImpl implements KpiService {
     }
 
     @Override
-    public List<EquipmentKpiAggregatorDto> computeEquipmentKpiAggregatorPerDay(KpiFilterDto filter) {
+    public List<EquipmentKpiAggregatorDto> computeEquipmentKpiAggregatorPerDay(FilterDto filter) {
         return computeEquipmentKpiAggregators(filter, null);
     }
 
     @Override
-    public List<EquipmentKpiAggregatorDto> computeEquipmentKpiAggregatorPerDayById(Long equipmentId, KpiFilterDto filter) {
+    public List<EquipmentKpiAggregatorDto> computeEquipmentKpiAggregatorPerDayById(Long equipmentId, FilterDto filter) {
         return computeEquipmentKpiAggregators(filter, equipmentId);
     }
 
-    private List<EquipmentKpiAggregatorDto> computeEquipmentKpiAggregators(KpiFilterDto filter, Long equipmentId) {
+    private List<EquipmentKpiAggregatorDto> computeEquipmentKpiAggregators(FilterDto filter, Long equipmentId) {
         Timestamp startDate = filter.getSearch().getTimestampValue(START_DATE);
         Timestamp endDate = filter.getSearch().getTimestampValue(END_DATE);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -159,12 +159,12 @@ public class KpiServiceImpl implements KpiService {
         return equipmentKpiAggregators;
     }
 
-    private Instant getPropertyAsInstant(KpiFilterDto filter, Filter.Property counterRecordProperty) {
+    private Instant getPropertyAsInstant(FilterDto filter, Filter.Property counterRecordProperty) {
         return DateUtil.convertToInstant(filter.getSearch().getValue(counterRecordProperty));
     }
 
     @Override
-    public KpiDto computeAvailability(Long equipmentId, KpiFilterDto filter) {
+    public KpiDto computeAvailability(Long equipmentId, FilterDto filter) {
         Timestamp startDate = filter.getSearch().getTimestampValue(START_DATE);
         Timestamp endDate = filter.getSearch().getTimestampValue(END_DATE);
         String productionOrderCode = filter.getSearch().getValue(PRODUCTION_ORDER_CODE);
@@ -189,7 +189,7 @@ public class KpiServiceImpl implements KpiService {
     }
 
     @Override
-    public KpiDto computeEquipmentQuality(Long equipmentId, KpiFilterDto filter) {
+    public KpiDto computeEquipmentQuality(Long equipmentId, FilterDto filter) {
 
         Integer validCounter = counterRecordService.sumValidCounterIncrement(equipmentId, filter);
         Integer totalCounter = counterRecordService.sumCounterIncrement(equipmentId, filter);

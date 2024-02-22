@@ -242,7 +242,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     }
 
     @Override
-    public List<ProductionOrderSummaryDto> getCompletedWithoutComposedFiltered(KpiFilterDto filter) {
+    public List<ProductionOrderSummaryDto> getCompletedWithoutComposedFiltered(FilterDto filter) {
         Timestamp startDate = filter.getSearch().getTimestampValue(START_DATE);
         Timestamp endDate = filter.getSearch().getTimestampValue(END_DATE);
         List<ProductionOrderSummaryEntity> persistedProductionOrders = repository.findCompleted(startDate, endDate, true);

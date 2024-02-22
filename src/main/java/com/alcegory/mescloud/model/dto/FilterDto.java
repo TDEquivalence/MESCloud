@@ -9,7 +9,7 @@ import lombok.Setter;
 
 @Setter
 @Getter
-public class KpiFilterDto implements Searchable<Filter.Property> {
+public class FilterDto implements Searchable<Filter.Property> {
 
     private TimeMode timeMode;
     @JsonUnwrapped

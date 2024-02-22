@@ -1,7 +1,7 @@
 package com.alcegory.mescloud.service.spi;
 
 import com.alcegory.mescloud.exception.ExcelExportException;
-import com.alcegory.mescloud.model.dto.KpiFilterDto;
+import com.alcegory.mescloud.model.dto.FilterDto;
 import com.alcegory.mescloud.model.entity.ComposedSummaryEntity;
 import com.alcegory.mescloud.model.entity.ProductionOrderSummaryEntity;
 import com.alcegory.mescloud.model.filter.Filter;
@@ -38,7 +38,7 @@ public class ExportExcelServiceImpl implements ExportExcelService {
     private final ComposedProductionOrderRepository composedRepository;
 
     @Override
-    public void exportProductionOrderViewToExcelFiltered(HttpServletResponse response, KpiFilterDto filter) {
+    public void exportProductionOrderViewToExcelFiltered(HttpServletResponse response, FilterDto filter) {
         Timestamp startDate = getDate(filter, START_DATE);
         Timestamp endDate = getDate(filter, END_DATE);
         setExcelResponseHeaders(response, PRODUCTION_ORDERS);
@@ -50,7 +50,7 @@ public class ExportExcelServiceImpl implements ExportExcelService {
     }
 
     @Override
-    public void exportCompletedComposedToExcelFiltered(HttpServletResponse response, boolean withHits, KpiFilterDto filter) {
+    public void exportCompletedComposedToExcelFiltered(HttpServletResponse response, boolean withHits, FilterDto filter) {
         Timestamp startDate = getDate(filter, START_DATE);
         Timestamp endDate = getDate(filter, END_DATE);
 
@@ -76,7 +76,7 @@ public class ExportExcelServiceImpl implements ExportExcelService {
     }
 
     @Override
-    public void exportProductionAndComposedToExcelFiltered(HttpServletResponse response, KpiFilterDto filter) {
+    public void exportProductionAndComposedToExcelFiltered(HttpServletResponse response, FilterDto filter) {
         Timestamp startDate = getDate(filter, START_DATE);
         Timestamp endDate = getDate(filter, END_DATE);
 
@@ -98,8 +98,8 @@ public class ExportExcelServiceImpl implements ExportExcelService {
         response.setHeader("Content-Disposition", "attachment; filename=" + filename);
     }
 
-    private Timestamp getDate(KpiFilterDto filter, Filter.Property property) {
-        if (filter == null) {
+    private Timestamp getDate(FilterDto filter, Filter.Property property) {
+        if (filter.getSearch() == null) {
             return null;
         }
         return filter.getSearch().getTimestampValue(property);

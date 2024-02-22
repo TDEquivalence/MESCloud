@@ -1,6 +1,6 @@
 package com.alcegory.mescloud.repository;
 
-import com.alcegory.mescloud.model.dto.KpiFilterDto;
+import com.alcegory.mescloud.model.dto.FilterDto;
 import com.alcegory.mescloud.model.entity.*;
 import com.alcegory.mescloud.model.filter.Filter;
 import com.alcegory.mescloud.utility.DateUtil;
@@ -33,7 +33,7 @@ public class CounterRecordRepositoryImpl extends AbstractFilterRepository<Filter
     private static final String DATE_FUNCION = "DATE";
 
 
-    public List<CounterRecordEntity> findLastPerProductionOrderAndEquipmentOutputPerDay(KpiFilterDto filter) {
+    public List<CounterRecordEntity> findLastPerProductionOrderAndEquipmentOutputPerDay(FilterDto filter) {
         String startDateStr = filter.getSearch().getValue(START_DATE);
         Date startDate = Date.from(DateUtil.convertToInstant(startDateStr));
         String endDateStr = filter.getSearch().getValue(END_DATE);
@@ -128,7 +128,7 @@ public class CounterRecordRepositoryImpl extends AbstractFilterRepository<Filter
                 .getResultList();
     }
 
-    public List<CounterRecordConclusionEntity> findLastPerProductionOrder(KpiFilterDto filterDto) {
+    public List<CounterRecordConclusionEntity> findLastPerProductionOrder(FilterDto filterDto) {
 
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<CounterRecordConclusionEntity> query = criteriaBuilder.createQuery(CounterRecordConclusionEntity.class);
@@ -172,7 +172,7 @@ public class CounterRecordRepositoryImpl extends AbstractFilterRepository<Filter
                 });
     }
 
-    public Integer sumCounterIncrement(Long countingEquipmentId, KpiFilterDto filter) {
+    public Integer sumCounterIncrement(Long countingEquipmentId, FilterDto filter) {
 
         Timestamp startDateFilter = filter.getSearch().getTimestampValue(START_DATE);
         Timestamp endDateFilter = filter.getSearch().getTimestampValue(END_DATE);
@@ -208,14 +208,14 @@ public class CounterRecordRepositoryImpl extends AbstractFilterRepository<Filter
         return sum != null ? sum : 0;
     }
 
-    public Integer sumValidCounterIncrement(Long countingEquipmentId, KpiFilterDto filter) {
+    public Integer sumValidCounterIncrement(Long countingEquipmentId, FilterDto filter) {
         Integer resultSumIncrement = sumValidCounterIncrementByPO(countingEquipmentId, filter);
 
         return Objects.requireNonNullElse(resultSumIncrement, 0);
     }
 
 
-    public Integer sumValidCounterIncrementByPO(Long countingEquipmentId, KpiFilterDto filter) {
+    public Integer sumValidCounterIncrementByPO(Long countingEquipmentId, FilterDto filter) {
 
         Timestamp startDateFilter = filter.getSearch().getTimestampValue(START_DATE);
         Timestamp endDateFilter = filter.getSearch().getTimestampValue(END_DATE);

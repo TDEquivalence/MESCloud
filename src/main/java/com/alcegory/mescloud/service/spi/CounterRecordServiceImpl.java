@@ -40,13 +40,13 @@ public class CounterRecordServiceImpl implements CounterRecordService {
 
 
     @Override
-    public List<CounterRecordDto> getEquipmentOutputProductionPerDay(KpiFilterDto filter) {
+    public List<CounterRecordDto> getEquipmentOutputProductionPerDay(FilterDto filter) {
         List<CounterRecordEntity> equipmentOutputProductionPerDay = repository.findLastPerProductionOrderAndEquipmentOutputPerDay(filter);
         return converter.toDto(equipmentOutputProductionPerDay);
     }
 
     @Override
-    public List<CounterRecordDto> filterConclusionRecordsKpi(KpiFilterDto filter) {
+    public List<CounterRecordDto> filterConclusionRecordsKpi(FilterDto filter) {
         List<CounterRecordConclusionEntity> counterRecordConclusionEntities = repository.findLastPerProductionOrder(filter);
         return converter.conclusionViewToDto(counterRecordConclusionEntities);
     }
@@ -273,12 +273,12 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     }
 
     @Override
-    public Integer sumValidCounterIncrement(Long countingEquipmentId, KpiFilterDto filter) {
+    public Integer sumValidCounterIncrement(Long countingEquipmentId, FilterDto filter) {
         return repository.sumValidCounterIncrement(countingEquipmentId, filter);
     }
 
     @Override
-    public Integer sumCounterIncrement(Long countingEquipmentId, KpiFilterDto filter) {
+    public Integer sumCounterIncrement(Long countingEquipmentId, FilterDto filter) {
         return repository.sumCounterIncrement(countingEquipmentId, filter);
     }
 

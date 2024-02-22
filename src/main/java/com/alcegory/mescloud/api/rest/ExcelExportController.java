@@ -1,6 +1,6 @@
 package com.alcegory.mescloud.api.rest;
 
-import com.alcegory.mescloud.model.dto.KpiFilterDto;
+import com.alcegory.mescloud.model.dto.FilterDto;
 import com.alcegory.mescloud.service.ExportExcelService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
@@ -22,7 +22,7 @@ public class ExcelExportController {
     }
 
     @PostMapping("composed-and-production-orders/completed")
-    public void exportCompletedComposedAndProductionToExcel(HttpServletResponse response, KpiFilterDto filter) {
+    public void exportCompletedComposedAndProductionToExcel(HttpServletResponse response, FilterDto filter) {
         exportExcelService.exportProductionAndComposedToExcelFiltered(response, filter);
     }
 }

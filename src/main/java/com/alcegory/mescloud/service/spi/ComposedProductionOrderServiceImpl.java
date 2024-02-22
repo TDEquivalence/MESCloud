@@ -173,7 +173,7 @@ public class ComposedProductionOrderServiceImpl implements ComposedProductionOrd
     }
 
     @Override
-    public List<ComposedSummaryDto> findSummarizedFiltered(boolean withHits, KpiFilterDto filter) {
+    public List<ComposedSummaryDto> findSummarizedFiltered(boolean withHits, FilterDto filter) {
         Timestamp startDate = filter.getSearch().getTimestampValue(START_DATE);
         Timestamp endDate = filter.getSearch().getTimestampValue(END_DATE);
         return getOpenComposedSummaries(withHits, startDate, endDate);
@@ -191,7 +191,7 @@ public class ComposedProductionOrderServiceImpl implements ComposedProductionOrd
     }
 
     @Override
-    public List<ComposedSummaryDto> findCompletedFiltered(KpiFilterDto filter) {
+    public List<ComposedSummaryDto> findCompletedFiltered(FilterDto filter) {
         Timestamp startDate = filter.getSearch().getTimestampValue(START_DATE);
         Timestamp endDate = filter.getSearch().getTimestampValue(END_DATE);
         List<ComposedSummaryEntity> composedCompleted = repository.findCompleted(startDate, endDate);
