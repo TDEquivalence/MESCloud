@@ -14,8 +14,8 @@ import java.util.List;
 @AllArgsConstructor
 @Repository
 public class ProductionOrderRepositoryImpl {
-    
-    private static final String COMPLETED_AT = "completeddAt";
+
+    private static final String COMPLETED_AT = "completedAt";
     private static final String COMPOSED_PRODUCTION_ORDER = "composedProductionOrder";
     private static final String IS_COMPLETED = "isCompleted";
     private static final String PROP_ID = "id";
