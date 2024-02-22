@@ -6,7 +6,10 @@ import com.alcegory.mescloud.exception.AlarmNotFoundException;
 import com.alcegory.mescloud.exception.EquipmentNotFoundException;
 import com.alcegory.mescloud.exception.IllegalAlarmStatusException;
 import com.alcegory.mescloud.model.converter.GenericConverter;
-import com.alcegory.mescloud.model.dto.*;
+import com.alcegory.mescloud.model.dto.AlarmDto;
+import com.alcegory.mescloud.model.dto.CountingEquipmentDto;
+import com.alcegory.mescloud.model.dto.PlcMqttDto;
+import com.alcegory.mescloud.model.dto.ProductionOrderDto;
 import com.alcegory.mescloud.model.entity.*;
 import com.alcegory.mescloud.model.filter.Filter;
 import com.alcegory.mescloud.model.request.RequestAlarmRecognitionDto;
@@ -42,24 +45,9 @@ public class AlarmServiceImpl implements AlarmService {
     private final GenericConverter<CountingEquipmentEntity, CountingEquipmentDto> countingEquipmentConverter;
 
     @Override
-    public List<AlarmDto> findByFilter(Filter filter) {
-        int requestAlarm = filter.getTake();
-        filter.setTake(filter.getTake() + 1);
-
-        List<AlarmEntity> alarms = repository.findByFilter(filter);
-        boolean hasNextPage = alarms.size() > requestAlarm;
-
-        if (hasNextPage) {
-            alarms.remove(alarms.size() - 1);
-        }
-
-        List<AlarmDto> alarmDtos = converter.toDto(alarms, AlarmDto.class);
-
-        PaginatedAlarmsDto paginatedAlarmsDto = new PaginatedAlarmsDto();
-        paginatedAlarmsDto.setHasNextPage(hasNextPage);
-        paginatedAlarmsDto.setCounterRecords(alarmDtos);
-
-        return alarmDtos;
+    public List<AlarmSummaryView> findByFilter(Filter filter) {
+        List<AlarmSummaryView> alarms = repository.findByFilter(filter);
+        return alarms;
     }
 
     @Override

@@ -3,6 +3,7 @@ package com.alcegory.mescloud.repository;
 import com.alcegory.mescloud.constant.AlarmStatus;
 import com.alcegory.mescloud.model.entity.AlarmCounts;
 import com.alcegory.mescloud.model.entity.AlarmEntity;
+import com.alcegory.mescloud.model.entity.AlarmSummaryView;
 import com.alcegory.mescloud.model.filter.Filter;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -12,7 +13,7 @@ import java.util.List;
 
 public interface AlarmRepository extends JpaRepository<AlarmEntity, Long> {
 
-    List<AlarmEntity> findByFilter(Filter filter);
+    List<AlarmSummaryView> findByFilter(Filter filter);
 
     List<AlarmEntity> findByEquipmentIdAndStatus(Long equipmentId, AlarmStatus status);
 

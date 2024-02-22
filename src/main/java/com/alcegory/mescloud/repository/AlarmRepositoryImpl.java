@@ -3,6 +3,7 @@ package com.alcegory.mescloud.repository;
 import com.alcegory.mescloud.constant.AlarmStatus;
 import com.alcegory.mescloud.model.entity.AlarmCounts;
 import com.alcegory.mescloud.model.entity.AlarmEntity;
+import com.alcegory.mescloud.model.entity.AlarmSummaryView;
 import com.alcegory.mescloud.model.filter.Filter;
 import jakarta.persistence.criteria.*;
 import lombok.extern.slf4j.Slf4j;
@@ -20,10 +21,10 @@ public class AlarmRepositoryImpl extends AbstractFilterRepository<Filter.Propert
     private static final String CREATED_AT_PROP = "createdAt";
     private static final String STATUS_PROP = "status";
 
-    public List<AlarmEntity> findByFilter(Filter filter) {
+    public List<AlarmSummaryView> findByFilter(Filter filter) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<AlarmEntity> query = criteriaBuilder.createQuery(AlarmEntity.class);
-        Root<AlarmEntity> root = query.from(AlarmEntity.class);
+        CriteriaQuery<AlarmSummaryView> query = criteriaBuilder.createQuery(AlarmSummaryView.class);
+        Root<AlarmSummaryView> root = query.from(AlarmSummaryView.class);
 
         List<Predicate> predicates = buildPredicates(criteriaBuilder, root, filter);
 
@@ -31,8 +32,7 @@ public class AlarmRepositoryImpl extends AbstractFilterRepository<Filter.Propert
                 .where(criteriaBuilder.and(predicates.toArray(new Predicate[0])))
                 .orderBy(criteriaBuilder.asc(root.get(ID_PROP)));
 
-        return entityManager.createQuery(query).setFirstResult(filter.getSkip())
-                .setMaxResults(filter.getTake())
+        return entityManager.createQuery(query)
                 .getResultList();
     }
 
@@ -66,7 +66,7 @@ public class AlarmRepositoryImpl extends AbstractFilterRepository<Filter.Propert
         );
     }
 
-    private List<Predicate> buildPredicates(CriteriaBuilder criteriaBuilder, Root<AlarmEntity> root, Filter filter) {
+    private List<Predicate> buildPredicates(CriteriaBuilder criteriaBuilder, Root<?> root, Filter filter) {
         List<Predicate> predicates = new ArrayList<>();
         Timestamp startDate = filter.getSearch().getTimestampValue(Filter.Property.START_DATE);
         Timestamp endDate = filter.getSearch().getTimestampValue(Filter.Property.END_DATE);
