@@ -13,7 +13,6 @@ DROP TABLE IF EXISTS alarm;
 DROP TABLE IF EXISTS alarm_configuration;
 DROP TABLE IF EXISTS production_order;
 DROP TABLE IF EXISTS equipment_status_record;
-DROP TABLE IF EXISTS production_order_recipe;
 DROP TABLE IF EXISTS equipment_output;
 DROP TABLE IF EXISTS counting_equipment;
 DROP TABLE IF EXISTS equipment_output_alias;

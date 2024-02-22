@@ -14,8 +14,8 @@ import java.util.List;
 @AllArgsConstructor
 @Repository
 public class ProductionOrderRepositoryImpl {
-
-    private static final String CREATED_AT = "createdAt";
+    
+    private static final String COMPLETED_AT = "completeddAt";
     private static final String COMPOSED_PRODUCTION_ORDER = "composedProductionOrder";
     private static final String IS_COMPLETED = "isCompleted";
     private static final String PROP_ID = "id";
@@ -37,12 +37,12 @@ public class ProductionOrderRepositoryImpl {
         }
 
         if (startDate != null) {
-            Predicate startDatePredicate = criteriaBuilder.greaterThanOrEqualTo(root.get(CREATED_AT), startDate);
+            Predicate startDatePredicate = criteriaBuilder.greaterThanOrEqualTo(root.get(COMPLETED_AT), startDate);
             predicates.add(startDatePredicate);
         }
 
         if (endDate != null) {
-            Predicate endDatePredicate = criteriaBuilder.lessThanOrEqualTo(root.get(CREATED_AT), endDate);
+            Predicate endDatePredicate = criteriaBuilder.lessThanOrEqualTo(root.get(COMPLETED_AT), endDate);
             predicates.add(endDatePredicate);
         }
 
