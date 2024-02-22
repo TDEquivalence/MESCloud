@@ -1,13 +1,11 @@
 package com.alcegory.mescloud.api.rest;
 
-import com.alcegory.mescloud.model.dto.FilterDto;
 import com.alcegory.mescloud.service.ExportExcelService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/export")
@@ -22,7 +20,7 @@ public class ExcelExportController {
     }
 
     @PostMapping("composed-and-production-orders/completed")
-    public void exportCompletedComposedAndProductionToExcel(HttpServletResponse response, FilterDto filter) {
-        exportExcelService.exportProductionAndComposedToExcelFiltered(response, filter);
+    public void exportCompletedComposedAndProductionToExcel(HttpServletResponse response, @RequestBody Map<String, String> requestPayload) {
+        exportExcelService.exportProductionAndComposedToExcelFiltered(response, requestPayload);
     }
 }
