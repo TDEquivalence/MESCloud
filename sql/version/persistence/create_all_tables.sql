@@ -339,7 +339,8 @@ SELECT
     a.created_at AS created_at,
     a.completed_at AS completed_at,
     a.recognized_at AS recognized_at,
-    u.username AS recognized_by_username  -- Include username here
+    u.first_name AS recognized_by_first_name,
+    u.last_name AS recognized_by_last_name
 FROM
     alarm a
 JOIN
@@ -349,6 +350,6 @@ JOIN
 LEFT JOIN
     production_order po ON a.production_order_id = po.id
 LEFT JOIN
-    users u ON a.recognized_by = u.id  -- Join to users table to get the username
+    users u ON a.recognized_by = u.id
 WHERE
     a.status IN ('ACTIVE', 'INACTIVE', 'RECOGNIZED');

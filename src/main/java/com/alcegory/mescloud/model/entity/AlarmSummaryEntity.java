@@ -28,5 +28,6 @@ public class AlarmSummaryEntity {
     private Date completedAt;
     @Temporal(TemporalType.TIMESTAMP)
     private Date recognizedAt;
-    private String recognizedBy;
+    private String recognizedByFirstName;
+    private String recognizedByLastName;
 }
