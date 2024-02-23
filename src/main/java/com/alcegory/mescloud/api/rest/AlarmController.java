@@ -3,9 +3,10 @@ package com.alcegory.mescloud.api.rest;
 import com.alcegory.mescloud.exception.AlarmNotFoundException;
 import com.alcegory.mescloud.exception.IllegalAlarmStatusException;
 import com.alcegory.mescloud.model.dto.AlarmDto;
-import com.alcegory.mescloud.model.dto.RequestAlarmRecognitionDto;
 import com.alcegory.mescloud.model.entity.AlarmCounts;
-import com.alcegory.mescloud.model.filter.AlarmFilter;
+import com.alcegory.mescloud.model.entity.AlarmSummaryEntity;
+import com.alcegory.mescloud.model.filter.Filter;
+import com.alcegory.mescloud.model.request.RequestAlarmRecognitionDto;
 import com.alcegory.mescloud.service.AlarmService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -23,8 +24,8 @@ public class AlarmController {
     private final AlarmService service;
 
     @PostMapping
-    public ResponseEntity<List<AlarmDto>> findByFilter(@RequestBody AlarmFilter filter) {
-        List<AlarmDto> alarmRecords = service.findByFilter(filter);
+    public ResponseEntity<List<AlarmSummaryEntity>> findByFilter(@RequestBody Filter filter) {
+        List<AlarmSummaryEntity> alarmRecords = service.findByFilter(filter);
         return new ResponseEntity<>(alarmRecords, HttpStatus.OK);
     }
 
@@ -44,7 +45,7 @@ public class AlarmController {
     }
 
     @PostMapping("/counts")
-    public ResponseEntity<AlarmCounts> getAlarmCounts(@RequestBody AlarmFilter filter) {
+    public ResponseEntity<AlarmCounts> getAlarmCounts(@RequestBody Filter filter) {
         AlarmCounts alarmCounts = service.getAlarmCounts(filter);
         return new ResponseEntity<>(alarmCounts, HttpStatus.OK);
     }

@@ -2,6 +2,7 @@ package com.alcegory.mescloud.protocol;
 
 import com.alcegory.mescloud.constant.MqttDTOConstants;
 import com.alcegory.mescloud.model.dto.PlcMqttDto;
+import com.alcegory.mescloud.model.entity.CountingEquipmentEntity;
 import com.alcegory.mescloud.service.AlarmService;
 import com.alcegory.mescloud.service.CounterRecordService;
 import com.alcegory.mescloud.service.CountingEquipmentService;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class CounterRecordProcess extends AbstractMesProtocolProcess<PlcMqttDto> {
 
+    
     private final CounterRecordService counterRecordService;
     private final CountingEquipmentService equipmentService;
     private final AlarmService alarmService;
@@ -31,6 +33,7 @@ public class CounterRecordProcess extends AbstractMesProtocolProcess<PlcMqttDto>
                     equipmentCounts.getProductionOrderCode()));
         }
 
+        setOperationStatus(equipmentCounts);
         counterRecordService.processCounterRecord(equipmentCounts);
     }
 
@@ -41,5 +44,14 @@ public class CounterRecordProcess extends AbstractMesProtocolProcess<PlcMqttDto>
     @Override
     public String getMatchingDTOName() {
         return MqttDTOConstants.COUNTING_RECORD_DTO_NAME;
+    }
+
+    private void setOperationStatus(PlcMqttDto equipmentCounts) {
+        if (equipmentCounts.getProductionOrderCode().isEmpty()) {
+            log.info(() -> String.format("Change status to IDLE for Equipment with code [%s]", equipmentCounts.getEquipmentCode()));
+            equipmentService.setOperationStatusByCode(equipmentCounts.getEquipmentCode(), CountingEquipmentEntity.OperationStatus.IDLE);
+        } else {
+            equipmentService.setOperationStatusByCode(equipmentCounts.getEquipmentCode(), CountingEquipmentEntity.OperationStatus.IN_PROGRESS);
+        }
     }
 }

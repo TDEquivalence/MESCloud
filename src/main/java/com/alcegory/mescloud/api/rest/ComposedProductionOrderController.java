@@ -1,7 +1,11 @@
 package com.alcegory.mescloud.api.rest;
 
-import com.alcegory.mescloud.model.dto.*;
-import com.alcegory.mescloud.model.entity.ProductionOrderSummaryEntity;
+import com.alcegory.mescloud.model.dto.ComposedProductionOrderDto;
+import com.alcegory.mescloud.model.dto.ComposedSummaryDto;
+import com.alcegory.mescloud.model.dto.FilterDto;
+import com.alcegory.mescloud.model.dto.ProductionOrderSummaryDto;
+import com.alcegory.mescloud.model.request.RequestById;
+import com.alcegory.mescloud.model.request.RequestComposedDto;
 import com.alcegory.mescloud.service.ComposedProductionOrderService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -36,19 +40,37 @@ public class ComposedProductionOrderController {
 
     @GetMapping("/insert-hits")
     public ResponseEntity<List<ComposedSummaryDto>> findAllToInsertHits() {
-        List<ComposedSummaryDto> composedWithoutHits = composedService.findSummarizedWithoutHits();
+        List<ComposedSummaryDto> composedWithoutHits = composedService.findAllSummarizedWithoutHits();
+        return new ResponseEntity<>(composedWithoutHits, HttpStatus.OK);
+    }
+
+    @PostMapping("/insert-hits/filtered")
+    public ResponseEntity<List<ComposedSummaryDto>> findToInsertHitsFiltered(@RequestBody FilterDto filter) {
+        List<ComposedSummaryDto> composedWithoutHits = composedService.findSummarizedWithoutHitsFiltered(filter);
         return new ResponseEntity<>(composedWithoutHits, HttpStatus.OK);
     }
 
     @GetMapping("/approval")
     public ResponseEntity<List<ComposedSummaryDto>> findAllForApproval() {
-        List<ComposedSummaryDto> composedWithoutHits = composedService.findSummarizedWithHits();
+        List<ComposedSummaryDto> composedWithoutHits = composedService.findAllSummarizedWithHits();
+        return new ResponseEntity<>(composedWithoutHits, HttpStatus.OK);
+    }
+
+    @PostMapping("/approval/filtered")
+    public ResponseEntity<List<ComposedSummaryDto>> findForApprovalFiltered(@RequestBody FilterDto filter) {
+        List<ComposedSummaryDto> composedWithoutHits = composedService.findSummarizedWithHitsFiltered(filter);
         return new ResponseEntity<>(composedWithoutHits, HttpStatus.OK);
     }
 
     @GetMapping("/completed")
-    public ResponseEntity<List<ComposedSummaryDto>> findCompleted() {
-        List<ComposedSummaryDto> composedCompleted = composedService.findCompleted();
+    public ResponseEntity<List<ComposedSummaryDto>> findAllCompleted() {
+        List<ComposedSummaryDto> composedCompleted = composedService.findAllCompleted();
+        return new ResponseEntity<>(composedCompleted, HttpStatus.OK);
+    }
+
+    @PostMapping("/completed/filtered")
+    public ResponseEntity<List<ComposedSummaryDto>> findCompletedFiltered(@RequestBody FilterDto filter) {
+        List<ComposedSummaryDto> composedCompleted = composedService.findCompletedFiltered(filter);
         return new ResponseEntity<>(composedCompleted, HttpStatus.OK);
     }
 

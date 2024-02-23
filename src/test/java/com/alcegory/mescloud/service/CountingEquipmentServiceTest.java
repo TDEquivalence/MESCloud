@@ -6,7 +6,7 @@ import com.alcegory.mescloud.exception.MesMqttException;
 import com.alcegory.mescloud.model.converter.GenericConverter;
 import com.alcegory.mescloud.model.dto.CountingEquipmentDto;
 import com.alcegory.mescloud.model.dto.ImsDto;
-import com.alcegory.mescloud.model.dto.RequestConfigurationDto;
+import com.alcegory.mescloud.model.request.RequestConfigurationDto;
 import com.alcegory.mescloud.model.entity.CountingEquipmentEntity;
 import com.alcegory.mescloud.model.entity.ImsEntity;
 import com.alcegory.mescloud.repository.CountingEquipmentRepository;

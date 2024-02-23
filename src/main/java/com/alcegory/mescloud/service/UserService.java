@@ -1,11 +1,11 @@
 package com.alcegory.mescloud.service;
 
-import com.alcegory.mescloud.repository.UserRepository;
-import com.alcegory.mescloud.model.filter.UserFilter;
+import com.alcegory.mescloud.model.dto.UserDto;
 import com.alcegory.mescloud.model.entity.UserEntity;
+import com.alcegory.mescloud.model.filter.Filter;
+import com.alcegory.mescloud.repository.UserRepository;
 import com.alcegory.mescloud.security.exception.UserNotFoundException;
 import com.alcegory.mescloud.security.mapper.EntityDtoMapper;
-import com.alcegory.mescloud.model.dto.UserDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -31,7 +31,7 @@ public class UserService {
         return mapper.convertToDto(userEntityList);
     }
 
-    public List<UserDto> getFilteredUsers(UserFilter filter) {
+    public List<UserDto> getFilteredUsers(Filter filter) {
         List<UserEntity> userEntityList = userRepository.getFilteredUsers(filter);
         return mapper.convertToDto(userEntityList);
     }

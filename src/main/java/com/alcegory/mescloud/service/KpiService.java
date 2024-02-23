@@ -2,26 +2,26 @@ package com.alcegory.mescloud.service;
 
 import com.alcegory.mescloud.model.dto.CountingEquipmentKpiDto;
 import com.alcegory.mescloud.model.dto.EquipmentKpiAggregatorDto;
+import com.alcegory.mescloud.model.dto.FilterDto;
 import com.alcegory.mescloud.model.dto.KpiDto;
-import com.alcegory.mescloud.model.dto.KpiFilterDto;
 
 import java.util.List;
 
 public interface KpiService {
 
-    CountingEquipmentKpiDto[] computeEquipmentKpi(KpiFilterDto filter);
+    CountingEquipmentKpiDto[] computeEquipmentKpi(FilterDto filter);
 
-    CountingEquipmentKpiDto[] getEquipmentOutputProductionPerDay(KpiFilterDto filter);
+    CountingEquipmentKpiDto[] getEquipmentOutputProductionPerDay(FilterDto filter);
 
-    KpiDto computeEquipmentQuality(Long equipmentId, KpiFilterDto requestKpiDto);
+    KpiDto computeEquipmentQuality(Long equipmentId, FilterDto requestKpiDto);
 
-    KpiDto computeAvailability(Long equipmentId, KpiFilterDto filter);
+    KpiDto computeAvailability(Long equipmentId, FilterDto filter);
 
-    EquipmentKpiAggregatorDto computeEquipmentKpiAggregator(KpiFilterDto filter);
+    EquipmentKpiAggregatorDto computeEquipmentKpiAggregator(FilterDto filter);
 
-    EquipmentKpiAggregatorDto computeEquipmentKpiAggregatorById(Long equipmentId, KpiFilterDto requestKpiDto);
+    EquipmentKpiAggregatorDto computeEquipmentKpiAggregatorById(Long equipmentId, FilterDto requestKpiDto);
 
-    List<EquipmentKpiAggregatorDto> computeEquipmentKpiAggregatorPerDayById(Long equipmentId, KpiFilterDto kpiRequest);
+    List<EquipmentKpiAggregatorDto> computeEquipmentKpiAggregatorPerDayById(Long equipmentId, FilterDto kpiRequest);
 
-    List<EquipmentKpiAggregatorDto> computeEquipmentKpiAggregatorPerDay(KpiFilterDto filter);
+    List<EquipmentKpiAggregatorDto> computeEquipmentKpiAggregatorPerDay(FilterDto filter);
 }

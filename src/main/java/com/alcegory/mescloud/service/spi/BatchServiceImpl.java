@@ -1,11 +1,13 @@
 package com.alcegory.mescloud.service.spi;
 
-import com.alcegory.mescloud.repository.BatchRepository;
 import com.alcegory.mescloud.model.converter.GenericConverter;
 import com.alcegory.mescloud.model.dto.BatchDto;
-import com.alcegory.mescloud.model.dto.RequestBatchDto;
+import com.alcegory.mescloud.model.dto.ComposedProductionOrderDto;
 import com.alcegory.mescloud.model.entity.BatchEntity;
 import com.alcegory.mescloud.model.entity.ComposedProductionOrderEntity;
+import com.alcegory.mescloud.model.request.RequestBatchDto;
+import com.alcegory.mescloud.model.request.RequestToRejectBatchDto;
+import com.alcegory.mescloud.repository.BatchRepository;
 import com.alcegory.mescloud.service.BatchService;
 import com.alcegory.mescloud.service.ComposedProductionOrderService;
 import lombok.AllArgsConstructor;
@@ -22,7 +24,6 @@ public class BatchServiceImpl implements BatchService {
 
     private final BatchRepository repository;
     private final GenericConverter<BatchEntity, BatchDto> converter;
-
     private final ComposedProductionOrderService composedService;
 
     @Override
@@ -37,6 +38,18 @@ public class BatchServiceImpl implements BatchService {
         BatchEntity batch = converter.toEntity(requestBatch.getBatch(), BatchEntity.class);
         batch.setComposedProductionOrder(getComposedById(requestBatch.getComposedId()));
         return batch;
+    }
+
+    public BatchDto rejectComposed(RequestToRejectBatchDto requestToRejectBatchDto) {
+        Optional<ComposedProductionOrderDto> composedProductionOrderDto = composedService.create(requestToRejectBatchDto.getProductionOrderIds());
+
+        if (composedProductionOrderDto.isEmpty()) {
+            throw new IllegalArgumentException("Composed production order not created");
+        }
+
+        ComposedProductionOrderDto composed = composedProductionOrderDto.get();
+        requestToRejectBatchDto.getRequestBatchDto().setComposedId(composed.getId());
+        return create(requestToRejectBatchDto.getRequestBatchDto());
     }
 
     private ComposedProductionOrderEntity getComposedById(Long composedId) {

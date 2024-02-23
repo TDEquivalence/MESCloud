@@ -1,5 +1,6 @@
 package com.alcegory.mescloud.service;
 
+import com.alcegory.mescloud.model.dto.FilterDto;
 import com.alcegory.mescloud.model.dto.ProductionOrderDto;
 import com.alcegory.mescloud.model.dto.ProductionOrderSummaryDto;
 import com.alcegory.mescloud.model.entity.ProductionOrderEntity;
@@ -12,6 +13,8 @@ import java.util.Optional;
 public interface ProductionOrderService {
 
     Optional<ProductionOrderDto> findDtoByCode(String code);
+
+    Optional<ProductionOrderEntity> findByCode(String code);
 
     String generateCode();
 
@@ -35,13 +38,13 @@ public interface ProductionOrderService {
 
     List<Long> findExistingIds(List<Long> ids);
 
-    List<ProductionOrderSummaryDto> getCompletedWithoutComposed();
+    List<ProductionOrderSummaryDto> getCompletedWithoutComposedFiltered();
+
+    List<ProductionOrderSummaryDto> getCompletedWithoutComposedFiltered(FilterDto filter);
 
     void setProductionOrderApproval(Long composedOrderId, boolean isApproved);
 
     List<ProductionOrderDto> findByEquipmentAndPeriod(Long equipmentId, Date startDate, Date endDate);
-
-    void completeByCode(String productionOrderCode);
 
     boolean isCompleted(String productionOrderCode);
 

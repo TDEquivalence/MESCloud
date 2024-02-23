@@ -7,7 +7,7 @@ import java.util.List;
 
 @Getter
 @Setter
-public class RequestHitDto {
-
-    private List<HitDto> hits;
+public class PaginatedAlarmsDto {
+    private List<AlarmDto> counterRecords;
+    private boolean hasNextPage;
 }

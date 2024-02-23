@@ -6,9 +6,13 @@ import com.alcegory.mescloud.exception.AlarmNotFoundException;
 import com.alcegory.mescloud.exception.EquipmentNotFoundException;
 import com.alcegory.mescloud.exception.IllegalAlarmStatusException;
 import com.alcegory.mescloud.model.converter.GenericConverter;
-import com.alcegory.mescloud.model.dto.*;
+import com.alcegory.mescloud.model.dto.AlarmDto;
+import com.alcegory.mescloud.model.dto.CountingEquipmentDto;
+import com.alcegory.mescloud.model.dto.PlcMqttDto;
+import com.alcegory.mescloud.model.dto.ProductionOrderDto;
 import com.alcegory.mescloud.model.entity.*;
-import com.alcegory.mescloud.model.filter.AlarmFilter;
+import com.alcegory.mescloud.model.filter.Filter;
+import com.alcegory.mescloud.model.request.RequestAlarmRecognitionDto;
 import com.alcegory.mescloud.repository.AlarmRepository;
 import com.alcegory.mescloud.service.AlarmConfigurationService;
 import com.alcegory.mescloud.service.AlarmService;
@@ -41,9 +45,8 @@ public class AlarmServiceImpl implements AlarmService {
     private final GenericConverter<CountingEquipmentEntity, CountingEquipmentDto> countingEquipmentConverter;
 
     @Override
-    public List<AlarmDto> findByFilter(AlarmFilter filter) {
-        List<AlarmEntity> alarms = repository.findByFilter(filter);
-        return converter.toDto(alarms, AlarmDto.class);
+    public List<AlarmSummaryEntity> findByFilter(Filter filter) {
+        return repository.findByFilter(filter);
     }
 
     @Override
@@ -87,7 +90,7 @@ public class AlarmServiceImpl implements AlarmService {
     }
 
     @Override
-    public AlarmCounts getAlarmCounts(AlarmFilter filter) {
+    public AlarmCounts getAlarmCounts(Filter filter) {
         return repository.getAlarmCounts(filter);
     }
 

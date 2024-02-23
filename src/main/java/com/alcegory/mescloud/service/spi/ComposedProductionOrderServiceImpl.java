@@ -4,6 +4,7 @@ import com.alcegory.mescloud.model.converter.GenericConverter;
 import com.alcegory.mescloud.model.dto.*;
 import com.alcegory.mescloud.model.entity.ComposedProductionOrderEntity;
 import com.alcegory.mescloud.model.entity.ComposedSummaryEntity;
+import com.alcegory.mescloud.model.request.RequestComposedDto;
 import com.alcegory.mescloud.repository.ComposedProductionOrderRepository;
 import com.alcegory.mescloud.service.ComposedProductionOrderService;
 import com.alcegory.mescloud.service.ProductionOrderService;
@@ -13,11 +14,15 @@ import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.logging.Logger;
+
+import static com.alcegory.mescloud.model.filter.Filter.Property.END_DATE;
+import static com.alcegory.mescloud.model.filter.Filter.Property.START_DATE;
 
 @Service
 @AllArgsConstructor
@@ -91,7 +96,7 @@ public class ComposedProductionOrderServiceImpl implements ComposedProductionOrd
         String codePrefix = OBO_SECTION_PREFIX + CODE_PREFIX + DateUtil.getCurrentYearLastTwoDigits();
 
         return composedProductionOrderOpt.isEmpty() ?
-                codePrefix + FIRST_CODE_VALUE :
+                codePrefix + String.format(FIVE_DIGIT_NUMBER_FORMAT, FIRST_CODE_VALUE) :
                 codePrefix + generateFormattedCodeValue(composedProductionOrderOpt.get(), codePrefix);
     }
 
@@ -163,14 +168,33 @@ public class ComposedProductionOrderServiceImpl implements ComposedProductionOrd
     }
 
     @Override
-    public List<ComposedSummaryDto> findSummarized(boolean withHits) {
-        List<ComposedSummaryEntity> composedWithoutHits = repository.getOpenComposedSummaries(withHits);
+    public List<ComposedSummaryDto> findAllSummarized(boolean withHits) {
+        return getOpenComposedSummaries(withHits, null, null);
+    }
+
+    @Override
+    public List<ComposedSummaryDto> findSummarizedFiltered(boolean withHits, FilterDto filter) {
+        Timestamp startDate = filter.getSearch().getTimestampValue(START_DATE);
+        Timestamp endDate = filter.getSearch().getTimestampValue(END_DATE);
+        return getOpenComposedSummaries(withHits, startDate, endDate);
+    }
+
+    private List<ComposedSummaryDto> getOpenComposedSummaries(boolean withHits, Timestamp startDate, Timestamp endDate) {
+        List<ComposedSummaryEntity> composedWithoutHits = repository.getOpenComposedSummaries(withHits, startDate, endDate);
         return summaryConverter.toDto(composedWithoutHits, ComposedSummaryDto.class);
     }
 
     @Override
-    public List<ComposedSummaryDto> findCompleted() {
-        List<ComposedSummaryEntity> composedCompleted = repository.findCompleted();
+    public List<ComposedSummaryDto> findAllCompleted() {
+        List<ComposedSummaryEntity> composedCompleted = repository.findCompleted(null, null);
+        return summaryConverter.toDto(composedCompleted, ComposedSummaryDto.class);
+    }
+
+    @Override
+    public List<ComposedSummaryDto> findCompletedFiltered(FilterDto filter) {
+        Timestamp startDate = filter.getSearch().getTimestampValue(START_DATE);
+        Timestamp endDate = filter.getSearch().getTimestampValue(END_DATE);
+        List<ComposedSummaryEntity> composedCompleted = repository.findCompleted(startDate, endDate);
         return summaryConverter.toDto(composedCompleted, ComposedSummaryDto.class);
     }
 

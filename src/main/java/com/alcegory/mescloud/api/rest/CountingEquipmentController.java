@@ -2,8 +2,8 @@ package com.alcegory.mescloud.api.rest;
 
 import com.alcegory.mescloud.exception.*;
 import com.alcegory.mescloud.model.dto.CountingEquipmentDto;
-import com.alcegory.mescloud.model.dto.RequestConfigurationDto;
-import com.alcegory.mescloud.model.dto.RequestById;
+import com.alcegory.mescloud.model.request.RequestById;
+import com.alcegory.mescloud.model.request.RequestConfigurationDto;
 import com.alcegory.mescloud.service.CountingEquipmentService;
 import com.alcegory.mescloud.utility.HttpUtil;
 import lombok.AllArgsConstructor;
@@ -35,7 +35,7 @@ public class CountingEquipmentController {
 
     @GetMapping("/{id}")
     public ResponseEntity<CountingEquipmentDto> findById(@PathVariable long id) {
-        Optional<CountingEquipmentDto> countingEquipmentOpt = service.findById(id);
+        Optional<CountingEquipmentDto> countingEquipmentOpt = service.findEquipmentWithProductionOrderById(id);
         if (countingEquipmentOpt.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }

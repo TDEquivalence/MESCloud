@@ -1,9 +1,9 @@
 package com.alcegory.mescloud.repository;
 
-import com.alcegory.mescloud.model.dto.KpiFilterDto;
+import com.alcegory.mescloud.model.dto.FilterDto;
 import com.alcegory.mescloud.model.entity.CounterRecordConclusionEntity;
 import com.alcegory.mescloud.model.entity.CounterRecordEntity;
-import com.alcegory.mescloud.model.filter.CounterRecordFilter;
+import com.alcegory.mescloud.model.filter.Filter;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -20,22 +20,22 @@ public interface CounterRecordRepository extends CrudRepository<CounterRecordEnt
     @Query(value = "SELECT * FROM counter_record cr WHERE (cr.production_order_id = :productionOrderId) LIMIT 1", nativeQuery = true)
     Optional<CounterRecordEntity> findLastByProductionOrderId(Long productionOrderId);
 
-    List<CounterRecordConclusionEntity> findLastPerProductionOrder(CounterRecordFilter filterDto);
+    List<CounterRecordConclusionEntity> findLastPerProductionOrder(Filter filterDto);
 
-    List<CounterRecordConclusionEntity> findLastPerProductionOrder(KpiFilterDto filterDto);
+    List<CounterRecordConclusionEntity> findLastPerProductionOrder(FilterDto filterDto);
 
 
-    List<CounterRecordEntity> findLastPerProductionOrderAndEquipmentOutputPerDay(KpiFilterDto filterDto);
+    List<CounterRecordEntity> findLastPerProductionOrderAndEquipmentOutputPerDay(FilterDto filterDto);
 
 
     //    @EntityGraph(attributePaths = { "equipmentOutput", "equipmentOutput.countingEquipment", "productionOrder" })
-    List<CounterRecordEntity> getFilteredAndPaginated(CounterRecordFilter filterDto);
+    List<CounterRecordEntity> getFilteredAndPaginated(Filter filterDto);
 
-    Integer sumValidCounterIncrement(Long countingEquipmentId, KpiFilterDto filter);
+    Integer sumValidCounterIncrement(Long countingEquipmentId, FilterDto filter);
 
     Integer sumValidCounterIncrementForApprovedPO(Long countingEquipmentId, Timestamp startDateFilter, Timestamp endDateFilter);
 
-    Integer sumCounterIncrement(Long countingEquipmentId, KpiFilterDto filter);
+    Integer sumCounterIncrement(Long countingEquipmentId, FilterDto filter);
 
     @Query(value = "SELECT " +
             "SUM(cr.increment_active_time) - COALESCE((" +

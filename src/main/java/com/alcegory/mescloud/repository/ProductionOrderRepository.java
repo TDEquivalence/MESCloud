@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -20,11 +21,11 @@ public interface ProductionOrderRepository extends JpaRepository<ProductionOrder
 
     @Query(value = "SELECT * FROM production_order po WHERE (po.equipment_id = :equipmentId AND po.is_completed = false) " +
             "ORDER BY id DESC LIMIT 1", nativeQuery = true)
-    Optional<ProductionOrderEntity> findActive(long equipmentId);
+    Optional<ProductionOrderEntity> findActiveByEquipmentId(long equipmentId);
 
     List<ProductionOrderEntity> findByIdIn(List<Long> ids);
 
-    List<ProductionOrderSummaryEntity> findCompletedWithoutComposed();
+    List<ProductionOrderSummaryEntity> findCompleted(Timestamp startDate, Timestamp endDate, boolean withoutComposed);
 
     List<ProductionOrderEntity> findByComposedProductionOrderId(Long composedProductionOrderId);
 
@@ -43,7 +44,13 @@ public interface ProductionOrderRepository extends JpaRepository<ProductionOrder
     @Query("SELECT po.isCompleted FROM production_order po WHERE po.code = :productionOrderCode")
     boolean isCompleted(String productionOrderCode);
 
-    boolean existsByEquipmentIdAndIsCompletedFalse(long equipmentId);
+    @Query(value = "SELECT CASE WHEN COUNT(*) > 0 THEN true ELSE false END " +
+            "FROM production_order po " +
+            "WHERE po.equipment_id = :equipmentId " +
+            "AND po.id = (SELECT MAX(p.id) FROM production_order p WHERE p.equipment_id = :equipmentId) " +
+            "AND po.is_completed = false",
+            nativeQuery = true)
+    boolean existsByEquipmentIdAndIsCompletedFalse(@Param("equipmentId") Long equipmentId);
 
     List<ProductionOrderSummaryEntity> findProductionOrderSummaryByComposedId(Long composedProductionOrderId);
 }

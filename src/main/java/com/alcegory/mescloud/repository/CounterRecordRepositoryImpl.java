@@ -1,8 +1,8 @@
 package com.alcegory.mescloud.repository;
 
-import com.alcegory.mescloud.model.dto.KpiFilterDto;
+import com.alcegory.mescloud.model.dto.FilterDto;
 import com.alcegory.mescloud.model.entity.*;
-import com.alcegory.mescloud.model.filter.CounterRecordFilter;
+import com.alcegory.mescloud.model.filter.Filter;
 import com.alcegory.mescloud.utility.DateUtil;
 import jakarta.persistence.EntityGraph;
 import jakarta.persistence.Tuple;
@@ -13,11 +13,11 @@ import org.springframework.stereotype.Repository;
 import java.sql.Timestamp;
 import java.util.*;
 
-import static com.alcegory.mescloud.model.filter.CounterRecordFilter.Property.*;
+import static com.alcegory.mescloud.model.filter.Filter.Property.*;
 
 @Repository
 @Log
-public class CounterRecordRepositoryImpl extends AbstractFilterRepository<CounterRecordFilter.Property, CounterRecordEntity> {
+public class CounterRecordRepositoryImpl extends AbstractFilterRepository<Filter.Property, CounterRecordEntity> {
 
     private static final String ID_PROP = "id";
     private static final String EQUIPMENT_OUTPUT_PROP = "equipmentOutput";
@@ -33,7 +33,7 @@ public class CounterRecordRepositoryImpl extends AbstractFilterRepository<Counte
     private static final String DATE_FUNCION = "DATE";
 
 
-    public List<CounterRecordEntity> findLastPerProductionOrderAndEquipmentOutputPerDay(KpiFilterDto filter) {
+    public List<CounterRecordEntity> findLastPerProductionOrderAndEquipmentOutputPerDay(FilterDto filter) {
         String startDateStr = filter.getSearch().getValue(START_DATE);
         Date startDate = Date.from(DateUtil.convertToInstant(startDateStr));
         String endDateStr = filter.getSearch().getValue(END_DATE);
@@ -72,7 +72,7 @@ public class CounterRecordRepositoryImpl extends AbstractFilterRepository<Counte
         return entityManager.createQuery(criteriaQuery).getResultList();
     }
 
-    public List<CounterRecordEntity> getFilteredAndPaginated(CounterRecordFilter filterDto) {
+    public List<CounterRecordEntity> getFilteredAndPaginated(Filter filterDto) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<CounterRecordEntity> query = cb.createQuery(CounterRecordEntity.class);
         Root<CounterRecordEntity> root = query.from(CounterRecordEntity.class);
@@ -101,7 +101,7 @@ public class CounterRecordRepositoryImpl extends AbstractFilterRepository<Counte
     }
 
 
-    public List<CounterRecordConclusionEntity> findLastPerProductionOrder(CounterRecordFilter filterDto) {
+    public List<CounterRecordConclusionEntity> findLastPerProductionOrder(Filter filterDto) {
 
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<CounterRecordConclusionEntity> query = criteriaBuilder.createQuery(CounterRecordConclusionEntity.class);
@@ -128,7 +128,7 @@ public class CounterRecordRepositoryImpl extends AbstractFilterRepository<Counte
                 .getResultList();
     }
 
-    public List<CounterRecordConclusionEntity> findLastPerProductionOrder(KpiFilterDto filterDto) {
+    public List<CounterRecordConclusionEntity> findLastPerProductionOrder(FilterDto filterDto) {
 
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<CounterRecordConclusionEntity> query = criteriaBuilder.createQuery(CounterRecordConclusionEntity.class);
@@ -138,8 +138,6 @@ public class CounterRecordRepositoryImpl extends AbstractFilterRepository<Counte
         addPredicates(filterDto, predicates, criteriaBuilder, root);
 
         List<Order> orders = new ArrayList<>();
-        //TODO: Implement sort
-        //addSortOrdersConclusion(filterDto, orders, criteriaBuilder, root);
         Order newestOrder = criteriaBuilder.desc(root.get(ID_PROP));
         orders.add(newestOrder);
 
@@ -157,7 +155,7 @@ public class CounterRecordRepositoryImpl extends AbstractFilterRepository<Counte
     @Override
     protected <T> void populatePathByJointProperty() {
 
-        pathByJointProperty.put(CounterRecordFilter.Property.EQUIPMENT_ALIAS.getEntityProperty(),
+        pathByJointProperty.put(Filter.Property.EQUIPMENT_ALIAS.getEntityProperty(),
                 r -> {
                     Join<T, EquipmentOutputEntity> equipmentOutputJoin = r.join(EQUIPMENT_OUTPUT_PROP);
                     Join<EquipmentOutputEntity, CountingEquipmentEntity> countingEquipmentJoin =
@@ -172,7 +170,7 @@ public class CounterRecordRepositoryImpl extends AbstractFilterRepository<Counte
                 });
     }
 
-    public Integer sumCounterIncrement(Long countingEquipmentId, KpiFilterDto filter) {
+    public Integer sumCounterIncrement(Long countingEquipmentId, FilterDto filter) {
 
         Timestamp startDateFilter = filter.getSearch().getTimestampValue(START_DATE);
         Timestamp endDateFilter = filter.getSearch().getTimestampValue(END_DATE);
@@ -208,14 +206,14 @@ public class CounterRecordRepositoryImpl extends AbstractFilterRepository<Counte
         return sum != null ? sum : 0;
     }
 
-    public Integer sumValidCounterIncrement(Long countingEquipmentId, KpiFilterDto filter) {
+    public Integer sumValidCounterIncrement(Long countingEquipmentId, FilterDto filter) {
         Integer resultSumIncrement = sumValidCounterIncrementByPO(countingEquipmentId, filter);
 
         return Objects.requireNonNullElse(resultSumIncrement, 0);
     }
 
 
-    public Integer sumValidCounterIncrementByPO(Long countingEquipmentId, KpiFilterDto filter) {
+    public Integer sumValidCounterIncrementByPO(Long countingEquipmentId, FilterDto filter) {
 
         Timestamp startDateFilter = filter.getSearch().getTimestampValue(START_DATE);
         Timestamp endDateFilter = filter.getSearch().getTimestampValue(END_DATE);

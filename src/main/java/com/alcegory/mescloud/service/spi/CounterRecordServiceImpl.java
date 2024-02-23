@@ -6,7 +6,7 @@ import com.alcegory.mescloud.model.entity.CounterRecordConclusionEntity;
 import com.alcegory.mescloud.model.entity.CounterRecordEntity;
 import com.alcegory.mescloud.model.entity.EquipmentOutputEntity;
 import com.alcegory.mescloud.model.entity.ProductionOrderEntity;
-import com.alcegory.mescloud.model.filter.CounterRecordFilter;
+import com.alcegory.mescloud.model.filter.Filter;
 import com.alcegory.mescloud.repository.CounterRecordRepository;
 import com.alcegory.mescloud.repository.ProductionOrderRepository;
 import com.alcegory.mescloud.service.*;
@@ -40,19 +40,19 @@ public class CounterRecordServiceImpl implements CounterRecordService {
 
 
     @Override
-    public List<CounterRecordDto> getEquipmentOutputProductionPerDay(KpiFilterDto filter) {
+    public List<CounterRecordDto> getEquipmentOutputProductionPerDay(FilterDto filter) {
         List<CounterRecordEntity> equipmentOutputProductionPerDay = repository.findLastPerProductionOrderAndEquipmentOutputPerDay(filter);
         return converter.toDto(equipmentOutputProductionPerDay);
     }
 
     @Override
-    public List<CounterRecordDto> filterConclusionRecordsKpi(KpiFilterDto filter) {
+    public List<CounterRecordDto> filterConclusionRecordsKpi(FilterDto filter) {
         List<CounterRecordConclusionEntity> counterRecordConclusionEntities = repository.findLastPerProductionOrder(filter);
         return converter.conclusionViewToDto(counterRecordConclusionEntities);
     }
 
     @Override
-    public PaginatedCounterRecordsDto filterConclusionRecordsPaginated(CounterRecordFilter filter) {
+    public PaginatedCounterRecordsDto filterConclusionRecordsPaginated(Filter filter) {
         int requestedRecords = filter.getTake();
         filter.setTake(filter.getTake() + 1);
 
@@ -73,7 +73,7 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     }
 
     @Override
-    public PaginatedCounterRecordsDto getFilteredAndPaginated(CounterRecordFilter filterDto) {
+    public PaginatedCounterRecordsDto getFilteredAndPaginated(Filter filterDto) {
         int requestedRecords = filterDto.getTake();
         filterDto.setTake(filterDto.getTake() + 1);
 
@@ -144,7 +144,6 @@ public class CounterRecordServiceImpl implements CounterRecordService {
             return;
         }
 
-        //TODO: This should rely on a converter
         EquipmentOutputDto equipmentOutput = equipmentOutputOpt.get();
         EquipmentOutputEntity equipmentOutputEntity = new EquipmentOutputEntity();
         equipmentOutputEntity.setId(equipmentOutput.getId());
@@ -273,12 +272,12 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     }
 
     @Override
-    public Integer sumValidCounterIncrement(Long countingEquipmentId, KpiFilterDto filter) {
+    public Integer sumValidCounterIncrement(Long countingEquipmentId, FilterDto filter) {
         return repository.sumValidCounterIncrement(countingEquipmentId, filter);
     }
 
     @Override
-    public Integer sumCounterIncrement(Long countingEquipmentId, KpiFilterDto filter) {
+    public Integer sumCounterIncrement(Long countingEquipmentId, FilterDto filter) {
         return repository.sumCounterIncrement(countingEquipmentId, filter);
     }
 

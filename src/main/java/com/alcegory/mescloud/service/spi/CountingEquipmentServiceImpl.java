@@ -5,16 +5,16 @@ import com.alcegory.mescloud.exception.*;
 import com.alcegory.mescloud.model.converter.CountingEquipmentConverter;
 import com.alcegory.mescloud.model.converter.GenericConverter;
 import com.alcegory.mescloud.model.converter.PlcMqttConverter;
+import com.alcegory.mescloud.model.converter.ProductionOrderConverter;
 import com.alcegory.mescloud.model.dto.CountingEquipmentDto;
 import com.alcegory.mescloud.model.dto.EquipmentConfigMqttDto;
 import com.alcegory.mescloud.model.dto.ImsDto;
-import com.alcegory.mescloud.model.dto.RequestConfigurationDto;
-import com.alcegory.mescloud.model.entity.CountingEquipmentEntity;
-import com.alcegory.mescloud.model.entity.EquipmentOutputAliasEntity;
-import com.alcegory.mescloud.model.entity.EquipmentOutputEntity;
-import com.alcegory.mescloud.model.entity.ImsEntity;
+import com.alcegory.mescloud.model.dto.ProductionOrderDto;
+import com.alcegory.mescloud.model.entity.*;
+import com.alcegory.mescloud.model.request.RequestConfigurationDto;
 import com.alcegory.mescloud.protocol.MesMqttSettings;
 import com.alcegory.mescloud.repository.CountingEquipmentRepository;
+import com.alcegory.mescloud.repository.ProductionOrderRepository;
 import com.alcegory.mescloud.service.*;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
@@ -30,17 +30,22 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
 
     private static final int MIN_P_TIMER_IN_MINUTES = 1;
     private static final int MIN_P_TIMER_IN_SECONDS = MIN_P_TIMER_IN_MINUTES * 60;
+    private static final String COUNTING_EQUIPMENT_ID_NOT_FOUND = "No Counting Equipment found for id: [%s]";
+    private static final String COUNTING_EQUIPMENT_CODE_NOT_FOUND = "No Counting Equipment found for code: [%s]";
 
     private final CountingEquipmentRepository repository;
     private final EquipmentOutputService outputService;
     private final EquipmentOutputAliasService aliasService;
     private final CountingEquipmentConverter converter;
     private final ImsService imsService;
-    private final GenericConverter<ImsEntity, ImsDto> imsConverter;
     private final EquipmentStatusRecordService statusRecordService;
-    private final PlcMqttConverter plcConverter;
     private final MqttClient mqttClient;
     private final MesMqttSettings mqttSettings;
+    private final ProductionOrderRepository productionOrderRepository;
+
+    private final PlcMqttConverter plcConverter;
+    private final GenericConverter<ImsEntity, ImsDto> imsConverter;
+    private final ProductionOrderConverter productionOrderConverter;
 
     @Override
     public List<CountingEquipmentDto> findAllWithLastProductionOrder() {
@@ -81,13 +86,13 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
     public Optional<CountingEquipmentDto> findById(long id) {
         Optional<CountingEquipmentEntity> countingEquipmentOpt = repository.findByIdWithLastProductionOrder(id);
         if (countingEquipmentOpt.isEmpty()) {
-            log.warning(() -> String.format("No Counting Equipment found for id: [%s]", id));
+            log.warning(() -> String.format(COUNTING_EQUIPMENT_ID_NOT_FOUND, id));
             return Optional.empty();
         }
 
         CountingEquipmentEntity countingEquipment = countingEquipmentOpt.get();
         if (countingEquipment.getOutputs().isEmpty()) {
-            log.warning(() -> String.format("No Counting Equipment found for id: [%s]", id));
+            log.warning(() -> String.format(COUNTING_EQUIPMENT_ID_NOT_FOUND, id));
             return Optional.empty();
         }
 
@@ -96,11 +101,38 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
     }
 
     @Override
+    public Optional<CountingEquipmentDto> findEquipmentWithProductionOrderById(long id) {
+        Optional<CountingEquipmentEntity> countingEquipmentOpt = repository.findByIdWithLastProductionOrder(id);
+        if (countingEquipmentOpt.isEmpty()) {
+            log.warning(() -> String.format(COUNTING_EQUIPMENT_ID_NOT_FOUND, id));
+            return Optional.empty();
+        }
+
+        CountingEquipmentEntity countingEquipment = countingEquipmentOpt.get();
+        if (countingEquipment.getOutputs().isEmpty()) {
+            log.warning(() -> String.format(COUNTING_EQUIPMENT_ID_NOT_FOUND, id));
+            return Optional.empty();
+        }
+
+        CountingEquipmentDto dto = convertToDtoWithActiveProductionOrder(countingEquipment);
+        Optional<ProductionOrderEntity> productionOrder = productionOrderRepository.findActiveByEquipmentId(id);
+
+        if (productionOrder.isEmpty()) {
+            return Optional.of(dto);
+        }
+
+        ProductionOrderDto productionOrderDto = productionOrderConverter.toDto(productionOrder.get());
+        dto.setProductionOrder(productionOrderDto);
+
+        return Optional.of(dto);
+    }
+
+    @Override
     public Optional<CountingEquipmentDto> findByCode(String code) {
 
         Optional<CountingEquipmentEntity> countingEquipmentOpt = repository.findByCode(code);
         if (countingEquipmentOpt.isEmpty()) {
-            log.warning(() -> String.format("No Counting Equipment found for code: [%s]", code));
+            log.warning(() -> String.format(COUNTING_EQUIPMENT_CODE_NOT_FOUND, code));
             return Optional.empty();
         }
 
@@ -125,7 +157,7 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
 
         Optional<CountingEquipmentEntity> countingEquipmentOpt = repository.findByCodeWithLastStatusRecord(equipmentCode);
         if (countingEquipmentOpt.isEmpty()) {
-            log.warning(() -> String.format("No Counting Equipment was found with the code [%s]", equipmentCode));
+            log.warning(() -> String.format(COUNTING_EQUIPMENT_CODE_NOT_FOUND, equipmentCode));
             return Optional.empty();
         }
 
@@ -333,4 +365,5 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
     public Long findIdByAlias(String alias) {
         return repository.findIdByAlias(alias);
     }
+
 }

@@ -2,6 +2,7 @@
 DROP VIEW IF EXISTS production_order_summary;
 DROP VIEW IF EXISTS composed_summary;
 DROP VIEW IF EXISTS counter_record_production_conclusion;
+DROP VIEW IF EXISTS alarm_summary;
 
 -- Drop tables
 DROP TABLE IF EXISTS batch;
@@ -13,7 +14,6 @@ DROP TABLE IF EXISTS alarm;
 DROP TABLE IF EXISTS alarm_configuration;
 DROP TABLE IF EXISTS production_order;
 DROP TABLE IF EXISTS equipment_status_record;
-DROP TABLE IF EXISTS production_order_recipe;
 DROP TABLE IF EXISTS equipment_output;
 DROP TABLE IF EXISTS counting_equipment;
 DROP TABLE IF EXISTS equipment_output_alias;
@@ -326,3 +326,30 @@ GROUP BY
     po.input_batch, po.source, po.gauge, po.category, po.washing_process,
     b.id, b.code, b.is_approved,
     subquery.amount_of_hits;
+
+CREATE VIEW alarm_summary AS
+SELECT
+    a.id AS id,
+    ac.code AS configuration_code,
+    ac.description AS configuration_description,
+    ce.alias AS equipment_alias,
+    po.code AS production_order_code,
+    a.status AS status,
+    a.comment AS comment,
+    a.created_at AS created_at,
+    a.completed_at AS completed_at,
+    a.recognized_at AS recognized_at,
+    u.first_name AS recognized_by_first_name,
+    u.last_name AS recognized_by_last_name
+FROM
+    alarm a
+JOIN
+    alarm_configuration ac ON a.alarm_configuration_id = ac.id
+JOIN
+    counting_equipment ce ON a.equipment_id = ce.id
+LEFT JOIN
+    production_order po ON a.production_order_id = po.id
+LEFT JOIN
+    users u ON a.recognized_by = u.id
+WHERE
+    a.status IN ('ACTIVE', 'INACTIVE', 'RECOGNIZED');

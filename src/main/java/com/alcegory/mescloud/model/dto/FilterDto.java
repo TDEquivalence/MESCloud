@@ -1,6 +1,6 @@
 package com.alcegory.mescloud.model.dto;
 
-import com.alcegory.mescloud.model.filter.CounterRecordFilter;
+import com.alcegory.mescloud.model.filter.Filter;
 import com.alcegory.mescloud.utility.filter.FilterSearch;
 import com.alcegory.mescloud.utility.filter.Searchable;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
@@ -9,11 +9,11 @@ import lombok.Setter;
 
 @Setter
 @Getter
-public class KpiFilterDto implements Searchable<CounterRecordFilter.Property> {
+public class FilterDto implements Searchable<Filter.Property> {
 
     private TimeMode timeMode;
     @JsonUnwrapped
-    private FilterSearch<CounterRecordFilter.Property> search;
+    private FilterSearch<Filter.Property> search;
 
     public enum TimeMode {
         DAY,

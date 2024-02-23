@@ -3,7 +3,7 @@ package com.alcegory.mescloud.service.spi;
 import com.alcegory.mescloud.repository.SampleRepository;
 import com.alcegory.mescloud.model.converter.GenericConverter;
 import com.alcegory.mescloud.model.dto.ComposedProductionOrderDto;
-import com.alcegory.mescloud.model.dto.RequestSampleDto;
+import com.alcegory.mescloud.model.request.RequestSampleDto;
 import com.alcegory.mescloud.model.dto.SampleDto;
 import com.alcegory.mescloud.model.entity.ComposedProductionOrderEntity;
 import com.alcegory.mescloud.model.entity.SampleEntity;

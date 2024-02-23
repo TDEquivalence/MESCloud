@@ -3,7 +3,7 @@ package com.alcegory.mescloud.service.spi;
 import com.alcegory.mescloud.repository.HitRepository;
 import com.alcegory.mescloud.model.converter.GenericConverter;
 import com.alcegory.mescloud.model.dto.HitDto;
-import com.alcegory.mescloud.model.dto.RequestHitDto;
+import com.alcegory.mescloud.model.request.RequestHitDto;
 import com.alcegory.mescloud.model.entity.HitEntity;
 import com.alcegory.mescloud.model.entity.SampleEntity;
 import com.alcegory.mescloud.service.ComposedProductionOrderService;

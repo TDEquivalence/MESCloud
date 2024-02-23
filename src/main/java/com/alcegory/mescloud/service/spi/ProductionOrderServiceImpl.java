@@ -5,10 +5,7 @@ import com.alcegory.mescloud.constant.MqttDTOConstants;
 import com.alcegory.mescloud.exception.MesMqttException;
 import com.alcegory.mescloud.model.converter.GenericConverter;
 import com.alcegory.mescloud.model.converter.ProductionOrderConverter;
-import com.alcegory.mescloud.model.dto.CountingEquipmentDto;
-import com.alcegory.mescloud.model.dto.ProductionOrderDto;
-import com.alcegory.mescloud.model.dto.ProductionOrderMqttDto;
-import com.alcegory.mescloud.model.dto.ProductionOrderSummaryDto;
+import com.alcegory.mescloud.model.dto.*;
 import com.alcegory.mescloud.model.entity.CountingEquipmentEntity;
 import com.alcegory.mescloud.model.entity.ProductionOrderEntity;
 import com.alcegory.mescloud.model.entity.ProductionOrderSummaryEntity;
@@ -27,6 +24,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import static com.alcegory.mescloud.model.filter.Filter.Property.END_DATE;
+import static com.alcegory.mescloud.model.filter.Filter.Property.START_DATE;
+
 @Service
 @AllArgsConstructor
 @Log
@@ -41,6 +41,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     private final ProductionOrderConverter converter;
     private final GenericConverter<ProductionOrderSummaryEntity, ProductionOrderSummaryDto> summaryConverter;
     private final GenericConverter<CountingEquipmentEntity, CountingEquipmentDto> equipmentConverter;
+    private final ProductionOrderConverter productionOrderConverter;
     private final CountingEquipmentService countingEquipmentService;
     private final CountingEquipmentRepository countingEquipmentRepository;
     private final MqttClient mqttClient;
@@ -60,7 +61,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
                 CountingEquipmentEntity.OperationStatus.PENDING);
         log.info(() -> String.format("Change status to PENDING for Equipment with code [%s]", countingEquipmentDto.getCode()));
 
-        Optional<ProductionOrderEntity> productionOrderEntityOpt = repository.findActive(equipmentId);
+        Optional<ProductionOrderEntity> productionOrderEntityOpt = repository.findActiveByEquipmentId(equipmentId);
         if (productionOrderEntityOpt.isEmpty()) {
             log.warning(() -> String.format("No active Production Order found for Equipment with id [%s]", equipmentId));
             return Optional.empty();
@@ -69,7 +70,9 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         publishProductionOrderCompletion(countingEquipmentOpt.get(), productionOrderEntityOpt.get());
         log.info(() -> String.format("Production Order Conclusion already publish for equipmentId [%s]:", equipmentId));
 
-        return setCompleteDate(productionOrderEntityOpt.get());
+        ProductionOrderEntity productionOrder = productionOrderEntityOpt.get();
+        ProductionOrderDto productionOrderDto = productionOrderConverter.toDto(productionOrder);
+        return Optional.of(productionOrderDto);
     }
 
     public void publishProductionOrderCompletion(CountingEquipmentEntity countingEquipment, ProductionOrderEntity productionOrder) {
@@ -94,28 +97,6 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     }
 
     @Override
-    public void completeByCode(String productionOrderCode) {
-
-        Optional<ProductionOrderEntity> productionOrderOpt = findByCode(productionOrderCode);
-        if (productionOrderOpt.isEmpty()) {
-            return;
-        }
-
-        ProductionOrderEntity productionOrder = productionOrderOpt.get();
-        productionOrder.setCompleted(true);
-        setCompleteDate(productionOrder);
-    }
-
-    private Optional<ProductionOrderDto> setCompleteDate(ProductionOrderEntity productionOrderEntity) {
-
-        productionOrderEntity.setCompletedAt(new Date());
-        repository.save(productionOrderEntity);
-        ProductionOrderDto productionOrderDto = converter.toDto(productionOrderEntity);
-
-        return Optional.of(productionOrderDto);
-    }
-
-    @Override
     public Optional<ProductionOrderDto> create(ProductionOrderDto productionOrder) {
 
         Optional<CountingEquipmentEntity> countingEquipmentEntityOpt =
@@ -123,6 +104,12 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         if (countingEquipmentEntityOpt.isEmpty()) {
             log.warning(() -> String.format("Unable to create Production Order - no Equipment found with id [%s]",
                     productionOrder.getEquipmentId()));
+            return Optional.empty();
+        }
+
+        if (repository.existsByEquipmentIdAndIsCompletedFalse(productionOrder.getEquipmentId())) {
+            log.warning(() -> String.format("Unable to create Production Order - Equipment with id [%s] still has an " +
+                    "uncompleted production order", productionOrder.getEquipmentId()));
             return Optional.empty();
         }
 
@@ -201,13 +188,10 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         return Optional.of(productionOrder);
     }
 
-    private Optional<ProductionOrderEntity> findByCode(String code) {
-        Optional<ProductionOrderEntity> persistedProductionOrderOpt = repository.findByCode(code);
-        if (persistedProductionOrderOpt.isEmpty()) {
-            return Optional.empty();
-        }
+    @Override
+    public Optional<ProductionOrderEntity> findByCode(String code) {
+        return repository.findByCode(code);
 
-        return persistedProductionOrderOpt;
     }
 
     @Override
@@ -249,8 +233,16 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     }
 
     @Override
-    public List<ProductionOrderSummaryDto> getCompletedWithoutComposed() {
-        List<ProductionOrderSummaryEntity> persistedProductionOrders = repository.findCompletedWithoutComposed();
+    public List<ProductionOrderSummaryDto> getCompletedWithoutComposedFiltered() {
+        List<ProductionOrderSummaryEntity> persistedProductionOrders = repository.findCompleted(null, null, true);
+        return summaryConverter.toDto(persistedProductionOrders, ProductionOrderSummaryDto.class);
+    }
+
+    @Override
+    public List<ProductionOrderSummaryDto> getCompletedWithoutComposedFiltered(FilterDto filter) {
+        Timestamp startDate = filter.getSearch().getTimestampValue(START_DATE);
+        Timestamp endDate = filter.getSearch().getTimestampValue(END_DATE);
+        List<ProductionOrderSummaryEntity> persistedProductionOrders = repository.findCompleted(startDate, endDate, true);
         return summaryConverter.toDto(persistedProductionOrders, ProductionOrderSummaryDto.class);
     }
 
