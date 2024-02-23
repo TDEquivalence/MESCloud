@@ -73,11 +73,7 @@ public class ExportExcelServiceImpl implements ExportExcelService {
         List<ComposedSummaryEntity> composedList = composedRepository.findCompleted(null, null);
 
         MultiExcelExport multiExcelExport = new MultiExcelExport();
-        try {
-            multiExcelExport.exportDataToExcel(response, composedList, productionOrderViews);
-        } catch (IOException e) {
-            throw new ExcelExportException(ERROR_MESSAGE, e);
-        }
+        multiExcelExport.exportDataToExcel(response, composedList, productionOrderViews);
     }
 
     @Override
