@@ -5,55 +5,23 @@ import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFFont;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+
+import static com.alcegory.mescloud.utility.export.ExcelConstants.TABLE_NAME_COMPOSED;
+import static com.alcegory.mescloud.utility.export.ExcelConstants.getHeaders;
 
 public class ExcelExportComposed extends AbstractExcelExport {
 
-    private static final String TABLE_NAME = "ComposedProductionOrdersTable";
+
     private final List<ComposedSummaryEntity> composedList;
     private final boolean withHits;
     private final boolean isCompleted;
 
     public ExcelExportComposed(List<ComposedSummaryEntity> composedList, boolean withHits, String sheetName, boolean isCompleted) {
-        super(composedList, getHeaders(withHits, isCompleted), TABLE_NAME, sheetName);
+        super(composedList, getHeaders(withHits, isCompleted), TABLE_NAME_COMPOSED, sheetName);
         this.composedList = composedList;
         this.withHits = withHits;
         this.isCompleted = isCompleted;
-    }
-
-    private static String[] getHeaders(boolean withHits, boolean isCompleted) {
-        List<String> headersList = new ArrayList<>();
-
-        if (isCompleted) {
-            headersList.add("Lote Final");
-        }
-
-        String[] commonHeaders = {
-                "Produção Composta",
-                "Lote de Entrada",
-                "Proveniência",
-                "Calibre",
-                "Classe",
-                "Lavação",
-                "Quantidade",
-                "Amostra",
-                "Criação da composta"
-        };
-
-        headersList.addAll(Arrays.asList(commonHeaders));
-
-        if (withHits) {
-            headersList.addAll(Arrays.asList("Hits", "Fiabilidade", "Hits inseridos em"));
-        }
-
-        if (isCompleted) {
-            headersList.add("Status");
-            headersList.add("Resolvido em");
-        }
-
-        return headersList.toArray(new String[0]);
     }
 
     @Override

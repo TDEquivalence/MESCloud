@@ -5,51 +5,22 @@ import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFFont;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-public class ExcelExportProductionOrder extends AbstractExcelExport {
+import static com.alcegory.mescloud.utility.export.ExcelConstants.TABLE_NAME_PRODUCTION;
+import static com.alcegory.mescloud.utility.export.ExcelConstants.getHeaders;
 
-    private static final String TABLE_NAME = "ProductionOrdersTable";
+public class ExcelExportProductionOrder extends AbstractExcelExport {
 
     private final List<ProductionOrderSummaryEntity> productionOrders;
 
     private final boolean isCompleted;
 
     public ExcelExportProductionOrder(List<ProductionOrderSummaryEntity> productionOrders, String sheetName, boolean isCompleted) {
-        super(productionOrders, getHeaders(isCompleted), TABLE_NAME, sheetName);
+        super(productionOrders, getHeaders(isCompleted), TABLE_NAME_PRODUCTION, sheetName);
         this.productionOrders = productionOrders;
         this.isCompleted = isCompleted;
     }
-
-    private static String[] getHeaders(boolean isCompleted) {
-        List<String> headersList = new ArrayList<>();
-
-        String[] commonHeaders = {
-                "Equipamento",
-                "Ordem de Produção",
-                "IMS",
-                "Lote de Entrada",
-                "Proveniência",
-                "Calibre",
-                "Classe",
-                "Lavação",
-                "Quantidade",
-                "Início de Produção",
-                "Conclusão de Produção"
-        };
-
-        // Add common headers
-        headersList.addAll(Arrays.asList(commonHeaders));
-
-        if (isCompleted) {
-            headersList.add(1, "Produção Composta");
-        }
-
-        return headersList.toArray(new String[0]);
-    }
-
 
     @Override
     protected void writeData() {

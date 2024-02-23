@@ -14,13 +14,9 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.util.List;
 
-public class MultiExcelExport extends AbstractExcelExport {
+import static com.alcegory.mescloud.utility.export.ExcelConstants.*;
 
-    private static final String SHEET_NAME_PRODUCTION_ORDERS = "Ordens de Produção";
-    private static final String SHEET_NAME_COMPOSED = "Produções Compostas";
-    private static final String TABLE_NAME_PRODUCTION = "ProductionOrdersTable";
-    private static final String TABLE_NAME_COMPOSED = "ComposedProductionOrdersTable";
-    private static final String TABLE_STYLE = "TableStyleMedium9";
+public class MultiExcelExport extends AbstractExcelExport {
 
     public MultiExcelExport() {
         super(null, null, null, null);
@@ -129,42 +125,5 @@ public class MultiExcelExport extends AbstractExcelExport {
         AreaReference areaReference = new AreaReference(new CellReference(firstRow, firstCol),
                 new CellReference(lastRow, lastCol), sheet.getWorkbook().getSpreadsheetVersion());
         return sheet.createTable(areaReference);
-    }
-
-    private static String[] getComposedHeaders() {
-        return new String[]{
-                "Lote Final",
-                "Lote Final2",
-                "Lote de Entrada",
-                "Proveniência",
-                "Calibre",
-                "Classe",
-                "Lavação",
-                "Quantidade",
-                "Amostra",
-                "Criação da composta",
-                "Hits",
-                "Fiabilidade",
-                "Hits inseridos em",
-                "Status",
-                "Resolvido em"
-        };
-    }
-
-    private static String[] getProductionOrderHeaders() {
-        return new String[]{
-                "Equipamento",
-                "Produção Composta",
-                "Ordem de Produção",
-                "IMS",
-                "Lote de Entrada",
-                "Proveniência",
-                "Calibre",
-                "Classe",
-                "Lavação",
-                "Quantidade",
-                "Início de Produção",
-                "Conclusão de Produção"
-        };
     }
 }
