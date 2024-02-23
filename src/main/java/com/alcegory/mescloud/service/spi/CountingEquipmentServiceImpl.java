@@ -30,6 +30,8 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
 
     private static final int MIN_P_TIMER_IN_MINUTES = 1;
     private static final int MIN_P_TIMER_IN_SECONDS = MIN_P_TIMER_IN_MINUTES * 60;
+    private static final String COUNTING_EQUIPMENT_ID_NOT_FOUND = "No Counting Equipment found for id: [%s]";
+    private static final String COUNTING_EQUIPMENT_CODE_NOT_FOUND = "No Counting Equipment found for code: [%s]";
 
     private final CountingEquipmentRepository repository;
     private final EquipmentOutputService outputService;
@@ -84,13 +86,13 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
     public Optional<CountingEquipmentDto> findById(long id) {
         Optional<CountingEquipmentEntity> countingEquipmentOpt = repository.findByIdWithLastProductionOrder(id);
         if (countingEquipmentOpt.isEmpty()) {
-            log.warning(() -> String.format("No Counting Equipment found for id: [%s]", id));
+            log.warning(() -> String.format(COUNTING_EQUIPMENT_ID_NOT_FOUND, id));
             return Optional.empty();
         }
 
         CountingEquipmentEntity countingEquipment = countingEquipmentOpt.get();
         if (countingEquipment.getOutputs().isEmpty()) {
-            log.warning(() -> String.format("No Counting Equipment found for id: [%s]", id));
+            log.warning(() -> String.format(COUNTING_EQUIPMENT_ID_NOT_FOUND, id));
             return Optional.empty();
         }
 
@@ -102,13 +104,13 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
     public Optional<CountingEquipmentDto> findEquipmentWithProductionOrderById(long id) {
         Optional<CountingEquipmentEntity> countingEquipmentOpt = repository.findByIdWithLastProductionOrder(id);
         if (countingEquipmentOpt.isEmpty()) {
-            log.warning(() -> String.format("No Counting Equipment found for id: [%s]", id));
+            log.warning(() -> String.format(COUNTING_EQUIPMENT_ID_NOT_FOUND, id));
             return Optional.empty();
         }
 
         CountingEquipmentEntity countingEquipment = countingEquipmentOpt.get();
         if (countingEquipment.getOutputs().isEmpty()) {
-            log.warning(() -> String.format("No Counting Equipment found for id: [%s]", id));
+            log.warning(() -> String.format(COUNTING_EQUIPMENT_ID_NOT_FOUND, id));
             return Optional.empty();
         }
 
@@ -130,7 +132,7 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
 
         Optional<CountingEquipmentEntity> countingEquipmentOpt = repository.findByCode(code);
         if (countingEquipmentOpt.isEmpty()) {
-            log.warning(() -> String.format("No Counting Equipment found for code: [%s]", code));
+            log.warning(() -> String.format(COUNTING_EQUIPMENT_CODE_NOT_FOUND, code));
             return Optional.empty();
         }
 
@@ -155,7 +157,7 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
 
         Optional<CountingEquipmentEntity> countingEquipmentOpt = repository.findByCodeWithLastStatusRecord(equipmentCode);
         if (countingEquipmentOpt.isEmpty()) {
-            log.warning(() -> String.format("No Counting Equipment was found with the code [%s]", equipmentCode));
+            log.warning(() -> String.format(COUNTING_EQUIPMENT_CODE_NOT_FOUND, equipmentCode));
             return Optional.empty();
         }
 
@@ -363,5 +365,5 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
     public Long findIdByAlias(String alias) {
         return repository.findIdByAlias(alias);
     }
-    
+
 }

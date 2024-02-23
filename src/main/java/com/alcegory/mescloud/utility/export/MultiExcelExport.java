@@ -12,7 +12,6 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFTable;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import java.io.IOException;
 import java.util.List;
 
 public class MultiExcelExport extends AbstractExcelExport {
@@ -29,8 +28,7 @@ public class MultiExcelExport extends AbstractExcelExport {
     }
 
     public void exportDataToExcel(HttpServletResponse response, List<ComposedSummaryEntity> composedList,
-                                  List<ProductionOrderSummaryEntity> productionOrders)
-            throws IOException {
+                                  List<ProductionOrderSummaryEntity> productionOrders) {
 
         XSSFSheet composedSheet = createSheet(SHEET_NAME_COMPOSED);
         createHeaderRow(composedSheet, getComposedHeaders());

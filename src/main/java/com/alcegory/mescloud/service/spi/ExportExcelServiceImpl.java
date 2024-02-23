@@ -108,9 +108,9 @@ public class ExportExcelServiceImpl implements ExportExcelService {
 
     private void handleEmptyLists(HttpServletResponse response) throws IOException {
         setExcelResponseHeaders(response, COMPOSED_PRODUCTION_ORDERS_COMPLETED);
-        Workbook workbook = new XSSFWorkbook();
-        workbook.createSheet("No Data Available");
-        try (OutputStream outputStream = response.getOutputStream()) {
+        try (Workbook workbook = new XSSFWorkbook();
+             OutputStream outputStream = response.getOutputStream()) {
+            workbook.createSheet("No Data Available");
             workbook.write(outputStream);
         }
     }

@@ -14,6 +14,8 @@ public interface ProductionOrderService {
 
     Optional<ProductionOrderDto> findDtoByCode(String code);
 
+    Optional<ProductionOrderEntity> findByCode(String code);
+
     String generateCode();
 
     Optional<ProductionOrderDto> create(ProductionOrderDto productionOrderDto);

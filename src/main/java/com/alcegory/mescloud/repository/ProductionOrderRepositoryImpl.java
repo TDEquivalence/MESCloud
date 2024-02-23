@@ -65,7 +65,8 @@ public class ProductionOrderRepositoryImpl {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<ProductionOrderSummaryEntity> query = criteriaBuilder.createQuery(ProductionOrderSummaryEntity.class);
         Root<ProductionOrderSummaryEntity> root = query.from(ProductionOrderSummaryEntity.class);
-        Join<ProductionOrderSummaryEntity, ComposedProductionOrderEntity> joinComposedProductionOrder = root.join("composedProductionOrder", JoinType.LEFT);
+        Join<ProductionOrderSummaryEntity, ComposedProductionOrderEntity> joinComposedProductionOrder = root.join(COMPOSED_PRODUCTION_ORDER,
+                JoinType.LEFT);
 
         query.select(root)
                 .where(criteriaBuilder.equal(joinComposedProductionOrder.get("id"), composedProductionOrderId));

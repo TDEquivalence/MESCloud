@@ -188,13 +188,10 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         return Optional.of(productionOrder);
     }
 
-    private Optional<ProductionOrderEntity> findByCode(String code) {
-        Optional<ProductionOrderEntity> persistedProductionOrderOpt = repository.findByCode(code);
-        if (persistedProductionOrderOpt.isEmpty()) {
-            return Optional.empty();
-        }
+    @Override
+    public Optional<ProductionOrderEntity> findByCode(String code) {
+        return repository.findByCode(code);
 
-        return persistedProductionOrderOpt;
     }
 
     @Override

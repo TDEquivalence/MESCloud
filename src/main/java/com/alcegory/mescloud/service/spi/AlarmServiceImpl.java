@@ -46,8 +46,7 @@ public class AlarmServiceImpl implements AlarmService {
 
     @Override
     public List<AlarmSummaryEntity> findByFilter(Filter filter) {
-        List<AlarmSummaryEntity> alarms = repository.findByFilter(filter);
-        return alarms;
+        return repository.findByFilter(filter);
     }
 
     @Override
