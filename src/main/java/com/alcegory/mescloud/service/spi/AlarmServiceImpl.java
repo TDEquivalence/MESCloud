@@ -45,8 +45,8 @@ public class AlarmServiceImpl implements AlarmService {
     private final GenericConverter<CountingEquipmentEntity, CountingEquipmentDto> countingEquipmentConverter;
 
     @Override
-    public List<AlarmSummaryView> findByFilter(Filter filter) {
-        List<AlarmSummaryView> alarms = repository.findByFilter(filter);
+    public List<AlarmSummaryEntity> findByFilter(Filter filter) {
+        List<AlarmSummaryEntity> alarms = repository.findByFilter(filter);
         return alarms;
     }
 

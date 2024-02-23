@@ -3,7 +3,7 @@ package com.alcegory.mescloud.repository;
 import com.alcegory.mescloud.constant.AlarmStatus;
 import com.alcegory.mescloud.model.entity.AlarmCounts;
 import com.alcegory.mescloud.model.entity.AlarmEntity;
-import com.alcegory.mescloud.model.entity.AlarmSummaryView;
+import com.alcegory.mescloud.model.entity.AlarmSummaryEntity;
 import com.alcegory.mescloud.model.filter.Filter;
 import jakarta.persistence.criteria.*;
 import lombok.extern.slf4j.Slf4j;
@@ -21,10 +21,10 @@ public class AlarmRepositoryImpl extends AbstractFilterRepository<Filter.Propert
     private static final String CREATED_AT_PROP = "createdAt";
     private static final String STATUS_PROP = "status";
 
-    public List<AlarmSummaryView> findByFilter(Filter filter) {
+    public List<AlarmSummaryEntity> findByFilter(Filter filter) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<AlarmSummaryView> query = criteriaBuilder.createQuery(AlarmSummaryView.class);
-        Root<AlarmSummaryView> root = query.from(AlarmSummaryView.class);
+        CriteriaQuery<AlarmSummaryEntity> query = criteriaBuilder.createQuery(AlarmSummaryEntity.class);
+        Root<AlarmSummaryEntity> root = query.from(AlarmSummaryEntity.class);
 
         List<Predicate> predicates = buildPredicates(criteriaBuilder, root, filter);
 

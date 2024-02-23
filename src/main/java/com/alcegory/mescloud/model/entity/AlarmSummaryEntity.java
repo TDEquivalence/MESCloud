@@ -9,8 +9,8 @@ import java.util.Date;
 
 @Getter
 @Setter
-@Entity(name = "alarm_summary_view")
-public class AlarmSummaryView {
+@Entity(name = "alarm_summary")
+public class AlarmSummaryEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

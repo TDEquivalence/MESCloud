@@ -4,7 +4,7 @@ import com.alcegory.mescloud.exception.AlarmNotFoundException;
 import com.alcegory.mescloud.exception.IllegalAlarmStatusException;
 import com.alcegory.mescloud.model.dto.AlarmDto;
 import com.alcegory.mescloud.model.entity.AlarmCounts;
-import com.alcegory.mescloud.model.entity.AlarmSummaryView;
+import com.alcegory.mescloud.model.entity.AlarmSummaryEntity;
 import com.alcegory.mescloud.model.filter.Filter;
 import com.alcegory.mescloud.model.request.RequestAlarmRecognitionDto;
 import com.alcegory.mescloud.service.AlarmService;
@@ -24,8 +24,8 @@ public class AlarmController {
     private final AlarmService service;
 
     @PostMapping
-    public ResponseEntity<List<AlarmSummaryView>> findByFilter(@RequestBody Filter filter) {
-        List<AlarmSummaryView> alarmRecords = service.findByFilter(filter);
+    public ResponseEntity<List<AlarmSummaryEntity>> findByFilter(@RequestBody Filter filter) {
+        List<AlarmSummaryEntity> alarmRecords = service.findByFilter(filter);
         return new ResponseEntity<>(alarmRecords, HttpStatus.OK);
     }
 
