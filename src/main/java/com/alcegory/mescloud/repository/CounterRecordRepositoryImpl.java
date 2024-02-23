@@ -138,8 +138,6 @@ public class CounterRecordRepositoryImpl extends AbstractFilterRepository<Filter
         addPredicates(filterDto, predicates, criteriaBuilder, root);
 
         List<Order> orders = new ArrayList<>();
-        //TODO: Implement sort
-        //addSortOrdersConclusion(filterDto, orders, criteriaBuilder, root);
         Order newestOrder = criteriaBuilder.desc(root.get(ID_PROP));
         orders.add(newestOrder);
 

@@ -6,7 +6,6 @@ import com.alcegory.mescloud.model.dto.ProductionOrderMqttDto;
 import com.alcegory.mescloud.model.entity.ProductionOrderEntity;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public interface ProductionOrderConverter {
 
@@ -19,6 +18,6 @@ public interface ProductionOrderConverter {
     default List<ProductionOrderDto> toDto(List<ProductionOrderEntity> entityList) {
         return entityList.stream()
                 .map(this::toDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 }

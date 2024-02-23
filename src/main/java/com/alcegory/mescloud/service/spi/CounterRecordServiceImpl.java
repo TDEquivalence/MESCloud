@@ -144,7 +144,6 @@ public class CounterRecordServiceImpl implements CounterRecordService {
             return;
         }
 
-        //TODO: This should rely on a converter
         EquipmentOutputDto equipmentOutput = equipmentOutputOpt.get();
         EquipmentOutputEntity equipmentOutputEntity = new EquipmentOutputEntity();
         equipmentOutputEntity.setId(equipmentOutput.getId());
