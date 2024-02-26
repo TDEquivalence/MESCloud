@@ -61,6 +61,7 @@ public abstract class AbstractExcelExport {
         font.setFontHeightInPoints((short) 12);
         style.setFont(font);
         style.setAlignment(HorizontalAlignment.CENTER);
+        style.setFillForegroundColor(IndexedColors.WHITE.getIndex());
         style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
         style.setBorderTop(BorderStyle.THIN);
         style.setBorderBottom(BorderStyle.THIN);
@@ -105,12 +106,6 @@ public abstract class AbstractExcelExport {
         setTableProperties(table, tableName, TABLE_STYLE);
         addAutoFilter(table, firstRow, lastCol);
         showStripes(table);
-
-        // Setting light orange color for the header
-        setHeaderColor(workbook, table, 255, 239, 219); // Adjust RGB values as needed
-
-        // Setting very light orange color for the stripes
-        setStripeColor(sheetTable, firstRow, lastRow, 255, 255, 255); // Adjust RGB values as needed
     }
 
     protected void addAutoFilter(XSSFTable table, int firstRow, int lastCol) {
@@ -138,45 +133,20 @@ public abstract class AbstractExcelExport {
         return new XSSFColor(rgb, new DefaultIndexedColorMap());
     }
 
-    protected void setStripeColor(XSSFSheet sheet, int startRowIndex, int endRowIndex, int red, int green, int blue) {
-        XSSFColor stripeColor = getCustomColor(red, green, blue);
-
-        for (int i = startRowIndex + 1; i <= endRowIndex; i += 2) {
-            XSSFRow row = sheet.getRow(i);
-
-            if (row == null) {
-                row = sheet.createRow(i);
-            }
-
-            for (int j = row.getFirstCellNum(); j < row.getLastCellNum(); j++) {
-                XSSFCell cell = row.getCell(j);
-
-                if (cell == null) {
-                    cell = row.createCell(j);
-                }
-
-                XSSFCellStyle style = cell.getCellStyle();
-                if (style == null) {
-                    style = row.getSheet().getWorkbook().createCellStyle();
-                }
-
-                style.setFillForegroundColor(stripeColor);
-                style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-                cell.setCellStyle(style);
-            }
-        }
-    }
-
-    protected void setHeaderColor(XSSFWorkbook workbook, XSSFTable table, int red, int green, int blue) {
+    protected void setHeaderColor(XSSFWorkbook workbook, XSSFTable table) {
         XSSFSheet sheetToColored = table.getXSSFSheet();
         XSSFRow headerRow = sheetToColored.getRow(table.getStartRowIndex());
         XSSFCellStyle style = workbook.createCellStyle();
-        XSSFColor color = getCustomColor(red, green, blue);
-        style.setFillForegroundColor(color);
-        style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        XSSFFont font = workbook.createFont();
+
+        // Set font color to black
+        font.setColor(IndexedColors.BLACK.getIndex());
+        style.setFont(font);
 
         if (headerRow != null) {
             for (Cell cell : headerRow) {
+                cell.setCellValue("");
+                style.setFillPattern(FillPatternType.NO_FILL);
                 cell.setCellStyle(style);
             }
         }

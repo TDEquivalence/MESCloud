@@ -4,6 +4,7 @@ import com.alcegory.mescloud.model.entity.BatchEntity;
 import com.alcegory.mescloud.model.entity.ComposedSummaryEntity;
 import com.alcegory.mescloud.model.entity.HitEntity;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -44,7 +45,7 @@ public class ComposedProductionOrderRepositoryImpl {
             predicates.add(endDatePredicate);
         }
         List<Order> orders = new ArrayList<>();
-        Order approvedAtDescOrder = criteriaBuilder.desc(root.get(APPROVED_AT)); // Order by APPROVED_AT desc
+        Order approvedAtDescOrder = criteriaBuilder.desc(root.get(APPROVED_AT));
         orders.add(approvedAtDescOrder);
 
         query.select(root)
@@ -52,6 +53,22 @@ public class ComposedProductionOrderRepositoryImpl {
                 .orderBy(orders);
 
         return entityManager.createQuery(query).getResultList();
+    }
+
+    public List<ComposedSummaryEntity> findAllComposed(Timestamp startDate, Timestamp endDate) {
+        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<ComposedSummaryEntity> query = builder.createQuery(ComposedSummaryEntity.class);
+        Root<ComposedSummaryEntity> root = query.from(ComposedSummaryEntity.class);
+
+        query.distinct(true);
+
+        // Adding predicates to filter by startDate and endDate
+        Predicate datePredicate = builder.between(root.get(CREATED_AT), startDate, endDate);
+        query.where(datePredicate);
+
+        // Execute query
+        TypedQuery<ComposedSummaryEntity> typedQuery = entityManager.createQuery(query);
+        return typedQuery.getResultList();
     }
 
     private Predicate hasAssociatedBatchPredicate(CriteriaQuery<ComposedSummaryEntity> rootQuery,
@@ -106,6 +123,8 @@ public class ComposedProductionOrderRepositoryImpl {
         // Constructing the final query
         query.where(predicates.toArray(new Predicate[0]));
 
+        // Ordering by created_at
+        query.orderBy(criteriaBuilder.desc(root.get(CREATED_AT)));
         // Execute the query and return results
         return entityManager.createQuery(query).getResultList();
     }

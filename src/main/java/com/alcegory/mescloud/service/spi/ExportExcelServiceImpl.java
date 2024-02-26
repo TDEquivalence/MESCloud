@@ -84,7 +84,7 @@ public class ExportExcelServiceImpl implements ExportExcelService {
         setExcelResponseHeaders(response, COMPOSED_PRODUCTION_ORDERS_COMPLETED);
 
         List<ProductionOrderSummaryEntity> productionOrderViews = productionOrderRepository.findCompleted(startDate, endDate, false);
-        List<ComposedSummaryEntity> composedList = composedRepository.findCompleted(startDate, endDate);
+        List<ComposedSummaryEntity> composedList = composedRepository.findAllComposed(startDate, endDate);
 
         try {
             if (productionOrderViews.isEmpty() && composedList.isEmpty()) {
