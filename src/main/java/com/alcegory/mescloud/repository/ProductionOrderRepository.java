@@ -2,7 +2,9 @@ package com.alcegory.mescloud.repository;
 
 import com.alcegory.mescloud.model.entity.ProductionOrderEntity;
 import com.alcegory.mescloud.model.entity.ProductionOrderSummaryEntity;
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -50,7 +52,21 @@ public interface ProductionOrderRepository extends JpaRepository<ProductionOrder
             "AND po.id = (SELECT MAX(p.id) FROM production_order p WHERE p.equipment_id = :equipmentId) " +
             "AND po.is_completed = false",
             nativeQuery = true)
-    boolean existsByEquipmentIdAndIsCompletedFalse(@Param("equipmentId") Long equipmentId);
+    boolean hasEquipmentActiveProductionOrder(@Param("equipmentId") Long equipmentId);
+
+    @Query(value = "SELECT CASE WHEN COUNT(*) > 0 THEN true ELSE false END " +
+            "FROM production_order po " +
+            "JOIN counting_equipment ce ON po.equipment_id = ce.id " +
+            "WHERE ce.code = :countingEquipmentCode " +
+            "AND po.id = (SELECT MAX(p.id) FROM production_order p WHERE p.equipment_id = ce.id) " +
+            "AND po.is_completed = false",
+            nativeQuery = true)
+    boolean hasEquipmentActiveProductionOrder(@Param("countingEquipmentCode") String countingEquipmentCode);
 
     List<ProductionOrderSummaryEntity> findProductionOrderSummaryByComposedId(Long composedProductionOrderId);
+
+    @Transactional
+    @Modifying
+    @Query(value = "DELETE FROM production_order WHERE code = :productionOrderCode", nativeQuery = true)
+    void deleteByCode(String productionOrderCode);
 }

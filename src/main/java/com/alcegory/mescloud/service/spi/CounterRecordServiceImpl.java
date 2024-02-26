@@ -301,4 +301,13 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     private void saveAll(List<CounterRecordEntity> counterRecords) {
         repository.saveAll(counterRecords);
     }
+
+    @Override
+    public void validateProductionOrder(String equipmentCode, String productionOrderCode) {
+        if (productionOrderService.hasActiveProductionOrderByEquipmentCode(equipmentCode) && (productionOrderCode == null
+                || productionOrderCode.isEmpty()) && repository.hasIncrementByProductionOrderCode(productionOrderCode)) {
+            repository.deleteByProductionOrderCode(productionOrderCode);
+            productionOrderRepository.deleteByCode(productionOrderCode);
+        }
+    }
 }

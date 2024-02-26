@@ -107,7 +107,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
             return Optional.empty();
         }
 
-        if (repository.existsByEquipmentIdAndIsCompletedFalse(productionOrder.getEquipmentId())) {
+        if (repository.hasEquipmentActiveProductionOrder(productionOrder.getEquipmentId())) {
             log.warning(() -> String.format("Unable to create Production Order - Equipment with id [%s] still has an " +
                     "uncompleted production order", productionOrder.getEquipmentId()));
             return Optional.empty();
@@ -195,8 +195,13 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     }
 
     @Override
-    public boolean hasActiveProductionOrder(long equipmentId) {
-        return repository.existsByEquipmentIdAndIsCompletedFalse(equipmentId);
+    public boolean hasActiveProductionOrderByEquipmentId(long equipmentId) {
+        return repository.hasEquipmentActiveProductionOrder(equipmentId);
+    }
+
+    @Override
+    public boolean hasActiveProductionOrderByEquipmentCode(String equipmentCode) {
+        return repository.hasEquipmentActiveProductionOrder(equipmentCode);
     }
 
     @Override

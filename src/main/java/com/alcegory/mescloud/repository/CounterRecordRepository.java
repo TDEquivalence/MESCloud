@@ -4,6 +4,8 @@ import com.alcegory.mescloud.model.dto.FilterDto;
 import com.alcegory.mescloud.model.entity.CounterRecordConclusionEntity;
 import com.alcegory.mescloud.model.entity.CounterRecordEntity;
 import com.alcegory.mescloud.model.filter.Filter;
+import jakarta.transaction.Transactional;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -27,8 +29,6 @@ public interface CounterRecordRepository extends CrudRepository<CounterRecordEnt
 
     List<CounterRecordEntity> findLastPerProductionOrderAndEquipmentOutputPerDay(FilterDto filterDto);
 
-
-    //    @EntityGraph(attributePaths = { "equipmentOutput", "equipmentOutput.countingEquipment", "productionOrder" })
     List<CounterRecordEntity> getFilteredAndPaginated(Filter filterDto);
 
     Integer sumValidCounterIncrement(Long countingEquipmentId, FilterDto filter);
@@ -64,4 +64,18 @@ public interface CounterRecordRepository extends CrudRepository<CounterRecordEnt
             "WHERE cr.production_order_id = :productionOrderId " +
             "ORDER BY cr.registered_at DESC LIMIT 1", nativeQuery = true)
     Timestamp findLatestRegisteredAtByProductionOrderId(@Param("productionOrderId") Long productionOrderId);
+
+    @Transactional
+    @Modifying
+    @Query(value = "DELETE FROM counter_record cr " +
+            "WHERE cr.production_order_id IN " +
+            "(SELECT po.id FROM production_order po WHERE po.production_order_code = :productionOrderCode)", nativeQuery = true)
+    void deleteByProductionOrderCode(String productionOrderCode);
+
+    @Query(value = "SELECT CASE WHEN COUNT(*) > 0 THEN true ELSE false END " +
+            "FROM counter_record cr " +
+            "JOIN production_order po ON cr.production_order_id = po.id " +
+            "WHERE po.code = :productionOrderCode " +
+            "AND (cr.increment IS NOT NULL AND cr.increment > 0)", nativeQuery = true)
+    boolean hasIncrementByProductionOrderCode(String productionOrderCode);
 }
