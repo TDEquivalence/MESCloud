@@ -304,10 +304,17 @@ public class CounterRecordServiceImpl implements CounterRecordService {
 
     @Override
     public void validateProductionOrder(String equipmentCode, String productionOrderCode) {
-        if (productionOrderService.hasActiveProductionOrderByEquipmentCode(equipmentCode) && (productionOrderCode == null
-                || productionOrderCode.isEmpty()) && repository.hasIncrementByProductionOrderCode(productionOrderCode)) {
-            repository.deleteByProductionOrderCode(productionOrderCode);
-            productionOrderRepository.deleteByCode(productionOrderCode);
+        if (productionOrderService.hasActiveProductionOrderByEquipmentCode(equipmentCode) &&
+                (productionOrderCode == null || productionOrderCode.isEmpty())) {
+
+            Optional<ProductionOrderEntity> productionOrderOpt = productionOrderRepository.findActiveByEquipmentCode(equipmentCode);
+
+            productionOrderOpt.ifPresent(productionOrder -> {
+                if (!repository.hasIncrementByProductionOrderCode(productionOrder.getCode())) {
+                    repository.deleteByProductionOrderCode(productionOrder.getCode());
+                    productionOrderRepository.deleteByCode(productionOrder.getCode());
+                }
+            });
         }
     }
 }

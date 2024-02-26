@@ -25,6 +25,12 @@ public interface ProductionOrderRepository extends JpaRepository<ProductionOrder
             "ORDER BY id DESC LIMIT 1", nativeQuery = true)
     Optional<ProductionOrderEntity> findActiveByEquipmentId(long equipmentId);
 
+    @Query(value = "SELECT * FROM production_order po " +
+            "JOIN counting_equipment ce ON po.equipment_id = ce.id " +
+            "WHERE (ce.code = :equipmentCode AND po.is_completed = false) " +
+            "ORDER BY po.id DESC LIMIT 1", nativeQuery = true)
+    Optional<ProductionOrderEntity> findActiveByEquipmentCode(@Param("equipmentCode") String equipmentCode);
+
     List<ProductionOrderEntity> findByIdIn(List<Long> ids);
 
     List<ProductionOrderSummaryEntity> findCompleted(Timestamp startDate, Timestamp endDate, boolean withoutComposed);
@@ -54,13 +60,12 @@ public interface ProductionOrderRepository extends JpaRepository<ProductionOrder
             nativeQuery = true)
     boolean hasEquipmentActiveProductionOrder(@Param("equipmentId") Long equipmentId);
 
-    @Query(value = "SELECT CASE WHEN COUNT(*) > 0 THEN true ELSE false END " +
+    @Query(value = "SELECT COUNT(*) > 0 " +
             "FROM production_order po " +
             "JOIN counting_equipment ce ON po.equipment_id = ce.id " +
             "WHERE ce.code = :countingEquipmentCode " +
             "AND po.id = (SELECT MAX(p.id) FROM production_order p WHERE p.equipment_id = ce.id) " +
-            "AND po.is_completed = false",
-            nativeQuery = true)
+            "AND po.is_completed = false", nativeQuery = true)
     boolean hasEquipmentActiveProductionOrder(@Param("countingEquipmentCode") String countingEquipmentCode);
 
     List<ProductionOrderSummaryEntity> findProductionOrderSummaryByComposedId(Long composedProductionOrderId);
