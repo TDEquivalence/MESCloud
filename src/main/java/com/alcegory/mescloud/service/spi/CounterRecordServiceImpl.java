@@ -15,7 +15,6 @@ import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -295,9 +294,8 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     }
 
     @Override
-    public Instant getLastRegisteredAtByProductionOrderId(Long productionOrderId) {
-        Timestamp registeredAt = repository.findLatestRegisteredAtByProductionOrderId(productionOrderId);
-        return registeredAt.toInstant();
+    public Timestamp getLastRegisteredAtByProductionOrderId(Long productionOrderId) {
+        return repository.findLatestRegisteredAtByProductionOrderId(productionOrderId);
     }
 
     private void saveAll(List<CounterRecordEntity> counterRecords) {
