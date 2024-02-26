@@ -110,14 +110,24 @@ public class ComposedProductionOrderRepositoryImpl {
             predicates.add(hitsPredicate);
         }
 
-        // Predicates for startDate and endDate
-        if (startDate != null) {
-            Predicate startDatePredicate = criteriaBuilder.greaterThanOrEqualTo(root.get(CREATED_AT), startDate);
-            predicates.add(startDatePredicate);
-        }
-        if (endDate != null) {
-            Predicate endDatePredicate = criteriaBuilder.lessThanOrEqualTo(root.get(CREATED_AT), endDate);
-            predicates.add(endDatePredicate);
+        if (!withHits) {
+            if (startDate != null) {
+                Predicate startDatePredicate = criteriaBuilder.greaterThanOrEqualTo(root.get(CREATED_AT), startDate);
+                predicates.add(startDatePredicate);
+            }
+            if (endDate != null) {
+                Predicate endDatePredicate = criteriaBuilder.lessThanOrEqualTo(root.get(CREATED_AT), endDate);
+                predicates.add(endDatePredicate);
+            }
+        } else {
+            if (startDate != null) {
+                Predicate startDatePredicate = criteriaBuilder.greaterThanOrEqualTo(root.get(INSERT_HIT_AT), startDate);
+                predicates.add(startDatePredicate);
+            }
+            if (endDate != null) {
+                Predicate endDatePredicate = criteriaBuilder.lessThanOrEqualTo(root.get(INSERT_HIT_AT), endDate);
+                predicates.add(endDatePredicate);
+            }
         }
 
         // Predicate to exclude instances where approvedAt is not null
@@ -128,7 +138,11 @@ public class ComposedProductionOrderRepositoryImpl {
         query.where(predicates.toArray(new Predicate[0]));
 
         // Ordering by created_at
-        query.orderBy(criteriaBuilder.desc(root.get(CREATED_AT)));
+        if (!withHits) {
+            query.orderBy(criteriaBuilder.desc(root.get(CREATED_AT)));
+        } else {
+            query.orderBy(criteriaBuilder.desc(root.get(INSERT_HIT_AT)));
+        }
         // Execute the query and return results
         return entityManager.createQuery(query).getResultList();
     }
