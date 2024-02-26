@@ -22,6 +22,7 @@ public class ComposedProductionOrderRepositoryImpl {
     private static final String PROP_COMPOSED_PO = "composedProductionOrder";
     private static final String CREATED_AT = "createdAt";
     private static final String APPROVED_AT = "approvedAt";
+    private static final String INSERT_HIT_AT = "hitInsertedAt";
 
     private final EntityManager entityManager;
 
@@ -62,11 +63,14 @@ public class ComposedProductionOrderRepositoryImpl {
 
         query.distinct(true);
 
-        // Adding predicates to filter by startDate and endDate
-        Predicate datePredicate = builder.between(root.get(CREATED_AT), startDate, endDate);
-        query.where(datePredicate);
+        Predicate createdAtPredicate = builder.between(root.get(CREATED_AT), startDate, endDate);
+        Predicate insertHitAtPredicate = builder.between(root.get(INSERT_HIT_AT), startDate, endDate);
+        Predicate iApprovedAtPredicate = builder.between(root.get(APPROVED_AT), startDate, endDate);
 
-        // Execute query
+        Predicate combinedPredicate = builder.or(createdAtPredicate, insertHitAtPredicate, iApprovedAtPredicate);
+
+        query.where(combinedPredicate);
+
         TypedQuery<ComposedSummaryEntity> typedQuery = entityManager.createQuery(query);
         return typedQuery.getResultList();
     }
