@@ -271,7 +271,7 @@ public class KpiServiceImpl implements KpiService {
     }
 
     private Instant getLastRegisteredOrCurrentInstant(ProductionOrderEntity productionOrder) {
-        Timestamp lastCounterRecordRegistered = counterRecordService.getLastRegisteredAtByProductionOrderId(productionOrder.getId()); //result can be null
+        Timestamp lastCounterRecordRegistered = counterRecordService.getLastRegisteredAtByProductionOrderId(productionOrder.getId());
         return lastCounterRecordRegistered != null ? lastCounterRecordRegistered.toInstant() : Instant.now();
     }
 
