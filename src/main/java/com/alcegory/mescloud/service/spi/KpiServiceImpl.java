@@ -250,13 +250,29 @@ public class KpiServiceImpl implements KpiService {
     }
 
     public Timestamp calculateAdjustedEndDate(ProductionOrderEntity productionOrder, Timestamp endDate) {
-        Instant completedAtInstant = DateUtil.determineCompletedAt(productionOrder.getCompletedAt(), endDate);
+        Instant completedAtInstant = determineCompletedTimestamp(productionOrder, endDate);
+        return Timestamp.from(completedAtInstant);
+    }
 
-        if (completedAtInstant.isAfter(Instant.now())) {
-            completedAtInstant = counterRecordService.getLastRegisteredAtByProductionOrderId(productionOrder.getId());
+    private Instant determineCompletedTimestamp(ProductionOrderEntity productionOrder, Timestamp endDate) {
+        Instant completedAtInstant;
+
+        if (productionOrder.getCompletedAt() != null) {
+            completedAtInstant = DateUtil.determineCompletedAt(productionOrder.getCompletedAt(), endDate);
+        } else {
+            completedAtInstant = endDate.toInstant();
         }
 
-        return Timestamp.from(completedAtInstant);
+        if (completedAtInstant.isAfter(Instant.now())) {
+            completedAtInstant = getLastRegisteredOrCurrentInstant(productionOrder);
+        }
+
+        return completedAtInstant;
+    }
+
+    private Instant getLastRegisteredOrCurrentInstant(ProductionOrderEntity productionOrder) {
+        Timestamp lastCounterRecordRegistered = counterRecordService.getLastRegisteredAtByProductionOrderId(productionOrder.getId());
+        return lastCounterRecordRegistered != null ? lastCounterRecordRegistered.toInstant() : Instant.now();
     }
 
     public EquipmentKpiAggregatorDto sumEquipmentKpiAggregators(List<EquipmentKpiAggregatorDto> aggregatorList) {
