@@ -4,6 +4,7 @@ import com.alcegory.mescloud.model.entity.BatchEntity;
 import com.alcegory.mescloud.model.entity.ComposedSummaryEntity;
 import com.alcegory.mescloud.model.entity.HitEntity;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -21,6 +22,7 @@ public class ComposedProductionOrderRepositoryImpl {
     private static final String PROP_COMPOSED_PO = "composedProductionOrder";
     private static final String CREATED_AT = "createdAt";
     private static final String APPROVED_AT = "approvedAt";
+    private static final String INSERT_HIT_AT = "hitInsertedAt";
 
     private final EntityManager entityManager;
 
@@ -44,7 +46,7 @@ public class ComposedProductionOrderRepositoryImpl {
             predicates.add(endDatePredicate);
         }
         List<Order> orders = new ArrayList<>();
-        Order approvedAtDescOrder = criteriaBuilder.desc(root.get(APPROVED_AT)); // Order by APPROVED_AT desc
+        Order approvedAtDescOrder = criteriaBuilder.desc(root.get(APPROVED_AT));
         orders.add(approvedAtDescOrder);
 
         query.select(root)
@@ -52,6 +54,25 @@ public class ComposedProductionOrderRepositoryImpl {
                 .orderBy(orders);
 
         return entityManager.createQuery(query).getResultList();
+    }
+
+    public List<ComposedSummaryEntity> findAllComposed(Timestamp startDate, Timestamp endDate) {
+        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<ComposedSummaryEntity> query = builder.createQuery(ComposedSummaryEntity.class);
+        Root<ComposedSummaryEntity> root = query.from(ComposedSummaryEntity.class);
+
+        query.distinct(true);
+
+        Predicate createdAtPredicate = builder.between(root.get(CREATED_AT), startDate, endDate);
+        Predicate insertHitAtPredicate = builder.between(root.get(INSERT_HIT_AT), startDate, endDate);
+        Predicate iApprovedAtPredicate = builder.between(root.get(APPROVED_AT), startDate, endDate);
+
+        Predicate combinedPredicate = builder.or(createdAtPredicate, insertHitAtPredicate, iApprovedAtPredicate);
+
+        query.where(combinedPredicate);
+
+        TypedQuery<ComposedSummaryEntity> typedQuery = entityManager.createQuery(query);
+        return typedQuery.getResultList();
     }
 
     private Predicate hasAssociatedBatchPredicate(CriteriaQuery<ComposedSummaryEntity> rootQuery,
@@ -89,14 +110,24 @@ public class ComposedProductionOrderRepositoryImpl {
             predicates.add(hitsPredicate);
         }
 
-        // Predicates for startDate and endDate
-        if (startDate != null) {
-            Predicate startDatePredicate = criteriaBuilder.greaterThanOrEqualTo(root.get(CREATED_AT), startDate);
-            predicates.add(startDatePredicate);
-        }
-        if (endDate != null) {
-            Predicate endDatePredicate = criteriaBuilder.lessThanOrEqualTo(root.get(CREATED_AT), endDate);
-            predicates.add(endDatePredicate);
+        if (!withHits) {
+            if (startDate != null) {
+                Predicate startDatePredicate = criteriaBuilder.greaterThanOrEqualTo(root.get(CREATED_AT), startDate);
+                predicates.add(startDatePredicate);
+            }
+            if (endDate != null) {
+                Predicate endDatePredicate = criteriaBuilder.lessThanOrEqualTo(root.get(CREATED_AT), endDate);
+                predicates.add(endDatePredicate);
+            }
+        } else {
+            if (startDate != null) {
+                Predicate startDatePredicate = criteriaBuilder.greaterThanOrEqualTo(root.get(INSERT_HIT_AT), startDate);
+                predicates.add(startDatePredicate);
+            }
+            if (endDate != null) {
+                Predicate endDatePredicate = criteriaBuilder.lessThanOrEqualTo(root.get(INSERT_HIT_AT), endDate);
+                predicates.add(endDatePredicate);
+            }
         }
 
         // Predicate to exclude instances where approvedAt is not null
@@ -106,6 +137,12 @@ public class ComposedProductionOrderRepositoryImpl {
         // Constructing the final query
         query.where(predicates.toArray(new Predicate[0]));
 
+        // Ordering by created_at
+        if (!withHits) {
+            query.orderBy(criteriaBuilder.desc(root.get(CREATED_AT)));
+        } else {
+            query.orderBy(criteriaBuilder.desc(root.get(INSERT_HIT_AT)));
+        }
         // Execute the query and return results
         return entityManager.createQuery(query).getResultList();
     }

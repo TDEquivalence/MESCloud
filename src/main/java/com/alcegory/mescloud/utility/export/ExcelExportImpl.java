@@ -16,9 +16,9 @@ import java.util.List;
 
 import static com.alcegory.mescloud.utility.export.ExcelConstants.*;
 
-public class MultiExcelExport extends AbstractExcelExport {
+public class ExcelExportImpl extends AbstractExcelExport {
 
-    public MultiExcelExport() {
+    public ExcelExportImpl() {
         super(null, null, null, null);
         this.workbook = new XSSFWorkbook();
     }
@@ -28,14 +28,19 @@ public class MultiExcelExport extends AbstractExcelExport {
 
         XSSFSheet composedSheet = createSheet(SHEET_NAME_COMPOSED);
         createHeaderRow(composedSheet, getComposedHeaders());
-        writeDataToComposed(composedSheet, composedList);
+        
+        if (!composedList.isEmpty()) {
+            writeDataToComposed(composedSheet, composedList);
+            createTable(composedSheet, TABLE_NAME_COMPOSED, getComposedHeaders().length - 1);
+        }
 
         XSSFSheet productionSheet = createSheet(SHEET_NAME_PRODUCTION_ORDERS);
         createHeaderRow(productionSheet, getProductionOrderHeaders());
-        writeDataToProduction(productionSheet, productionOrders);
 
-        createTable(composedSheet, TABLE_NAME_COMPOSED, getComposedHeaders().length - 1);
-        createTable(productionSheet, TABLE_NAME_PRODUCTION, getProductionOrderHeaders().length - 1);
+        if (!productionOrders.isEmpty()) {
+            writeDataToProduction(productionSheet, productionOrders);
+            createTable(productionSheet, TABLE_NAME_PRODUCTION, getProductionOrderHeaders().length - 1);
+        }
 
         writeWorkbookToResponse(response);
     }
@@ -53,7 +58,7 @@ public class MultiExcelExport extends AbstractExcelExport {
     }
 
     protected void writeDataToComposed(XSSFSheet sheet, List<ComposedSummaryEntity> composedList) {
-        int rowCount = 1; // Start from row 1 (row 0 is header)
+        int rowCount = 1;
         CellStyle style = workbook.createCellStyle();
         XSSFFont font = workbook.createFont();
         font.setFontHeight(14);
@@ -116,8 +121,6 @@ public class MultiExcelExport extends AbstractExcelExport {
         setTableProperties(table, tableName, TABLE_STYLE);
         addAutoFilter(table, firstRow, lastCol);
         showStripes(table);
-
-        setHeaderColor(workbook, table, 255, 239, 219); // Adjust RGB values as needed
     }
 
     @Override
