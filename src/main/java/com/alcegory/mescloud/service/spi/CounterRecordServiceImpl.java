@@ -304,8 +304,8 @@ public class CounterRecordServiceImpl implements CounterRecordService {
 
     @Override
     public void validateProductionOrder(String equipmentCode, String productionOrderCode) {
-        if (productionOrderService.hasActiveProductionOrderByEquipmentCode(equipmentCode) &&
-                (productionOrderCode == null || productionOrderCode.isEmpty())) {
+        if ((productionOrderCode == null || productionOrderCode.isEmpty()) &&
+                productionOrderService.hasActiveProductionOrderByEquipmentCode(equipmentCode)) {
 
             Optional<ProductionOrderEntity> productionOrderOpt = productionOrderRepository.findActiveByEquipmentCode(equipmentCode);
 
