@@ -307,8 +307,10 @@ public class CounterRecordServiceImpl implements CounterRecordService {
         if ((productionOrderCode == null || productionOrderCode.isEmpty()) &&
                 productionOrderService.hasActiveProductionOrderByEquipmentCode(equipmentCode)) {
 
+            log.info("Production Order is empty or null, but Equipment has Active PO");
             Optional<ProductionOrderEntity> productionOrderOpt = productionOrderRepository.findActiveByEquipmentCode(equipmentCode);
 
+            log.info("Production Order was find in Equipment by findActiveByEquipmentCode method");
             productionOrderOpt.ifPresent(productionOrder -> {
                 if (!repository.hasIncrementByProductionOrderCode(productionOrder.getCode())) {
                     Long productionOrderId = productionOrder.getId();

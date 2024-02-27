@@ -71,7 +71,9 @@ public interface CounterRecordRepository extends CrudRepository<CounterRecordEnt
             "WHERE cr.productionOrder.id = :productionOrderId")
     void deleteByProductionOrderId(Long productionOrderId);
 
-    @Query("SELECT CASE WHEN COUNT(cr) > 0 THEN true ELSE false END FROM CounterRecordEntity cr WHERE cr.productionOrder.id = :productionOrderId")
+    @Query(value = "SELECT CASE WHEN COUNT(*) > 0 THEN TRUE ELSE FALSE END " +
+            "FROM counter_record cr " +
+            "WHERE cr.production_order_id = :productionOrderId", nativeQuery = true)
     boolean existsByProductionOrderId(Long productionOrderId);
 
     @Query(value = "SELECT CASE WHEN COUNT(*) > 0 THEN true ELSE false END " +
