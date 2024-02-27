@@ -67,10 +67,9 @@ public interface CounterRecordRepository extends CrudRepository<CounterRecordEnt
 
     @Transactional
     @Modifying
-    @Query(value = "DELETE FROM counter_record cr " +
-            "WHERE cr.production_order_id IN " +
-            "(SELECT po.id AS production_order_id FROM production_order po WHERE po.production_order_code = :productionOrderCode)", nativeQuery = true)
-    void deleteByProductionOrderCode(String productionOrderCode);
+    @Query(value = "DELETE FROM CounterRecordEntity cr " +
+            "WHERE cr.productionOrder.id = :productionOrderId")
+    void deleteByProductionOrderId(Long productionOrderId);
 
     @Query(value = "SELECT CASE WHEN COUNT(*) > 0 THEN true ELSE false END " +
             "FROM counter_record cr " +

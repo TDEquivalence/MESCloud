@@ -311,8 +311,8 @@ public class CounterRecordServiceImpl implements CounterRecordService {
 
             productionOrderOpt.ifPresent(productionOrder -> {
                 if (!repository.hasIncrementByProductionOrderCode(productionOrder.getCode())) {
-                    repository.deleteByProductionOrderCode(productionOrder.getCode());
-                    productionOrderRepository.deleteByCode(productionOrder.getCode());
+                    repository.deleteByProductionOrderId(productionOrder.getId());
+                    productionOrderRepository.delete(productionOrder);
                 }
             });
         }
