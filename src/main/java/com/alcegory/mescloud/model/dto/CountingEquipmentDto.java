@@ -29,6 +29,7 @@ public class CountingEquipmentDto {
     private Double availabilityTarget;
     private Double performanceTarget;
     private Double overallEquipmentEffectivenessTarget;
+    private int unrecognizedAlarmDuration;
     @Enumerated(EnumType.STRING)
     private CountingEquipmentEntity.OperationStatus operationStatus;
 

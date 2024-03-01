@@ -297,6 +297,7 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
         toUpdate.setPerformanceTarget(updateFrom.getPerformanceTarget());
         toUpdate.setAvailabilityTarget(updateFrom.getAvailabilityTarget());
         toUpdate.setOverallEquipmentEffectivenessTarget(updateFrom.getOverallEquipmentEffectivenessTarget());
+        toUpdate.setUnrecognizedAlarmDuration(updateFrom.getUnrecognizedAlarmDuration());
         updateOutputsAlias(toUpdate, updateFrom);
         updateIms(toUpdate, updateFrom.getIms());
     }

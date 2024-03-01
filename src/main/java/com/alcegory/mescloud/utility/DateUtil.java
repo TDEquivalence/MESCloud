@@ -20,6 +20,7 @@ public class DateUtil {
     }
 
     private static final int INCLUDE_LAST_DAY = 1;
+    private static final int MILLISECONDS_PER_MINUTE = 60 * 1000;
 
     public static int spanInDays(Instant startDate, Instant endDate) {
         long differenceInDays = ChronoUnit.DAYS.between(startDate.truncatedTo(ChronoUnit.DAYS), endDate.truncatedTo(ChronoUnit.DAYS));
@@ -85,5 +86,9 @@ public class DateUtil {
         Instant endInstant = endDate.toInstant();
         Duration duration = Duration.between(startInstant, endInstant);
         return duration.isNegative() ? Duration.ZERO : duration;
+    }
+
+    public static long calculateDifferenceInMinutes(Date completedAt, Date createdAt) {
+        return (completedAt.getTime() - createdAt.getTime()) / MILLISECONDS_PER_MINUTE;
     }
 }

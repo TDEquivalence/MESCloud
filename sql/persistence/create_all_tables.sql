@@ -108,6 +108,7 @@ CREATE TABLE counting_equipment (
     performance_target DOUBLE PRECISION,
     overall_equipment_effectiveness_target DOUBLE PRECISION,
     operation_status VARCHAR(20),
+    unrecognized_alarm_duration INTEGER,
 
     PRIMARY KEY(id),
     FOREIGN KEY(section_id) REFERENCES section(id),
