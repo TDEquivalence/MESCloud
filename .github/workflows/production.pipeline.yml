@@ -7,6 +7,7 @@ on:
       - 'feature/*'
       - 'bug/*'
   pull_request:
+  workflow_dispatch:
 
 env:
   DB_HOST: ${{ vars.DB_HOST }}
