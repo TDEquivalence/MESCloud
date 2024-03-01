@@ -159,6 +159,7 @@ public class AlarmServiceImpl implements AlarmService {
         });
     }
 
+    //verify if inactive alarms should be recognized automatically
     private void verifyUnrecognizedAlarmDuration(Map<Long, AlarmEntity> activeAlarmByConfigId, CountingEquipmentDto equipment) {
         for (AlarmEntity activeAlarm : activeAlarmByConfigId.values()) {
             if (activeAlarm.getCompletedAt() != null) {
