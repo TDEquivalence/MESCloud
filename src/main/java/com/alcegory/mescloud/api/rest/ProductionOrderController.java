@@ -3,7 +3,6 @@ package com.alcegory.mescloud.api.rest;
 import com.alcegory.mescloud.model.dto.FilterDto;
 import com.alcegory.mescloud.model.dto.ProductionOrderDto;
 import com.alcegory.mescloud.model.dto.ProductionOrderSummaryDto;
-import com.alcegory.mescloud.model.request.RequestProductionOrderDto;
 import com.alcegory.mescloud.service.ProductionOrderService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -31,7 +30,7 @@ public class ProductionOrderController {
     }
 
     @PutMapping("/edit")
-    public ResponseEntity<ProductionOrderDto> edit(@RequestBody RequestProductionOrderDto requestProductionOrder) {
+    public ResponseEntity<ProductionOrderDto> edit(@RequestBody ProductionOrderDto requestProductionOrder) {
         Optional<ProductionOrderDto> productionOrder = service.editProductionOrder(requestProductionOrder);
         if (productionOrder.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

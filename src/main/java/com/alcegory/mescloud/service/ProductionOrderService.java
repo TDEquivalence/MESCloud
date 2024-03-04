@@ -4,7 +4,6 @@ import com.alcegory.mescloud.model.dto.FilterDto;
 import com.alcegory.mescloud.model.dto.ProductionOrderDto;
 import com.alcegory.mescloud.model.dto.ProductionOrderSummaryDto;
 import com.alcegory.mescloud.model.entity.ProductionOrderEntity;
-import com.alcegory.mescloud.model.request.RequestProductionOrderDto;
 
 import java.sql.Timestamp;
 import java.util.Date;
@@ -56,5 +55,5 @@ public interface ProductionOrderService {
 
     List<ProductionOrderSummaryDto> getProductionOrderByComposedId(Long composedId);
 
-    Optional<ProductionOrderDto> editProductionOrder(RequestProductionOrderDto requestProductionOrder);
+    Optional<ProductionOrderDto> editProductionOrder(ProductionOrderDto requestProductionOrder);
 }

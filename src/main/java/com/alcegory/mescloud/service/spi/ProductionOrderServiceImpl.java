@@ -6,11 +6,9 @@ import com.alcegory.mescloud.exception.MesMqttException;
 import com.alcegory.mescloud.model.converter.GenericConverter;
 import com.alcegory.mescloud.model.converter.ProductionOrderConverter;
 import com.alcegory.mescloud.model.dto.*;
-import com.alcegory.mescloud.model.entity.ComposedProductionOrderEntity;
 import com.alcegory.mescloud.model.entity.CountingEquipmentEntity;
 import com.alcegory.mescloud.model.entity.ProductionOrderEntity;
 import com.alcegory.mescloud.model.entity.ProductionOrderSummaryEntity;
-import com.alcegory.mescloud.model.request.RequestProductionOrderDto;
 import com.alcegory.mescloud.protocol.MesMqttSettings;
 import com.alcegory.mescloud.repository.ComposedProductionOrderRepository;
 import com.alcegory.mescloud.repository.CountingEquipmentRepository;
@@ -25,7 +23,6 @@ import org.springframework.stereotype.Service;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 import static com.alcegory.mescloud.model.filter.Filter.Property.END_DATE;
@@ -326,7 +323,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     }
 
     @Override
-    public Optional<ProductionOrderDto> editProductionOrder(RequestProductionOrderDto requestProductionOrder) {
+    public Optional<ProductionOrderDto> editProductionOrder(ProductionOrderDto requestProductionOrder) {
         if (requestProductionOrder == null) {
             log.warning("Null request Production Order received for editing production order.");
             return Optional.empty();
@@ -345,36 +342,13 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         return Optional.of(productionOrderDto);
     }
 
-    private ProductionOrderEntity updateProductionOrder(RequestProductionOrderDto requestProductionOrder, ProductionOrderEntity productionOrderToUpdate) {
+    private ProductionOrderEntity updateProductionOrder(ProductionOrderDto requestProductionOrder, ProductionOrderEntity productionOrderToUpdate) {
         productionOrderToUpdate.setTargetAmount(requestProductionOrder.getTargetAmount());
         productionOrderToUpdate.setInputBatch(requestProductionOrder.getInputBatch());
         productionOrderToUpdate.setSource(requestProductionOrder.getSource());
         productionOrderToUpdate.setGauge(requestProductionOrder.getGauge());
         productionOrderToUpdate.setCategory(requestProductionOrder.getCategory());
         productionOrderToUpdate.setWashingProcess(requestProductionOrder.getWashingProcess());
-        updateComposedProductionOrder(requestProductionOrder, productionOrderToUpdate);
         return productionOrderToUpdate;
-    }
-
-    private void updateComposedProductionOrder(RequestProductionOrderDto requestProductionOrder, ProductionOrderEntity productionOrderToUpdate) {
-
-        if (productionOrderToUpdate.getComposedProductionOrder() == null && requestProductionOrder.getComposedId() <= 0
-                || productionOrderToUpdate.getComposedProductionOrder() != null &&
-                productionOrderToUpdate.getComposedProductionOrder().getId() == requestProductionOrder.getComposedId()) {
-            return;
-        }
-
-        ComposedProductionOrderEntity currentComposedProductionOrder = productionOrderToUpdate.getComposedProductionOrder();
-        Optional<ComposedProductionOrderEntity> composedOpt = composedRepository.findById(requestProductionOrder.getComposedId());
-
-        if (composedOpt.isEmpty()) {
-            productionOrderToUpdate.setComposedProductionOrder(null);
-            return;
-        }
-
-        ComposedProductionOrderEntity newComposedProductionOrder = composedOpt.get();
-        if (!Objects.equals(currentComposedProductionOrder, newComposedProductionOrder)) {
-            productionOrderToUpdate.setComposedProductionOrder(newComposedProductionOrder);
-        }
     }
 }
