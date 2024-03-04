@@ -118,12 +118,12 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
         Optional<ProductionOrderEntity> productionOrder = productionOrderRepository.findActiveByEquipmentId(id);
 
         if (productionOrder.isEmpty()) {
-            return Optional.of(dto);
+            dto.setProductionOrder(null);
+        } else {
+            ProductionOrderDto productionOrderDto = productionOrderConverter.toDto(productionOrder.get());
+            dto.setProductionOrder(productionOrderDto);
         }
-
-        ProductionOrderDto productionOrderDto = productionOrderConverter.toDto(productionOrder.get());
-        dto.setProductionOrder(productionOrderDto);
-
+        
         return Optional.of(dto);
     }
 
