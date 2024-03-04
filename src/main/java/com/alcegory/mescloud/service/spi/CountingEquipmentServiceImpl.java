@@ -115,9 +115,9 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
         }
 
         CountingEquipmentDto dto = convertToDtoWithActiveProductionOrder(countingEquipment);
-        Optional<ProductionOrderEntity> productionOrder = productionOrderRepository.findLatestActiveOrNullIfCompletedByEquipmentId(id, true);
+        Optional<ProductionOrderEntity> productionOrder = productionOrderRepository.findActiveByEquipmentId(id);
 
-        if (productionOrder.isEmpty()) {
+        if (productionOrder.isEmpty() || productionOrder.get().isCompleted()) {
             dto.setProductionOrder(null);
         } else {
             ProductionOrderDto productionOrderDto = productionOrderConverter.toDto(productionOrder.get());
