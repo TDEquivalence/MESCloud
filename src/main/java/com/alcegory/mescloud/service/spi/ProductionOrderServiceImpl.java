@@ -6,10 +6,13 @@ import com.alcegory.mescloud.exception.MesMqttException;
 import com.alcegory.mescloud.model.converter.GenericConverter;
 import com.alcegory.mescloud.model.converter.ProductionOrderConverter;
 import com.alcegory.mescloud.model.dto.*;
+import com.alcegory.mescloud.model.entity.ComposedProductionOrderEntity;
 import com.alcegory.mescloud.model.entity.CountingEquipmentEntity;
 import com.alcegory.mescloud.model.entity.ProductionOrderEntity;
 import com.alcegory.mescloud.model.entity.ProductionOrderSummaryEntity;
+import com.alcegory.mescloud.model.request.RequestProductionOrderDto;
 import com.alcegory.mescloud.protocol.MesMqttSettings;
+import com.alcegory.mescloud.repository.ComposedProductionOrderRepository;
 import com.alcegory.mescloud.repository.CountingEquipmentRepository;
 import com.alcegory.mescloud.repository.ProductionOrderRepository;
 import com.alcegory.mescloud.service.CountingEquipmentService;
@@ -22,6 +25,7 @@ import org.springframework.stereotype.Service;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import static com.alcegory.mescloud.model.filter.Filter.Property.END_DATE;
@@ -38,14 +42,16 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     private static final int FIRST_CODE_VALUE = 1;
 
     private final ProductionOrderRepository repository;
+    private final CountingEquipmentRepository countingEquipmentRepository;
+    private final ComposedProductionOrderRepository composedRepository;
+
+    private final CountingEquipmentService countingEquipmentService;
+    private final MqttClient mqttClient;
+    private final MesMqttSettings mqttSettings;
+
     private final ProductionOrderConverter converter;
     private final GenericConverter<ProductionOrderSummaryEntity, ProductionOrderSummaryDto> summaryConverter;
     private final GenericConverter<CountingEquipmentEntity, CountingEquipmentDto> equipmentConverter;
-    private final ProductionOrderConverter productionOrderConverter;
-    private final CountingEquipmentService countingEquipmentService;
-    private final CountingEquipmentRepository countingEquipmentRepository;
-    private final MqttClient mqttClient;
-    private final MesMqttSettings mqttSettings;
 
     @Override
     public Optional<ProductionOrderDto> complete(long equipmentId) {
@@ -71,7 +77,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         log.info(() -> String.format("Production Order Conclusion already publish for equipmentId [%s]:", equipmentId));
 
         ProductionOrderEntity productionOrder = productionOrderEntityOpt.get();
-        ProductionOrderDto productionOrderDto = productionOrderConverter.toDto(productionOrder);
+        ProductionOrderDto productionOrderDto = converter.toDto(productionOrder);
         return Optional.of(productionOrderDto);
     }
 
@@ -317,5 +323,58 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         }
         List<ProductionOrderSummaryEntity> productionOrderSummaryEntities = repository.findProductionOrderSummaryByComposedId(composedId);
         return summaryConverter.toDto(productionOrderSummaryEntities, ProductionOrderSummaryDto.class);
+    }
+
+    @Override
+    public Optional<ProductionOrderDto> editProductionOrder(RequestProductionOrderDto requestProductionOrder) {
+        if (requestProductionOrder == null) {
+            log.warning("Null request Production Order received for editing production order.");
+            return Optional.empty();
+        }
+
+        Optional<ProductionOrderEntity> persistedProductionOrderOpt = repository.findById(requestProductionOrder.getId());
+
+        if (persistedProductionOrderOpt.isEmpty()) {
+            log.warning("No production order found for ID: " + requestProductionOrder.getId());
+            return Optional.empty();
+        }
+
+        ProductionOrderEntity productionOrderUpdated = updateProductionOrder(requestProductionOrder, persistedProductionOrderOpt.get());
+        ProductionOrderEntity persistedProductionOrder = repository.save(productionOrderUpdated);
+        ProductionOrderDto productionOrderDto = converter.toDto(persistedProductionOrder);
+        return Optional.of(productionOrderDto);
+    }
+
+    private ProductionOrderEntity updateProductionOrder(RequestProductionOrderDto requestProductionOrder, ProductionOrderEntity productionOrderToUpdate) {
+        productionOrderToUpdate.setTargetAmount(requestProductionOrder.getTargetAmount());
+        productionOrderToUpdate.setInputBatch(requestProductionOrder.getInputBatch());
+        productionOrderToUpdate.setSource(requestProductionOrder.getSource());
+        productionOrderToUpdate.setGauge(requestProductionOrder.getGauge());
+        productionOrderToUpdate.setCategory(requestProductionOrder.getCategory());
+        productionOrderToUpdate.setWashingProcess(requestProductionOrder.getWashingProcess());
+        updateComposedProductionOrder(requestProductionOrder, productionOrderToUpdate);
+        return productionOrderToUpdate;
+    }
+
+    private void updateComposedProductionOrder(RequestProductionOrderDto requestProductionOrder, ProductionOrderEntity productionOrderToUpdate) {
+
+        if (productionOrderToUpdate.getComposedProductionOrder() == null && requestProductionOrder.getComposedId() <= 0
+                || productionOrderToUpdate.getComposedProductionOrder() != null &&
+                productionOrderToUpdate.getComposedProductionOrder().getId() == requestProductionOrder.getComposedId()) {
+            return;
+        }
+
+        ComposedProductionOrderEntity currentComposedProductionOrder = productionOrderToUpdate.getComposedProductionOrder();
+        Optional<ComposedProductionOrderEntity> composedOpt = composedRepository.findById(requestProductionOrder.getComposedId());
+
+        if (composedOpt.isEmpty()) {
+            productionOrderToUpdate.setComposedProductionOrder(null);
+            return;
+        }
+
+        ComposedProductionOrderEntity newComposedProductionOrder = composedOpt.get();
+        if (!Objects.equals(currentComposedProductionOrder, newComposedProductionOrder)) {
+            productionOrderToUpdate.setComposedProductionOrder(newComposedProductionOrder);
+        }
     }
 }
