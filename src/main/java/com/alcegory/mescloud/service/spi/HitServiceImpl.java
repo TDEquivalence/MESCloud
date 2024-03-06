@@ -1,11 +1,11 @@
 package com.alcegory.mescloud.service.spi;
 
-import com.alcegory.mescloud.repository.HitRepository;
 import com.alcegory.mescloud.model.converter.GenericConverter;
 import com.alcegory.mescloud.model.dto.HitDto;
-import com.alcegory.mescloud.model.request.RequestHitDto;
 import com.alcegory.mescloud.model.entity.HitEntity;
 import com.alcegory.mescloud.model.entity.SampleEntity;
+import com.alcegory.mescloud.model.request.RequestHitDto;
+import com.alcegory.mescloud.repository.HitRepository;
 import com.alcegory.mescloud.service.ComposedProductionOrderService;
 import com.alcegory.mescloud.service.HitService;
 import com.alcegory.mescloud.service.SampleService;
@@ -47,9 +47,9 @@ public class HitServiceImpl implements HitService {
             return false;
         }
 
-        Long firstSampleId = hitDtoList.get(0).getSampleId();
+        Long firstSampleId = hitDtoList.get(0).getComposedId();
         for (HitDto hitDto : hitDtoList) {
-            if (!firstSampleId.equals(hitDto.getSampleId())) {
+            if (!firstSampleId.equals(hitDto.getComposedId())) {
                 return false;
             }
         }
@@ -114,12 +114,14 @@ public class HitServiceImpl implements HitService {
 
     private SampleEntity getSample(List<HitDto> hitList) {
         HitDto hitDto = hitList.get(0);
-        Optional<SampleEntity> sample = sampleService.findById(hitDto.getSampleId());
-        if (sample.isEmpty()) {
+        Long composedId = hitDto.getComposedId();
+        SampleEntity sample = sampleService.findByComposedProductionOrderId(composedId);
+
+        if (sample == null) {
             throw new IllegalArgumentException("Sample not found");
         }
 
-        return sample.get();
+        return sample;
     }
 
     public HitEntity saveAndUpdate(HitEntity hitEntity) {
