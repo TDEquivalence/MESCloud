@@ -194,7 +194,6 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     @Override
     public Optional<ProductionOrderEntity> findByCode(String code) {
         return repository.findByCode(code);
-
     }
 
     @Override
@@ -257,7 +256,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     @Override
     public void setProductionOrderApproval(Long composedOrderId, boolean isApproved) {
         try {
-            List<ProductionOrderEntity> productionOrders = repository.findByComposedProductionOrderId(composedOrderId);
+            List<ProductionOrderEntity> productionOrders = findByComposedProductionOrderId(composedOrderId);
 
             if (productionOrders == null || productionOrders.isEmpty()) {
                 log.warning("No production orders found for composed order ID: " + composedOrderId);
@@ -272,6 +271,11 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         } catch (Exception e) {
             log.warning("Error in setProductionOrderApproval: " + e.getMessage());
         }
+    }
+
+    @Override
+    public List<ProductionOrderEntity> findByComposedProductionOrderId(Long composedOrderId) {
+        return repository.findByComposedProductionOrderId(composedOrderId);
     }
 
     @Override

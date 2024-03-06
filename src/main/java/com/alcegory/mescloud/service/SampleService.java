@@ -1,8 +1,10 @@
 package com.alcegory.mescloud.service;
 
-import com.alcegory.mescloud.model.request.RequestSampleDto;
+import com.alcegory.mescloud.model.dto.ProductionOrderDto;
 import com.alcegory.mescloud.model.dto.SampleDto;
 import com.alcegory.mescloud.model.entity.SampleEntity;
+import com.alcegory.mescloud.model.request.RequestById;
+import com.alcegory.mescloud.model.request.RequestSampleDto;
 
 import java.util.List;
 import java.util.Optional;
@@ -18,4 +20,6 @@ public interface SampleService {
     SampleDto create(RequestSampleDto requestSampleDto);
 
     List<SampleDto> getAll();
+
+    List<ProductionOrderDto> removeProductionOrderFromComposed(RequestById request);
 }
