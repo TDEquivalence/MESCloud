@@ -8,7 +8,10 @@ import lombok.Setter;
 public class HitDto {
 
     private Long id;
+<<<<<<< HEAD
+=======
     private Long sampleId;
+>>>>>>> feature/MES-470
     private Long composedId;
     private Float tca;
     private Boolean isValidForReliability;

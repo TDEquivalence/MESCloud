@@ -32,9 +32,9 @@ public class ComposedProductionOrderServiceImpl implements ComposedProductionOrd
     private static final java.util.logging.Logger logger = Logger.getLogger(ComposedProductionOrderServiceImpl.class.getName());
 
     private final ComposedProductionOrderRepository repository;
-    private final GenericConverter<ComposedProductionOrderEntity, ComposedProductionOrderDto> converter;
-
     private final ProductionOrderService productionOrderService;
+
+    private final GenericConverter<ComposedProductionOrderEntity, ComposedProductionOrderDto> converter;
     private final GenericConverter<ComposedSummaryEntity, ComposedSummaryDto> summaryConverter;
 
     private static final String OBO_SECTION_PREFIX = "OBO";
@@ -236,4 +236,10 @@ public class ComposedProductionOrderServiceImpl implements ComposedProductionOrd
         }
         return productionOrderService.getProductionOrderByComposedId(composedId);
     }
+
+    @Override
+    public void deleteComposed(ComposedProductionOrderEntity composedProductionOrder) {
+        repository.delete(composedProductionOrder);
+    }
+
 }

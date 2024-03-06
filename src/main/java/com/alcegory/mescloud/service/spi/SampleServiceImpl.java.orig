@@ -3,12 +3,18 @@ package com.alcegory.mescloud.service.spi;
 import com.alcegory.mescloud.model.converter.GenericConverter;
 import com.alcegory.mescloud.model.converter.ProductionOrderConverter;
 import com.alcegory.mescloud.model.dto.ComposedProductionOrderDto;
+<<<<<<< HEAD
+=======
 import com.alcegory.mescloud.model.dto.ProductionOrderDto;
+>>>>>>> feature/MES-470
 import com.alcegory.mescloud.model.dto.SampleDto;
 import com.alcegory.mescloud.model.entity.ComposedProductionOrderEntity;
 import com.alcegory.mescloud.model.entity.ProductionOrderEntity;
 import com.alcegory.mescloud.model.entity.SampleEntity;
+<<<<<<< HEAD
+=======
 import com.alcegory.mescloud.model.request.RequestById;
+>>>>>>> feature/MES-470
 import com.alcegory.mescloud.model.request.RequestSampleDto;
 import com.alcegory.mescloud.repository.SampleRepository;
 import com.alcegory.mescloud.service.ComposedProductionOrderService;
@@ -84,6 +90,8 @@ public class SampleServiceImpl implements SampleService {
     }
 
     @Override
+<<<<<<< HEAD
+=======
     public List<ProductionOrderDto> removeProductionOrderFromComposed(RequestById request) {
 
         Optional<ProductionOrderEntity> productionOrderOpt = productionOrderService.findById(request.getId());
@@ -110,6 +118,7 @@ public class SampleServiceImpl implements SampleService {
     }
 
     @Override
+>>>>>>> feature/MES-470
     public SampleEntity findByComposedProductionOrderId(Long composedProductionOrderId) {
         return repository.findByComposedProductionOrderId(composedProductionOrderId);
     }
