@@ -108,4 +108,11 @@ public class SampleServiceImpl implements SampleService {
 
         return productionOrderConverter.toDto(productionOrders);
     }
+
+    @Override
+    public SampleEntity findByComposedProductionOrderId(Long composedProductionOrderId) {
+        return repository.findByComposedProductionOrderId(composedProductionOrderId);
+    }
+
+
 }

@@ -21,5 +21,7 @@ public interface SampleService {
 
     List<SampleDto> getAll();
 
+    SampleEntity findByComposedProductionOrderId(Long composedProductionOrderId);
+    
     List<ProductionOrderDto> removeProductionOrderFromComposed(RequestById request);
 }

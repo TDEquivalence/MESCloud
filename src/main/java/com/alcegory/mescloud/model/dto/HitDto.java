@@ -9,6 +9,7 @@ public class HitDto {
 
     private Long id;
     private Long sampleId;
+    private Long composedId;
     private Float tca;
     private Boolean isValidForReliability;
 }
