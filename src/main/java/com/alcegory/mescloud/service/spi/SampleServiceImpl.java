@@ -1,12 +1,12 @@
 package com.alcegory.mescloud.service.spi;
 
-import com.alcegory.mescloud.repository.SampleRepository;
 import com.alcegory.mescloud.model.converter.GenericConverter;
 import com.alcegory.mescloud.model.dto.ComposedProductionOrderDto;
-import com.alcegory.mescloud.model.request.RequestSampleDto;
 import com.alcegory.mescloud.model.dto.SampleDto;
 import com.alcegory.mescloud.model.entity.ComposedProductionOrderEntity;
 import com.alcegory.mescloud.model.entity.SampleEntity;
+import com.alcegory.mescloud.model.request.RequestSampleDto;
+import com.alcegory.mescloud.repository.SampleRepository;
 import com.alcegory.mescloud.service.ComposedProductionOrderService;
 import com.alcegory.mescloud.service.SampleService;
 import lombok.AllArgsConstructor;
@@ -73,4 +73,11 @@ public class SampleServiceImpl implements SampleService {
     public List<SampleDto> getAll() {
         return converter.toDto(repository.findAll(), SampleDto.class);
     }
+
+    @Override
+    public SampleEntity findByComposedProductionOrderId(Long composedProductionOrderId) {
+        return repository.findByComposedProductionOrderId(composedProductionOrderId);
+    }
+
+
 }
