@@ -6,4 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface BatchRepository extends JpaRepository<BatchEntity, Long> {
+
+    BatchEntity findByComposedProductionOrderId(Long composedProductionOrderId);
 }
