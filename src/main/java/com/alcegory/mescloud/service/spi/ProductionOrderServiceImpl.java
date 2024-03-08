@@ -10,7 +10,6 @@ import com.alcegory.mescloud.model.entity.CountingEquipmentEntity;
 import com.alcegory.mescloud.model.entity.ProductionOrderEntity;
 import com.alcegory.mescloud.model.entity.ProductionOrderSummaryEntity;
 import com.alcegory.mescloud.protocol.MesMqttSettings;
-import com.alcegory.mescloud.repository.ComposedProductionOrderRepository;
 import com.alcegory.mescloud.repository.CountingEquipmentRepository;
 import com.alcegory.mescloud.repository.ProductionOrderRepository;
 import com.alcegory.mescloud.service.CountingEquipmentService;
@@ -40,7 +39,6 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
 
     private final ProductionOrderRepository repository;
     private final CountingEquipmentRepository countingEquipmentRepository;
-    private final ComposedProductionOrderRepository composedRepository;
 
     private final CountingEquipmentService countingEquipmentService;
     private final MqttClient mqttClient;
