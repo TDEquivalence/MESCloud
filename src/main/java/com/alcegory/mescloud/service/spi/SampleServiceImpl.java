@@ -113,6 +113,4 @@ public class SampleServiceImpl implements SampleService {
     public SampleEntity findByComposedProductionOrderId(Long composedProductionOrderId) {
         return repository.findByComposedProductionOrderId(composedProductionOrderId);
     }
-
-
 }

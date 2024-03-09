@@ -29,8 +29,7 @@ public class AlarmRepositoryImpl extends AbstractFilterRepository<Filter.Propert
         List<Predicate> predicates = buildPredicates(criteriaBuilder, root, filter);
 
         query.select(root)
-                .where(criteriaBuilder.and(predicates.toArray(new Predicate[0])))
-                .orderBy(criteriaBuilder.asc(root.get(ID_PROP)));
+                .where(criteriaBuilder.and(predicates.toArray(new Predicate[0])));
 
         return entityManager.createQuery(query)
                 .getResultList();
