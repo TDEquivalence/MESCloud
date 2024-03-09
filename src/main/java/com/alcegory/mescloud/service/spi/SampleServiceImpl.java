@@ -101,7 +101,11 @@ public class SampleServiceImpl implements SampleService {
         List<ProductionOrderEntity> productionOrders = productionOrderService.findByComposedProductionOrderId(composedProductionOrder.getId());
         if (productionOrders.isEmpty()) {
             SampleEntity sampleEntity = repository.findByComposedProductionOrderId(composedProductionOrder.getId());
-            repository.delete(sampleEntity);
+
+            if (sampleEntity != null) {
+                repository.delete(sampleEntity);
+            }
+
             composedService.delete(composedProductionOrder);
             return Collections.emptyList();
         }
