@@ -48,10 +48,12 @@ public class CountingEquipmentEntity {
     private Double availabilityTarget;
     private Double performanceTarget;
     private Double overallEquipmentEffectivenessTarget;
+    private int unrecognizedAlarmDuration;
 
     @Enumerated(EnumType.STRING)
     private OperationStatus operationStatus;
 
+    @Getter
     public enum OperationStatus {
         PENDING("PENDING"),
         IN_PROGRESS("IN_PROGRESS"),
@@ -63,8 +65,5 @@ public class CountingEquipmentEntity {
             this.value = value;
         }
 
-        public String getValue() {
-            return value;
-        }
     }
 }

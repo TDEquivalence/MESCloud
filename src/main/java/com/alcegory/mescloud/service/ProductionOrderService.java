@@ -20,7 +20,9 @@ public interface ProductionOrderService {
 
     Optional<ProductionOrderDto> create(ProductionOrderDto productionOrderDto);
 
-    boolean hasActiveProductionOrder(long countingEquipmentId);
+    boolean hasActiveProductionOrderByEquipmentId(long countingEquipmentId);
+
+    boolean hasActiveProductionOrderByEquipmentCode(String countingEquipmentCode);
 
     Optional<ProductionOrderDto> complete(long countingEquipmentId);
 
@@ -52,4 +54,8 @@ public interface ProductionOrderService {
                                                          Timestamp endDate);
 
     List<ProductionOrderSummaryDto> getProductionOrderByComposedId(Long composedId);
+
+    Optional<ProductionOrderDto> editProductionOrder(ProductionOrderDto requestProductionOrder);
+
+    List<ProductionOrderEntity> findByComposedProductionOrderId(Long composedOrderId);
 }

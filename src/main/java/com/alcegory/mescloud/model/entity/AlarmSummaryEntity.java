@@ -30,4 +30,5 @@ public class AlarmSummaryEntity {
     private Date recognizedAt;
     private String recognizedByFirstName;
     private String recognizedByLastName;
+    private Long duration;
 }

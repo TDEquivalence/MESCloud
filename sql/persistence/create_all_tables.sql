@@ -108,6 +108,7 @@ CREATE TABLE counting_equipment (
     performance_target DOUBLE PRECISION,
     overall_equipment_effectiveness_target DOUBLE PRECISION,
     operation_status VARCHAR(20),
+    unrecognized_alarm_duration INTEGER,
 
     PRIMARY KEY(id),
     FOREIGN KEY(section_id) REFERENCES section(id),
@@ -340,7 +341,8 @@ SELECT
     a.completed_at AS completed_at,
     a.recognized_at AS recognized_at,
     u.first_name AS recognized_by_first_name,
-    u.last_name AS recognized_by_last_name
+    u.last_name AS recognized_by_last_name,
+    EXTRACT(EPOCH FROM (a.completed_at - a.created_at)) AS duration -- Calculate duration in seconds
 FROM
     alarm a
 JOIN

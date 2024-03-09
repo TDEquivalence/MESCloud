@@ -33,4 +33,6 @@ public interface CounterRecordService {
                                                       Timestamp endDate);
 
     Timestamp getLastRegisteredAtByProductionOrderId(Long productionOrderId);
+
+    void validateProductionOrder(String equipmentCode, String productionOrderCode);
 }

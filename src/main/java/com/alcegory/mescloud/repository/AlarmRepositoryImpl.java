@@ -1,7 +1,7 @@
 package com.alcegory.mescloud.repository;
 
 import com.alcegory.mescloud.constant.AlarmStatus;
-import com.alcegory.mescloud.model.entity.AlarmCounts;
+import com.alcegory.mescloud.model.dto.AlarmCountsDto;
 import com.alcegory.mescloud.model.entity.AlarmEntity;
 import com.alcegory.mescloud.model.entity.AlarmSummaryEntity;
 import com.alcegory.mescloud.model.filter.Filter;
@@ -29,16 +29,15 @@ public class AlarmRepositoryImpl extends AbstractFilterRepository<Filter.Propert
         List<Predicate> predicates = buildPredicates(criteriaBuilder, root, filter);
 
         query.select(root)
-                .where(criteriaBuilder.and(predicates.toArray(new Predicate[0])))
-                .orderBy(criteriaBuilder.asc(root.get(ID_PROP)));
+                .where(criteriaBuilder.and(predicates.toArray(new Predicate[0])));
 
         return entityManager.createQuery(query)
                 .getResultList();
     }
 
-    public AlarmCounts getAlarmCounts(Filter filter) {
+    public AlarmCountsDto getAlarmCounts(Filter filter) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<AlarmCounts> query = criteriaBuilder.createQuery(AlarmCounts.class);
+        CriteriaQuery<AlarmCountsDto> query = criteriaBuilder.createQuery(AlarmCountsDto.class);
         Root<AlarmEntity> root = query.from(AlarmEntity.class);
 
         Expression<Long> totalAlarmsExpression = getTotalAlarmsExpression(criteriaBuilder, root);
@@ -46,7 +45,7 @@ public class AlarmRepositoryImpl extends AbstractFilterRepository<Filter.Propert
 
         List<Predicate> predicates = buildPredicates(criteriaBuilder, root, filter);
 
-        query.select(criteriaBuilder.construct(AlarmCounts.class, totalAlarmsExpression, totalActiveAlarmsExpression))
+        query.select(criteriaBuilder.construct(AlarmCountsDto.class, totalAlarmsExpression, totalActiveAlarmsExpression))
                 .where(criteriaBuilder.and(predicates.toArray(new Predicate[0])));
 
         return entityManager.createQuery(query).getSingleResult();

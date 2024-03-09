@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class CounterRecordProcess extends AbstractMesProtocolProcess<PlcMqttDto> {
 
-    
+
     private final CounterRecordService counterRecordService;
     private final CountingEquipmentService equipmentService;
     private final AlarmService alarmService;
@@ -33,6 +33,7 @@ public class CounterRecordProcess extends AbstractMesProtocolProcess<PlcMqttDto>
                     equipmentCounts.getProductionOrderCode()));
         }
 
+        validateProductionOrder(equipmentCounts.getEquipmentCode(), equipmentCounts.getProductionOrderCode());
         setOperationStatus(equipmentCounts);
         counterRecordService.processCounterRecord(equipmentCounts);
     }
@@ -53,5 +54,9 @@ public class CounterRecordProcess extends AbstractMesProtocolProcess<PlcMqttDto>
         } else {
             equipmentService.setOperationStatusByCode(equipmentCounts.getEquipmentCode(), CountingEquipmentEntity.OperationStatus.IN_PROGRESS);
         }
+    }
+
+    private void validateProductionOrder(String equipmentCode, String productionOrderCode) {
+        counterRecordService.validateProductionOrder(equipmentCode, productionOrderCode);
     }
 }

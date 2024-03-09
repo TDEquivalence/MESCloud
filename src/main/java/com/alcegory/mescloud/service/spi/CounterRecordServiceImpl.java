@@ -301,4 +301,28 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     private void saveAll(List<CounterRecordEntity> counterRecords) {
         repository.saveAll(counterRecords);
     }
+
+    @Override
+    public void validateProductionOrder(String equipmentCode, String productionOrderCode) {
+        if ((productionOrderCode == null || productionOrderCode.isEmpty()) &&
+                productionOrderService.hasActiveProductionOrderByEquipmentCode(equipmentCode)) {
+
+            log.info("Production Order is empty or null, but Equipment has Active PO");
+            Optional<ProductionOrderEntity> productionOrderOpt = productionOrderRepository.findActiveByEquipmentCode(equipmentCode);
+
+            log.info("Production Order was find in Equipment by findActiveByEquipmentCode method");
+            productionOrderOpt.ifPresent(productionOrder -> {
+                if (!repository.hasIncrementByProductionOrderCode(productionOrder.getCode())) {
+                    Long productionOrderId = productionOrder.getId();
+                    boolean hasCounterRecords = repository.existsByProductionOrderId(productionOrderId);
+
+                    if (hasCounterRecords) {
+                        repository.deleteByProductionOrderId(productionOrder.getId());
+                    }
+
+                    productionOrderRepository.delete(productionOrder);
+                }
+            });
+        }
+    }
 }

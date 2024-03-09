@@ -19,7 +19,6 @@ public class ProductionOrderController {
 
     private final ProductionOrderService service;
 
-
     @PostMapping
     public ResponseEntity<ProductionOrderDto> create(@RequestBody ProductionOrderDto requestProductionOrder) {
         Optional<ProductionOrderDto> productionOrderOpt = service.create(requestProductionOrder);
@@ -28,6 +27,16 @@ public class ProductionOrderController {
         }
 
         return new ResponseEntity<>(productionOrderOpt.get(), HttpStatus.OK);
+    }
+
+    @PutMapping("/edit")
+    public ResponseEntity<ProductionOrderDto> edit(@RequestBody ProductionOrderDto requestProductionOrder) {
+        Optional<ProductionOrderDto> productionOrder = service.editProductionOrder(requestProductionOrder);
+        if (productionOrder.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        return new ResponseEntity<>(productionOrder.get(), HttpStatus.OK);
     }
 
     @PutMapping("{countingEquipmentId}/complete")

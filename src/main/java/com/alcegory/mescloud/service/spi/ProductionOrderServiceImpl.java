@@ -38,14 +38,15 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     private static final int FIRST_CODE_VALUE = 1;
 
     private final ProductionOrderRepository repository;
+    private final CountingEquipmentRepository countingEquipmentRepository;
+
+    private final CountingEquipmentService countingEquipmentService;
+    private final MqttClient mqttClient;
+    private final MesMqttSettings mqttSettings;
+
     private final ProductionOrderConverter converter;
     private final GenericConverter<ProductionOrderSummaryEntity, ProductionOrderSummaryDto> summaryConverter;
     private final GenericConverter<CountingEquipmentEntity, CountingEquipmentDto> equipmentConverter;
-    private final ProductionOrderConverter productionOrderConverter;
-    private final CountingEquipmentService countingEquipmentService;
-    private final CountingEquipmentRepository countingEquipmentRepository;
-    private final MqttClient mqttClient;
-    private final MesMqttSettings mqttSettings;
 
     @Override
     public Optional<ProductionOrderDto> complete(long equipmentId) {
@@ -71,7 +72,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         log.info(() -> String.format("Production Order Conclusion already publish for equipmentId [%s]:", equipmentId));
 
         ProductionOrderEntity productionOrder = productionOrderEntityOpt.get();
-        ProductionOrderDto productionOrderDto = productionOrderConverter.toDto(productionOrder);
+        ProductionOrderDto productionOrderDto = converter.toDto(productionOrder);
         return Optional.of(productionOrderDto);
     }
 
@@ -107,7 +108,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
             return Optional.empty();
         }
 
-        if (repository.existsByEquipmentIdAndIsCompletedFalse(productionOrder.getEquipmentId())) {
+        if (repository.hasEquipmentActiveProductionOrder(productionOrder.getEquipmentId())) {
             log.warning(() -> String.format("Unable to create Production Order - Equipment with id [%s] still has an " +
                     "uncompleted production order", productionOrder.getEquipmentId()));
             return Optional.empty();
@@ -191,12 +192,16 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     @Override
     public Optional<ProductionOrderEntity> findByCode(String code) {
         return repository.findByCode(code);
-
     }
 
     @Override
-    public boolean hasActiveProductionOrder(long equipmentId) {
-        return repository.existsByEquipmentIdAndIsCompletedFalse(equipmentId);
+    public boolean hasActiveProductionOrderByEquipmentId(long equipmentId) {
+        return repository.hasEquipmentActiveProductionOrder(equipmentId);
+    }
+
+    @Override
+    public boolean hasActiveProductionOrderByEquipmentCode(String equipmentCode) {
+        return repository.hasEquipmentActiveProductionOrder(equipmentCode);
     }
 
     @Override
@@ -249,7 +254,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     @Override
     public void setProductionOrderApproval(Long composedOrderId, boolean isApproved) {
         try {
-            List<ProductionOrderEntity> productionOrders = repository.findByComposedProductionOrderId(composedOrderId);
+            List<ProductionOrderEntity> productionOrders = findByComposedProductionOrderId(composedOrderId);
 
             if (productionOrders == null || productionOrders.isEmpty()) {
                 log.warning("No production orders found for composed order ID: " + composedOrderId);
@@ -264,6 +269,11 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         } catch (Exception e) {
             log.warning("Error in setProductionOrderApproval: " + e.getMessage());
         }
+    }
+
+    @Override
+    public List<ProductionOrderEntity> findByComposedProductionOrderId(Long composedOrderId) {
+        return repository.findByComposedProductionOrderId(composedOrderId);
     }
 
     @Override
@@ -312,5 +322,35 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         }
         List<ProductionOrderSummaryEntity> productionOrderSummaryEntities = repository.findProductionOrderSummaryByComposedId(composedId);
         return summaryConverter.toDto(productionOrderSummaryEntities, ProductionOrderSummaryDto.class);
+    }
+
+    @Override
+    public Optional<ProductionOrderDto> editProductionOrder(ProductionOrderDto requestProductionOrder) {
+        if (requestProductionOrder == null) {
+            log.warning("Null request Production Order received for editing production order.");
+            return Optional.empty();
+        }
+
+        Optional<ProductionOrderEntity> persistedProductionOrderOpt = repository.findById(requestProductionOrder.getId());
+
+        if (persistedProductionOrderOpt.isEmpty()) {
+            log.warning("No production order found for ID: " + requestProductionOrder.getId());
+            return Optional.empty();
+        }
+
+        ProductionOrderEntity productionOrderUpdated = updateProductionOrder(requestProductionOrder, persistedProductionOrderOpt.get());
+        ProductionOrderEntity persistedProductionOrder = repository.save(productionOrderUpdated);
+        ProductionOrderDto productionOrderDto = converter.toDto(persistedProductionOrder);
+        return Optional.of(productionOrderDto);
+    }
+
+    private ProductionOrderEntity updateProductionOrder(ProductionOrderDto requestProductionOrder, ProductionOrderEntity productionOrderToUpdate) {
+        productionOrderToUpdate.setTargetAmount(requestProductionOrder.getTargetAmount());
+        productionOrderToUpdate.setInputBatch(requestProductionOrder.getInputBatch());
+        productionOrderToUpdate.setSource(requestProductionOrder.getSource());
+        productionOrderToUpdate.setGauge(requestProductionOrder.getGauge());
+        productionOrderToUpdate.setCategory(requestProductionOrder.getCategory());
+        productionOrderToUpdate.setWashingProcess(requestProductionOrder.getWashingProcess());
+        return productionOrderToUpdate;
     }
 }

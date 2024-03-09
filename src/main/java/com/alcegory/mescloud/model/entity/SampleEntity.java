@@ -32,6 +32,6 @@ public class SampleEntity {
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
 
-    @OneToMany(mappedBy = "sample")
+    @OneToMany(mappedBy = "sample", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<HitEntity> hits = new ArrayList<>();
 }

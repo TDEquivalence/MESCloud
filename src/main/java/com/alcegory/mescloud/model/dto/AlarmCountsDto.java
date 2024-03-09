@@ -1,4 +1,4 @@
-package com.alcegory.mescloud.model.entity;
+package com.alcegory.mescloud.model.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class AlarmCounts {
+public class AlarmCountsDto {
 
     private long totalAlarms;
     private long totalActiveAlarms;

@@ -53,4 +53,6 @@ public interface ComposedProductionOrderService {
     void setHitInsertAtInComposed(ComposedProductionOrderEntity composed);
 
     List<ProductionOrderSummaryDto> getProductionOrderSummaryByComposedId(Long composedId);
+
+    void deleteComposed(ComposedProductionOrderEntity composedProductionOrder);
 }

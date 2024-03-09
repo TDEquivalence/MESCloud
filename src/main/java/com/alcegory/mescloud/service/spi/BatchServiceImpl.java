@@ -1,19 +1,25 @@
 package com.alcegory.mescloud.service.spi;
 
 import com.alcegory.mescloud.model.converter.GenericConverter;
+import com.alcegory.mescloud.model.converter.ProductionOrderConverter;
 import com.alcegory.mescloud.model.dto.BatchDto;
 import com.alcegory.mescloud.model.dto.ComposedProductionOrderDto;
+import com.alcegory.mescloud.model.dto.ProductionOrderDto;
 import com.alcegory.mescloud.model.entity.BatchEntity;
 import com.alcegory.mescloud.model.entity.ComposedProductionOrderEntity;
+import com.alcegory.mescloud.model.entity.ProductionOrderEntity;
 import com.alcegory.mescloud.model.request.RequestBatchDto;
+import com.alcegory.mescloud.model.request.RequestById;
 import com.alcegory.mescloud.model.request.RequestToRejectBatchDto;
 import com.alcegory.mescloud.repository.BatchRepository;
 import com.alcegory.mescloud.service.BatchService;
 import com.alcegory.mescloud.service.ComposedProductionOrderService;
+import com.alcegory.mescloud.service.ProductionOrderService;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,8 +29,11 @@ import java.util.Optional;
 public class BatchServiceImpl implements BatchService {
 
     private final BatchRepository repository;
-    private final GenericConverter<BatchEntity, BatchDto> converter;
     private final ComposedProductionOrderService composedService;
+    private final ProductionOrderService productionOrderService;
+
+    private final GenericConverter<BatchEntity, BatchDto> converter;
+    private final ProductionOrderConverter productionOrderConverter;
 
     @Override
     public BatchDto create(RequestBatchDto requestBatch) {
@@ -50,6 +59,30 @@ public class BatchServiceImpl implements BatchService {
         ComposedProductionOrderDto composed = composedProductionOrderDto.get();
         requestToRejectBatchDto.getRequestBatchDto().setComposedId(composed.getId());
         return create(requestToRejectBatchDto.getRequestBatchDto());
+    }
+
+    @Override
+    public List<ProductionOrderDto> removeBatch(RequestById request) {
+        Optional<ComposedProductionOrderEntity> composedOpt = composedService.findById(request.getId());
+
+        if (composedOpt.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        BatchEntity batch = repository.findByComposedProductionOrderId(composedOpt.get().getId());
+
+        if (batch == null) {
+            throw new IllegalArgumentException("Batch not found");
+        }
+
+        repository.delete(batch);
+        composedOpt.get().setApprovedAt(null);
+        composedService.saveAndUpdate(composedOpt.get());
+
+        List<ProductionOrderEntity> productionOrders =
+                productionOrderService.findByComposedProductionOrderId(composedOpt.get().getId());
+
+        return productionOrderConverter.toDto(productionOrders);
     }
 
     private ComposedProductionOrderEntity getComposedById(Long composedId) {

@@ -1,8 +1,10 @@
 package com.alcegory.mescloud.service;
 
 import com.alcegory.mescloud.model.dto.HitDto;
-import com.alcegory.mescloud.model.request.RequestHitDto;
+import com.alcegory.mescloud.model.dto.ProductionOrderDto;
 import com.alcegory.mescloud.model.entity.HitEntity;
+import com.alcegory.mescloud.model.request.RequestById;
+import com.alcegory.mescloud.model.request.RequestHitDto;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,4 +22,6 @@ public interface HitService {
     Optional<HitEntity> findById(Long id);
 
     List<HitDto> getAll();
+
+    List<ProductionOrderDto> removeHits(RequestById request);
 }

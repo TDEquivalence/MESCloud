@@ -115,14 +115,14 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
         }
 
         CountingEquipmentDto dto = convertToDtoWithActiveProductionOrder(countingEquipment);
-        Optional<ProductionOrderEntity> productionOrder = productionOrderRepository.findActiveByEquipmentId(id);
+        Optional<ProductionOrderEntity> productionOrder = productionOrderRepository.findLastByEquipmentId(id);
 
-        if (productionOrder.isEmpty()) {
-            return Optional.of(dto);
+        if (productionOrder.isEmpty() || productionOrder.get().isCompleted()) {
+            dto.setProductionOrder(null);
+        } else {
+            ProductionOrderDto productionOrderDto = productionOrderConverter.toDto(productionOrder.get());
+            dto.setProductionOrder(productionOrderDto);
         }
-
-        ProductionOrderDto productionOrderDto = productionOrderConverter.toDto(productionOrder.get());
-        dto.setProductionOrder(productionOrderDto);
 
         return Optional.of(dto);
     }
@@ -297,6 +297,7 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
         toUpdate.setPerformanceTarget(updateFrom.getPerformanceTarget());
         toUpdate.setAvailabilityTarget(updateFrom.getAvailabilityTarget());
         toUpdate.setOverallEquipmentEffectivenessTarget(updateFrom.getOverallEquipmentEffectivenessTarget());
+        toUpdate.setUnrecognizedAlarmDuration(updateFrom.getUnrecognizedAlarmDuration());
         updateOutputsAlias(toUpdate, updateFrom);
         updateIms(toUpdate, updateFrom.getIms());
     }

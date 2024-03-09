@@ -6,10 +6,7 @@ import com.alcegory.mescloud.exception.AlarmNotFoundException;
 import com.alcegory.mescloud.exception.EquipmentNotFoundException;
 import com.alcegory.mescloud.exception.IllegalAlarmStatusException;
 import com.alcegory.mescloud.model.converter.GenericConverter;
-import com.alcegory.mescloud.model.dto.AlarmDto;
-import com.alcegory.mescloud.model.dto.CountingEquipmentDto;
-import com.alcegory.mescloud.model.dto.PlcMqttDto;
-import com.alcegory.mescloud.model.dto.ProductionOrderDto;
+import com.alcegory.mescloud.model.dto.*;
 import com.alcegory.mescloud.model.entity.*;
 import com.alcegory.mescloud.model.filter.Filter;
 import com.alcegory.mescloud.model.request.RequestAlarmRecognitionDto;
@@ -19,6 +16,7 @@ import com.alcegory.mescloud.service.AlarmService;
 import com.alcegory.mescloud.service.CountingEquipmentService;
 import com.alcegory.mescloud.service.ProductionOrderService;
 import com.alcegory.mescloud.utility.BinaryUtil;
+import com.alcegory.mescloud.utility.DateUtil;
 import jakarta.annotation.Nullable;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
@@ -35,6 +33,7 @@ public class AlarmServiceImpl implements AlarmService {
 
     private static final int PLC_BITS_PER_WORD = 16;
     public static final int ZERO_BASED_OFFSET = 1;
+    private static final String SYSTEM_COMMENT = "Reconhecido Automaticamente";
 
     private final GenericConverter<AlarmEntity, AlarmDto> converter;
     private final AlarmRepository repository;
@@ -90,7 +89,7 @@ public class AlarmServiceImpl implements AlarmService {
     }
 
     @Override
-    public AlarmCounts getAlarmCounts(Filter filter) {
+    public AlarmCountsDto getAlarmCounts(Filter filter) {
         return repository.getAlarmCounts(filter);
     }
 
@@ -126,6 +125,7 @@ public class AlarmServiceImpl implements AlarmService {
         }
 
         deactivateAlarms(activeAlarmByConfigId, alarmsToUpsert);
+        verifyUnrecognizedAlarmDuration(activeAlarmByConfigId, countingEquipment);
         return alarmsToUpsert;
     }
 
@@ -152,11 +152,30 @@ public class AlarmServiceImpl implements AlarmService {
     }
 
     private void deactivateAlarms(Map<Long, AlarmEntity> alarmByConfigId, List<AlarmEntity> alarmsToUpsert) {
-        alarmByConfigId.values().forEach(inactiveAlarm -> {
-            inactiveAlarm.setStatus(AlarmStatus.INACTIVE);
-            inactiveAlarm.setCompletedAt(new Date());
-            alarmsToUpsert.add(inactiveAlarm);
+        alarmByConfigId.values().forEach(inactiveAlarmToRecognize -> {
+            inactiveAlarmToRecognize.setStatus(AlarmStatus.INACTIVE);
+            inactiveAlarmToRecognize.setCompletedAt(new Date());
+            alarmsToUpsert.add(inactiveAlarmToRecognize);
         });
+    }
+
+    //verify if inactive alarms should be recognized automatically
+    private void verifyUnrecognizedAlarmDuration(Map<Long, AlarmEntity> activeAlarmByConfigId, CountingEquipmentDto equipment) {
+        for (AlarmEntity activeAlarm : activeAlarmByConfigId.values()) {
+            if (activeAlarm.getCompletedAt() != null) {
+                long differenceInMinutes = DateUtil.calculateDifferenceInMinutes(activeAlarm.getCompletedAt(), activeAlarm.getCreatedAt());
+                int unrecognizedDurationInMinutes = equipment.getUnrecognizedAlarmDuration();
+                if (differenceInMinutes < unrecognizedDurationInMinutes) {
+                    autoRecognition(activeAlarm);
+                }
+            }
+        }
+    }
+
+    private void autoRecognition(AlarmEntity alarm) {
+        alarm.setStatus(AlarmStatus.RECOGNIZED);
+        alarm.setComment(SYSTEM_COMMENT);
+        alarm.setRecognizedAt(new Date());
     }
 
     private AlarmConfigurationEntity findAlarmConfiguration(Long equipmentId, int wordIndex, int bitIndex) throws AlarmConfigurationNotFoundException {
@@ -171,6 +190,12 @@ public class AlarmServiceImpl implements AlarmService {
 
     private Map<Long, AlarmEntity> findActiveAlarmsMap(Long equipmentId) {
         List<AlarmEntity> activeAlarms = repository.findByEquipmentIdAndStatus(equipmentId, AlarmStatus.ACTIVE);
+        return activeAlarms.stream()
+                .collect(Collectors.toMap(alarm -> alarm.getAlarmConfiguration().getId(), alarm -> alarm));
+    }
+
+    private Map<Long, AlarmEntity> findInactiveAlarmsMap(Long equipmentId) {
+        List<AlarmEntity> activeAlarms = repository.findByEquipmentIdAndStatus(equipmentId, AlarmStatus.INACTIVE);
         return activeAlarms.stream()
                 .collect(Collectors.toMap(alarm -> alarm.getAlarmConfiguration().getId(), alarm -> alarm));
     }

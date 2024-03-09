@@ -1,19 +1,26 @@
 package com.alcegory.mescloud.service.spi;
 
 import com.alcegory.mescloud.model.converter.GenericConverter;
+import com.alcegory.mescloud.model.converter.ProductionOrderConverter;
 import com.alcegory.mescloud.model.dto.HitDto;
+import com.alcegory.mescloud.model.dto.ProductionOrderDto;
+import com.alcegory.mescloud.model.entity.ComposedProductionOrderEntity;
 import com.alcegory.mescloud.model.entity.HitEntity;
+import com.alcegory.mescloud.model.entity.ProductionOrderEntity;
 import com.alcegory.mescloud.model.entity.SampleEntity;
+import com.alcegory.mescloud.model.request.RequestById;
 import com.alcegory.mescloud.model.request.RequestHitDto;
 import com.alcegory.mescloud.repository.HitRepository;
 import com.alcegory.mescloud.service.ComposedProductionOrderService;
 import com.alcegory.mescloud.service.HitService;
+import com.alcegory.mescloud.service.ProductionOrderService;
 import com.alcegory.mescloud.service.SampleService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,11 +30,16 @@ import java.util.Optional;
 public class HitServiceImpl implements HitService {
 
     public static final float TCA_LIMIT = 0.695f;
+    private static final double INITIAL_VALUE = 0.0;
 
     private final SampleService sampleService;
     private final ComposedProductionOrderService composedService;
+    private final ProductionOrderService productionOrderService;
+
     private final HitRepository repository;
+
     private final GenericConverter<HitEntity, HitDto> converter;
+    private final ProductionOrderConverter productionOrderConverter;
 
     @Override
     public List<HitDto> create(RequestHitDto requestHitDto) {
@@ -124,6 +136,36 @@ public class HitServiceImpl implements HitService {
         return sample;
     }
 
+    @Override
+    public List<ProductionOrderDto> removeHits(RequestById request) {
+        Optional<ComposedProductionOrderEntity> composedOpt = composedService.findById(request.getId());
+
+        if (composedOpt.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        SampleEntity sample = sampleService.findByComposedProductionOrderId(composedOpt.get().getId());
+
+        if (sample == null) {
+            throw new IllegalArgumentException("Sample not found in remove hits");
+        }
+
+        List<HitEntity> hits = repository.findBySampleId(sample.getId());
+        deleteAll(hits);
+        resetSample(sample);
+
+        List<ProductionOrderEntity> productionOrders =
+                productionOrderService.findByComposedProductionOrderId(composedOpt.get().getId());
+
+        return productionOrderConverter.toDto(productionOrders);
+    }
+
+    private void resetSample(SampleEntity sample) {
+        sample.setReliability(INITIAL_VALUE);
+        sample.setTcaAverage(INITIAL_VALUE);
+        sampleService.saveAndUpdate(sample);
+    }
+
     public HitEntity saveAndUpdate(HitEntity hitEntity) {
         return repository.save(hitEntity);
     }
@@ -138,6 +180,10 @@ public class HitServiceImpl implements HitService {
         repository.delete(hitEntity);
     }
 
+    private void deleteAll(List<HitEntity> hits) {
+        repository.deleteAll(hits);
+    }
+
     @Override
     public Optional<HitEntity> findById(Long id) {
         return repository.findById(id);
@@ -147,4 +193,5 @@ public class HitServiceImpl implements HitService {
     public List<HitDto> getAll() {
         return converter.toDto(repository.findAll(), HitDto.class);
     }
+
 }
