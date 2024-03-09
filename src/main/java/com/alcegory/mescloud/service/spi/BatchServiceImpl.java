@@ -75,13 +75,19 @@ public class BatchServiceImpl implements BatchService {
             throw new IllegalArgumentException("Batch not found");
         }
 
+        List<ProductionOrderEntity> productionOrders =
+                productionOrderService.findByComposedProductionOrderId(composedOpt.get().getId());
+        if (Boolean.FALSE.equals(batch.getIsApproved())) {
+            for (ProductionOrderEntity productionOrder : productionOrders) {
+                productionOrder.setComposedProductionOrder(null);
+                productionOrderService.saveAndUpdate(productionOrder);
+            }
+        }
+
         repository.delete(batch);
         composedOpt.get().setApprovedAt(null);
         composedService.saveAndUpdate(composedOpt.get());
-
-        List<ProductionOrderEntity> productionOrders =
-                productionOrderService.findByComposedProductionOrderId(composedOpt.get().getId());
-
+        
         return productionOrderConverter.toDto(productionOrders);
     }
 
