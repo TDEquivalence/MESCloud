@@ -9,7 +9,7 @@ SELECT
     po.code AS production_order_code,
     a.status AS status,
     a.comment AS comment,
-    a.created_at AS registered_at
+    a.created_at AS registered_at, -- Renamed here
     a.completed_at AS completed_at,
     a.recognized_at AS recognized_at,
     u.first_name AS recognized_by_first_name,
@@ -28,6 +28,7 @@ LEFT JOIN
 WHERE
     a.status IN ('ACTIVE', 'INACTIVE', 'RECOGNIZED');
 
+
 INSERT INTO audit_script (run_date, process, version, schema)
 VALUES
-    (CURRENT_DATE, '0008_add_duration_column_alarm_summary.sql', '1.0.0', '1.0.0_0008');
+    (CURRENT_DATE, '0009_change_column_name_alarm_summary_view.sql', '1.0.0', '1.0.0_0009');
