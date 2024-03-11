@@ -34,8 +34,10 @@ public class Filter extends AbstractPaginatedFilter<Filter.Property> {
 
         //Alarm
         STATUS("status", FilterDataTypeOperation.STRING_EQUAL),
-        COMPLETED_AT("completedAt", FilterDataTypeOperation.DATE_LESS_OR_EQUAL),
-        RECOGNIZED_AT("recognizedAt", FilterDataTypeOperation.DATE_LESS_OR_EQUAL);
+        COMPLETED_AT("completedAt", "completedAt", FilterDataTypeOperation.DATE_LESS_OR_EQUAL),
+        RECOGNIZED_AT("recognizedAt", "recognizedAt", FilterDataTypeOperation.DATE_LESS_OR_EQUAL),
+        CREATED_AT(REGISTERED_AT_PROP, CREATED_AT_PROP, FilterDataTypeOperation.DATE_GREATER_OR_EQUAL),
+        DURATION("duration", "duration", FilterDataTypeOperation.DATE_GREATER_OR_EQUAL);
 
 
         Property(String name, FilterDataTypeOperation dataTypeOperation) {

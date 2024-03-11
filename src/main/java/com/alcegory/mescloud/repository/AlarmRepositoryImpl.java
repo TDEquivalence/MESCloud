@@ -26,12 +26,21 @@ public class AlarmRepositoryImpl extends AbstractFilterRepository<Filter.Propert
         CriteriaQuery<AlarmSummaryEntity> query = criteriaBuilder.createQuery(AlarmSummaryEntity.class);
         Root<AlarmSummaryEntity> root = query.from(AlarmSummaryEntity.class);
 
-        List<Predicate> predicates = buildPredicates(criteriaBuilder, root, filter);
+        List<Predicate> predicates = new ArrayList<>();
+        addPredicates(filter, predicates, criteriaBuilder, root);
+
+        List<Order> orders = new ArrayList<>();
+        addSortOrders(filter, orders, criteriaBuilder, root);
+        Order newestOrder = criteriaBuilder.desc(root.get(ID_PROP));
+        orders.add(newestOrder);
 
         query.select(root)
-                .where(criteriaBuilder.and(predicates.toArray(new Predicate[0])));
+                .where(criteriaBuilder.and(predicates.toArray(new Predicate[0])))
+                .orderBy(orders);
 
         return entityManager.createQuery(query)
+                .setFirstResult(filter.getSkip())
+                .setMaxResults(filter.getTake())
                 .getResultList();
     }
 

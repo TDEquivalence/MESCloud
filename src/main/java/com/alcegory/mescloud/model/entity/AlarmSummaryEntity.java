@@ -23,7 +23,7 @@ public class AlarmSummaryEntity {
     private AlarmStatus status;
     private String comment;
     @Temporal(TemporalType.TIMESTAMP)
-    private Date createdAt;
+    private Date registeredAt;
     @Temporal(TemporalType.TIMESTAMP)
     private Date completedAt;
     @Temporal(TemporalType.TIMESTAMP)
