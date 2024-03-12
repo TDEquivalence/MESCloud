@@ -42,7 +42,7 @@ public class ExportExcelServiceImpl implements ExportExcelService {
 
         setExcelResponseHeaders(response, COMPOSED_PRODUCTION_ORDERS_COMPLETED);
 
-        List<ProductionOrderSummaryEntity> productionOrderViews = productionOrderRepository.findCompleted(startDate, endDate, false);
+        List<ProductionOrderSummaryEntity> productionOrderViews = productionOrderRepository.findCompleted(startDate, endDate, false, null);
         List<ComposedSummaryEntity> composedList = composedRepository.findAllComposed(startDate, endDate);
 
         try {

@@ -17,7 +17,7 @@ import java.util.Optional;
 @Repository
 public interface ProductionOrderRepository extends JpaRepository<ProductionOrderEntity, Long> {
 
-    Optional<ProductionOrderEntity> findByCode(String equipmentOutputCode);
+    Optional<ProductionOrderEntity> findByCode(String productionOrderCode);
 
     Optional<ProductionOrderEntity> findTopByOrderByIdDesc();
 
@@ -37,7 +37,8 @@ public interface ProductionOrderRepository extends JpaRepository<ProductionOrder
 
     List<ProductionOrderEntity> findByIdIn(List<Long> ids);
 
-    List<ProductionOrderSummaryEntity> findCompleted(Timestamp startDate, Timestamp endDate, boolean withoutComposed);
+    List<ProductionOrderSummaryEntity> findCompleted(Timestamp startDate, Timestamp endDate, boolean withoutComposed,
+                                                     String productionOrderCode);
 
     List<ProductionOrderEntity> findByComposedProductionOrderId(Long composedProductionOrderId);
 
@@ -78,4 +79,7 @@ public interface ProductionOrderRepository extends JpaRepository<ProductionOrder
     @Modifying
     @Query(value = "DELETE FROM production_order WHERE code = :productionOrderCode", nativeQuery = true)
     void deleteByCode(String productionOrderCode);
+
+    @Query(value = "SELECT composed_production_order_id FROM production_order WHERE code = :code", nativeQuery = true)
+    Long findComposedProductionOrderIdByCode(@Param("code") String code);
 }
