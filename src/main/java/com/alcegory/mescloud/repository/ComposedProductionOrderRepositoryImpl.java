@@ -1,8 +1,10 @@
 package com.alcegory.mescloud.repository;
 
+import com.alcegory.mescloud.model.dto.FilterDto;
 import com.alcegory.mescloud.model.entity.BatchEntity;
 import com.alcegory.mescloud.model.entity.ComposedSummaryEntity;
 import com.alcegory.mescloud.model.entity.HitEntity;
+import com.alcegory.mescloud.model.filter.Filter;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
@@ -12,6 +14,10 @@ import org.springframework.stereotype.Repository;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
+import static com.alcegory.mescloud.model.filter.Filter.Property.END_DATE;
+import static com.alcegory.mescloud.model.filter.Filter.Property.START_DATE;
 
 @AllArgsConstructor
 @Repository
@@ -27,30 +33,26 @@ public class ComposedProductionOrderRepositoryImpl {
     private final EntityManager entityManager;
 
 
-    public List<ComposedSummaryEntity> findCompleted(Timestamp startDate, Timestamp endDate) {
-
+    public List<ComposedSummaryEntity> findCompleted(FilterDto filter, Long composedId) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<ComposedSummaryEntity> query = criteriaBuilder.createQuery(ComposedSummaryEntity.class);
         Root<ComposedSummaryEntity> root = query.from(ComposedSummaryEntity.class);
 
+        // Construct predicates
         List<Predicate> predicates = new ArrayList<>();
         predicates.add(hasAssociatedBatchPredicate(query, root));
+        predicates.addAll(getDatePredicates(criteriaBuilder, root, filter));
 
-        // Predicates for startDate and endDate
-        if (startDate != null) {
-            Predicate startDatePredicate = criteriaBuilder.greaterThanOrEqualTo(root.get(APPROVED_AT), startDate);
-            predicates.add(startDatePredicate);
+        if (composedId != null) {
+            predicates.add(criteriaBuilder.equal(root.get("id"), composedId));
         }
-        if (endDate != null) {
-            Predicate endDatePredicate = criteriaBuilder.lessThanOrEqualTo(root.get(APPROVED_AT), endDate);
-            predicates.add(endDatePredicate);
-        }
+        // Construct ordering
         List<Order> orders = new ArrayList<>();
-        Order approvedAtDescOrder = criteriaBuilder.desc(root.get(APPROVED_AT));
-        orders.add(approvedAtDescOrder);
+        orders.add(criteriaBuilder.desc(root.get(APPROVED_AT)));
 
+        // Construct and execute the query
         query.select(root)
-                .where(criteriaBuilder.and(predicates.toArray(new Predicate[0])))
+                .where(predicates.toArray(new Predicate[0]))
                 .orderBy(orders);
 
         return entityManager.createQuery(query).getResultList();
@@ -85,7 +87,7 @@ public class ComposedProductionOrderRepositoryImpl {
         return root.get(PROP_ID).in(subquery);
     }
 
-    public List<ComposedSummaryEntity> getOpenComposedSummaries(boolean withHits, Timestamp startDate, Timestamp endDate) {
+    public List<ComposedSummaryEntity> getOpenComposedSummaries(boolean withHits, FilterDto filter, Long composedId) {
 
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<ComposedSummaryEntity> query = criteriaBuilder.createQuery(ComposedSummaryEntity.class);
@@ -94,56 +96,58 @@ public class ComposedProductionOrderRepositoryImpl {
         List<Predicate> predicates = new ArrayList<>();
 
         // Predicate for withHits condition
-        if (!withHits) {
-            Subquery<Integer> subquery = query.subquery(Integer.class);
-            Root<HitEntity> subRoot = subquery.from(HitEntity.class);
-            subquery.select(subRoot.get(PROP_SAMPLE).get(PROP_COMPOSED_PO).get(PROP_ID));
+        Subquery<Integer> subquery = query.subquery(Integer.class);
+        Root<HitEntity> subRoot = subquery.from(HitEntity.class);
+        subquery.select(subRoot.get(PROP_SAMPLE).get(PROP_COMPOSED_PO).get(PROP_ID));
 
-            Predicate noHitsPredicate = criteriaBuilder.not(root.get(PROP_ID).in(subquery));
-            predicates.add(noHitsPredicate);
-        } else {
-            Subquery<Integer> subquery = query.subquery(Integer.class);
-            Root<HitEntity> subRoot = subquery.from(HitEntity.class);
-            subquery.select(subRoot.get(PROP_SAMPLE).get(PROP_COMPOSED_PO).get(PROP_ID));
+        Predicate hitsPredicate = withHits ? root.get(PROP_ID).in(subquery) : criteriaBuilder.not(root.get(PROP_ID).in(subquery));
+        predicates.add(hitsPredicate);
 
-            Predicate hitsPredicate = root.get(PROP_ID).in(subquery);
-            predicates.add(hitsPredicate);
+        // Handle filter
+        if (filter != null) {
+            Optional<Timestamp> startDateOpt = Optional.ofNullable(filter.getSearch().getTimestampValue(Filter.Property.START_DATE));
+            Optional<Timestamp> endDateOpt = Optional.ofNullable(filter.getSearch().getTimestampValue(Filter.Property.END_DATE));
+
+            startDateOpt.ifPresent(startDate -> predicates.add(
+                    withHits ? criteriaBuilder.greaterThanOrEqualTo(root.get(INSERT_HIT_AT), startDate)
+                            : criteriaBuilder.greaterThanOrEqualTo(root.get(CREATED_AT), startDate)
+            ));
+            endDateOpt.ifPresent(endDate -> predicates.add(
+                    withHits ? criteriaBuilder.lessThanOrEqualTo(root.get(INSERT_HIT_AT), endDate)
+                            : criteriaBuilder.lessThanOrEqualTo(root.get(CREATED_AT), endDate)
+            ));
         }
 
-        if (!withHits) {
-            if (startDate != null) {
-                Predicate startDatePredicate = criteriaBuilder.greaterThanOrEqualTo(root.get(CREATED_AT), startDate);
-                predicates.add(startDatePredicate);
-            }
-            if (endDate != null) {
-                Predicate endDatePredicate = criteriaBuilder.lessThanOrEqualTo(root.get(CREATED_AT), endDate);
-                predicates.add(endDatePredicate);
-            }
-        } else {
-            if (startDate != null) {
-                Predicate startDatePredicate = criteriaBuilder.greaterThanOrEqualTo(root.get(INSERT_HIT_AT), startDate);
-                predicates.add(startDatePredicate);
-            }
-            if (endDate != null) {
-                Predicate endDatePredicate = criteriaBuilder.lessThanOrEqualTo(root.get(INSERT_HIT_AT), endDate);
-                predicates.add(endDatePredicate);
-            }
-        }
+        // Exclude instances where approvedAt is not null
+        predicates.add(criteriaBuilder.isNull(root.get(APPROVED_AT)));
 
-        // Predicate to exclude instances where approvedAt is not null
-        Predicate approvedAtIsNullPredicate = criteriaBuilder.isNull(root.get(APPROVED_AT));
-        predicates.add(approvedAtIsNullPredicate);
+        // Add predicate for composedId if it's not null
+        if (composedId != null) {
+            predicates.add(criteriaBuilder.equal(root.get(PROP_ID), composedId));
+        }
 
         // Constructing the final query
         query.where(predicates.toArray(new Predicate[0]));
 
-        // Ordering by created_at
-        if (!withHits) {
-            query.orderBy(criteriaBuilder.desc(root.get(CREATED_AT)));
-        } else {
-            query.orderBy(criteriaBuilder.desc(root.get(INSERT_HIT_AT)));
-        }
+        // Ordering by created_at or insert_hit_at based on withHits condition
+        query.orderBy(withHits ? criteriaBuilder.desc(root.get(INSERT_HIT_AT)) : criteriaBuilder.desc(root.get(CREATED_AT)));
+
         // Execute the query and return results
         return entityManager.createQuery(query).getResultList();
+    }
+
+    private List<Predicate> getDatePredicates(CriteriaBuilder criteriaBuilder, Root<ComposedSummaryEntity> root, FilterDto filter) {
+        List<Predicate> datePredicates = new ArrayList<>();
+        Timestamp startDate = filter.getSearch().getTimestampValue(START_DATE);
+        Timestamp endDate = filter.getSearch().getTimestampValue(END_DATE);
+
+        if (startDate != null) {
+            datePredicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get(APPROVED_AT), startDate));
+        }
+        if (endDate != null) {
+            datePredicates.add(criteriaBuilder.lessThanOrEqualTo(root.get(APPROVED_AT), endDate));
+        }
+
+        return datePredicates;
     }
 }

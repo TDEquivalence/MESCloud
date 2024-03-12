@@ -9,6 +9,7 @@ import com.alcegory.mescloud.model.dto.*;
 import com.alcegory.mescloud.model.entity.CountingEquipmentEntity;
 import com.alcegory.mescloud.model.entity.ProductionOrderEntity;
 import com.alcegory.mescloud.model.entity.ProductionOrderSummaryEntity;
+import com.alcegory.mescloud.model.filter.Filter;
 import com.alcegory.mescloud.protocol.MesMqttSettings;
 import com.alcegory.mescloud.repository.CountingEquipmentRepository;
 import com.alcegory.mescloud.repository.ProductionOrderRepository;
@@ -239,7 +240,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
 
     @Override
     public List<ProductionOrderSummaryDto> getCompletedWithoutComposedFiltered() {
-        List<ProductionOrderSummaryEntity> persistedProductionOrders = repository.findCompleted(null, null, true);
+        List<ProductionOrderSummaryEntity> persistedProductionOrders = repository.findCompleted(null, null, true, null);
         return summaryConverter.toDto(persistedProductionOrders, ProductionOrderSummaryDto.class);
     }
 
@@ -247,7 +248,9 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     public List<ProductionOrderSummaryDto> getCompletedWithoutComposedFiltered(FilterDto filter) {
         Timestamp startDate = filter.getSearch().getTimestampValue(START_DATE);
         Timestamp endDate = filter.getSearch().getTimestampValue(END_DATE);
-        List<ProductionOrderSummaryEntity> persistedProductionOrders = repository.findCompleted(startDate, endDate, true);
+        String productionOrderCode = filter.getSearch().getValue(Filter.Property.PRODUCTION_ORDER_CODE);
+        List<ProductionOrderSummaryEntity> persistedProductionOrders = repository.findCompleted(startDate, endDate, true,
+                productionOrderCode);
         return summaryConverter.toDto(persistedProductionOrders, ProductionOrderSummaryDto.class);
     }
 
@@ -274,6 +277,11 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     @Override
     public List<ProductionOrderEntity> findByComposedProductionOrderId(Long composedOrderId) {
         return repository.findByComposedProductionOrderId(composedOrderId);
+    }
+
+    @Override
+    public Long findComposedProductionOrderIdByCode(String code) {
+        return repository.findComposedProductionOrderIdByCode(code);
     }
 
     @Override

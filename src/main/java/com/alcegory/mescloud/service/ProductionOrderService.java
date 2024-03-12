@@ -58,4 +58,6 @@ public interface ProductionOrderService {
     Optional<ProductionOrderDto> editProductionOrder(ProductionOrderDto requestProductionOrder);
 
     List<ProductionOrderEntity> findByComposedProductionOrderId(Long composedOrderId);
+
+    Long findComposedProductionOrderIdByCode(String code);
 }

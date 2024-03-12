@@ -16,13 +16,15 @@ import java.util.List;
 public class ProductionOrderRepositoryImpl {
 
     private static final String COMPLETED_AT = "completedAt";
+    private static final String PRODUCTION_ORDER_CODE = "code";
     private static final String COMPOSED_PRODUCTION_ORDER = "composedProductionOrder";
     private static final String IS_COMPLETED = "isCompleted";
     private static final String PROP_ID = "id";
 
     private final EntityManager entityManager;
 
-    public List<ProductionOrderSummaryEntity> findCompleted(Timestamp startDate, Timestamp endDate, boolean withoutComposed) {
+    public List<ProductionOrderSummaryEntity> findCompleted(Timestamp startDate, Timestamp endDate, boolean withoutComposed,
+                                                            String productionOrderCode) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<ProductionOrderSummaryEntity> query = criteriaBuilder.createQuery(ProductionOrderSummaryEntity.class);
         Root<ProductionOrderSummaryEntity> root = query.from(ProductionOrderSummaryEntity.class);
@@ -46,10 +48,13 @@ public class ProductionOrderRepositoryImpl {
             predicates.add(endDatePredicate);
         }
 
-        // Add predicate for isCompleted = true
         Predicate isCompletedPredicate = criteriaBuilder.isTrue(root.get(IS_COMPLETED));
         predicates.add(isCompletedPredicate);
 
+        if (productionOrderCode != null && !productionOrderCode.isEmpty()) {
+            Predicate productionOrderCodePredicate = criteriaBuilder.like(root.get(PRODUCTION_ORDER_CODE), "%" + productionOrderCode + "%");
+            predicates.add(productionOrderCodePredicate);
+        }
         query.where(predicates.toArray(new Predicate[0]));
 
         List<Order> orders = new ArrayList<>();
