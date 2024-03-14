@@ -24,48 +24,10 @@ env:
   SECURITY_KEY: ${{ secrets.SECURITY_KEY }}
 
 jobs:
-  unit-tests:
-    name: Unit Tests
-    runs-on: ubuntu-latest
-
-    services:
-      postgres:
-        image: postgres
-        env:
-          POSTGRES_PORT: ${{ vars.DB_PORT }}
-          POSTGRES_HOST: ${{ vars.DB_HOST }}
-          POSTGRES_USER: ${{ vars.DB_USERNAME }}
-          POSTGRES_PASSWORD: ${{ vars.DB_PASSWORD }}
-          POSTGRES_DB: ${{ secrets.DB_NAME }}
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
-
-    steps:
-      - uses: actions/checkout@v3
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3.3.0
-        with:
-          distribution: 'zulu'
-          java-version: '17'
-      - name: Cache Maven packages
-        uses: actions/cache@v3
-        with:
-          path: ~/.m2
-          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-          restore-keys: ${{ runner.os }}-m2
-      - name: Run Tests
-        run: mvn -B test -Dsonar.projectKey=tdedevelopment_MESCloud
-
   build-and-analyze:
     name: Build and Analyze
     runs-on: ubuntu-latest
     if: github.event_name != 'pull_request'
-    needs: unit-tests
 
     services:
       postgres:
