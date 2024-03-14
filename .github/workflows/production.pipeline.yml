@@ -24,7 +24,6 @@ env:
   SECURITY_KEY: ${{ secrets.SECURITY_KEY }}
 
 jobs:
-
   unit-tests:
     name: Unit Tests
     runs-on: ubuntu-latest
