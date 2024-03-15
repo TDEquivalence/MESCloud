@@ -68,6 +68,34 @@ CREATE TABLE factory (
  PRIMARY KEY(id)
 );
 
+CREATE TABLE company (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(30)
+);
+
+CREATE TABLE section_config (
+  id SERIAL PRIMARY KEY,
+  section_id INT REFERENCES section(id),
+  name VARCHAR(20)
+);
+
+CREATE TABLE feature (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(20)
+);
+
+CREATE TABLE section_feature (
+  section_id INT REFERENCES section(id),
+  feature_id INT REFERENCES feature(id),
+  PRIMARY KEY (section_id, feature_id)
+);
+
+CREATE TABLE counting_equipment_feature (
+  counting_equipment_id INT REFERENCES counting_equipment(id),
+  feature_id INT REFERENCES feature(id),
+  PRIMARY KEY (counting_equipment_id, feature_id)
+);
+
 CREATE TABLE section (
  id int GENERATED ALWAYS AS IDENTITY,
  factory_id int,
@@ -98,7 +126,6 @@ CREATE TABLE counting_equipment (
     performance_target DOUBLE PRECISION,
     overall_equipment_effectiveness_target DOUBLE PRECISION,
     operation_status VARCHAR(20),
-    unrecognized_alarm_duration INTEGER,
 
     PRIMARY KEY(id),
     FOREIGN KEY(section_id) REFERENCES section(id),
@@ -331,8 +358,7 @@ SELECT
     a.completed_at AS completed_at,
     a.recognized_at AS recognized_at,
     u.first_name AS recognized_by_first_name,
-    u.last_name AS recognized_by_last_name,
-    EXTRACT(EPOCH FROM (a.completed_at - a.created_at)) AS duration -- Calculate duration in seconds
+    u.last_name AS recognized_by_last_name
 FROM
     alarm a
 JOIN
