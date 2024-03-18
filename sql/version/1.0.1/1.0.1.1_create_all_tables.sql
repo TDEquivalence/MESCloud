@@ -46,8 +46,10 @@ CREATE TABLE users (
   updated_at TIMESTAMP,
   is_active BOOLEAN,
   is_not_locked BOOLEAN,
+  company_id INTEGER
 
   PRIMARY KEY(id)
+  FOREIGN KEY(company_id) REFERENCES company(id)
 );
 
 CREATE TABLE token (
@@ -73,6 +75,16 @@ CREATE TABLE company (
   name VARCHAR(30)
 );
 
+CREATE TABLE section (
+ id int GENERATED ALWAYS AS IDENTITY,
+ factory_id int,
+ prefix varchar(20),
+ name varchar(100),
+
+ PRIMARY KEY(id),
+ FOREIGN KEY(factory_id) REFERENCES factory(id)
+);
+
 CREATE TABLE section_config (
   id SERIAL PRIMARY KEY,
   section_id INT REFERENCES section(id),
@@ -84,25 +96,10 @@ CREATE TABLE feature (
   name VARCHAR(20)
 );
 
-CREATE TABLE section_feature (
-  section_id INT REFERENCES section(id),
+CREATE TABLE section_config_feature (
+  section_config_id INT REFERENCES section(id),
   feature_id INT REFERENCES feature(id),
   PRIMARY KEY (section_id, feature_id)
-);
-
-CREATE TABLE counting_equipment_feature (
-  counting_equipment_id INT REFERENCES counting_equipment(id),
-  feature_id INT REFERENCES feature(id),
-  PRIMARY KEY (counting_equipment_id, feature_id)
-);
-
-CREATE TABLE section (
- id int GENERATED ALWAYS AS IDENTITY,
- factory_id int,
- name varchar(100),
-
- PRIMARY KEY(id),
- FOREIGN KEY(factory_id) REFERENCES factory(id)
 );
 
 CREATE TABLE ims (
@@ -130,6 +127,12 @@ CREATE TABLE counting_equipment (
     PRIMARY KEY(id),
     FOREIGN KEY(section_id) REFERENCES section(id),
     FOREIGN KEY(ims_id) REFERENCES ims(id)
+);
+
+CREATE TABLE counting_equipment_feature (
+  counting_equipment_id INT REFERENCES counting_equipment(id),
+  feature_id INT REFERENCES feature(id),
+  PRIMARY KEY (counting_equipment_id, feature_id)
 );
 
 CREATE INDEX idx_counting_equipment_section_id ON counting_equipment (section_id);

@@ -1,7 +1,7 @@
 package com.alcegory.mescloud.api.rest;
 
-import com.alcegory.mescloud.model.dto.FactoryDto;
-import com.alcegory.mescloud.service.FactoryService;
+import com.alcegory.mescloud.model.dto.CompanyDto;
+import com.alcegory.mescloud.service.CompanyService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,21 +12,21 @@ import org.springframework.web.bind.annotation.*;
 @AllArgsConstructor
 public class FactoryController {
 
-    private final FactoryService factoryService;
+    private final CompanyService companyService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<FactoryDto> getFactoryById(@PathVariable("id") Long id) {
-        FactoryDto factoryDto = factoryService.getFactoryById(id);
-        if (factoryDto != null) {
-            return ResponseEntity.ok(factoryDto);
+    public ResponseEntity<CompanyDto> getFactoryById(@PathVariable("id") Long id) {
+        CompanyDto companyDto = companyService.getFactoryById(id);
+        if (companyDto != null) {
+            return ResponseEntity.ok(companyDto);
         } else {
             return ResponseEntity.notFound().build();
         }
     }
 
     @PostMapping("/save")
-    public ResponseEntity<FactoryDto> saveFactory(@RequestBody FactoryDto factoryDto) {
-        FactoryDto savedFactoryDto = factoryService.saveFactory(factoryDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedFactoryDto);
+    public ResponseEntity<CompanyDto> saveFactory(@RequestBody CompanyDto companyDto) {
+        CompanyDto savedCompanyDto = companyService.saveFactory(companyDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedCompanyDto);
     }
 }

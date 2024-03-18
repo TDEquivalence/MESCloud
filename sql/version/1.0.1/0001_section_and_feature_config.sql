@@ -1,6 +1,6 @@
 --add column user company in all tables and these tables
 --delete relational table user factory
-DROP TABLE IF EXISTS factory_user;production_instruction
+DROP TABLE IF EXISTS factory_user;
 DROP TABLE IF EXISTS production_instruction;
 ALTER TABLE factory RENAME TO company;
 
@@ -30,10 +30,10 @@ CREATE TABLE feature (
   name VARCHAR(20)
 );
 
-CREATE TABLE section_feature (
-  section_id INT REFERENCES section(id),
+CREATE TABLE section_config_feature (
+  section_config_id INT REFERENCES section_config(id),
   feature_id INT REFERENCES feature(id),
-  PRIMARY KEY (section_id, feature_id)
+  PRIMARY KEY (section_config_id, feature_id)
 );
 
 CREATE TABLE counting_equipment_feature (

@@ -1,21 +1,18 @@
-package com.alcegory.mescloud.model.dto;
+package com.alcegory.mescloud.security.model.auth;
 
 import com.alcegory.mescloud.security.role.Role;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
-@Setter
 @Getter
+@Setter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserDto {
+public class UserAuthenticationResponse {
 
     private Long id;
     private String username;
     private String firstName;
     private String lastName;
     private Role role;
-    private CompanyDto company;
 }

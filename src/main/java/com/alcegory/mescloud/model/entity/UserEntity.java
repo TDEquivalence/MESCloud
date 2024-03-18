@@ -33,13 +33,17 @@ public class UserEntity implements UserDetails {
     private String[] userAuthorities;
 
     @OneToMany(mappedBy = "user")
-    private transient  List<TokenEntity> tokens;
+    private transient List<TokenEntity> tokens;
 
     private Date createdAt;
     private Date updatedAt;
     private boolean isActive;
     private boolean isNotLocked;
 
+    @ManyToOne
+    @JoinColumn(name = "company_id")
+    private CompanyEntity company;
+    
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return role.getRoleAuthorities();

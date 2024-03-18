@@ -6,9 +6,9 @@ import lombok.Setter;
 
 import java.util.List;
 
-@Entity(name = "counting_equipment")
 @Getter
 @Setter
+@Entity(name = "counting_equipment")
 public class CountingEquipmentEntity {
 
     @Id
@@ -66,4 +66,10 @@ public class CountingEquipmentEntity {
         }
 
     }
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "counting_equipment_feature",
+            joinColumns = @JoinColumn(name = "counting_equipment_id"),
+            inverseJoinColumns = @JoinColumn(name = "feature_id"))
+    private List<FeatureEntity> features;
 }

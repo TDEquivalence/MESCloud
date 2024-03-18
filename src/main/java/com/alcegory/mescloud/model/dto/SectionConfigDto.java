@@ -7,9 +7,10 @@ import java.util.List;
 
 @Getter
 @Setter
-public class FactoryDto {
+public class SectionConfigDto {
 
     private Long id;
+    private SectionDto sectionDto;
     private String name;
-    private List<SectionDto> sectionList;
+    private List<FeatureDto> featureList;
 }

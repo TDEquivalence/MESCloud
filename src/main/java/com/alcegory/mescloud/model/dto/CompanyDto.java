@@ -7,9 +7,9 @@ import java.util.List;
 
 @Getter
 @Setter
-public class FactoryDto {
+public class CompanyDto {
 
     private Long id;
     private String name;
-    private List<SectionDto> sectionList;
+    private List<FactoryDto> factoryList;
 }

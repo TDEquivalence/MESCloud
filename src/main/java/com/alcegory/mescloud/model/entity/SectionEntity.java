@@ -6,9 +6,9 @@ import lombok.Setter;
 
 import java.util.List;
 
-@Entity(name = "section")
 @Getter
 @Setter
+@Entity(name = "section")
 public class SectionEntity {
 
     @Id
@@ -19,4 +19,8 @@ public class SectionEntity {
     private List<CountingEquipmentEntity> countingEquipments;
     @ManyToOne
     private FactoryEntity factory;
+    @OneToOne(mappedBy = "section")
+    private SectionConfigEntity sectionConfigEntity;
 }
+
+

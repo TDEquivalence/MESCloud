@@ -35,7 +35,7 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     private final ProductionOrderService productionOrderService;
     private final ProductionOrderRepository productionOrderRepository;
     private final CountingEquipmentService countingEquipmentService;
-    private final FactoryService factoryService;
+    private final CompanyService companyService;
 
 
     @Override
