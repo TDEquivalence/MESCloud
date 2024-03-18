@@ -10,7 +10,7 @@ import java.util.List;
 public class SectionConfigDto {
 
     private Long id;
-    private SectionDto sectionDto;
+    private SectionDto section;
     private String name;
     private List<FeatureDto> featureList;
 }

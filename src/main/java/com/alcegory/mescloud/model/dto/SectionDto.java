@@ -12,5 +12,5 @@ public class SectionDto {
     private Long id;
     private String name;
     private List<CountingEquipmentDto> countingEquipments;
-    private SectionConfigDto sectionConfigEntity;
+    private SectionConfigDto sectionConfig;
 }
