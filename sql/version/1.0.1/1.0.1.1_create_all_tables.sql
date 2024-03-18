@@ -66,8 +66,10 @@ CREATE TABLE token (
 CREATE TABLE factory (
  id int GENERATED ALWAYS AS IDENTITY,
  name varchar(100) UNIQUE,
+ company_id INT,
 
- PRIMARY KEY(id)
+ PRIMARY KEY(id),
+ FOREIGN KEY(company_id) REFERENCES company(id)
 );
 
 CREATE TABLE company (
