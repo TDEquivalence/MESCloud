@@ -81,7 +81,7 @@ public class UserConverterImpl implements UserConverter {
             sectionDto.setId(sectionEntity.getId());
             sectionDto.setName(sectionEntity.getName());
             // Convert countingEquipments
-            sectionDto.setCountingEquipments(countingEquipmentConverter.convertToSummaryDtoList(sectionEntity.getCountingEquipments()));
+            //sectionDto.setCountingEquipments(countingEquipmentConverter.convertToSummaryDtoList(sectionEntity.getCountingEquipments()));
             // Convert sectionConfigEntity
             sectionDto.setSectionConfig(convertToSectionConfigDto(sectionEntity.getSectionConfigEntity()));
             // Set other SectionDto properties as needed
