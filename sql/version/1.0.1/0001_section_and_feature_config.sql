@@ -22,7 +22,7 @@ CREATE TABLE factory (
 CREATE TABLE section_config (
   id SERIAL PRIMARY KEY,
   section_id INT REFERENCES section(id),
-  name VARCHAR(20)
+  name VARCHAR(50)
 );
 
 CREATE TABLE feature (

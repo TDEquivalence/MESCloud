@@ -13,11 +13,14 @@ UPDATE section
 SET name = 'One by one'
 WHERE id = 1;
 
+ALTER TABLE section_config
+ALTER COLUMN name TYPE VARCHAR(30);
+
 INSERT INTO section_config (section_id, name) VALUES
-(1, 'Dashboard'),
-(1, 'Central de Máquinas'),
-(1, 'Gestão de Produção'),
-(1, 'Alarmes');
+(1, 'dashboard'),
+(1, 'machine-center'),
+(1, 'production-management'),
+(1, 'alarms');
 
 INSERT INTO feature (name) VALUES
 ('Gauge'),
