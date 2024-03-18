@@ -67,7 +67,7 @@ public class CountingEquipmentEntity {
 
     }
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "counting_equipment_feature",
             joinColumns = @JoinColumn(name = "counting_equipment_id"),
             inverseJoinColumns = @JoinColumn(name = "feature_id"))

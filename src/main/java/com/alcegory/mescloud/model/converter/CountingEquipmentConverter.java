@@ -1,8 +1,10 @@
 package com.alcegory.mescloud.model.converter;
 
 import com.alcegory.mescloud.model.dto.CountingEquipmentDto;
-import com.alcegory.mescloud.model.request.RequestConfigurationDto;
 import com.alcegory.mescloud.model.entity.CountingEquipmentEntity;
+import com.alcegory.mescloud.model.request.RequestConfigurationDto;
+
+import java.util.List;
 
 public interface CountingEquipmentConverter {
 
@@ -11,4 +13,6 @@ public interface CountingEquipmentConverter {
     CountingEquipmentEntity convertToEntity(CountingEquipmentDto dto);
 
     CountingEquipmentEntity convertToEntity(RequestConfigurationDto dto);
+
+    List<CountingEquipmentDto> convertToDto(List<CountingEquipmentEntity> countingEquipments);
 }

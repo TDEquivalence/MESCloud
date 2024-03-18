@@ -36,6 +36,21 @@ INSERT INTO section_config_feature (section_config_id, feature_id) VALUES
 (3, 3),
 (4, 4);
 
+INSERT INTO counting_equipment_feature (counting_equipment_id, feature_id)
+VALUES
+  (1, 1),
+  (1, 2),
+  (1, 3),
+  (2, 1),
+  (2, 2),
+  (2, 3),
+  (3, 1),
+  (3, 2),
+  (3, 3),
+  (4, 1),
+  (4, 2),
+  (4, 3);
+
 INSERT INTO audit_script (run_date, process, version, schema)
 VALUES
     (CURRENT_DATE, '0002_section_and_feature_config', '1.0.1', '1.0.1_0002');

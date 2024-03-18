@@ -15,7 +15,7 @@ public class SectionEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
-    @OneToMany(mappedBy = "section")
+    @OneToMany(mappedBy = "section", fetch = FetchType.EAGER)
     private List<CountingEquipmentEntity> countingEquipments;
     @ManyToOne
     private FactoryEntity factory;

@@ -13,10 +13,12 @@ import java.util.List;
 public class UserConverterImpl implements UserConverter {
 
     private final ModelMapper modelMapper;
+    private final CountingEquipmentConverter countingEquipmentConverter;
 
     @Autowired
-    public UserConverterImpl(ModelMapper modelMapper) {
+    public UserConverterImpl(ModelMapper modelMapper, CountingEquipmentConverter countingEquipmentConverter) {
         this.modelMapper = modelMapper;
+        this.countingEquipmentConverter = countingEquipmentConverter;
     }
 
     @Override
@@ -79,7 +81,7 @@ public class UserConverterImpl implements UserConverter {
             sectionDto.setId(sectionEntity.getId());
             sectionDto.setName(sectionEntity.getName());
             // Convert countingEquipments
-            // Omitted for brevity
+            sectionDto.setCountingEquipments(countingEquipmentConverter.convertToDto(sectionEntity.getCountingEquipments()));
             // Convert sectionConfigEntity
             sectionDto.setSectionConfigEntity(convertToSectionConfigDto(sectionEntity.getSectionConfigEntity()));
             // Set other SectionDto properties as needed
