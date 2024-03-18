@@ -72,6 +72,7 @@ public class UserConverterImpl implements UserConverter {
         }
         return sectionEntities.stream()
                 .map(this::convertToSectionDto)
+                .distinct() // Ensure distinct sections
                 .toList();
     }
 
@@ -80,25 +81,19 @@ public class UserConverterImpl implements UserConverter {
         if (sectionEntity != null) {
             sectionDto.setId(sectionEntity.getId());
             sectionDto.setName(sectionEntity.getName());
-            // Convert countingEquipments
-            //sectionDto.setCountingEquipments(countingEquipmentConverter.convertToSummaryDtoList(sectionEntity.getCountingEquipments()));
-            // Convert sectionConfigEntity
-            sectionDto.setSectionConfig(convertToSectionConfigDto(sectionEntity.getSectionConfigEntity()));
-            // Set other SectionDto properties as needed
+            // Convert all associated section configs
+            sectionDto.setSectionConfigList(convertToSectionConfigDtoList(sectionEntity.getSectionConfigList()));
         }
         return sectionDto;
     }
 
-    private SectionConfigDto convertToSectionConfigDto(SectionConfigEntity sectionConfigEntity) {
-        SectionConfigDto sectionConfigDto = new SectionConfigDto();
-        if (sectionConfigEntity != null) {
-            sectionConfigDto.setId(sectionConfigEntity.getId());
-            sectionConfigDto.setName(sectionConfigEntity.getName());
-            // Convert featureList
-            sectionConfigDto.setFeatureList(convertToFeatureDtoList(sectionConfigEntity.getFeatureList()));
-            // Set other SectionConfigDto properties as needed
+    private List<SectionConfigDto> convertToSectionConfigDtoList(List<SectionConfigEntity> sectionConfigEntities) {
+        if (sectionConfigEntities == null) {
+            return Collections.emptyList();
         }
-        return sectionConfigDto;
+        return sectionConfigEntities.stream()
+                .map(this::convertToSectionConfigDto)
+                .toList();
     }
 
     private List<FeatureDto> convertToFeatureDtoList(List<FeatureEntity> featureEntities) {
@@ -108,6 +103,16 @@ public class UserConverterImpl implements UserConverter {
         return featureEntities.stream()
                 .map(this::convertToFeatureDto)
                 .toList();
+    }
+
+    private SectionConfigDto convertToSectionConfigDto(SectionConfigEntity sectionConfigEntity) {
+        SectionConfigDto sectionConfigDto = new SectionConfigDto();
+        if (sectionConfigEntity != null) {
+            sectionConfigDto.setId(sectionConfigEntity.getId());
+            sectionConfigDto.setName(sectionConfigEntity.getName());
+            sectionConfigDto.setFeatureList(convertToFeatureDtoList(sectionConfigEntity.getFeatureList()));
+        }
+        return sectionConfigDto;
     }
 
     private FeatureDto convertToFeatureDto(FeatureEntity featureEntity) {

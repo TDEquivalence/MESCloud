@@ -19,8 +19,8 @@ public class SectionEntity {
     private List<CountingEquipmentEntity> countingEquipments;
     @ManyToOne
     private FactoryEntity factory;
-    @OneToOne(mappedBy = "section")
-    private SectionConfigEntity sectionConfigEntity;
+    @OneToMany(mappedBy = "section", fetch = FetchType.EAGER)
+    private List<SectionConfigEntity> sectionConfigList;
 }
 
 
