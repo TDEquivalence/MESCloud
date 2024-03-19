@@ -22,283 +22,239 @@ DROP TABLE IF EXISTS token;
 DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS factory;
 DROP TABLE IF EXISTS ims;
-DROP TABLE IF EXISTS audit_script;
 
 -- Create tables
-CREATE TABLE audit_script (
+CREATE TABLE IF NOT EXISTS audit_script (
     id SERIAL PRIMARY KEY,
     run_date DATE,
     process VARCHAR(50),
     version VARCHAR(10),
-    schema VARCHAR(50)
+    schema_name VARCHAR(50)
 );
 
-CREATE TABLE users (
-  id int GENERATED ALWAYS AS IDENTITY,
-  first_name VARCHAR(50),
-  last_name VARCHAR(50),
-  username VARCHAR(50) NOT NULL,
-  email VARCHAR(50),
-  password VARCHAR(255) NOT NULL,
-  role VARCHAR(50),
-  user_authorities TEXT[],
-  created_at TIMESTAMP,
-  updated_at TIMESTAMP,
-  is_active BOOLEAN,
-  is_not_locked BOOLEAN,
-  company_id INTEGER
-
-  PRIMARY KEY(id)
-  FOREIGN KEY(company_id) REFERENCES company(id)
+CREATE TABLE IF NOT EXISTS company (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(30) UNIQUE
 );
 
-CREATE TABLE token (
-  id SERIAL PRIMARY KEY,
-  token VARCHAR(255) NOT NULL,
-  token_type VARCHAR(10) NOT NULL,
-  expired BOOLEAN,
-  revoked BOOLEAN,
-  user_id INTEGER NOT NULL,
-
-  FOREIGN KEY (user_id) REFERENCES users (id)
+CREATE TABLE IF NOT EXISTS factory (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) UNIQUE,
+    company_id INT,
+    FOREIGN KEY (company_id) REFERENCES company(id)
 );
 
-CREATE TABLE factory (
- id int GENERATED ALWAYS AS IDENTITY,
- name varchar(100) UNIQUE,
- company_id INT,
-
- PRIMARY KEY(id),
- FOREIGN KEY(company_id) REFERENCES company(id)
+CREATE TABLE IF NOT EXISTS section (
+    id SERIAL PRIMARY KEY,
+    factory_id INT,
+    prefix VARCHAR(20),
+    name VARCHAR(100),
+    FOREIGN KEY (factory_id) REFERENCES factory(id)
 );
 
-CREATE TABLE company (
-  id SERIAL PRIMARY KEY,
-  name VARCHAR(30)
+CREATE TABLE IF NOT EXISTS section_config (
+    id SERIAL PRIMARY KEY,
+    section_id INT REFERENCES section(id),
+    label VARCHAR(20),
+    "order" INTEGER
 );
 
-CREATE TABLE section (
- id int GENERATED ALWAYS AS IDENTITY,
- factory_id int,
- prefix varchar(20),
- name varchar(100),
-
- PRIMARY KEY(id),
- FOREIGN KEY(factory_id) REFERENCES factory(id)
+CREATE TABLE IF NOT EXISTS feature (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(20)
 );
 
-CREATE TABLE section_config (
-  id SERIAL PRIMARY KEY,
-  section_id INT REFERENCES section(id),
-  label VARCHAR(20),
-  "order" INTEGER
+CREATE TABLE IF NOT EXISTS section_config_feature (
+    section_config_id INT REFERENCES section_config(id),
+    feature_id INT REFERENCES feature(id),
+    PRIMARY KEY (section_config_id, feature_id)
 );
 
-CREATE TABLE feature (
-  id SERIAL PRIMARY KEY,
-  name VARCHAR(20)
+CREATE TABLE IF NOT EXISTS ims (
+    id SERIAL PRIMARY KEY,
+    code VARCHAR(100) NOT NULL UNIQUE
 );
 
-CREATE TABLE section_config_feature (
-  section_config_id INT REFERENCES section(id),
-  feature_id INT REFERENCES feature(id),
-  PRIMARY KEY (section_id, feature_id)
-);
-
-CREATE TABLE ims (
-    id int GENERATED ALWAYS AS IDENTITY,
-    code varchar(100) NOT NULL UNIQUE,
-
-    PRIMARY KEY(id)
-);
-
-CREATE TABLE counting_equipment (
-    id int GENERATED ALWAYS AS IDENTITY,
-    code varchar(20) UNIQUE NOT NULL,
-    alias varchar(100),
-    section_id int,
-    equipment_status int,
-    p_timer_communication_cycle int,
-    ims_id int UNIQUE,
+CREATE TABLE IF NOT EXISTS counting_equipment (
+    id SERIAL PRIMARY KEY,
+    code VARCHAR(20) UNIQUE NOT NULL,
+    alias VARCHAR(100),
+    section_id INT,
+    equipment_status INT,
+    p_timer_communication_cycle INT,
+    ims_id INT UNIQUE,
     theoretical_production DOUBLE PRECISION,
     quality_target DOUBLE PRECISION,
     availability_target DOUBLE PRECISION,
     performance_target DOUBLE PRECISION,
     overall_equipment_effectiveness_target DOUBLE PRECISION,
     operation_status VARCHAR(20),
-
-    PRIMARY KEY(id),
-    FOREIGN KEY(section_id) REFERENCES section(id),
-    FOREIGN KEY(ims_id) REFERENCES ims(id)
+    FOREIGN KEY (section_id) REFERENCES section(id),
+    FOREIGN KEY (ims_id) REFERENCES ims(id)
 );
 
-CREATE TABLE counting_equipment_feature (
-  counting_equipment_id INT REFERENCES counting_equipment(id),
-  feature_id INT REFERENCES feature(id),
-  PRIMARY KEY (counting_equipment_id, feature_id)
+CREATE TABLE IF NOT EXISTS counting_equipment_feature (
+    counting_equipment_id INT REFERENCES counting_equipment(id),
+    feature_id INT REFERENCES feature(id),
+    PRIMARY KEY (counting_equipment_id, feature_id)
 );
 
-CREATE INDEX idx_counting_equipment_section_id ON counting_equipment (section_id);
-
-CREATE TABLE equipment_output_alias (
-    id int GENERATED ALWAYS AS IDENTITY,
-    alias varchar(100) UNIQUE,
-
-    PRIMARY KEY(id)
+CREATE TABLE IF NOT EXISTS users (
+    id SERIAL PRIMARY KEY,
+    first_name VARCHAR(50),
+    last_name VARCHAR(50),
+    username VARCHAR(50) NOT NULL,
+    email VARCHAR(50),
+    password VARCHAR(255) NOT NULL,
+    role VARCHAR(50),
+    user_authorities TEXT[],
+    created_at TIMESTAMP,
+    updated_at TIMESTAMP,
+    is_active BOOLEAN,
+    is_not_locked BOOLEAN,
+    company_id INTEGER,
+    FOREIGN KEY (company_id) REFERENCES company(id)
 );
 
-CREATE INDEX idx_equipment_output_alias_alias ON equipment_output_alias (alias);
-
-CREATE TABLE equipment_output (
-    id int GENERATED ALWAYS AS IDENTITY,
-    counting_equipment_id int,
-    code varchar(20) UNIQUE NOT NULL,
-    equipment_output_alias_id int,
-    is_valid_for_production boolean,
-
-    PRIMARY KEY(id),
-    FOREIGN KEY(equipment_output_alias_id) REFERENCES equipment_output_alias(id)
+CREATE TABLE IF NOT EXISTS token (
+    id SERIAL PRIMARY KEY,
+    token VARCHAR(255) NOT NULL,
+    token_type VARCHAR(10) NOT NULL,
+    expired BOOLEAN,
+    revoked BOOLEAN,
+    user_id INTEGER NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
-CREATE INDEX idx_equipment_output_code ON equipment_output (code);
+CREATE TABLE IF NOT EXISTS equipment_output_alias (
+    id SERIAL PRIMARY KEY,
+    alias VARCHAR(100) UNIQUE
+);
 
+CREATE TABLE IF NOT EXISTS equipment_output (
+    id SERIAL PRIMARY KEY,
+    counting_equipment_id INT,
+    code VARCHAR(20) UNIQUE NOT NULL,
+    equipment_output_alias_id INT,
+    is_valid_for_production BOOLEAN,
+    FOREIGN KEY (counting_equipment_id) REFERENCES counting_equipment(id),
+    FOREIGN KEY (equipment_output_alias_id) REFERENCES equipment_output_alias(id)
+);
 
-CREATE TABLE composed_production_order (
-    id int GENERATED ALWAYS AS IDENTITY,
+CREATE TABLE IF NOT EXISTS composed_production_order (
+    id SERIAL PRIMARY KEY,
     code VARCHAR(255) NOT NULL UNIQUE,
     created_at TIMESTAMP,
     approved_at TIMESTAMP,
-    hit_inserted_at TIMESTAMP,
-
-    PRIMARY KEY(id)
+    hit_inserted_at TIMESTAMP
 );
 
-CREATE TABLE production_order (
-    id int GENERATED ALWAYS AS IDENTITY,
-    equipment_id int,
-    ims_id int,
-    composed_production_order_id int,
-    code varchar(20) UNIQUE NOT NULL,
-    target_amount int,
-    is_equipment_enabled boolean,
-    is_completed boolean,
+CREATE TABLE IF NOT EXISTS production_order (
+    id SERIAL PRIMARY KEY,
+    equipment_id INT,
+    ims_id INT,
+    composed_production_order_id INT,
+    code VARCHAR(20) UNIQUE NOT NULL,
+    target_amount INT,
+    is_equipment_enabled BOOLEAN,
+    is_completed BOOLEAN,
     created_at TIMESTAMP,
     completed_at TIMESTAMP,
-    input_batch varchar(100),
-    source varchar(100),
-    gauge varchar(100),
-    category varchar(100),
-    washing_process varchar(100),
-    is_approved boolean,
-
-    PRIMARY KEY(id),
-    FOREIGN KEY(equipment_id) REFERENCES counting_equipment(id),
-    FOREIGN KEY(ims_id) REFERENCES ims(id),
-    FOREIGN KEY(composed_production_order_id) REFERENCES composed_production_order(id)
+    input_batch VARCHAR(100),
+    source VARCHAR(100),
+    gauge VARCHAR(100),
+    category VARCHAR(100),
+    washing_process VARCHAR(100),
+    is_approved BOOLEAN,
+    FOREIGN KEY (equipment_id) REFERENCES counting_equipment(id),
+    FOREIGN KEY (ims_id) REFERENCES ims(id),
+    FOREIGN KEY (composed_production_order_id) REFERENCES composed_production_order(id)
 );
 
-CREATE INDEX idx_production_order_code ON production_order (code);
-
-CREATE TABLE production_instruction (
-    id int GENERATED ALWAYS AS IDENTITY,
-    instruction int,
-    production_order_id int,
+CREATE TABLE IF NOT EXISTS production_instruction (
+    id SERIAL PRIMARY KEY,
+    instruction INT,
+    production_order_id INT,
     created_at TIMESTAMP,
-    created_by int,
-
-    PRIMARY KEY(id),
-    FOREIGN KEY(production_order_id) REFERENCES production_order(id),
-    FOREIGN KEY(created_by) REFERENCES users(id)
+    created_by INT,
+    FOREIGN KEY (production_order_id) REFERENCES production_order(id),
+    FOREIGN KEY (created_by) REFERENCES users(id)
 );
 
-CREATE TABLE counter_record (
-    id int GENERATED ALWAYS AS IDENTITY,
-    equipment_output_id int,
-    equipment_output_alias varchar(100),
-    real_value int,
-    computed_value int,
-    increment int,
-    production_order_id int,
+CREATE TABLE IF NOT EXISTS counter_record (
+    id SERIAL PRIMARY KEY,
+    equipment_output_id INT,
+    equipment_output_alias VARCHAR(100),
+    real_value INT,
+    computed_value INT,
+    increment INT,
+    production_order_id INT,
     registered_at TIMESTAMP,
-    is_valid_for_production boolean,
-    active_time int,
-    computed_active_time int,
-    increment_active_time int,
-
-    PRIMARY KEY(id),
-    FOREIGN KEY(equipment_output_id) REFERENCES equipment_output(id),
-    FOREIGN KEY(production_order_id) REFERENCES production_order(id)
+    is_valid_for_production BOOLEAN,
+    active_time INT,
+    computed_active_time INT,
+    increment_active_time INT,
+    FOREIGN KEY (equipment_output_id) REFERENCES equipment_output(id),
+    FOREIGN KEY (production_order_id) REFERENCES production_order(id)
 );
 
-CREATE INDEX idx_counter_record_equipment_output_id ON counter_record (equipment_output_id);
-CREATE INDEX idx_counter_record_production_order_id ON counter_record (production_order_id);
-CREATE INDEX idx_counter_record_registered_at ON counter_record (registered_at);
-
-CREATE TABLE equipment_status_record (
-    id int GENERATED ALWAYS AS IDENTITY,
-    counting_equipment_id int NOT NULL,
-    equipment_status int NOT NULL,
+CREATE TABLE IF NOT EXISTS equipment_status_record (
+    id SERIAL PRIMARY KEY,
+    counting_equipment_id INT NOT NULL,
+    equipment_status INT NOT NULL,
     registered_at TIMESTAMP NOT NULL,
-
-    PRIMARY KEY(id),
-    FOREIGN KEY(counting_equipment_id) REFERENCES counting_equipment(id)
+    FOREIGN KEY (counting_equipment_id) REFERENCES counting_equipment(id)
 );
 
-CREATE TABLE sample (
-  id int GENERATED ALWAYS AS IDENTITY,
-  composed_production_order_id INT,
-  amount INT,
-  tca_average DOUBLE PRECISION,
-  reliability DOUBLE PRECISION,
-  created_at TIMESTAMP,
-  PRIMARY KEY (id),
-  FOREIGN KEY (composed_production_order_id) REFERENCES composed_production_order (id)
+CREATE TABLE IF NOT EXISTS sample (
+    id SERIAL PRIMARY KEY,
+    composed_production_order_id INT,
+    amount INT,
+    tca_average DOUBLE PRECISION,
+    reliability DOUBLE PRECISION,
+    created_at TIMESTAMP,
+    FOREIGN KEY (composed_production_order_id) REFERENCES composed_production_order(id)
 );
 
-CREATE TABLE hit (
-  id int GENERATED ALWAYS AS IDENTITY,
-  sample_id INT,
-  tca FLOAT,
-  is_valid_for_reliability BOOLEAN,
-  PRIMARY KEY (id),
-  FOREIGN KEY (sample_id) REFERENCES sample (id)
+CREATE TABLE IF NOT EXISTS hit (
+    id SERIAL PRIMARY KEY,
+    sample_id INT,
+    tca FLOAT,
+    is_valid_for_reliability BOOLEAN,
+    FOREIGN KEY (sample_id) REFERENCES sample(id)
 );
 
-CREATE TABLE batch (
-  id int GENERATED ALWAYS AS IDENTITY,
-  code VARCHAR,
-  composed_production_order_id INT,
-  is_approved BOOLEAN,
-  PRIMARY KEY (id),
-  FOREIGN KEY (composed_production_order_id) REFERENCES composed_production_order (id)
+CREATE TABLE IF NOT EXISTS batch (
+    id SERIAL PRIMARY KEY,
+    code VARCHAR,
+    composed_production_order_id INT,
+    is_approved BOOLEAN,
+    FOREIGN KEY (composed_production_order_id) REFERENCES composed_production_order(id)
 );
 
-CREATE TABLE alarm_configuration (
-    id serial PRIMARY KEY,
-    word_index int NOT NULL,
-    bit_index int NOT NULL,
-    code varchar(20) NOT NULL UNIQUE,
-    description varchar(100),
-
-    CONSTRAINT word_bit_indexes_unique UNIQUE (word_index, bit_index)
+CREATE TABLE IF NOT EXISTS alarm_configuration (
+    id SERIAL PRIMARY KEY,
+    word_index INT NOT NULL,
+    bit_index INT NOT NULL,
+    code VARCHAR(20) NOT NULL UNIQUE,
+    description VARCHAR(100)
 );
 
-CREATE TABLE alarm (
-    id serial PRIMARY KEY,
-    alarm_configuration_id int NOT NULL,
-    equipment_id int NOT NULL,
-    production_order_id int,
-    status varchar(10) NOT NULL CHECK (status IN ('ACTIVE', 'INACTIVE', 'RECOGNIZED')),
-    comment text,
-    created_at timestamp NOT NULL,
-    completed_at timestamp,
-    recognized_at timestamp,
-    recognized_by int,
-
-    FOREIGN KEY (equipment_id) REFERENCES counting_equipment (id),
-    FOREIGN KEY (alarm_configuration_id) REFERENCES alarm_configuration (id),
-    FOREIGN KEY (production_order_id) REFERENCES production_order (id),
-    FOREIGN KEY (recognized_by) REFERENCES Users (id)
+CREATE TABLE IF NOT EXISTS alarm (
+    id SERIAL PRIMARY KEY,
+    alarm_configuration_id INT NOT NULL,
+    equipment_id INT NOT NULL,
+    production_order_id INT,
+    status VARCHAR(10) NOT NULL CHECK (status IN ('ACTIVE', 'INACTIVE', 'RECOGNIZED')),
+    comment TEXT,
+    created_at TIMESTAMP NOT NULL,
+    completed_at TIMESTAMP,
+    recognized_at TIMESTAMP,
+    recognized_by INT,
+    FOREIGN KEY (alarm_configuration_id) REFERENCES alarm_configuration(id),
+    FOREIGN KEY (equipment_id) REFERENCES counting_equipment(id),
+    FOREIGN KEY (production_order_id) REFERENCES production_order(id),
+    FOREIGN KEY (recognized_by) REFERENCES users(id)
 );
 
 -- Create views
