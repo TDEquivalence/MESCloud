@@ -7,11 +7,17 @@ ALTER TABLE factory RENAME TO company;
 ALTER TABLE users
 ADD COLUMN company_id INT REFERENCES company(id);
 
-ALTER TABLE section
-RENAME COLUMN name TO prefix;
+--ALTER TABLE section
+--RENAME COLUMN name TO prefix;
 
-ALTER TABLE section
-ADD COLUMN name VARCHAR(20);
+--ALTER TABLE section_config
+--ADD COLUMN "order" INTEGER;
+--UPDATE section_config
+--SET "order" = id
+--WHERE id BETWEEN 1 AND 5;
+
+--ALTER TABLE section
+--ADD COLUMN name VARCHAR(20);
 
 CREATE TABLE factory (
   id SERIAL PRIMARY KEY,
@@ -22,7 +28,8 @@ CREATE TABLE factory (
 CREATE TABLE section_config (
   id SERIAL PRIMARY KEY,
   section_id INT REFERENCES section(id),
-  name VARCHAR(50)
+  name VARCHAR(50),
+  order int
 );
 
 CREATE TABLE feature (

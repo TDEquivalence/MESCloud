@@ -21,6 +21,8 @@ public class SectionConfigEntity {
 
     private String label;
 
+    private int order;
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "section_config_feature",
             joinColumns = @JoinColumn(name = "section_config_id"),

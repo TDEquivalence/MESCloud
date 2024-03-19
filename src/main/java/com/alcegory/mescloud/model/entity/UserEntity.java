@@ -40,10 +40,10 @@ public class UserEntity implements UserDetails {
     private boolean isActive;
     private boolean isNotLocked;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "company_id")
     private CompanyEntity company;
-    
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return role.getRoleAuthorities();

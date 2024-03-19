@@ -111,6 +111,7 @@ public class UserConverterImpl implements UserConverter {
             sectionConfigDto.setId(sectionConfigEntity.getId());
             sectionConfigDto.setLabel(sectionConfigEntity.getLabel());
             sectionConfigDto.setFeatureList(convertToFeatureDtoList(sectionConfigEntity.getFeatureList()));
+            sectionConfigDto.setOrder(sectionConfigEntity.getOrder());
         }
         return sectionConfigDto;
     }

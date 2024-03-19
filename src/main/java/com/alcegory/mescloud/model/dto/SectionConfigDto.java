@@ -11,5 +11,6 @@ public class SectionConfigDto {
 
     private Long id;
     private String label;
+    private int order;
     private List<FeatureDto> featureList;
 }
