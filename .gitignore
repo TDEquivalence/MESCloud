@@ -3,6 +3,8 @@ application.yaml
 application.yml
 application.properties
 
+com/alcegory/mescloud/security/config/SecurityConfig
+
 # Automation processes
 automation/set-sys-env-vars.bat
 
