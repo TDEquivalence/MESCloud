@@ -2,8 +2,6 @@ package com.alcegory.mescloud.model.converter;
 
 import com.alcegory.mescloud.model.dto.*;
 import com.alcegory.mescloud.model.entity.*;
-import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
@@ -11,15 +9,6 @@ import java.util.List;
 
 @Component
 public class UserConverterImpl implements UserConverter {
-
-    private final ModelMapper modelMapper;
-    private final CountingEquipmentConverter countingEquipmentConverter;
-
-    @Autowired
-    public UserConverterImpl(ModelMapper modelMapper, CountingEquipmentConverter countingEquipmentConverter) {
-        this.modelMapper = modelMapper;
-        this.countingEquipmentConverter = countingEquipmentConverter;
-    }
 
     @Override
     public UserConfigDto convertToDtoWithRelatedEntities(UserEntity userEntity) {
