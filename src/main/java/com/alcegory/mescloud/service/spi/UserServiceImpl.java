@@ -1,6 +1,7 @@
 package com.alcegory.mescloud.service.spi;
 
 import com.alcegory.mescloud.model.converter.UserConverter;
+import com.alcegory.mescloud.model.dto.UserConfigDto;
 import com.alcegory.mescloud.model.dto.UserDto;
 import com.alcegory.mescloud.model.entity.UserEntity;
 import com.alcegory.mescloud.model.filter.Filter;
@@ -57,7 +58,7 @@ public class UserServiceImpl implements UserService {
         return mapper.convertToDto(dbUserEntity);
     }
 
-    public UserDto getUserByAuth(AuthenticationResponse authenticateRequest) {
+    public UserConfigDto getUserByAuth(AuthenticationResponse authenticateRequest) {
         UserEntity userEntity = userRepository.findUserByUsername(authenticateRequest.getUsername());
 
         return userConverter.convertToDtoWithRelatedEntities(userEntity);

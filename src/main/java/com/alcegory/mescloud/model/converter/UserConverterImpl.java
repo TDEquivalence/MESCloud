@@ -22,17 +22,17 @@ public class UserConverterImpl implements UserConverter {
     }
 
     @Override
-    public UserDto convertToDtoWithRelatedEntities(UserEntity userEntity) {
-        UserDto userDto = new UserDto();
+    public UserConfigDto convertToDtoWithRelatedEntities(UserEntity userEntity) {
+        UserConfigDto userConfigDto = new UserConfigDto();
         if (userEntity != null) {
-            userDto.setId(userEntity.getId());
-            userDto.setUsername(userEntity.getUsername());
-            userDto.setFirstName(userEntity.getFirstName());
-            userDto.setLastName(userEntity.getLastName());
+            userConfigDto.setId(userEntity.getId());
+            userConfigDto.setUsername(userEntity.getUsername());
+            userConfigDto.setFirstName(userEntity.getFirstName());
+            userConfigDto.setLastName(userEntity.getLastName());
             // Convert company
-            userDto.setCompany(convertToCompanyDto(userEntity.getCompany()));
+            userConfigDto.setCompany(convertToCompanyDto(userEntity.getCompany()));
         }
-        return userDto;
+        return userConfigDto;
     }
 
     private CompanyDto convertToCompanyDto(CompanyEntity companyEntity) {
@@ -109,7 +109,7 @@ public class UserConverterImpl implements UserConverter {
         SectionConfigDto sectionConfigDto = new SectionConfigDto();
         if (sectionConfigEntity != null) {
             sectionConfigDto.setId(sectionConfigEntity.getId());
-            sectionConfigDto.setName(sectionConfigEntity.getName());
+            sectionConfigDto.setLabel(sectionConfigEntity.getLabel());
             sectionConfigDto.setFeatureList(convertToFeatureDtoList(sectionConfigEntity.getFeatureList()));
         }
         return sectionConfigDto;

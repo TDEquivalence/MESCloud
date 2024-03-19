@@ -16,7 +16,7 @@ WHERE id = 1;
 ALTER TABLE section_config
 ALTER COLUMN name TYPE VARCHAR(30);
 
-INSERT INTO section_config (section_id, name) VALUES
+INSERT INTO section_config (section_id, label) VALUES
 (1, 'dashboard'),
 (1, 'machine-center'),
 (1, 'production-management'),

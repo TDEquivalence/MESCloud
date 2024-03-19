@@ -1,6 +1,6 @@
 package com.alcegory.mescloud.api.rest;
 
-import com.alcegory.mescloud.model.dto.UserDto;
+import com.alcegory.mescloud.model.dto.UserConfigDto;
 import com.alcegory.mescloud.security.exception.UsernameExistException;
 import com.alcegory.mescloud.security.model.auth.AuthenticateRequest;
 import com.alcegory.mescloud.security.model.auth.AuthenticationResponse;
@@ -31,11 +31,11 @@ public class AuthenticationController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<UserDto> login(@RequestBody AuthenticateRequest request, HttpServletResponse response) {
+    public ResponseEntity<UserConfigDto> login(@RequestBody AuthenticateRequest request, HttpServletResponse response) {
         AuthenticationResponse authenticationResponse = authenticationService.authenticate(request);
         authenticationService.setJwtTokenCookie(authenticationResponse, response);
 
-        UserDto userDto = userService.getUserByAuth(authenticationResponse);
+        UserConfigDto userDto = userService.getUserByAuth(authenticationResponse);
         return new ResponseEntity<>(userDto, HttpStatus.OK);
     }
 }

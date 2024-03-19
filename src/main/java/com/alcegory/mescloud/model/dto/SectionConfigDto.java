@@ -10,6 +10,6 @@ import java.util.List;
 public class SectionConfigDto {
 
     private Long id;
-    private String name;
+    private String label;
     private List<FeatureDto> featureList;
 }

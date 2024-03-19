@@ -19,7 +19,7 @@ public class SectionConfigEntity {
     @JoinColumn(name = "section_id")
     private SectionEntity section;
 
-    private String name;
+    private String label;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "section_config_feature",

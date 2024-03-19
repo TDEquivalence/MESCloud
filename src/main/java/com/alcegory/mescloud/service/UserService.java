@@ -1,5 +1,6 @@
 package com.alcegory.mescloud.service;
 
+import com.alcegory.mescloud.model.dto.UserConfigDto;
 import com.alcegory.mescloud.model.dto.UserDto;
 import com.alcegory.mescloud.model.filter.Filter;
 import com.alcegory.mescloud.security.exception.UserNotFoundException;
@@ -17,5 +18,5 @@ public interface UserService {
 
     UserDto updateUser(UserDto userDto) throws UserNotFoundException;
 
-    UserDto getUserByAuth(AuthenticationResponse authenticateRequest);
+    UserConfigDto getUserByAuth(AuthenticationResponse authenticateRequest);
 }

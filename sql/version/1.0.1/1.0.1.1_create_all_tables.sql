@@ -90,7 +90,7 @@ CREATE TABLE section (
 CREATE TABLE section_config (
   id SERIAL PRIMARY KEY,
   section_id INT REFERENCES section(id),
-  name VARCHAR(20)
+  label VARCHAR(20)
 );
 
 CREATE TABLE feature (
