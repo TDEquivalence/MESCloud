@@ -20,7 +20,13 @@ DROP TABLE IF EXISTS composed_production_order;
 DROP TABLE IF EXISTS section;
 DROP TABLE IF EXISTS token;
 DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS company;
 DROP TABLE IF EXISTS factory;
+DROP TABLE IF EXISTS company;
+DROP TABLE IF EXISTS section;
+DROP TABLE IF EXISTS section_config;
+DROP TABLE IF EXISTS feature;
+DROP TABLE IF EXISTS section_config_feature;
 DROP TABLE IF EXISTS ims;
 
 -- Create tables
