@@ -9,6 +9,7 @@ import com.azure.storage.blob.BlobContainerClientBuilder;
 import com.azure.storage.blob.models.BlobItem;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
+@Slf4j
 public class PublicContainerServiceImpl implements PublicContainerService {
 
     @Value("${azure.storage.accountUrl}")
@@ -41,11 +43,10 @@ public class PublicContainerServiceImpl implements PublicContainerService {
                 .buildClient();
 
         List<ContainerInfoDto> containerInfoList = new ArrayList<>();
-        Map<String, ImageAnnotationDto> decisionMap = new HashMap<>(); // Map to store ImageDecisionDto objects by blob name
+        Map<String, ImageAnnotationDto> decisionMap = new HashMap<>();
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
-        // Collect all JSON files and store them in the decisionMap
         for (BlobItem blobItem : blobContainerClient.listBlobs()) {
             String blobName = blobItem.getName();
             if (blobName.toLowerCase().endsWith(".json")) {
@@ -55,34 +56,29 @@ public class PublicContainerServiceImpl implements PublicContainerService {
                     ImageAnnotationDto imageDecision = objectMapper.readValue(jsonContent, ImageAnnotationDto.class);
                     decisionMap.put(blobName, imageDecision);
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    log.error("An error occurred while processing blob: {}", blobName, e);
                 }
             }
         }
 
-        // Match JPEG files with their corresponding ImageDecisionDto objects and create ContainerInfoDto objects
         for (BlobItem blobItem : blobContainerClient.listBlobs()) {
             String blobName = blobItem.getName();
             if (blobName.toLowerCase().endsWith(".jpg") || blobName.toLowerCase().endsWith(".jpeg")) {
                 BlobClient blobClient = getBlobClient(blobContainerClient, blobItem);
                 try {
-                    // Find corresponding ImageDecisionDto object
                     String correspondingJsonBlobName = getCorrespondingJsonBlobName(blobName);
                     ImageAnnotationDto relatedImageDecision = decisionMap.get(correspondingJsonBlobName);
 
-                    // Create ImageInfoDto object
                     ImageInfoDto imageInfo = new ImageInfoDto();
                     imageInfo.setJpeg(blobClient.getBlobUrl());
 
-                    // Create ContainerInfoDto object and set ImageInfoDto and ImageDecisionDto
                     ContainerInfoDto containerInfo = new ContainerInfoDto();
                     containerInfo.setJpeg(imageInfo);
                     containerInfo.setImageAnnotationDto(relatedImageDecision);
 
-                    // Add ContainerInfoDto object to the list
                     containerInfoList.add(containerInfo);
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    log.error("An error occurred while processing blob: {}", blobName, e);
                 }
             }
         }

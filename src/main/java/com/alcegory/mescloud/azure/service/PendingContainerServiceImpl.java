@@ -7,6 +7,7 @@ import com.azure.storage.blob.BlobContainerClientBuilder;
 import com.azure.storage.blob.models.BlobItem;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Slf4j
 public class PendingContainerServiceImpl implements PendingContainerService {
 
     @Value("${azure.storage.accountUrl}")
@@ -47,7 +49,7 @@ public class PendingContainerServiceImpl implements PendingContainerService {
 
                     updatedImageDecisions.add(imageDecision);
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    log.error("An error occurred while processing blob: {}", blobItem, e);
                 }
             }
         }
@@ -93,7 +95,7 @@ public class PendingContainerServiceImpl implements PendingContainerService {
                     imageDecisionField.set(imageDecision, value);
                 }
             } catch (IllegalAccessException | NoSuchFieldException e) {
-                e.printStackTrace();
+                log.error("An error occurred while processing field blob: {}", field, e);
             }
         }
     }
