@@ -13,13 +13,6 @@ RENAME COLUMN name TO prefix;
 ALTER TABLE section
 ADD COLUMN name VARCHAR(20);
 
-ALTER TABLE section_config
-ADD COLUMN "order" INTEGER;
-UPDATE section_config
-SET "order" = id
-WHERE id BETWEEN 1 AND 5;
-
-
 CREATE TABLE IF NOT EXISTS factory (
     id SERIAL PRIMARY KEY,
     name VARCHAR(100) UNIQUE,

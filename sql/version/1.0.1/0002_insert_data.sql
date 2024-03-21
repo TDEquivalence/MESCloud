@@ -29,6 +29,10 @@ INSERT INTO feature (name) VALUES
 ('Production'),
 ('Alarm');
 
+UPDATE section_config
+SET "order" = id
+WHERE id BETWEEN 1 AND 5;
+
 INSERT INTO section_config_feature (section_config_id, feature_id) VALUES
 (1, 1),
 (1, 2),
