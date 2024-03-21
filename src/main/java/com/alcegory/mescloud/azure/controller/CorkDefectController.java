@@ -1,6 +1,7 @@
 package com.alcegory.mescloud.azure.controller;
 
-import com.alcegory.mescloud.azure.service.CorkDefectService;
+import com.alcegory.mescloud.azure.dto.ContainerInfoDto;
+import com.alcegory.mescloud.azure.service.PublicContainerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,12 +16,12 @@ import java.util.List;
 @RequestMapping("/api/cork-defect")
 public class CorkDefectController {
 
-    private final CorkDefectService corkDefectService;
+    private final PublicContainerService pendingContainerService;
 
 
     @GetMapping("/jpeg")
-    public ResponseEntity<List<String>> getJpegImages() {
-        List<String> imageUrls = corkDefectService.getJpegImageUrls();
+    public ResponseEntity<List<ContainerInfoDto>> getJpegImages() {
+        List<ContainerInfoDto> imageUrls = pendingContainerService.getImageAnnotations();
         return new ResponseEntity<>(imageUrls, HttpStatus.OK);
     }
 }
