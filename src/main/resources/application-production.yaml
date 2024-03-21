@@ -31,3 +31,11 @@ mes:
 
 factory:
   timeZone: ${FACTORY_TIMEZONE}
+
+azure:
+  storage:
+    accountUrl: ${ACCOUNT_URL}
+    publicContainerName: ${PUBLIC_CONTAINER_NAME}
+    publicSasToken: ${PUBLIC_SAS_TOKEN}
+    pendingContainerName: ${PENDING_CONTAINER_NAME}
+    pendingSasToken: ${PENDING_SAS_TOKEN}

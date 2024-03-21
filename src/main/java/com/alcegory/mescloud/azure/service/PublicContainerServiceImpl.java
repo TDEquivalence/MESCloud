@@ -90,10 +90,7 @@ public class PublicContainerServiceImpl implements PublicContainerService {
         return containerInfoList;
     }
 
-    // Helper method to get the corresponding JSON blob name for a given JPEG blob name
     private String getCorrespondingJsonBlobName(String jpegBlobName) {
-        // Assuming that JPEG blob names and JSON blob names follow the same naming convention
-        // For example, if JPEG blob name is "image.jpg", the corresponding JSON blob name might be "image.json"
         return jpegBlobName.substring(0, jpegBlobName.lastIndexOf('.')) + ".json";
     }
 
