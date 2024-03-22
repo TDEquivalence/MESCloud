@@ -1,5 +1,6 @@
 package com.alcegory.mescloud.azure.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -7,10 +8,14 @@ import lombok.Setter;
 @Setter
 public class ResultDto {
 
+    @JsonProperty("from_name")
     private String fromName;
+    @JsonProperty("to_name")
     private String toName;
     private String type;
+    @JsonProperty("original_width")
     private Integer originalWidth;
+    @JsonProperty("original_height")
     private Integer originalHeight;
-    private ValueDto valueDtoList;
+    private ValueDto value;
 }

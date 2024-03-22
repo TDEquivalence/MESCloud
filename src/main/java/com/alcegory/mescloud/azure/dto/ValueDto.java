@@ -1,5 +1,6 @@
 package com.alcegory.mescloud.azure.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,5 +15,6 @@ public class ValueDto {
     private Double width;
     private Double height;
     private Double rotation;
+    @JsonProperty("rectanglelabels")
     private List<String> rectangleLabels;
 }
