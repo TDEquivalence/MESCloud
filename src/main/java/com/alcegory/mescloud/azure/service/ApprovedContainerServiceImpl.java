@@ -39,9 +39,8 @@ public class ApprovedContainerServiceImpl implements ApprovedContainerService {
     @Override
     public void saveToApprovedContainer(ContainerInfoDto containerInfoDto) {
         try {
-            String jsonContent = serializeImageAnnotationToJson(containerInfoDto.getImageAnnotationDto());
             String jsonBlobUrl = containerInfoDto.getImageAnnotationDto().getData().getImage();
-            uploadJsonBlob(jsonBlobUrl, jsonContent);
+            uploadJsonBlob(jsonBlobUrl, containerInfoDto.getImageAnnotationDto());
             uploadJpegImage(containerInfoDto.getJpg().getPath());
         } catch (IOException e) {
             log.error("Error saving to approved container", e);
@@ -53,7 +52,10 @@ public class ApprovedContainerServiceImpl implements ApprovedContainerService {
         return objectMapper.writeValueAsString(imageAnnotationDto);
     }
 
-    private void uploadJsonBlob(String jsonBlobUrl, String jsonContent) throws IOException {
+    private void uploadJsonBlob(String jsonBlobUrl, ImageAnnotationDto imageAnnotationDto) throws IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        String jsonContent = objectMapper.writeValueAsString(imageAnnotationDto);
+
         uploadBlob(jsonBlobUrl, jsonContent.getBytes());
         log.info("ImageAnnotationDto JSON saved to the approved container successfully");
     }
