@@ -68,7 +68,8 @@ public class ApprovedContainerServiceImpl implements ApprovedContainerService {
         BlobClient blobClient = approvedContainerClient.getBlobClient(blobUrl);
 
         try (ByteArrayInputStream inputStream = new ByteArrayInputStream(content)) {
-            blobClient.upload(inputStream, content.length);
+            blobClient.upload(inputStream, content.length, true);
+            log.info("Blob '{}' uploaded successfully.", blobUrl);
         }
     }
 
