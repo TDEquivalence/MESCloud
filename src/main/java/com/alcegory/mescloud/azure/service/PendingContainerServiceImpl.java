@@ -94,13 +94,6 @@ public class PendingContainerServiceImpl implements PendingContainerService {
         return null;
     }
 
-    private BlobContainerClient getBlobContainerClient() {
-        String containerUriWithSAS = String.format("%s%s?%s", accountUrl, containerName, sasToken);
-        return new BlobContainerClientBuilder()
-                .endpoint(containerUriWithSAS)
-                .buildClient();
-    }
-
     private BlobClient getBlobClient(BlobContainerClient blobContainerClient, BlobItem blobItem) {
         return blobContainerClient.getBlobClient(blobItem.getName());
     }
@@ -218,5 +211,12 @@ public class PendingContainerServiceImpl implements PendingContainerService {
     private BlobClient getBlobClient(String blobName) {
         BlobContainerClient blobContainerClient = getBlobContainerClient();
         return blobContainerClient.getBlobClient(blobName);
+    }
+
+    private BlobContainerClient getBlobContainerClient() {
+        String containerUriWithSAS = String.format("%s%s?%s", accountUrl, containerName, sasToken);
+        return new BlobContainerClientBuilder()
+                .endpoint(containerUriWithSAS)
+                .buildClient();
     }
 }
