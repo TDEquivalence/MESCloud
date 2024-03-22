@@ -3,7 +3,8 @@ package com.alcegory.mescloud.azure.service;
 import com.alcegory.mescloud.azure.dto.ContainerInfoDto;
 import com.azure.storage.blob.BlobClient;
 import com.azure.storage.blob.BlobContainerClient;
-import com.azure.storage.blob.BlobContainerClientBuilder;
+import com.azure.storage.blob.BlobServiceClient;
+import com.azure.storage.blob.BlobServiceClientBuilder;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.io.SerializationException;
@@ -50,14 +51,18 @@ public class ApprovedContainerServiceImpl implements ApprovedContainerService {
             throw new SerializationException("Error serializing ImageAnnotationDto to JSON", e);
         }
 
-        String containerUriWithSAS = String.format("%s%s?%s", accountUrl, containerName, sasToken);
-        BlobContainerClient blobContainerClient = new BlobContainerClientBuilder()
-                .endpoint(containerUriWithSAS)
+        String jsonBlobUrl = containerInfoDto.getJpeg().getJpeg() + ".json";
+
+        String jpegBlobUrl = containerInfoDto.getJpeg().getJpeg();
+
+        BlobServiceClient blobServiceClient = new BlobServiceClientBuilder()
+                .endpoint(accountUrl)
+                .sasToken(sasToken)
                 .buildClient();
 
-        String jpegUrl = containerInfoDto.getJpeg().getJpeg();
-
-        BlobClient jsonBlobClient = blobContainerClient.getBlobClient(jpegUrl + ".json");
+        BlobContainerClient approvedContainerClient = blobServiceClient.getBlobContainerClient(containerName);
+        
+        BlobClient jsonBlobClient = approvedContainerClient.getBlobClient(jsonBlobUrl);
         try (ByteArrayInputStream inputStream = new ByteArrayInputStream(jsonContent.getBytes())) {
             jsonBlobClient.upload(inputStream, jsonContent.length());
             log.info("ImageAnnotationDto saved to the approved container successfully");
@@ -65,8 +70,9 @@ public class ApprovedContainerServiceImpl implements ApprovedContainerService {
             log.error("Error uploading ImageAnnotationDto to the approved container", e);
         }
 
-        BlobClient jpegBlobClient = blobContainerClient.getBlobClient(jpegUrl);
-        try (InputStream jpegInputStream = new URL(jpegUrl).openStream()) {
+        // Upload JPEG image to the approved container
+        BlobClient jpegBlobClient = approvedContainerClient.getBlobClient(jpegBlobUrl);
+        try (InputStream jpegInputStream = new URL(jpegBlobUrl).openStream()) {
             jpegBlobClient.upload(jpegInputStream, -1);
             log.info("JPEG image saved to the approved container successfully");
         } catch (IOException e) {
