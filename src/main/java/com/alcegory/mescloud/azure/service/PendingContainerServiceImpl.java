@@ -57,10 +57,9 @@ public class PendingContainerServiceImpl implements PendingContainerService {
         ImageAnnotationDto imageAnnotationDto = updateImageDecision(updatedImageAnnotationDto);
         assert imageAnnotationDto != null;
         ContainerInfoDto containerInfoDtoUpdated = getImageAnnotationFromContainerInfo(imageAnnotationDto);
-        approvedContainerService.saveToApprovedContainer(containerInfoDtoUpdated);
         assert containerInfoDtoUpdated != null;
+        approvedContainerService.saveToApprovedContainer(containerInfoDtoUpdated);
         deleteFilesFromPendingContainer(containerInfoDtoUpdated);
-
         return containerInfoDtoUpdated;
     }
 

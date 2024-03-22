@@ -4,7 +4,6 @@ import com.alcegory.mescloud.azure.dto.ContainerInfoDto;
 import com.alcegory.mescloud.azure.dto.ImageAnnotationDto;
 import com.azure.storage.blob.*;
 import com.azure.storage.blob.models.BlobItem;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -45,11 +44,6 @@ public class ApprovedContainerServiceImpl implements ApprovedContainerService {
         } catch (IOException e) {
             log.error("Error saving to approved container", e);
         }
-    }
-
-    private String serializeImageAnnotationToJson(ImageAnnotationDto imageAnnotationDto) throws JsonProcessingException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        return objectMapper.writeValueAsString(imageAnnotationDto);
     }
 
     private void uploadJsonBlob(String jsonBlobUrl, ImageAnnotationDto imageAnnotationDto) throws IOException {
