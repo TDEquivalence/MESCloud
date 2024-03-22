@@ -40,7 +40,7 @@ public class CorkDefectController {
         return new ResponseEntity<>(imageUrls, HttpStatus.OK);
     }
 
-    @PutMapping("/update")
+    @PostMapping("/update")
     public ResponseEntity<ContainerInfoDto> updateImageInfo(@RequestBody ImageAnnotationDto imageAnnotationDto) {
         ContainerInfoDto updatedImage = pendingContainerService.processUpdateImage(imageAnnotationDto);
         return new ResponseEntity<>(updatedImage, HttpStatus.OK);

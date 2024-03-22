@@ -210,7 +210,7 @@ public class PendingContainerServiceImpl implements PendingContainerService {
     }
 
     private String retrieveJpegReference(String jpegFileName) {
-        return String.format("%s/%s/%s%s", accountUrl, containerName, jpegFileName, ".jpg");
+        return String.format("%s/%s/%s", accountUrl, containerName, jpegFileName);
     }
 
     private void uploadUpdatedBlob(BlobClient blobClient, ImageAnnotationDto imageDecision) throws IOException {
