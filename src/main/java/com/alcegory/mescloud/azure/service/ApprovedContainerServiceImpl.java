@@ -4,6 +4,7 @@ import com.alcegory.mescloud.azure.dto.ContainerInfoDto;
 import com.alcegory.mescloud.azure.dto.ImageAnnotationDto;
 import com.azure.storage.blob.*;
 import com.azure.storage.blob.models.BlobItem;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -38,38 +39,43 @@ public class ApprovedContainerServiceImpl implements ApprovedContainerService {
     @Override
     public void saveToApprovedContainer(ContainerInfoDto containerInfoDto) {
         try {
-            String jsonBlobUrl = containerInfoDto.getImageAnnotationDto().getData().getImage();
-            uploadJsonBlob(jsonBlobUrl, containerInfoDto.getImageAnnotationDto());
-            uploadJpegImage(containerInfoDto.getJpg().getPath());
+            ImageAnnotationDto imageAnnotationDto = containerInfoDto.getImageAnnotationDto();
+            String blobName = imageAnnotationDto.getData().getImage();
+            String jsonContent = convertImageAnnotationDtoToJson(imageAnnotationDto);
+
+            uploadJsonBlob(blobName, jsonContent);
+            uploadJpgImage(containerInfoDto.getJpg().getPath());
         } catch (IOException e) {
             log.error("Error saving to approved container", e);
         }
     }
 
-    private void uploadJsonBlob(String jsonBlobUrl, ImageAnnotationDto imageAnnotationDto) throws IOException {
+    private String convertImageAnnotationDtoToJson(ImageAnnotationDto imageAnnotationDto) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
-        String jsonContent = objectMapper.writeValueAsString(imageAnnotationDto);
+        return objectMapper.writeValueAsString(imageAnnotationDto);
+    }
 
+    private void uploadJsonBlob(String jsonBlobUrl, String jsonContent) throws IOException {
         uploadBlob(jsonBlobUrl, jsonContent.getBytes());
         log.info("ImageAnnotationDto JSON saved to the approved container successfully");
     }
 
-    private void uploadJpegImage(String jpegUrl) throws IOException {
+    private void uploadJpgImage(String jpegUrl) throws IOException {
         uploadBlob(jpegUrl, new byte[0]);
         log.info("JPEG image saved to the approved container successfully");
     }
 
-    private void uploadBlob(String blobUrl, byte[] content) throws IOException {
+    private void uploadBlob(String blobName, byte[] content) throws IOException {
         BlobServiceClient blobServiceClient = new BlobServiceClientBuilder()
                 .endpoint(accountUrl)
                 .sasToken(sasToken)
                 .buildClient();
         BlobContainerClient approvedContainerClient = blobServiceClient.getBlobContainerClient(containerName);
-        BlobClient blobClient = approvedContainerClient.getBlobClient(blobUrl);
+        BlobClient blobClient = approvedContainerClient.getBlobClient(blobName);
 
         try (ByteArrayInputStream inputStream = new ByteArrayInputStream(content)) {
             blobClient.upload(inputStream, content.length, true);
-            log.info("Blob '{}' uploaded successfully.", blobUrl);
+            log.info("Blob '{}' uploaded successfully.", blobName);
         }
     }
 
