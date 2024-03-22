@@ -6,7 +6,6 @@ import com.alcegory.mescloud.azure.dto.ImageInfoDto;
 import com.azure.storage.blob.BlobClient;
 import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.BlobContainerClientBuilder;
-import com.azure.storage.blob.BlobServiceClientBuilder;
 import com.azure.storage.blob.models.BlobItem;
 import com.azure.storage.blob.models.BlobStorageException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -73,12 +72,11 @@ public class PendingContainerServiceImpl implements PendingContainerService {
                     ImageAnnotationDto blobImageAnnotation = getImageAnnotationDtoFromBlob(blobClient);
 
                     if (shouldUpdateImageDecision(blobImageAnnotation, updatedImageAnnotationDto)) {
-                        // Update fields using the updateFields method
+
                         updateFields(blobImageAnnotation, updatedImageAnnotationDto);
 
                         uploadUpdatedBlob(blobClient, blobImageAnnotation);
 
-                        // Update jpeg field in ContainerInfoDto
                         ContainerInfoDto containerInfoDto = new ContainerInfoDto();
                         ImageInfoDto imageInfoDto = new ImageInfoDto();
                         imageInfoDto.setPath(updatedImageAnnotationDto.getData().getImage());
@@ -94,23 +92,6 @@ public class PendingContainerServiceImpl implements PendingContainerService {
         }
 
         return null;
-    }
-
-    private byte[] retrieveBlobContent(String blobName, String accountUrl, String sasToken) {
-        try {
-            BlobContainerClient blobContainerClient = new BlobServiceClientBuilder()
-                    .endpoint(accountUrl)
-                    .sasToken(sasToken)
-                    .buildClient()
-                    .getBlobContainerClient(containerName);
-
-            BlobClient blobClient = blobContainerClient.getBlobClient(blobName);
-
-            return blobClient.downloadContent().toBytes();
-        } catch (Exception e) {
-            log.error("An error occurred while retrieving blob content for blob: {}", blobName, e);
-            return null;
-        }
     }
 
     private BlobContainerClient getBlobContainerClient() {
@@ -162,13 +143,11 @@ public class PendingContainerServiceImpl implements PendingContainerService {
             String jpegFileName = getImageFileNameFromUrl(imageUrl);
             String jsonBlobName = getJsonBlobName(jpegFileName);
 
-            // Retrieve the JSON data
             String jsonContent = retrieveBlobContent(jsonBlobName);
             if (jsonContent != null) {
                 ObjectMapper objectMapper = new ObjectMapper();
                 ImageAnnotationDto parsedImageAnnotationDto = objectMapper.readValue(jsonContent, ImageAnnotationDto.class);
 
-                // Retrieve the JPEG data
                 String jpegContent = retrieveJpegReference(jpegFileName);
                 if (jpegContent != null) {
                     ImageInfoDto imageInfoDto = new ImageInfoDto();
@@ -197,7 +176,7 @@ public class PendingContainerServiceImpl implements PendingContainerService {
 
     private String retrieveBlobContent(String blobName) {
         try {
-            BlobContainerClient blobContainerClient = getBlobContainerClient(); // Assuming this method returns the BlobContainerClient
+            BlobContainerClient blobContainerClient = getBlobContainerClient();
             BlobClient blobClient = blobContainerClient.getBlobClient(blobName);
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             blobClient.downloadStream(outputStream);

@@ -55,7 +55,7 @@ public class ApprovedContainerServiceImpl implements ApprovedContainerService {
     }
 
     private void uploadJpegImage(String jpegUrl) throws IOException {
-        uploadBlob(jpegUrl, new byte[0]); // Placeholder byte array for JPEG content
+        uploadBlob(jpegUrl, new byte[0]);
         log.info("JPEG image saved to the approved container successfully");
     }
 
