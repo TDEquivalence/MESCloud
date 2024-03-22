@@ -39,3 +39,5 @@ azure:
     publicSasToken: ${PUBLIC_SAS_TOKEN}
     pendingContainerName: ${PENDING_CONTAINER_NAME}
     pendingSasToken: ${PENDING_SAS_TOKEN}
+    approvedContainerName: ${PENDING_CONTAINER_NAME}
+    approvedSasToken: ${PENDING_SAS_TOKEN}

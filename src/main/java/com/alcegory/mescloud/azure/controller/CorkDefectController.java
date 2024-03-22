@@ -2,6 +2,7 @@ package com.alcegory.mescloud.azure.controller;
 
 import com.alcegory.mescloud.azure.dto.ContainerInfoDto;
 import com.alcegory.mescloud.azure.dto.ImageAnnotationDto;
+import com.alcegory.mescloud.azure.service.ApprovedContainerService;
 import com.alcegory.mescloud.azure.service.PendingContainerService;
 import com.alcegory.mescloud.azure.service.PublicContainerService;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ public class CorkDefectController {
 
     private final PublicContainerService publicContainerService;
     private final PendingContainerService pendingContainerService;
+    private final ApprovedContainerService approvedContainerService;
 
 
     @GetMapping("/jpeg")
@@ -26,9 +28,21 @@ public class CorkDefectController {
         return new ResponseEntity<>(imageUrls, HttpStatus.OK);
     }
 
+    @GetMapping("/pending")
+    public ResponseEntity<List<ContainerInfoDto>> getPendingContainerInfo() {
+        List<ContainerInfoDto> imageUrls = pendingContainerService.getPendingImageAnnotations();
+        return new ResponseEntity<>(imageUrls, HttpStatus.OK);
+    }
+
+    @GetMapping("/approved")
+    public ResponseEntity<List<ContainerInfoDto>> getApprovedContainerInfo() {
+        List<ContainerInfoDto> imageUrls = approvedContainerService.getApprovedImageAnnotations();
+        return new ResponseEntity<>(imageUrls, HttpStatus.OK);
+    }
+
     @PutMapping("/update")
-    public ResponseEntity<List<ImageAnnotationDto>> getJpegImages(@RequestBody ImageAnnotationDto imageAnnotationDto) {
-        List<ImageAnnotationDto> updatedImages = pendingContainerService.editImageDecision(imageAnnotationDto);
-        return new ResponseEntity<>(updatedImages, HttpStatus.OK);
+    public ResponseEntity<ContainerInfoDto> updateImageInfo(@RequestBody ImageAnnotationDto imageAnnotationDto) {
+        ContainerInfoDto updatedImage = pendingContainerService.processUpdateImage(imageAnnotationDto);
+        return new ResponseEntity<>(updatedImage, HttpStatus.OK);
     }
 }
