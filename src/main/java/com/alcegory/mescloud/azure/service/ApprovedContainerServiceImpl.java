@@ -2,10 +2,8 @@ package com.alcegory.mescloud.azure.service;
 
 import com.alcegory.mescloud.azure.dto.ContainerInfoDto;
 import com.alcegory.mescloud.azure.dto.ImageAnnotationDto;
-import com.azure.storage.blob.BlobClient;
-import com.azure.storage.blob.BlobContainerClient;
-import com.azure.storage.blob.BlobServiceClient;
-import com.azure.storage.blob.BlobServiceClientBuilder;
+import com.azure.storage.blob.*;
+import com.azure.storage.blob.models.BlobItem;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -44,7 +42,7 @@ public class ApprovedContainerServiceImpl implements ApprovedContainerService {
             String jsonContent = serializeImageAnnotationToJson(containerInfoDto.getImageAnnotationDto());
             String jsonBlobUrl = containerInfoDto.getImageAnnotationDto().getData().getImage();
             uploadJsonBlob(jsonBlobUrl, jsonContent);
-            uploadJpegImage(containerInfoDto.getJpeg().getJpeg());
+            uploadJpegImage(containerInfoDto.getJpg().getPath());
         } catch (IOException e) {
             log.error("Error saving to approved container", e);
         }
@@ -76,5 +74,26 @@ public class ApprovedContainerServiceImpl implements ApprovedContainerService {
         try (ByteArrayInputStream inputStream = new ByteArrayInputStream(content)) {
             blobClient.upload(inputStream, content.length);
         }
+    }
+
+    @Override
+    public void deleteAllBlobsInContainer() {
+        BlobContainerClient containerClient = getBlobContainerClient();
+        for (BlobItem blobItem : containerClient.listBlobs()) {
+            BlobClient blobClient = containerClient.getBlobClient(blobItem.getName());
+            try {
+                blobClient.delete();
+                log.info("Blob '{}' deleted successfully.", blobItem.getName());
+            } catch (Exception e) {
+                log.error("Error deleting blob '{}': {}", blobItem.getName(), e.getMessage());
+            }
+        }
+    }
+
+    private BlobContainerClient getBlobContainerClient() {
+        String containerUriWithSAS = String.format("%s%s?%s", accountUrl, containerName, sasToken);
+        return new BlobContainerClientBuilder()
+                .endpoint(containerUriWithSAS)
+                .buildClient();
     }
 }

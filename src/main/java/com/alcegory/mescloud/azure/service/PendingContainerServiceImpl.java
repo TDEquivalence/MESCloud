@@ -82,8 +82,8 @@ public class PendingContainerServiceImpl implements PendingContainerService {
                         // Update jpeg field in ContainerInfoDto
                         ContainerInfoDto containerInfoDto = new ContainerInfoDto();
                         ImageInfoDto imageInfoDto = new ImageInfoDto();
-                        imageInfoDto.setJpeg(updatedImageAnnotationDto.getData().getImage());
-                        containerInfoDto.setJpeg(imageInfoDto);
+                        imageInfoDto.setPath(updatedImageAnnotationDto.getData().getImage());
+                        containerInfoDto.setJpg(imageInfoDto);
                         containerInfoDto.setImageAnnotationDto(blobImageAnnotation);
 
                         return containerInfoDto.getImageAnnotationDto();
@@ -173,10 +173,10 @@ public class PendingContainerServiceImpl implements PendingContainerService {
                 String jpegContent = retrieveJpegReference(jpegFileName);
                 if (jpegContent != null) {
                     ImageInfoDto imageInfoDto = new ImageInfoDto();
-                    imageInfoDto.setJpeg(jpegContent);
+                    imageInfoDto.setPath(jpegContent);
 
                     ContainerInfoDto containerInfoDto = new ContainerInfoDto();
-                    containerInfoDto.setJpeg(imageInfoDto);
+                    containerInfoDto.setJpg(imageInfoDto);
                     containerInfoDto.setImageAnnotationDto(parsedImageAnnotationDto);
 
                     return containerInfoDto;
@@ -220,7 +220,7 @@ public class PendingContainerServiceImpl implements PendingContainerService {
     }
 
     private void deleteFilesFromPendingContainer(ContainerInfoDto containerInfoDto) {
-        String jpegUrl = containerInfoDto.getJpeg().getJpeg();
+        String jpegUrl = containerInfoDto.getJpg().getPath();
         String jsonFileName = jpegUrl.substring(0, jpegUrl.lastIndexOf('.')) + JSON;
 
         deleteBlob(jpegUrl);

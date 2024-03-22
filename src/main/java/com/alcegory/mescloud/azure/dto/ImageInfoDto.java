@@ -7,5 +7,5 @@ import lombok.Setter;
 @Setter
 public class ImageInfoDto {
 
-    private String jpeg;
+    private String path;
 }

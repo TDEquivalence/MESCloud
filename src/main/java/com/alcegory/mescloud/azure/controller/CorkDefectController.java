@@ -45,4 +45,10 @@ public class CorkDefectController {
         ContainerInfoDto updatedImage = pendingContainerService.processUpdateImage(imageAnnotationDto);
         return new ResponseEntity<>(updatedImage, HttpStatus.OK);
     }
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<Void> updateImageInfo() {
+        approvedContainerService.deleteAllBlobsInContainer();
+        return ResponseEntity.ok().build();
+    }
 }

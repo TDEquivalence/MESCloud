@@ -65,10 +65,10 @@ public class ContainerServiceUtil {
                     ImageAnnotationDto relatedImageDecision = decisionMap.get(correspondingJsonBlobName);
 
                     ImageInfoDto imageInfo = new ImageInfoDto();
-                    imageInfo.setJpeg(blobClient.getBlobUrl());
+                    imageInfo.setPath(blobClient.getBlobUrl());
 
                     ContainerInfoDto containerInfo = new ContainerInfoDto();
-                    containerInfo.setJpeg(imageInfo);
+                    containerInfo.setJpg(imageInfo);
                     containerInfo.setImageAnnotationDto(relatedImageDecision);
 
                     containerInfoList.add(containerInfo);

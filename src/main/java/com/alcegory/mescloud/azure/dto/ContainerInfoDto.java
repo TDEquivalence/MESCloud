@@ -7,6 +7,6 @@ import lombok.Setter;
 @Setter
 public class ContainerInfoDto {
 
-    private ImageInfoDto jpeg;
+    private ImageInfoDto jpg;
     private ImageAnnotationDto imageAnnotationDto;
 }

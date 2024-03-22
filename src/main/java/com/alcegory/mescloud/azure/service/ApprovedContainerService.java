@@ -9,4 +9,6 @@ public interface ApprovedContainerService {
     void saveToApprovedContainer(ContainerInfoDto containerInfoDto);
 
     List<ContainerInfoDto> getApprovedImageAnnotations();
+
+    void deleteAllBlobsInContainer();
 }
