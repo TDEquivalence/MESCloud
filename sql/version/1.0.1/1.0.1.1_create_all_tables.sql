@@ -192,8 +192,6 @@ CREATE TABLE production_order (
     FOREIGN KEY(composed_production_order_id) REFERENCES composed_production_order(id)
 );
 
-CREATE INDEX idx_production_order_code ON production_order (code);
-
 CREATE TABLE counter_record (
     id int GENERATED ALWAYS AS IDENTITY,
     equipment_output_id int,
