@@ -20,6 +20,8 @@ DELETE FROM section;
 DELETE FROM token;
 DELETE FROM users;
 DELETE FROM factory;
+DELETE FROM company;
+DELETE FROM section;
 DELETE FROM ims;
 DELETE FROM audit_script;
 
