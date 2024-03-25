@@ -1,3 +1,6 @@
+ALTER TABLE section_config
+ALTER COLUMN label TYPE VARCHAR(30);
+
 UPDATE company
 SET name = 'M.A. SILVA'
 WHERE id = 1;
@@ -9,9 +12,15 @@ WHERE id = 1;
 UPDATE users
 SET company_id = 1;
 
+ALTER TABLE section_config
+ADD COLUMN order INTEGER;
+
 UPDATE section
 SET name = 'One by one'
 WHERE id = 1;
+
+ALTER TABLE section_config
+RENAME COLUMN name TO label;
 
 ALTER TABLE section_config
 ALTER COLUMN name TYPE VARCHAR(30);
