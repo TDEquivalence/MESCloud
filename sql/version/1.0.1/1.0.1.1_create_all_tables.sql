@@ -194,18 +194,6 @@ CREATE TABLE production_order (
 
 CREATE INDEX idx_production_order_code ON production_order (code);
 
-CREATE TABLE production_instruction (
-    id int GENERATED ALWAYS AS IDENTITY,
-    instruction int,
-    production_order_id int,
-    created_at TIMESTAMP,
-    created_by int,
-
-    PRIMARY KEY(id),
-    FOREIGN KEY(production_order_id) REFERENCES production_order(id),
-    FOREIGN KEY(created_by) REFERENCES users(id)
-);
-
 CREATE TABLE counter_record (
     id int GENERATED ALWAYS AS IDENTITY,
     equipment_output_id int,
