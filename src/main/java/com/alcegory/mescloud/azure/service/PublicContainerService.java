@@ -1,10 +1,14 @@
 package com.alcegory.mescloud.azure.service;
 
-import com.alcegory.mescloud.azure.dto.ContainerInfoDto;
+import com.alcegory.mescloud.azure.dto.ImageInfoDto;
 
 import java.util.List;
 
 public interface PublicContainerService {
 
-    List<ContainerInfoDto> getImageAnnotations();
+    List<ImageInfoDto> getAllImageReference();
+
+    ImageInfoDto getImageReference();
+
+    void deleteBlob(String blobName);
 }

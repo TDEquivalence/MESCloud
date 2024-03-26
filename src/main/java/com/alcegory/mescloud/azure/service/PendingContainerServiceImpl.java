@@ -10,6 +10,8 @@ import com.azure.storage.blob.models.BlobItem;
 import com.azure.storage.blob.models.BlobStorageException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -19,28 +21,21 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Service
 @Slf4j
+@AllArgsConstructor
+@NoArgsConstructor
 public class PendingContainerServiceImpl implements PendingContainerService {
 
+    private static final String JSON_EXTENSION = ".json";
     @Value("${azure.storage.accountUrl}")
     private String accountUrl;
-
     @Value("${azure.storage.pendingContainerName}")
     private String containerName;
-
     @Value("${azure.storage.pendingSasToken}")
     private String sasToken;
-
-    private static final String JSON = ".json";
-    private final ApprovedContainerService approvedContainerService;
-
-    public PendingContainerServiceImpl(ApprovedContainerService approvedContainerService) {
-        this.approvedContainerService = approvedContainerService;
-    }
 
     @Override
     public List<ContainerInfoDto> getPendingImageAnnotations() {
@@ -52,166 +47,80 @@ public class PendingContainerServiceImpl implements PendingContainerService {
     }
 
     @Override
-    public ContainerInfoDto processUpdateImage(ImageAnnotationDto updatedImageAnnotationDto) {
-        ImageAnnotationDto imageAnnotationDto = updateImageDecision(updatedImageAnnotationDto);
-        assert imageAnnotationDto != null;
-        ContainerInfoDto containerInfoDtoUpdated = getImageAnnotationFromContainerInfo(imageAnnotationDto);
-        assert containerInfoDtoUpdated != null;
-        approvedContainerService.saveToApprovedContainer(containerInfoDtoUpdated);
-        deleteFilesFromPendingContainer(containerInfoDtoUpdated);
-        return containerInfoDtoUpdated;
+    public ContainerInfoDto getImageAnnotationDtoByImageInfo(ImageInfoDto imageInfoDto) {
+        ImageAnnotationDto imageAnnotationDto = getImageAnnotationFromContainer(imageInfoDto);
+        ContainerInfoDto containerInfoDto = new ContainerInfoDto();
+        containerInfoDto.setJpg(imageInfoDto);
+        containerInfoDto.setImageAnnotationDto(imageAnnotationDto);
+
+        return containerInfoDto;
     }
 
-    private ImageAnnotationDto updateImageDecision(ImageAnnotationDto updatedImageAnnotationDto) {
+    public ImageAnnotationDto getImageAnnotationFromContainer(ImageInfoDto imageInfoDto) {
         BlobContainerClient blobContainerClient = getBlobContainerClient();
 
+        String imageUrl = imageInfoDto.getPath();
+        String blobName = imageUrl.substring(imageUrl.lastIndexOf('/') + 1, imageUrl.lastIndexOf('.'));
+        String jsonName = blobName + JSON_EXTENSION;
+
         for (BlobItem blobItem : blobContainerClient.listBlobs()) {
-            if (blobItem.getName().toLowerCase().endsWith(JSON)) {
-                BlobClient blobClient = getBlobClient(blobContainerClient, blobItem);
-                try {
-                    ImageAnnotationDto blobImageAnnotation = getImageAnnotationDtoFromBlob(blobClient);
+            if (blobItem.getName().equals(jsonName)) {
 
-                    if (shouldUpdateImageDecision(blobImageAnnotation, updatedImageAnnotationDto)) {
-
-                        updateFields(blobImageAnnotation, updatedImageAnnotationDto);
-
-                        uploadUpdatedBlob(blobClient, blobImageAnnotation);
-
-                        ContainerInfoDto containerInfoDto = new ContainerInfoDto();
-                        ImageInfoDto imageInfoDto = new ImageInfoDto();
-                        imageInfoDto.setPath(updatedImageAnnotationDto.getData().getImage());
-                        containerInfoDto.setJpg(imageInfoDto);
-                        containerInfoDto.setImageAnnotationDto(blobImageAnnotation);
-
-                        return containerInfoDto.getImageAnnotationDto();
+                try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                     InputStream inputStream = blobContainerClient.getBlobClient(blobItem.getName()).openInputStream()) {
+                    byte[] buffer = new byte[1024];
+                    int bytesRead;
+                    while ((bytesRead = inputStream.read(buffer)) != -1) {
+                        outputStream.write(buffer, 0, bytesRead);
                     }
+                    String jsonContent = outputStream.toString();
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    return objectMapper.readValue(jsonContent, ImageAnnotationDto.class);
                 } catch (IOException e) {
-                    log.error("An error occurred while processing blob: {}", blobItem, e);
+                    log.error("Error reading JSON content from blob: {}", e.getMessage());
                 }
             }
-        }
-
-        return null;
-    }
-
-    private BlobClient getBlobClient(BlobContainerClient blobContainerClient, BlobItem blobItem) {
-        return blobContainerClient.getBlobClient(blobItem.getName());
-    }
-
-    private ImageAnnotationDto getImageAnnotationDtoFromBlob(BlobClient blobClient) throws IOException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-
-        try (InputStream inputStream = blobClient.openInputStream()) {
-            return objectMapper.readValue(inputStream, ImageAnnotationDto.class);
-        }
-    }
-
-    private boolean shouldUpdateImageDecision(ImageAnnotationDto blobImageAnnotation, ImageAnnotationDto updatedImageAnnotationDto) {
-        return blobImageAnnotation.getData() != null && blobImageAnnotation.getData().getImage() != null &&
-                blobImageAnnotation.getData().getImage().equals(updatedImageAnnotationDto.getData().getImage());
-    }
-
-    private void updateFields(ImageAnnotationDto blobImageAnnotation, ImageAnnotationDto updatedImageAnnotationDto) {
-        Field[] fields = updatedImageAnnotationDto.getClass().getDeclaredFields();
-
-        for (Field field : fields) {
-            try {
-                field.setAccessible(true);
-                Object value = field.get(updatedImageAnnotationDto);
-                if (value != null) {
-                    Field imageDecisionField = blobImageAnnotation.getClass().getDeclaredField(field.getName());
-                    imageDecisionField.setAccessible(true);
-                    imageDecisionField.set(blobImageAnnotation, value);
-                }
-            } catch (IllegalAccessException | NoSuchFieldException e) {
-                log.error("An error occurred while processing field blob: {}", field, e);
-            }
-        }
-    }
-
-    public ContainerInfoDto getImageAnnotationFromContainerInfo(ImageAnnotationDto imageAnnotationDto) {
-        try {
-            String imageUrl = imageAnnotationDto.getData().getImage();
-            String jpegFileName = getImageFileNameFromUrl(imageUrl);
-            String jsonBlobName = getJsonBlobName(jpegFileName);
-
-            String jsonContent = retrieveBlobContent(jsonBlobName);
-            if (jsonContent != null) {
-                ObjectMapper objectMapper = new ObjectMapper();
-                ImageAnnotationDto parsedImageAnnotationDto = objectMapper.readValue(jsonContent, ImageAnnotationDto.class);
-
-                String jpegContent = retrieveJpegReference(jpegFileName);
-                if (jpegContent != null) {
-                    ImageInfoDto imageInfoDto = new ImageInfoDto();
-                    imageInfoDto.setPath(jpegContent);
-
-                    ContainerInfoDto containerInfoDto = new ContainerInfoDto();
-                    containerInfoDto.setJpg(imageInfoDto);
-                    containerInfoDto.setImageAnnotationDto(parsedImageAnnotationDto);
-
-                    return containerInfoDto;
-                }
-            }
-        } catch (IOException e) {
-            log.error("An error occurred while processing image annotation: {}", imageAnnotationDto, e);
         }
         return null;
     }
 
-    private String getImageFileNameFromUrl(String imageUrl) {
-        return imageUrl.substring(imageUrl.lastIndexOf('/') + 1);
+    @Override
+    public void deleteJpgAndJsonBlobs(String blobUrl) {
+        String blobName = extractBlobName(blobUrl);
+
+        deleteBlob(blobName);
+        
+        String jsonBlobName = constructJsonBlobName(blobName);
+        deleteBlob(jsonBlobName);
     }
 
-    private String getJsonBlobName(String jpegFileName) {
-        return jpegFileName.substring(0, jpegFileName.lastIndexOf('.')) + JSON;
+    private String extractBlobName(String blobUrl) {
+        int lastSlashIndex = blobUrl.lastIndexOf('/');
+        return blobUrl.substring(lastSlashIndex + 1);
     }
 
-    private String retrieveBlobContent(String blobName) {
-        try {
-            BlobContainerClient blobContainerClient = getBlobContainerClient();
-            BlobClient blobClient = blobContainerClient.getBlobClient(blobName);
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            blobClient.downloadStream(outputStream);
-            return outputStream.toString(StandardCharsets.UTF_8);
-        } catch (Exception e) {
-            log.error("An error occurred while retrieving blob content for blob: {}", blobName, e);
+    private String constructJsonBlobName(String blobName) {
+        int extensionIndex = blobName.lastIndexOf('.');
+        if (extensionIndex != -1) {
+            return blobName.substring(0, extensionIndex) + JSON_EXTENSION;
+        } else {
+            log.warn("Unable to determine JSON blob name for blob '{}'.", blobName);
             return null;
         }
     }
 
-    private String retrieveJpegReference(String jpegFileName) {
-        return String.format("%s/%s/%s", accountUrl, containerName, jpegFileName);
-    }
+    public void deleteBlob(String blobName) {
+        BlobContainerClient blobContainerClient = getBlobContainerClient();
+        BlobClient blobClient = blobContainerClient.getBlobClient(blobName);
 
-    private void uploadUpdatedBlob(BlobClient blobClient, ImageAnnotationDto imageDecision) throws IOException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        String updatedJsonContent = objectMapper.writeValueAsString(imageDecision);
-        blobClient.upload(new ByteArrayInputStream(updatedJsonContent.getBytes()), updatedJsonContent.length(), true);
-    }
-
-    private void deleteFilesFromPendingContainer(ContainerInfoDto containerInfoDto) {
-        String jpegUrl = containerInfoDto.getJpg().getPath();
-        String jsonFileName = jpegUrl.substring(0, jpegUrl.lastIndexOf('.')) + JSON;
-
-        deleteBlob(jpegUrl);
-        deleteBlob(jsonFileName);
-    }
-
-    private void deleteBlob(String blobName) {
-        BlobClient blobClient = getBlobClient(blobName);
         try {
             blobClient.delete();
-            log.info("Blob '{}' deleted successfully.", blobClient.getBlobName());
+            log.info("Blob '{}' deleted successfully.", blobName);
         } catch (BlobStorageException ex) {
-            log.error("Error deleting blob '{}': {}", blobClient.getBlobName(), ex.getMessage());
+            log.error("Error deleting blob '{}': {}", blobName, ex.getMessage());
         }
     }
 
-    private BlobClient getBlobClient(String blobName) {
-        BlobContainerClient blobContainerClient = getBlobContainerClient();
-        return blobContainerClient.getBlobClient(blobName);
-    }
 
     private BlobContainerClient getBlobContainerClient() {
         String containerUriWithSAS = String.format("%s%s?%s", accountUrl, containerName, sasToken);

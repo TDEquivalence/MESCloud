@@ -58,7 +58,7 @@ public class ContainerServiceUtil {
 
         for (BlobItem blobItem : blobContainerClient.listBlobs()) {
             String blobName = blobItem.getName();
-            if (blobName.toLowerCase().endsWith(".jpg") || blobName.toLowerCase().endsWith(".jpeg")) {
+            if (blobName.toLowerCase().endsWith(".jpg")) {
                 BlobClient blobClient = getBlobClient(blobContainerClient, blobItem);
                 try {
                     String correspondingJsonBlobName = getCorrespondingJsonBlobName(blobName);
@@ -79,6 +79,62 @@ public class ContainerServiceUtil {
         }
 
         return containerInfoList;
+    }
+
+    public static ImageInfoDto getImageReference(
+            String accountUrl,
+            String containerName,
+            String sasToken) {
+
+        String containerUriWithSAS = String.format("%s%s?%s", accountUrl, containerName, sasToken);
+        BlobContainerClient blobContainerClient = new BlobContainerClientBuilder()
+                .endpoint(containerUriWithSAS)
+                .buildClient();
+
+        for (BlobItem blobItem : blobContainerClient.listBlobs()) {
+            String blobName = blobItem.getName();
+            if (blobName.toLowerCase().endsWith(".jpg")) {
+                BlobClient blobClient = getBlobClient(blobContainerClient, blobItem);
+                try {
+                    ImageInfoDto imageInfo = new ImageInfoDto();
+                    imageInfo.setPath(blobClient.getBlobUrl());
+                    return imageInfo;
+                } catch (Exception e) {
+                    log.error("An error occurred while processing blob: {}", blobName, e);
+                }
+            }
+        }
+
+        return null;
+    }
+
+    public static List<ImageInfoDto> getAllImageReference(
+            String accountUrl,
+            String containerName,
+            String sasToken) {
+
+        String containerUriWithSAS = String.format("%s%s?%s", accountUrl, containerName, sasToken);
+        BlobContainerClient blobContainerClient = new BlobContainerClientBuilder()
+                .endpoint(containerUriWithSAS)
+                .buildClient();
+
+        List<ImageInfoDto> imageInfoList = new ArrayList<>();
+
+        for (BlobItem blobItem : blobContainerClient.listBlobs()) {
+            String blobName = blobItem.getName();
+            if (blobName.toLowerCase().endsWith(".jpg")) {
+                BlobClient blobClient = getBlobClient(blobContainerClient, blobItem);
+                try {
+                    ImageInfoDto imageInfo = new ImageInfoDto();
+                    imageInfo.setPath(blobClient.getBlobUrl());
+                    imageInfoList.add(imageInfo);
+                } catch (Exception e) {
+                    log.error("An error occurred while processing blob: {}", blobName, e);
+                }
+            }
+        }
+
+        return imageInfoList;
     }
 
     private static String getCorrespondingJsonBlobName(String jpegBlobName) {

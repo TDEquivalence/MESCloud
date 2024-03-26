@@ -2,20 +2,28 @@ package com.alcegory.mescloud.azure.service;
 
 import com.alcegory.mescloud.azure.dto.ContainerInfoDto;
 import com.alcegory.mescloud.azure.dto.ImageAnnotationDto;
+import com.alcegory.mescloud.azure.dto.ImageInfoDto;
+import com.azure.json.implementation.jackson.core.JsonProcessingException;
 import com.azure.storage.blob.*;
-import com.azure.storage.blob.models.BlobItem;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Service
 @Slf4j
+@AllArgsConstructor
+@NoArgsConstructor
 public class ApprovedContainerServiceImpl implements ApprovedContainerService {
 
     @Value("${azure.storage.accountUrl}")
@@ -37,61 +45,57 @@ public class ApprovedContainerServiceImpl implements ApprovedContainerService {
     }
 
     @Override
-    public void saveToApprovedContainer(ContainerInfoDto containerInfoDto) {
-        try {
-            ImageAnnotationDto imageAnnotationDto = containerInfoDto.getImageAnnotationDto();
-            String blobName = imageAnnotationDto.getData().getImage();
-            String jsonContent = convertImageAnnotationDtoToJson(imageAnnotationDto);
-
-            uploadJsonBlob(blobName, jsonContent);
-            uploadJpgImage(containerInfoDto.getJpg().getPath());
-        } catch (IOException e) {
-            log.error("Error saving to approved container", e);
-        }
-    }
-
-    private String convertImageAnnotationDtoToJson(ImageAnnotationDto imageAnnotationDto) throws JsonProcessingException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        return objectMapper.writeValueAsString(imageAnnotationDto);
-    }
-
-    private void uploadJsonBlob(String jsonBlobUrl, String jsonContent) throws IOException {
-        uploadBlob(jsonBlobUrl, jsonContent.getBytes());
-        log.info("ImageAnnotationDto JSON saved to the approved container successfully");
-    }
-
-    private void uploadJpgImage(String jpegUrl) throws IOException {
-        uploadBlob(jpegUrl, new byte[0]);
-        log.info("JPEG image saved to the approved container successfully");
-    }
-
-    private void uploadBlob(String blobName, byte[] content) throws IOException {
-        BlobServiceClient blobServiceClient = new BlobServiceClientBuilder()
-                .endpoint(accountUrl)
-                .sasToken(sasToken)
-                .buildClient();
-        BlobContainerClient approvedContainerClient = blobServiceClient.getBlobContainerClient(containerName);
-        BlobClient blobClient = approvedContainerClient.getBlobClient(blobName);
-
-        try (ByteArrayInputStream inputStream = new ByteArrayInputStream(content)) {
-            blobClient.upload(inputStream, content.length, true);
-            log.info("Blob '{}' uploaded successfully.", blobName);
-        }
+    public List<ImageInfoDto> getAllImageReference() {
+        return ContainerServiceUtil.getAllImageReference(
+                accountUrl,
+                containerName,
+                sasToken
+        );
     }
 
     @Override
-    public void deleteAllBlobsInContainer() {
-        BlobContainerClient containerClient = getBlobContainerClient();
-        for (BlobItem blobItem : containerClient.listBlobs()) {
-            BlobClient blobClient = containerClient.getBlobClient(blobItem.getName());
-            try {
-                blobClient.delete();
-                log.info("Blob '{}' deleted successfully.", blobItem.getName());
-            } catch (Exception e) {
-                log.error("Error deleting blob '{}': {}", blobItem.getName(), e.getMessage());
-            }
+    public ImageAnnotationDto saveToApprovedContainer(ImageAnnotationDto imageAnnotationDto) {
+        try {
+            BlobContainerClient blobContainerClient = getBlobContainerClient();
+
+            String uploadedData = saveJsonAnnotation(blobContainerClient, imageAnnotationDto);
+            return convertJsonToImageAnnotation(uploadedData);
+        } catch (IOException e) {
+            log.error("Error saving to approved container", e);
+            return null; // Or return a default ImageAnnotationDto object as needed
         }
     }
+
+    private ImageAnnotationDto convertJsonToImageAnnotation(String json) throws IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        return objectMapper.readValue(json, ImageAnnotationDto.class);
+    }
+
+    private String saveJsonAnnotation(BlobContainerClient blobContainerClient, ImageAnnotationDto imageAnnotationDto) throws IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        String json = objectMapper.writeValueAsString(imageAnnotationDto);
+
+        String imageName = imageAnnotationDto.getData().getImage();
+        String imageNameWithExtension = imageName.substring(imageName.lastIndexOf('/') + 1);
+        String imageNameWithoutExtension = imageNameWithExtension.substring(0, imageNameWithExtension.lastIndexOf('.'));
+        BlobClient jsonBlobClient = blobContainerClient.getBlobClient(imageNameWithoutExtension + ".json");
+        try (InputStream dataStream = new ByteArrayInputStream(json.getBytes(StandardCharsets.UTF_8))) {
+            jsonBlobClient.upload(dataStream, json.length(), true);
+        }
+
+        // Return the JSON content instead of just the blob URL
+        // Retrieve and return JSON content from the blob
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        try (InputStream inputStream = jsonBlobClient.openInputStream()) {
+            byte[] buffer = new byte[1024];
+            int bytesRead;
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                outputStream.write(buffer, 0, bytesRead);
+            }
+        }
+        return outputStream.toString(StandardCharsets.UTF_8);
+    }
+
 
     private BlobContainerClient getBlobContainerClient() {
         String containerUriWithSAS = String.format("%s%s?%s", accountUrl, containerName, sasToken);

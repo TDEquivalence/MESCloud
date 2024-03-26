@@ -2,7 +2,9 @@ package com.alcegory.mescloud.azure.controller;
 
 import com.alcegory.mescloud.azure.dto.ContainerInfoDto;
 import com.alcegory.mescloud.azure.dto.ImageAnnotationDto;
+import com.alcegory.mescloud.azure.dto.ImageInfoDto;
 import com.alcegory.mescloud.azure.service.ApprovedContainerService;
+import com.alcegory.mescloud.azure.service.ContainerManagerService;
 import com.alcegory.mescloud.azure.service.PendingContainerService;
 import com.alcegory.mescloud.azure.service.PublicContainerService;
 import lombok.RequiredArgsConstructor;
@@ -14,41 +16,46 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/cork-defect")
+@RequestMapping("/api/")
 public class CorkDefectController {
 
     private final PublicContainerService publicContainerService;
-    private final PendingContainerService pendingContainerService;
     private final ApprovedContainerService approvedContainerService;
+    private final ContainerManagerService containerManagerService;
 
-
-    @GetMapping("/jpeg")
-    public ResponseEntity<List<ContainerInfoDto>> getJpegImages() {
-        List<ContainerInfoDto> imageUrls = publicContainerService.getImageAnnotations();
+    @GetMapping("/all-image-reference")
+    public ResponseEntity<List<ImageInfoDto>> getImageAllReference() {
+        List<ImageInfoDto> imageUrls = publicContainerService.getAllImageReference();
         return new ResponseEntity<>(imageUrls, HttpStatus.OK);
     }
 
-    @GetMapping("/pending")
-    public ResponseEntity<List<ContainerInfoDto>> getPendingContainerInfo() {
-        List<ContainerInfoDto> imageUrls = pendingContainerService.getPendingImageAnnotations();
+    @GetMapping("/all-approved-image-reference")
+    public ResponseEntity<List<ImageInfoDto>> getApprovedImageAllReference() {
+        List<ImageInfoDto> imageUrls = approvedContainerService.getAllImageReference();
         return new ResponseEntity<>(imageUrls, HttpStatus.OK);
     }
 
     @GetMapping("/approved")
-    public ResponseEntity<List<ContainerInfoDto>> getApprovedContainerInfo() {
-        List<ContainerInfoDto> imageUrls = approvedContainerService.getApprovedImageAnnotations();
+    public ResponseEntity<List<ContainerInfoDto>> getApproved() {
+        List<ContainerInfoDto> containerInfoDto = approvedContainerService.getApprovedImageAnnotations();
+        return new ResponseEntity<>(containerInfoDto, HttpStatus.OK);
+    }
+
+    @GetMapping("/image-reference")
+    public ResponseEntity<ImageInfoDto> getImageReference() {
+        ImageInfoDto imageUrls = publicContainerService.getImageReference();
         return new ResponseEntity<>(imageUrls, HttpStatus.OK);
     }
 
-    @PostMapping("/update")
-    public ResponseEntity<ContainerInfoDto> updateImageInfo(@RequestBody ImageAnnotationDto imageAnnotationDto) {
-        ContainerInfoDto updatedImage = pendingContainerService.processUpdateImage(imageAnnotationDto);
-        return new ResponseEntity<>(updatedImage, HttpStatus.OK);
+    @GetMapping("/corkDetails")
+    public ResponseEntity<ContainerInfoDto> getImageAnnotation() {
+        ContainerInfoDto containerInfoDto = containerManagerService.getData();
+        return new ResponseEntity<>(containerInfoDto, HttpStatus.OK);
     }
 
-    @DeleteMapping("/delete")
-    public ResponseEntity<Void> updateImageInfo() {
-        approvedContainerService.deleteAllBlobsInContainer();
-        return ResponseEntity.ok().build();
+    @PostMapping("/updateCorkDetails")
+    public ResponseEntity<ImageAnnotationDto> updateImageAnnotation(@RequestBody ContainerInfoDto containerInfoDto) {
+        ImageAnnotationDto updatedImageAnnotationDto = containerManagerService.saveToApprovedContainer(containerInfoDto);
+        return new ResponseEntity<>(updatedImageAnnotationDto, HttpStatus.OK);
     }
 }
