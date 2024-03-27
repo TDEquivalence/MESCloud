@@ -10,6 +10,7 @@ ADD COLUMN company_id INT REFERENCES company(id);
 
 ALTER TABLE section
 RENAME COLUMN name TO prefix;
+
 ALTER TABLE section
 ADD COLUMN name VARCHAR(20);
 
@@ -23,7 +24,7 @@ CREATE TABLE IF NOT EXISTS factory (
 CREATE TABLE IF NOT EXISTS section_config (
     id SERIAL PRIMARY KEY,
     section_id INT REFERENCES section(id),
-    label VARCHAR(20),
+    label VARCHAR(50),
     "order" INTEGER
 );
 

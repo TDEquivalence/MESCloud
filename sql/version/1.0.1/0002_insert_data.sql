@@ -1,6 +1,3 @@
-ALTER TABLE section_config
-ALTER COLUMN label TYPE VARCHAR(30);
-
 UPDATE company
 SET name = 'M.A. SILVA'
 WHERE id = 1;
@@ -12,18 +9,13 @@ WHERE id = 1;
 UPDATE users
 SET company_id = 1;
 
-ALTER TABLE section_config
-ADD COLUMN order INTEGER;
-
 UPDATE section
 SET name = 'One by one'
 WHERE id = 1;
 
-ALTER TABLE section_config
-RENAME COLUMN name TO label;
-
-ALTER TABLE section_config
-ALTER COLUMN name TYPE VARCHAR(30);
+UPDATE section_config
+SET "order" = id
+WHERE id BETWEEN 1 AND 5;
 
 INSERT INTO section_config (section_id, label) VALUES
 (1, 'dashboard'),
@@ -37,10 +29,6 @@ INSERT INTO feature (name) VALUES
 ('OEE Graph'),
 ('Production'),
 ('Alarm');
-
-UPDATE section_config
-SET "order" = id
-WHERE id BETWEEN 1 AND 5;
 
 INSERT INTO section_config_feature (section_config_id, feature_id) VALUES
 (1, 1),
