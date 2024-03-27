@@ -1,13 +1,16 @@
 package com.alcegory.mescloud.azure.service;
 
-import com.alcegory.mescloud.azure.dto.ContainerInfoDto;
-import com.alcegory.mescloud.azure.dto.ImageAnnotationDto;
-import com.alcegory.mescloud.azure.dto.ImageInfoDto;
+import com.alcegory.mescloud.azure.dto.*;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class ContainerManagerServiceImpl implements ContainerManagerService {
 
     private PublicContainerService publicContainerService;
@@ -15,23 +18,95 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
     private ApprovedContainerService approvedContainerService;
 
     @Override
-    public ContainerInfoDto getData() {
+    public ContainerInfoSummary getData() {
         ImageInfoDto imageInfoDto = publicContainerService.getImageReference();
-        ImageAnnotationDto imageAnnotationDto = pendingContainerService.getImageAnnotationFromContainer(imageInfoDto);
+        if (imageInfoDto == null) {
+            return new ContainerInfoSummary();
+        }
+
+        ImageAnnotationDto imageAnnotationDto = pendingContainerService.getImageAnnotationFromContainer(imageInfoDto.getPath());
+
+        if (imageAnnotationDto == null) {
+            return new ContainerInfoSummary();
+        }
 
         ContainerInfoDto containerInfoDto = new ContainerInfoDto();
         containerInfoDto.setJpg(imageInfoDto);
         containerInfoDto.setImageAnnotationDto(imageAnnotationDto);
-        return containerInfoDto;
+
+        return convertToSummary(containerInfoDto);
     }
 
     @Override
-    public ImageAnnotationDto saveToApprovedContainer(ContainerInfoDto containerInfoDto) {
-        //TODO: delete json and jpeg from public and pending containers
-        ImageAnnotationDto uploadedImageAnnotationDto = approvedContainerService.saveToApprovedContainer(containerInfoDto.getImageAnnotationDto());
+    public ImageAnnotationDto processSaveToApprovedContainer(ContainerInfoUpdate containerInfoUpdate) {
+        ImageAnnotationDto imageAnnotationDto = pendingContainerService.getImageAnnotationFromContainer(containerInfoUpdate.getFileName());
+        ContainerInfoDto containerInfoDto = convertToContainerInfo(imageAnnotationDto, containerInfoUpdate);
+        return saveToApprovedContainer(containerInfoDto);
+    }
 
-        publicContainerService.deleteBlob(containerInfoDto.getJpg().getPath());
-        pendingContainerService.deleteJpgAndJsonBlobs(containerInfoDto.getJpg().getPath());
+
+    private ImageAnnotationDto saveToApprovedContainer(ContainerInfoDto containerInfoDto) {
+        if (containerInfoDto == null || containerInfoDto.getImageAnnotationDto() == null) {
+            return null;
+        }
+
+        ImageAnnotationDto uploadedImageAnnotationDto = approvedContainerService.saveToApprovedContainer(containerInfoDto.getImageAnnotationDto());
+        String imageUrl = containerInfoDto.getImageAnnotationDto().getData().getImage();
+        if (uploadedImageAnnotationDto != null && imageUrl != null) {
+            publicContainerService.deleteBlob(imageUrl);
+            pendingContainerService.deleteJpgAndJsonBlobs(imageUrl);
+        }
         return uploadedImageAnnotationDto;
+    }
+
+    private ContainerInfoDto convertToContainerInfo(ImageAnnotationDto imageAnnotationDto, ContainerInfoUpdate containerInfoUpdate) {
+        if (imageAnnotationDto == null || containerInfoUpdate == null) {
+            return null;
+        }
+
+        imageAnnotationDto.setFileName(containerInfoUpdate.getFileName());
+        imageAnnotationDto.setClassification(containerInfoUpdate.getClassification());
+        imageAnnotationDto.setRejection(containerInfoUpdate.getRejection());
+        imageAnnotationDto.setComments(containerInfoUpdate.getComments());
+        imageAnnotationDto.setUserApproval(containerInfoUpdate.isUserApproval());
+
+        ContainerInfoDto containerInfoDto = new ContainerInfoDto();
+        containerInfoDto.setImageAnnotationDto(imageAnnotationDto);
+        return containerInfoDto;
+    }
+
+    private ContainerInfoSummary convertToSummary(ContainerInfoDto containerInfoDto) {
+        if (containerInfoDto == null || containerInfoDto.getImageAnnotationDto() == null || containerInfoDto.getImageAnnotationDto().getData() == null) {
+            return null;
+        }
+
+        ContainerInfoSummary summary = new ContainerInfoSummary();
+        summary.setImageUrl(containerInfoDto.getImageAnnotationDto().getData().getImage());
+        summary.setSasToken(publicContainerService.getSasToken());
+        summary.setModelDecision(containerInfoDto.getImageAnnotationDto().getModelDecision());
+        summary.setAnnotations(getRectangleLabels(containerInfoDto.getImageAnnotationDto().getAnnotations()));
+
+        return summary;
+    }
+
+    private List<String> getRectangleLabels(List<AnnotationDto> annotations) {
+        List<String> rectangleLabels = new ArrayList<>();
+        if (annotations != null) {
+            for (AnnotationDto annotation : annotations) {
+                addRectangleLabels(annotation.getResult(), rectangleLabels);
+            }
+        }
+        return rectangleLabels;
+    }
+
+    private void addRectangleLabels(List<ResultDto> results, List<String> rectangleLabels) {
+        if (results != null) {
+            for (ResultDto result : results) {
+                ValueDto value = result.getValue();
+                if (value != null && value.getRectangleLabels() != null) {
+                    rectangleLabels.addAll(value.getRectangleLabels());
+                }
+            }
+        }
     }
 }

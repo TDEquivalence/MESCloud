@@ -6,6 +6,7 @@ import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.BlobContainerClientBuilder;
 import com.azure.storage.blob.models.BlobStorageException;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,6 +26,7 @@ public class PublicContainerServiceImpl implements PublicContainerService {
     @Value("${azure.storage.publicContainerName}")
     private String containerName;
 
+    @Getter
     @Value("${azure.storage.publicSasToken}")
     private String sasToken;
 

@@ -12,7 +12,7 @@ public interface PendingContainerService {
 
     ContainerInfoDto getImageAnnotationDtoByImageInfo(ImageInfoDto imageInfoDto);
 
-    ImageAnnotationDto getImageAnnotationFromContainer(ImageInfoDto imageInfoDto);
+    ImageAnnotationDto getImageAnnotationFromContainer(String imageUrl);
 
     void deleteJpgAndJsonBlobs(String blobName);
 }

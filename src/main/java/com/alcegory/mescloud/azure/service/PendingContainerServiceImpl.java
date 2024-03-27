@@ -48,7 +48,7 @@ public class PendingContainerServiceImpl implements PendingContainerService {
 
     @Override
     public ContainerInfoDto getImageAnnotationDtoByImageInfo(ImageInfoDto imageInfoDto) {
-        ImageAnnotationDto imageAnnotationDto = getImageAnnotationFromContainer(imageInfoDto);
+        ImageAnnotationDto imageAnnotationDto = getImageAnnotationFromContainer(imageInfoDto.getPath());
         ContainerInfoDto containerInfoDto = new ContainerInfoDto();
         containerInfoDto.setJpg(imageInfoDto);
         containerInfoDto.setImageAnnotationDto(imageAnnotationDto);
@@ -56,16 +56,18 @@ public class PendingContainerServiceImpl implements PendingContainerService {
         return containerInfoDto;
     }
 
-    public ImageAnnotationDto getImageAnnotationFromContainer(ImageInfoDto imageInfoDto) {
+    public ImageAnnotationDto getImageAnnotationFromContainer(String imageUrl) {
         BlobContainerClient blobContainerClient = getBlobContainerClient();
 
-        String imageUrl = imageInfoDto.getPath();
         String blobName = imageUrl.substring(imageUrl.lastIndexOf('/') + 1, imageUrl.lastIndexOf('.'));
         String jsonName = blobName + JSON_EXTENSION;
 
         for (BlobItem blobItem : blobContainerClient.listBlobs()) {
-            if (blobItem.getName().equals(jsonName)) {
+            if (blobItem == null || blobItem.getName() == null) {
+                continue;
+            }
 
+            if (blobItem.getName().equals(jsonName)) {
                 try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
                      InputStream inputStream = blobContainerClient.getBlobClient(blobItem.getName()).openInputStream()) {
                     byte[] buffer = new byte[1024];
@@ -84,12 +86,13 @@ public class PendingContainerServiceImpl implements PendingContainerService {
         return null;
     }
 
+
     @Override
     public void deleteJpgAndJsonBlobs(String blobUrl) {
         String blobName = extractBlobName(blobUrl);
 
         deleteBlob(blobName);
-        
+
         String jsonBlobName = constructJsonBlobName(blobName);
         deleteBlob(jsonBlobName);
     }

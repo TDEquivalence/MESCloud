@@ -16,4 +16,11 @@ public class ImageAnnotationDto {
     private String modelDecision;
     @JsonProperty("user_decision")
     private String userDecision;
+    @JsonProperty("file_name")
+    private String fileName;
+    private String classification;
+    @JsonProperty("user_approval")
+    private boolean userApproval;
+    private List<String> rejection;
+    private String comments;
 }

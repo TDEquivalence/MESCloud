@@ -24,6 +24,9 @@ import java.util.Map;
 @Component
 public class ContainerServiceUtil {
 
+    private static final String JPG_EXTENSION = ".jpg";
+    private static final String JSON_EXTENSION = ".json";
+
     private ContainerServiceUtil() {
     }
 
@@ -44,7 +47,7 @@ public class ContainerServiceUtil {
 
         for (BlobItem blobItem : blobContainerClient.listBlobs()) {
             String blobName = blobItem.getName();
-            if (blobName.toLowerCase().endsWith(".json")) {
+            if (blobName.toLowerCase().endsWith(JSON_EXTENSION)) {
                 BlobClient blobClient = getBlobClient(blobContainerClient, blobItem);
                 try (InputStream inputStream = blobClient.openInputStream()) {
                     String jsonContent = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
@@ -58,7 +61,7 @@ public class ContainerServiceUtil {
 
         for (BlobItem blobItem : blobContainerClient.listBlobs()) {
             String blobName = blobItem.getName();
-            if (blobName.toLowerCase().endsWith(".jpg")) {
+            if (blobName.toLowerCase().endsWith(JPG_EXTENSION)) {
                 BlobClient blobClient = getBlobClient(blobContainerClient, blobItem);
                 try {
                     String correspondingJsonBlobName = getCorrespondingJsonBlobName(blobName);
@@ -93,7 +96,7 @@ public class ContainerServiceUtil {
 
         for (BlobItem blobItem : blobContainerClient.listBlobs()) {
             String blobName = blobItem.getName();
-            if (blobName.toLowerCase().endsWith(".jpg")) {
+            if (blobName.toLowerCase().endsWith(JPG_EXTENSION)) {
                 BlobClient blobClient = getBlobClient(blobContainerClient, blobItem);
                 try {
                     ImageInfoDto imageInfo = new ImageInfoDto();
@@ -122,7 +125,7 @@ public class ContainerServiceUtil {
 
         for (BlobItem blobItem : blobContainerClient.listBlobs()) {
             String blobName = blobItem.getName();
-            if (blobName.toLowerCase().endsWith(".jpg")) {
+            if (blobName.toLowerCase().endsWith(JPG_EXTENSION)) {
                 BlobClient blobClient = getBlobClient(blobContainerClient, blobItem);
                 try {
                     ImageInfoDto imageInfo = new ImageInfoDto();
@@ -138,7 +141,7 @@ public class ContainerServiceUtil {
     }
 
     private static String getCorrespondingJsonBlobName(String jpegBlobName) {
-        return jpegBlobName.substring(0, jpegBlobName.lastIndexOf('.')) + ".json";
+        return jpegBlobName.substring(0, jpegBlobName.lastIndexOf('.')) + JSON_EXTENSION;
     }
 
 

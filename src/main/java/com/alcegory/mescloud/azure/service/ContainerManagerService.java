@@ -1,11 +1,12 @@
 package com.alcegory.mescloud.azure.service;
 
-import com.alcegory.mescloud.azure.dto.ContainerInfoDto;
+import com.alcegory.mescloud.azure.dto.ContainerInfoSummary;
+import com.alcegory.mescloud.azure.dto.ContainerInfoUpdate;
 import com.alcegory.mescloud.azure.dto.ImageAnnotationDto;
 
 public interface ContainerManagerService {
 
-    ContainerInfoDto getData();
+    ContainerInfoSummary getData();
 
-    ImageAnnotationDto saveToApprovedContainer(ContainerInfoDto containerInfoDto);
+    ImageAnnotationDto processSaveToApprovedContainer(ContainerInfoUpdate containerInfoUpdate);
 }

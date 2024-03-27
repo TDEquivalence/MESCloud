@@ -1,11 +1,8 @@
 package com.alcegory.mescloud.azure.controller;
 
-import com.alcegory.mescloud.azure.dto.ContainerInfoDto;
-import com.alcegory.mescloud.azure.dto.ImageAnnotationDto;
-import com.alcegory.mescloud.azure.dto.ImageInfoDto;
+import com.alcegory.mescloud.azure.dto.*;
 import com.alcegory.mescloud.azure.service.ApprovedContainerService;
 import com.alcegory.mescloud.azure.service.ContainerManagerService;
-import com.alcegory.mescloud.azure.service.PendingContainerService;
 import com.alcegory.mescloud.azure.service.PublicContainerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -48,14 +45,14 @@ public class CorkDefectController {
     }
 
     @GetMapping("/corkDetails")
-    public ResponseEntity<ContainerInfoDto> getImageAnnotation() {
-        ContainerInfoDto containerInfoDto = containerManagerService.getData();
-        return new ResponseEntity<>(containerInfoDto, HttpStatus.OK);
+    public ResponseEntity<ContainerInfoSummary> getImageAnnotation() {
+        ContainerInfoSummary containerInfoSummary = containerManagerService.getData();
+        return new ResponseEntity<>(containerInfoSummary, HttpStatus.OK);
     }
 
     @PostMapping("/updateCorkDetails")
-    public ResponseEntity<ImageAnnotationDto> updateImageAnnotation(@RequestBody ContainerInfoDto containerInfoDto) {
-        ImageAnnotationDto updatedImageAnnotationDto = containerManagerService.saveToApprovedContainer(containerInfoDto);
+    public ResponseEntity<ImageAnnotationDto> updateImageAnnotation(@RequestBody ContainerInfoUpdate containerInfoUpdate) {
+        ImageAnnotationDto updatedImageAnnotationDto = containerManagerService.processSaveToApprovedContainer(containerInfoUpdate);
         return new ResponseEntity<>(updatedImageAnnotationDto, HttpStatus.OK);
     }
 }
