@@ -27,6 +27,10 @@ public class ContainerServiceUtil {
     private static final String JPG_EXTENSION = ".jpg";
     private static final String JSON_EXTENSION = ".json";
 
+    private static final String IMAGE_URL_FORMAT = "%s%s?%s";
+
+    private static final String ERROR_MESSAGE = "An error occurred while processing blob: {}";
+
     private ContainerServiceUtil() {
     }
 
@@ -35,7 +39,7 @@ public class ContainerServiceUtil {
             String containerName,
             String sasToken) {
 
-        String containerUriWithSAS = String.format("%s%s?%s", accountUrl, containerName, sasToken);
+        String containerUriWithSAS = String.format(IMAGE_URL_FORMAT, accountUrl, containerName, sasToken);
         BlobContainerClient blobContainerClient = new BlobContainerClientBuilder()
                 .endpoint(containerUriWithSAS)
                 .buildClient();
@@ -54,7 +58,7 @@ public class ContainerServiceUtil {
                     ImageAnnotationDto imageDecision = objectMapper.readValue(jsonContent, ImageAnnotationDto.class);
                     decisionMap.put(blobName, imageDecision);
                 } catch (IOException e) {
-                    log.error("An error occurred while processing blob: {}", blobName, e);
+                    log.error(ERROR_MESSAGE, blobName, e);
                 }
             }
         }
@@ -76,7 +80,7 @@ public class ContainerServiceUtil {
 
                     containerInfoList.add(containerInfo);
                 } catch (Exception e) {
-                    log.error("An error occurred while processing blob: {}", blobName, e);
+                    log.error(ERROR_MESSAGE, blobName, e);
                 }
             }
         }
@@ -89,7 +93,7 @@ public class ContainerServiceUtil {
             String containerName,
             String sasToken) {
 
-        String containerUriWithSAS = String.format("%s%s?%s", accountUrl, containerName, sasToken);
+        String containerUriWithSAS = String.format(IMAGE_URL_FORMAT, accountUrl, containerName, sasToken);
         BlobContainerClient blobContainerClient = new BlobContainerClientBuilder()
                 .endpoint(containerUriWithSAS)
                 .buildClient();
@@ -103,7 +107,7 @@ public class ContainerServiceUtil {
                     imageInfo.setPath(blobClient.getBlobUrl());
                     return imageInfo;
                 } catch (Exception e) {
-                    log.error("An error occurred while processing blob: {}", blobName, e);
+                    log.error(ERROR_MESSAGE, blobName, e);
                 }
             }
         }
@@ -116,7 +120,7 @@ public class ContainerServiceUtil {
             String containerName,
             String sasToken) {
 
-        String containerUriWithSAS = String.format("%s%s?%s", accountUrl, containerName, sasToken);
+        String containerUriWithSAS = String.format(IMAGE_URL_FORMAT, accountUrl, containerName, sasToken);
         BlobContainerClient blobContainerClient = new BlobContainerClientBuilder()
                 .endpoint(containerUriWithSAS)
                 .buildClient();
@@ -132,7 +136,7 @@ public class ContainerServiceUtil {
                     imageInfo.setPath(blobClient.getBlobUrl());
                     imageInfoList.add(imageInfo);
                 } catch (Exception e) {
-                    log.error("An error occurred while processing blob: {}", blobName, e);
+                    log.error(ERROR_MESSAGE, blobName, e);
                 }
             }
         }

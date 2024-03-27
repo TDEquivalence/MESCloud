@@ -5,12 +5,17 @@ import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.sql.Timestamp;
 
 @Entity(name = "composed_summary")
 @Getter
 @Setter
-public class ComposedSummaryEntity {
+public class ComposedSummaryEntity implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     @Id
     private Integer id;

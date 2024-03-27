@@ -4,19 +4,24 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.List;
 
-@Entity(name = "ims")
 @Getter
 @Setter
-public class ImsEntity {
+@Entity(name = "ims")
+public class ImsEntity implements Serializable {
 
+    @Serial
+    private static final long serialVersionUID = 1L;
+    
+    @OneToOne(mappedBy = "ims")
+    CountingEquipmentEntity countingEquipment;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String code;
-    @OneToOne(mappedBy = "ims")
-    CountingEquipmentEntity countingEquipment;
     @OneToMany(mappedBy = "ims", fetch = FetchType.LAZY)
     private List<ProductionOrderEntity> productionOrders;
 

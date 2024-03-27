@@ -4,13 +4,22 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.List;
 
 @Getter
 @Setter
 @Entity(name = "counting_equipment")
-public class CountingEquipmentEntity {
+public class CountingEquipmentEntity implements Serializable {
 
+    @Serial
+    private static final long serialVersionUID = 1L;
+    
+    @OneToMany(mappedBy = "equipment", fetch = FetchType.LAZY)
+    List<ProductionOrderEntity> productionOrders;
+    @OneToMany(mappedBy = "countingEquipment", fetch = FetchType.LAZY)
+    List<EquipmentStatusRecordEntity> equipmentStatusRecords;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -27,7 +36,6 @@ public class CountingEquipmentEntity {
     )
     @JoinColumn(name = "ims_id", referencedColumnName = "id")
     private ImsEntity ims;
-
     @OneToMany(
             mappedBy = "countingEquipment",
             fetch = FetchType.EAGER,
@@ -35,13 +43,6 @@ public class CountingEquipmentEntity {
             orphanRemoval = false
     )
     private List<EquipmentOutputEntity> outputs;
-
-    @OneToMany(mappedBy = "equipment", fetch = FetchType.LAZY)
-    List<ProductionOrderEntity> productionOrders;
-
-    @OneToMany(mappedBy = "countingEquipment", fetch = FetchType.LAZY)
-    List<EquipmentStatusRecordEntity> equipmentStatusRecords;
-
     private Double theoreticalProduction;
 
     private Double qualityTarget;
@@ -52,6 +53,11 @@ public class CountingEquipmentEntity {
 
     @Enumerated(EnumType.STRING)
     private OperationStatus operationStatus;
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "counting_equipment_feature",
+            joinColumns = @JoinColumn(name = "counting_equipment_id"),
+            inverseJoinColumns = @JoinColumn(name = "feature_id"))
+    private List<FeatureEntity> features;
 
     @Getter
     public enum OperationStatus {
@@ -66,10 +72,4 @@ public class CountingEquipmentEntity {
         }
 
     }
-
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "counting_equipment_feature",
-            joinColumns = @JoinColumn(name = "counting_equipment_id"),
-            inverseJoinColumns = @JoinColumn(name = "feature_id"))
-    private List<FeatureEntity> features;
 }
