@@ -2,6 +2,7 @@ package com.alcegory.mescloud.azure.service;
 
 import com.alcegory.mescloud.azure.dto.*;
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -9,8 +10,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-@AllArgsConstructor
 @Slf4j
+@AllArgsConstructor
+@NoArgsConstructor
 public class ContainerManagerServiceImpl implements ContainerManagerService {
 
     private PublicContainerService publicContainerService;
