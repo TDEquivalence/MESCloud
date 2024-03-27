@@ -26,24 +26,6 @@ public class CorkDefectController {
         return new ResponseEntity<>(imageUrls, HttpStatus.OK);
     }
 
-    @GetMapping("/all-approved-image-reference")
-    public ResponseEntity<List<ImageInfoDto>> getApprovedImageAllReference() {
-        List<ImageInfoDto> imageUrls = approvedContainerService.getAllImageReference();
-        return new ResponseEntity<>(imageUrls, HttpStatus.OK);
-    }
-
-    @GetMapping("/approved")
-    public ResponseEntity<List<ContainerInfoDto>> getApproved() {
-        List<ContainerInfoDto> containerInfoDto = approvedContainerService.getApprovedImageAnnotations();
-        return new ResponseEntity<>(containerInfoDto, HttpStatus.OK);
-    }
-
-    @GetMapping("/image-reference")
-    public ResponseEntity<ImageInfoDto> getImageReference() {
-        ImageInfoDto imageUrls = publicContainerService.getImageReference();
-        return new ResponseEntity<>(imageUrls, HttpStatus.OK);
-    }
-
     @GetMapping("/corkDetails")
     public ResponseEntity<ContainerInfoSummary> getImageAnnotation() {
         ContainerInfoSummary containerInfoSummary = containerManagerService.getData();
