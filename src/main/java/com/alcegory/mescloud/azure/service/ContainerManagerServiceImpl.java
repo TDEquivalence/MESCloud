@@ -1,8 +1,6 @@
 package com.alcegory.mescloud.azure.service;
 
 import com.alcegory.mescloud.azure.dto.*;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -11,13 +9,17 @@ import java.util.List;
 
 @Service
 @Slf4j
-@AllArgsConstructor
-@NoArgsConstructor
 public class ContainerManagerServiceImpl implements ContainerManagerService {
 
-    private PublicContainerService publicContainerService;
-    private PendingContainerService pendingContainerService;
-    private ApprovedContainerService approvedContainerService;
+    private final PublicContainerService publicContainerService;
+    private final PendingContainerService pendingContainerService;
+    private final ApprovedContainerService approvedContainerService;
+
+    public ContainerManagerServiceImpl(PublicContainerService publicContainerService, PendingContainerService pendingContainerService, ApprovedContainerService approvedContainerService) {
+        this.publicContainerService = publicContainerService;
+        this.pendingContainerService = pendingContainerService;
+        this.approvedContainerService = approvedContainerService;
+    }
 
     @Override
     public ContainerInfoSummary getData() {

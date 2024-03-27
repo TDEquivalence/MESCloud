@@ -2,9 +2,10 @@ UPDATE company
 SET name = 'M.A. SILVA'
 WHERE id = 1;
 
-UPDATE factory
-SET name = 'Porto'
-WHERE id = 1;
+INSERT INTO factory (id, name, company_id)
+VALUES (1, 'Porto', 1)
+ON CONFLICT (id) DO UPDATE
+SET name = EXCLUDED.name;
 
 UPDATE users
 SET company_id = 1;

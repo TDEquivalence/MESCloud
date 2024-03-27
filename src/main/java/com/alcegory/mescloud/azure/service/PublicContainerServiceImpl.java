@@ -5,9 +5,7 @@ import com.azure.storage.blob.BlobClient;
 import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.BlobContainerClientBuilder;
 import com.azure.storage.blob.models.BlobStorageException;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -16,19 +14,25 @@ import java.util.List;
 
 @Service
 @Slf4j
-@AllArgsConstructor
-@NoArgsConstructor
 public class PublicContainerServiceImpl implements PublicContainerService {
 
     @Value("${azure.storage.accountUrl}")
-    private String accountUrl;
+    private final String accountUrl;
 
     @Value("${azure.storage.publicContainerName}")
-    private String containerName;
+    private final String containerName;
 
     @Getter
     @Value("${azure.storage.publicSasToken}")
-    private String sasToken;
+    private final String sasToken;
+
+    public PublicContainerServiceImpl(@Value("${azure.storage.accountUrl}") String accountUrl,
+                                      @Value("${azure.storage.publicContainerName}") String containerName,
+                                      @Value("${azure.storage.publicSasToken}") String sasToken) {
+        this.accountUrl = accountUrl;
+        this.containerName = containerName;
+        this.sasToken = sasToken;
+    }
 
     @Override
     public List<ImageInfoDto> getAllImageReference() {

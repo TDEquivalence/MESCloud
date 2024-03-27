@@ -3,11 +3,10 @@ package com.alcegory.mescloud.azure.service;
 import com.alcegory.mescloud.azure.dto.ContainerInfoDto;
 import com.alcegory.mescloud.azure.dto.ImageAnnotationDto;
 import com.alcegory.mescloud.azure.dto.ImageInfoDto;
-import com.azure.json.implementation.jackson.core.JsonProcessingException;
-import com.azure.storage.blob.*;
+import com.azure.storage.blob.BlobClient;
+import com.azure.storage.blob.BlobContainerClient;
+import com.azure.storage.blob.BlobContainerClientBuilder;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -16,24 +15,29 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Service
 @Slf4j
-@AllArgsConstructor
-@NoArgsConstructor
 public class ApprovedContainerServiceImpl implements ApprovedContainerService {
 
     @Value("${azure.storage.accountUrl}")
-    private String accountUrl;
+    private final String accountUrl;
 
     @Value("${azure.storage.approvedContainerName}")
-    private String containerName;
+    private final String containerName;
 
     @Value("${azure.storage.approvedSasToken}")
-    private String sasToken;
+    private final String sasToken;
+
+    public ApprovedContainerServiceImpl(@Value("${azure.storage.accountUrl}") String accountUrl,
+                                        @Value("${azure.storage.approvedContainerName}") String containerName,
+                                        @Value("${azure.storage.approvedSasToken}") String sasToken) {
+        this.accountUrl = accountUrl;
+        this.containerName = containerName;
+        this.sasToken = sasToken;
+    }
 
     @Override
     public List<ContainerInfoDto> getApprovedImageAnnotations() {

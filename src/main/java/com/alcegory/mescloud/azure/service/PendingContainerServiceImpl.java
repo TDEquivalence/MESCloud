@@ -8,34 +8,35 @@ import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.BlobContainerClientBuilder;
 import com.azure.storage.blob.models.BlobItem;
 import com.azure.storage.blob.models.BlobStorageException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Field;
 import java.util.List;
 
 @Service
 @Slf4j
-@AllArgsConstructor
-@NoArgsConstructor
 public class PendingContainerServiceImpl implements PendingContainerService {
 
     private static final String JSON_EXTENSION = ".json";
     @Value("${azure.storage.accountUrl}")
-    private String accountUrl;
+    private final String accountUrl;
     @Value("${azure.storage.pendingContainerName}")
-    private String containerName;
+    private final String containerName;
     @Value("${azure.storage.pendingSasToken}")
-    private String sasToken;
+    private final String sasToken;
+
+    public PendingContainerServiceImpl(@Value("${azure.storage.accountUrl}") String accountUrl,
+                                       @Value("${azure.storage.pendingContainerName}") String containerName,
+                                       @Value("${azure.storage.pendingSasToken}") String sasToken) {
+        this.accountUrl = accountUrl;
+        this.containerName = containerName;
+        this.sasToken = sasToken;
+    }
 
     @Override
     public List<ContainerInfoDto> getPendingImageAnnotations() {
