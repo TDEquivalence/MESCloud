@@ -75,7 +75,8 @@ public class ApprovedContainerServiceImpl implements ApprovedContainerService {
         return objectMapper.readValue(json, ImageAnnotationDto.class);
     }
 
-    private String saveJsonAnnotation(BlobContainerClient blobContainerClient, ImageAnnotationDto imageAnnotationDto) throws IOException {
+    private String saveJsonAnnotation(BlobContainerClient blobContainerClient, ImageAnnotationDto imageAnnotationDto)
+            throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         String json = objectMapper.writeValueAsString(imageAnnotationDto);
 
@@ -86,9 +87,7 @@ public class ApprovedContainerServiceImpl implements ApprovedContainerService {
         try (InputStream dataStream = new ByteArrayInputStream(json.getBytes(StandardCharsets.UTF_8))) {
             jsonBlobClient.upload(dataStream, json.length(), true);
         }
-
-        // Return the JSON content instead of just the blob URL
-        // Retrieve and return JSON content from the blob
+        
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         try (InputStream inputStream = jsonBlobClient.openInputStream()) {
             byte[] buffer = new byte[1024];

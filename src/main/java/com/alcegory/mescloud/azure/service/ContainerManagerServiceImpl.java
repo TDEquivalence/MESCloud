@@ -15,7 +15,9 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
     private final PendingContainerService pendingContainerService;
     private final ApprovedContainerService approvedContainerService;
 
-    public ContainerManagerServiceImpl(PublicContainerService publicContainerService, PendingContainerService pendingContainerService, ApprovedContainerService approvedContainerService) {
+    public ContainerManagerServiceImpl(PublicContainerService publicContainerService,
+                                       PendingContainerService pendingContainerService,
+                                       ApprovedContainerService approvedContainerService) {
         this.publicContainerService = publicContainerService;
         this.pendingContainerService = pendingContainerService;
         this.approvedContainerService = approvedContainerService;
@@ -28,7 +30,8 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
             return new ContainerInfoSummary();
         }
 
-        ImageAnnotationDto imageAnnotationDto = pendingContainerService.getImageAnnotationFromContainer(imageInfoDto.getPath());
+        ImageAnnotationDto imageAnnotationDto =
+                pendingContainerService.getImageAnnotationFromContainer(imageInfoDto.getPath());
 
         if (imageAnnotationDto == null) {
             return new ContainerInfoSummary();
@@ -43,7 +46,8 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
 
     @Override
     public ImageAnnotationDto processSaveToApprovedContainer(ContainerInfoUpdate containerInfoUpdate) {
-        ImageAnnotationDto imageAnnotationDto = pendingContainerService.getImageAnnotationFromContainer(containerInfoUpdate.getFileName());
+        ImageAnnotationDto imageAnnotationDto =
+                pendingContainerService.getImageAnnotationFromContainer(containerInfoUpdate.getFileName());
         ContainerInfoDto containerInfoDto = convertToContainerInfo(imageAnnotationDto, containerInfoUpdate);
         return saveToApprovedContainer(containerInfoDto);
     }
@@ -54,7 +58,8 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
             return null;
         }
 
-        ImageAnnotationDto uploadedImageAnnotationDto = approvedContainerService.saveToApprovedContainer(containerInfoDto.getImageAnnotationDto());
+        ImageAnnotationDto uploadedImageAnnotationDto =
+                approvedContainerService.saveToApprovedContainer(containerInfoDto.getImageAnnotationDto());
         String imageUrl = containerInfoDto.getImageAnnotationDto().getData().getImage();
         if (uploadedImageAnnotationDto != null && imageUrl != null) {
             publicContainerService.deleteBlob(imageUrl);
@@ -63,7 +68,8 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
         return uploadedImageAnnotationDto;
     }
 
-    private ContainerInfoDto convertToContainerInfo(ImageAnnotationDto imageAnnotationDto, ContainerInfoUpdate containerInfoUpdate) {
+    private ContainerInfoDto convertToContainerInfo(ImageAnnotationDto imageAnnotationDto,
+                                                    ContainerInfoUpdate containerInfoUpdate) {
         if (imageAnnotationDto == null || containerInfoUpdate == null) {
             return null;
         }
@@ -80,7 +86,8 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
     }
 
     private ContainerInfoSummary convertToSummary(ContainerInfoDto containerInfoDto) {
-        if (containerInfoDto == null || containerInfoDto.getImageAnnotationDto() == null || containerInfoDto.getImageAnnotationDto().getData() == null) {
+        if (containerInfoDto == null || containerInfoDto.getImageAnnotationDto() == null
+                || containerInfoDto.getImageAnnotationDto().getData() == null) {
             return null;
         }
 
