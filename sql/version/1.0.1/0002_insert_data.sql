@@ -17,20 +17,12 @@ WHERE id = 1;
 INSERT INTO section (factory_id, prefix, name)
 VALUES (1, 'CRK', 'Cork Defect');
 
-UPDATE section_config
-SET "order" = id
-WHERE id BETWEEN 1 AND 5;
-
-INSERT INTO section_config (section_id, label) VALUES
-(1, 'dashboard'),
-(1, 'machine-center'),
-(1, 'production-management'),
-(1, 'alarms'),
-(2, 'labeling');
-
-UPDATE section_config
-SET "order" = 5
-WHERE label = 'labeling';
+INSERT INTO section_config (section_id, label, "order") VALUES
+(1, 'dashboard', 1),
+(1, 'machine-center', 2),
+(1, 'production-management', 3),
+(1, 'alarms', 4),
+(2, 'labeling', 5);
 
 INSERT INTO feature (name) VALUES
 ('Gauge'),
