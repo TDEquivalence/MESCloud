@@ -24,8 +24,7 @@ public class UserController {
         return new ResponseEntity<>(userDto, HttpStatus.OK);
     }
 
-    //TODO: remove /all to follow REST specifications
-    @GetMapping("/all")
+    @GetMapping
     public ResponseEntity<List<UserDto>> getAllUsers() {
         List<UserDto> users = userServiceImpl.getFilteredUsers();
         return new ResponseEntity<>(users, HttpStatus.OK);

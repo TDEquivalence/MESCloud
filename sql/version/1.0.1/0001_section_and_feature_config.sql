@@ -1,8 +1,3 @@
---add column user company in all tables and these tables
---delete relational table user factory
-DROP TABLE IF EXISTS factory_user;
-DROP TABLE IF EXISTS production_instruction;
-
 ALTER TABLE factory RENAME TO company;
 
 ALTER TABLE users
