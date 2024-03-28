@@ -17,7 +17,6 @@ import java.util.List;
 public class CorkDefectController {
 
     private final PublicContainerService publicContainerService;
-    private final ApprovedContainerService approvedContainerService;
     private final ContainerManagerService containerManagerService;
 
     @GetMapping("/all-image-reference")

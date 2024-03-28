@@ -92,7 +92,7 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
         }
 
         ContainerInfoSummary summary = new ContainerInfoSummary();
-        summary.setImageUrl(containerInfoDto.getImageAnnotationDto().getData().getImage());
+        summary.setImageUrl(containerInfoDto.getJpg().getPath());
         summary.setSasToken(publicContainerService.getSasToken());
         summary.setModelDecision(containerInfoDto.getImageAnnotationDto().getModelDecision());
         summary.setAnnotations(getRectangleLabels(containerInfoDto.getImageAnnotationDto().getAnnotations()));
