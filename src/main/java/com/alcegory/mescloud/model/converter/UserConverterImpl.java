@@ -15,6 +15,8 @@ public class UserConverterImpl implements UserConverter {
         UserConfigDto userConfigDto = new UserConfigDto();
         if (userEntity != null) {
             userConfigDto.setId(userEntity.getId());
+            userConfigDto.setFirstName(userConfigDto.getFirstName());
+            userConfigDto.setLastName(userConfigDto.getLastName());
             userConfigDto.setUsername(userEntity.getUsername());
             userConfigDto.setRole(userEntity.getRole());
             // Convert company
