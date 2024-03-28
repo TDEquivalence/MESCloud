@@ -76,7 +76,6 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
             return null;
         }
 
-        imageAnnotationDto.setFileName(containerInfoUpdate.getFileName());
         imageAnnotationDto.setClassification(containerInfoUpdate.getClassification());
         imageAnnotationDto.setRejection(containerInfoUpdate.getRejection());
         imageAnnotationDto.setComments(containerInfoUpdate.getComments());
