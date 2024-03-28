@@ -21,7 +21,7 @@ public class CompanyServiceImpl implements CompanyService {
     private final GenericConverter<CompanyEntity, CompanyDto> converter;
 
     @Override
-    public CompanyDto saveFactory(CompanyDto companyDto) {
+    public CompanyDto saveCompany(CompanyDto companyDto) {
         validateFactoryDto(companyDto);
         CompanyEntity entity = converter.toEntity(companyDto, CompanyEntity.class);
         repository.save(entity);
@@ -29,7 +29,7 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     @Override
-    public CompanyDto getFactoryById(Long id) {
+    public CompanyDto getCompanyDtoById(Long id) {
         validateId(id);
         CompanyEntity entity = repository.findCompanyById(id);
         validateEntity(entity);
@@ -37,20 +37,26 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     @Override
-    public CompanyDto getFactoryByName(String name) {
+    public CompanyEntity getCompanyById(Long id) {
+        validateId(id);
+        return repository.findCompanyById(id);
+    }
+
+    @Override
+    public CompanyDto getCompanyByName(String name) {
         validateName(name);
         CompanyEntity entity = repository.findByName(name);
         return converter.toDto(entity, CompanyDto.class);
     }
 
     @Override
-    public List<CompanyDto> getAllFactories() {
+    public List<CompanyDto> getAllCompanies() {
         List<CompanyEntity> factories = repository.findAll();
         return converter.toDto(factories, CompanyDto.class);
     }
 
     @Override
-    public void deleteFactoryById(Long id) {
+    public void deleteCompanyById(Long id) {
         validateId(id);
         CompanyEntity entity = repository.findCompanyById(id);
         if (entity != null) {
@@ -61,7 +67,7 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     @Override
-    public void deleteFactoryByName(String name) {
+    public void deleteCompanyByName(String name) {
         validateName(name);
         CompanyEntity entity = repository.findByName(name);
         if (entity != null) {
@@ -73,26 +79,25 @@ public class CompanyServiceImpl implements CompanyService {
 
     private void validateFactoryDto(CompanyDto companyDto) {
         if (companyDto == null) {
-            throw new IllegalArgumentException("FactoryDto cannot be null.");
+            throw new IllegalArgumentException("CompanyDto cannot be null.");
         }
-        // Validate other fields as needed
     }
 
     private void validateId(Long id) {
         if (id == null || id <= 0) {
-            throw new IllegalArgumentException("Invalid factory ID.");
+            throw new IllegalArgumentException("Invalid Company ID.");
         }
     }
 
     private void validateName(String name) {
         if (name == null || name.trim().isEmpty()) {
-            throw new IllegalArgumentException("Invalid factory name.");
+            throw new IllegalArgumentException("Invalid Company name.");
         }
     }
 
     private void validateEntity(CompanyEntity companyEntity) {
         if (companyEntity == null) {
-            throw new IllegalArgumentException("Invalid factory.");
+            throw new IllegalArgumentException("Invalid Company.");
         }
     }
 }

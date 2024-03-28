@@ -1,9 +1,9 @@
 package com.alcegory.mescloud.security.service;
 
+import com.alcegory.mescloud.model.entity.CompanyEntity;
 import com.alcegory.mescloud.repository.UserRepository;
 import com.alcegory.mescloud.security.constant.UserServiceImpConstant;
 import com.alcegory.mescloud.security.exception.UsernameExistException;
-import com.alcegory.mescloud.security.mapper.EntityDtoMapper;
 import com.alcegory.mescloud.security.model.auth.AuthenticateRequest;
 import com.alcegory.mescloud.security.model.auth.AuthenticationResponse;
 import com.alcegory.mescloud.security.model.auth.RegisterRequest;
@@ -12,6 +12,7 @@ import com.alcegory.mescloud.security.model.token.TokenType;
 import com.alcegory.mescloud.security.repository.TokenRepository;
 import com.alcegory.mescloud.model.entity.UserEntity;
 import com.alcegory.mescloud.security.role.Role;
+import com.alcegory.mescloud.service.CompanyService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +33,7 @@ public class AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenService jwtTokenService;
     private final AuthenticationManager authenticationManager;
-    private final EntityDtoMapper mapper;
+    private final CompanyService companyService;
 
     public AuthenticationResponse register(RegisterRequest request) throws UsernameExistException {
         setUsernameByEmail(request);
@@ -41,6 +42,7 @@ public class AuthenticationService {
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
                 .username(request.getUsername())
+                .company(getCompany())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(getRoleEnumName(request.getRole()))
@@ -136,5 +138,9 @@ public class AuthenticationService {
         if (!invalidUserTokens.isEmpty()) {
             invalidUserTokens.forEach(tokenRepository::delete);
         }
+    }
+
+    private CompanyEntity getCompany() {
+        return companyService.getCompanyById(1L);
     }
 }

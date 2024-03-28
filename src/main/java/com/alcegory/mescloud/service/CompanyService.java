@@ -1,20 +1,23 @@
 package com.alcegory.mescloud.service;
 
 import com.alcegory.mescloud.model.dto.CompanyDto;
+import com.alcegory.mescloud.model.entity.CompanyEntity;
 
 import java.util.List;
 
 public interface CompanyService {
 
-    CompanyDto saveFactory(CompanyDto companyDto);
+    CompanyDto saveCompany(CompanyDto companyDto);
 
-    CompanyDto getFactoryById(Long id);
+    CompanyEntity getCompanyById(Long id);
 
-    CompanyDto getFactoryByName(String name);
+    CompanyDto getCompanyDtoById(Long id);
 
-    List<CompanyDto> getAllFactories();
+    CompanyDto getCompanyByName(String name);
 
-    void deleteFactoryById(Long id);
+    List<CompanyDto> getAllCompanies();
 
-    void deleteFactoryByName(String name);
+    void deleteCompanyById(Long id);
+
+    void deleteCompanyByName(String name);
 }

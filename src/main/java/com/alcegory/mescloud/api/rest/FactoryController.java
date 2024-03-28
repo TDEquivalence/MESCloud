@@ -8,15 +8,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("api/factory")
+@RequestMapping("api/company")
 @AllArgsConstructor
 public class FactoryController {
 
     private final CompanyService companyService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<CompanyDto> getFactoryById(@PathVariable("id") Long id) {
-        CompanyDto companyDto = companyService.getFactoryById(id);
+    public ResponseEntity<CompanyDto> getCompanyById(@PathVariable("id") Long id) {
+        CompanyDto companyDto = companyService.getCompanyDtoById(id);
         if (companyDto != null) {
             return ResponseEntity.ok(companyDto);
         } else {
@@ -25,8 +25,8 @@ public class FactoryController {
     }
 
     @PostMapping("/save")
-    public ResponseEntity<CompanyDto> saveFactory(@RequestBody CompanyDto companyDto) {
-        CompanyDto savedCompanyDto = companyService.saveFactory(companyDto);
+    public ResponseEntity<CompanyDto> saveComapny(@RequestBody CompanyDto companyDto) {
+        CompanyDto savedCompanyDto = companyService.saveCompany(companyDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedCompanyDto);
     }
 }
