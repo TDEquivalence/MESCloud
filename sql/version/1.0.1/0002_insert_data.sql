@@ -14,6 +14,11 @@ UPDATE section
 SET name = 'One by one'
 WHERE id = 1;
 
+INSERT INTO section (factory_id, prefix, name)
+VALUES (1, 'CRK', 'Cork Defect');
+
+section_config: 'labeling'
+
 UPDATE section_config
 SET "order" = id
 WHERE id BETWEEN 1 AND 5;
