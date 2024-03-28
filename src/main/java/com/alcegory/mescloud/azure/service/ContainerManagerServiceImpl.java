@@ -34,6 +34,8 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
                 pendingContainerService.getImageAnnotationFromContainer(imageInfoDto.getPath());
 
         if (imageAnnotationDto == null) {
+            log.info("The image at path '{}' was not found in the pending container and has been successfully deleted.",
+                    imageInfoDto.getPath());
             return new ContainerInfoSummary();
         }
 
@@ -60,10 +62,10 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
 
         ImageAnnotationDto uploadedImageAnnotationDto =
                 approvedContainerService.saveToApprovedContainer(containerInfoDto.getImageAnnotationDto());
-        String imageUrl = containerInfoDto.getImageAnnotationDto().getData().getImage();
-        if (uploadedImageAnnotationDto != null && imageUrl != null) {
-            publicContainerService.deleteBlob(imageUrl);
-            pendingContainerService.deleteJpgAndJsonBlobs(imageUrl);
+        String image = containerInfoDto.getImageAnnotationDto().getData().getImage();
+        if (uploadedImageAnnotationDto != null && image != null) {
+            publicContainerService.deleteBlob(image);
+            pendingContainerService.deleteJpgAndJsonBlobs(image);
         }
         return uploadedImageAnnotationDto;
     }
