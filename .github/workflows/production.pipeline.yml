@@ -29,7 +29,7 @@ env:
   PENDING_SAS_TOKEN: ${{ secrets.PENDING_SAS_TOKEN }}
   APPROVED_CONTAINER_NAME: ${{ secrets.APPROVED_CONTAINER_NAME }}
   APPROVED_SAS_TOKEN: ${{ secrets.APPROVED_SAS_TOKEN }}
-  
+
 
 jobs:
   codeql-analysis:
@@ -43,7 +43,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: ['java']
+        language: [ 'java' ]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -184,8 +184,7 @@ jobs:
           aws_secret_key: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
           aws_session_token: ${{ secrets.AWS_SESSION_TOKEN }}
           use_existing_version_if_available: true
-          application_name: mescloud
-          environment_name: Mescloud
+          environment_name: Mescloud-env1
           version_label: ${{ github.SHA }}
           region: eu-west-1
           deployment_package: mescloud-0.0.1-SNAPSHOT.jar
