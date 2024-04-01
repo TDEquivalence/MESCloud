@@ -85,9 +85,10 @@ public class ApprovedContainerServiceImpl implements ApprovedContainerService {
         String imageNameWithoutExtension = imageNameWithExtension.substring(0, imageNameWithExtension.lastIndexOf('.'));
         BlobClient jsonBlobClient = blobContainerClient.getBlobClient(imageNameWithoutExtension + ".json");
         try (InputStream dataStream = new ByteArrayInputStream(json.getBytes(StandardCharsets.UTF_8))) {
-            jsonBlobClient.upload(dataStream, json.length(), true);
+            int dataSize = json.getBytes(StandardCharsets.UTF_8).length;
+            jsonBlobClient.upload(dataStream, dataSize, true);
         }
-        
+
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         try (InputStream inputStream = jsonBlobClient.openInputStream()) {
             byte[] buffer = new byte[1024];
