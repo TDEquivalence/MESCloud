@@ -34,4 +34,5 @@ public class CountingEquipmentDto {
     private CountingEquipmentEntity.OperationStatus operationStatus;
 
     private ProductionOrderDto productionOrder;
+    List<FeatureDto> features;
 }

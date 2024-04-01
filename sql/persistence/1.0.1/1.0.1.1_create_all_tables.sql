@@ -8,7 +8,6 @@ DROP VIEW IF EXISTS alarm_summary;
 DROP TABLE IF EXISTS batch;
 DROP TABLE IF EXISTS hit;
 DROP TABLE IF EXISTS sample;
-DROP TABLE IF EXISTS production_instruction;
 DROP TABLE IF EXISTS counter_record;
 DROP TABLE IF EXISTS alarm;
 DROP TABLE IF EXISTS alarm_configuration;
@@ -20,7 +19,6 @@ DROP TABLE IF EXISTS equipment_output_alias;
 DROP TABLE IF EXISTS composed_production_order;
 DROP TABLE IF EXISTS section;
 DROP TABLE IF EXISTS token;
-DROP TABLE IF EXISTS factory_user;
 DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS factory;
 DROP TABLE IF EXISTS ims;
@@ -70,12 +68,9 @@ CREATE TABLE factory (
  PRIMARY KEY(id)
 );
 
-CREATE TABLE factory_user (
- factory_id int,
- user_id int,
-
- FOREIGN KEY(factory_id) REFERENCES factory(id),
- FOREIGN KEY(user_id) REFERENCES users(id)
+CREATE TABLE company (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(30)
 );
 
 CREATE TABLE section (
@@ -87,12 +82,31 @@ CREATE TABLE section (
  FOREIGN KEY(factory_id) REFERENCES factory(id)
 );
 
+CREATE TABLE section_config (
+  id SERIAL PRIMARY KEY,
+  section_id INT REFERENCES section(id),
+  label VARCHAR(20),
+  "order" int
+);
+
+CREATE TABLE feature (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(20)
+);
+
+CREATE TABLE section_feature (
+  section_id INT REFERENCES section(id),
+  feature_id INT REFERENCES feature(id),
+  PRIMARY KEY (section_id, feature_id)
+);
+
 CREATE TABLE ims (
     id int GENERATED ALWAYS AS IDENTITY,
     code varchar(100) NOT NULL UNIQUE,
 
     PRIMARY KEY(id)
 );
+
 
 CREATE TABLE counting_equipment (
     id int GENERATED ALWAYS AS IDENTITY,
@@ -108,7 +122,6 @@ CREATE TABLE counting_equipment (
     performance_target DOUBLE PRECISION,
     overall_equipment_effectiveness_target DOUBLE PRECISION,
     operation_status VARCHAR(20),
-    unrecognized_alarm_duration INTEGER,
 
     PRIMARY KEY(id),
     FOREIGN KEY(section_id) REFERENCES section(id),
@@ -116,6 +129,12 @@ CREATE TABLE counting_equipment (
 );
 
 CREATE INDEX idx_counting_equipment_section_id ON counting_equipment (section_id);
+
+CREATE TABLE counting_equipment_feature (
+  counting_equipment_id INT REFERENCES counting_equipment(id),
+  feature_id INT REFERENCES feature(id),
+  PRIMARY KEY (counting_equipment_id, feature_id)
+);
 
 CREATE TABLE equipment_output_alias (
     id int GENERATED ALWAYS AS IDENTITY,
@@ -172,20 +191,6 @@ CREATE TABLE production_order (
     FOREIGN KEY(equipment_id) REFERENCES counting_equipment(id),
     FOREIGN KEY(ims_id) REFERENCES ims(id),
     FOREIGN KEY(composed_production_order_id) REFERENCES composed_production_order(id)
-);
-
-CREATE INDEX idx_production_order_code ON production_order (code);
-
-CREATE TABLE production_instruction (
-    id int GENERATED ALWAYS AS IDENTITY,
-    instruction int,
-    production_order_id int,
-    created_at TIMESTAMP,
-    created_by int,
-
-    PRIMARY KEY(id),
-    FOREIGN KEY(production_order_id) REFERENCES production_order(id),
-    FOREIGN KEY(created_by) REFERENCES users(id)
 );
 
 CREATE TABLE counter_record (
@@ -341,8 +346,7 @@ SELECT
     a.completed_at AS completed_at,
     a.recognized_at AS recognized_at,
     u.first_name AS recognized_by_first_name,
-    u.last_name AS recognized_by_last_name,
-    EXTRACT(EPOCH FROM (a.completed_at - a.created_at)) AS duration -- Calculate duration in seconds
+    u.last_name AS recognized_by_last_name
 FROM
     alarm a
 JOIN

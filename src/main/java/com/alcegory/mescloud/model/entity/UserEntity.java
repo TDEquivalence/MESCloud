@@ -7,6 +7,8 @@ import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -17,7 +19,10 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @Entity(name = "users")
-public class UserEntity implements UserDetails {
+public class UserEntity implements UserDetails, Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,12 +38,16 @@ public class UserEntity implements UserDetails {
     private String[] userAuthorities;
 
     @OneToMany(mappedBy = "user")
-    private transient  List<TokenEntity> tokens;
+    private transient List<TokenEntity> tokens;
 
     private Date createdAt;
     private Date updatedAt;
     private boolean isActive;
     private boolean isNotLocked;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "company_id")
+    private CompanyEntity company;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

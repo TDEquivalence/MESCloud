@@ -1,8 +1,9 @@
 package com.alcegory.mescloud.model.converter;
 
 import com.alcegory.mescloud.model.dto.CountingEquipmentDto;
-import com.alcegory.mescloud.model.request.RequestConfigurationDto;
+import com.alcegory.mescloud.model.dto.CountingEquipmentSummaryDto;
 import com.alcegory.mescloud.model.entity.CountingEquipmentEntity;
+import com.alcegory.mescloud.model.request.RequestConfigurationDto;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.modelmapper.ModelMapper;
@@ -36,5 +37,25 @@ public class CountingEquipmentConverterImpl implements CountingEquipmentConverte
 
     public CountingEquipmentEntity convertToEntity(RequestConfigurationDto request) {
         return (request == null) ? null : mapper.map(request, CountingEquipmentEntity.class);
+    }
+
+    public CountingEquipmentSummaryDto convertToSummaryDto(CountingEquipmentEntity countingEquipment) {
+        return mapper.map(countingEquipment, CountingEquipmentSummaryDto.class);
+    }
+
+    public CountingEquipmentEntity convertToEntity(CountingEquipmentSummaryDto summaryDto) {
+        return (summaryDto == null) ? null : mapper.map(summaryDto, CountingEquipmentEntity.class);
+    }
+
+    public List<CountingEquipmentSummaryDto> convertToSummaryDtoList(List<CountingEquipmentEntity> countingEquipments) {
+        return countingEquipments.stream()
+                .map(this::convertToSummaryDto)
+                .toList();
+    }
+
+    public List<CountingEquipmentEntity> convertToEntityList(List<CountingEquipmentSummaryDto> summaryDtos) {
+        return summaryDtos.stream()
+                .map(this::convertToEntity)
+                .toList();
     }
 }

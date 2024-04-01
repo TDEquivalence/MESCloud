@@ -1,56 +1,22 @@
 package com.alcegory.mescloud.service;
 
+import com.alcegory.mescloud.model.dto.UserConfigDto;
 import com.alcegory.mescloud.model.dto.UserDto;
-import com.alcegory.mescloud.model.entity.UserEntity;
 import com.alcegory.mescloud.model.filter.Filter;
-import com.alcegory.mescloud.repository.UserRepository;
 import com.alcegory.mescloud.security.exception.UserNotFoundException;
-import com.alcegory.mescloud.security.mapper.EntityDtoMapper;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import com.alcegory.mescloud.security.model.auth.AuthenticationResponse;
 
-import java.util.Date;
 import java.util.List;
 
-import static com.alcegory.mescloud.security.constant.UserServiceImpConstant.USER_NOT_FOUND_BY_USERNAME;
+public interface UserService {
 
-@Service
-@RequiredArgsConstructor
-public class UserService {
+    UserDto getUserById(Long id);
 
-    private final UserRepository userRepository;
-    private final EntityDtoMapper mapper;
+    List<UserDto> getFilteredUsers();
 
-    public UserDto getUserById(Long id) {
-        UserEntity userEntity = userRepository.findUserById(id);
-        return mapper.convertToDto(userEntity);
-    }
+    List<UserDto> getFilteredUsers(Filter filter);
 
-    public List<UserDto> getFilteredUsers() {
-        List<UserEntity> userEntityList = userRepository.findAll();
-        return mapper.convertToDto(userEntityList);
-    }
+    UserDto updateUser(UserDto userDto) throws UserNotFoundException;
 
-    public List<UserDto> getFilteredUsers(Filter filter) {
-        List<UserEntity> userEntityList = userRepository.getFilteredUsers(filter);
-        return mapper.convertToDto(userEntityList);
-    }
-
-    public UserDto updateUser(UserDto userDto) throws UserNotFoundException {
-        UserEntity dbUserEntity = userRepository.findUserByUsername(userDto.getUsername());
-
-        if (dbUserEntity == null) {
-            throw new UserNotFoundException(USER_NOT_FOUND_BY_USERNAME);
-        }
-        dbUserEntity = UserEntity.builder()
-                .firstName(userDto.getFirstName())
-                .lastName(userDto.getLastName())
-                .username(userDto.getUsername())
-                .updatedAt(new Date())
-                .build();
-
-        userRepository.save(dbUserEntity);
-        return mapper.convertToDto(dbUserEntity);
-    }
+    UserConfigDto getUserByAuth(AuthenticationResponse authenticateRequest);
 }
-

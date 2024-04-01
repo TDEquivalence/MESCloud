@@ -1,6 +1,5 @@
 package com.alcegory.mescloud.model.dto;
 
-import com.alcegory.mescloud.model.entity.SectionEntity;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,5 +11,5 @@ public class FactoryDto {
 
     private Long id;
     private String name;
-    private List<SectionEntity> sections;
+    private List<SectionDto> sectionList;
 }

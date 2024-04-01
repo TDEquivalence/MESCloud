@@ -4,13 +4,18 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
-@Entity(name = "production_order")
 @Getter
 @Setter
-public class ProductionOrderEntity {
+@Entity(name = "production_order")
+public class ProductionOrderEntity implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,3 +44,5 @@ public class ProductionOrderEntity {
     @ManyToOne
     private ComposedProductionOrderEntity composedProductionOrder;
 }
+
+
