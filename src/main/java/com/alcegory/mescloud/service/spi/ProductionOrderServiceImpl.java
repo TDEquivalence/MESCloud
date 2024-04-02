@@ -245,13 +245,28 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     }
 
     @Override
-    public List<ProductionOrderSummaryDto> getCompletedWithoutComposedFiltered(FilterDto filter) {
+    public PaginatedProductionOrderDto getCompletedWithoutComposedFiltered(Filter filter) {
+        int requestedProductionOrders = filter.getTake();
+        filter.setTake(filter.getTake() + 1);
+
         Timestamp startDate = filter.getSearch().getTimestampValue(START_DATE);
         Timestamp endDate = filter.getSearch().getTimestampValue(END_DATE);
         String productionOrderCode = filter.getSearch().getValue(Filter.Property.PRODUCTION_ORDER_CODE);
-        List<ProductionOrderSummaryEntity> persistedProductionOrders = repository.findCompleted(startDate, endDate, true,
-                productionOrderCode);
-        return summaryConverter.toDto(persistedProductionOrders, ProductionOrderSummaryDto.class);
+
+        List<ProductionOrderSummaryEntity> persistedProductionOrders = repository.findCompleted(startDate, endDate, true, productionOrderCode);
+        boolean hasNextPage = persistedProductionOrders.size() > requestedProductionOrders;
+
+        if (hasNextPage) {
+            persistedProductionOrders.remove(persistedProductionOrders.size() - 1);
+        }
+
+        PaginatedProductionOrderDto paginatedProductionOrderDto = new PaginatedProductionOrderDto();
+        paginatedProductionOrderDto.setHasNextPage(hasNextPage);
+
+        List<ProductionOrderSummaryDto> summaryDtos = summaryConverter.toDto(persistedProductionOrders, ProductionOrderSummaryDto.class);
+        paginatedProductionOrderDto.setProductionOrders(summaryDtos);
+
+        return paginatedProductionOrderDto;
     }
 
     @Override
