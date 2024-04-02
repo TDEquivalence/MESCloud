@@ -1,6 +1,5 @@
 package com.alcegory.mescloud.repository;
 
-import com.alcegory.mescloud.model.dto.FilterDto;
 import com.alcegory.mescloud.model.entity.BatchEntity;
 import com.alcegory.mescloud.model.entity.ComposedSummaryEntity;
 import com.alcegory.mescloud.model.entity.HitEntity;
@@ -33,7 +32,7 @@ public class ComposedProductionOrderRepositoryImpl {
     private final EntityManager entityManager;
 
 
-    public List<ComposedSummaryEntity> findCompleted(FilterDto filter, Long composedId) {
+    public List<ComposedSummaryEntity> findCompleted(Filter filter, Long composedId) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<ComposedSummaryEntity> query = criteriaBuilder.createQuery(ComposedSummaryEntity.class);
         Root<ComposedSummaryEntity> root = query.from(ComposedSummaryEntity.class);
@@ -55,7 +54,10 @@ public class ComposedProductionOrderRepositoryImpl {
                 .where(predicates.toArray(new Predicate[0]))
                 .orderBy(orders);
 
-        return entityManager.createQuery(query).getResultList();
+        return entityManager.createQuery(query)
+                .setFirstResult(filter.getSkip())
+                .setMaxResults(filter.getTake())
+                .getResultList();
     }
 
     public List<ComposedSummaryEntity> findAllComposed(Timestamp startDate, Timestamp endDate) {
@@ -87,7 +89,7 @@ public class ComposedProductionOrderRepositoryImpl {
         return root.get(PROP_ID).in(subquery);
     }
 
-    public List<ComposedSummaryEntity> getOpenComposedSummaries(boolean withHits, FilterDto filter, Long composedId) {
+    public List<ComposedSummaryEntity> getOpenComposedSummaries(boolean withHits, Filter filter, Long composedId) {
 
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<ComposedSummaryEntity> query = criteriaBuilder.createQuery(ComposedSummaryEntity.class);
@@ -133,10 +135,13 @@ public class ComposedProductionOrderRepositoryImpl {
         query.orderBy(withHits ? criteriaBuilder.desc(root.get(INSERT_HIT_AT)) : criteriaBuilder.desc(root.get(CREATED_AT)));
 
         // Execute the query and return results
-        return entityManager.createQuery(query).getResultList();
+        return entityManager.createQuery(query)
+                .setFirstResult(filter.getSkip())
+                .setMaxResults(filter.getTake())
+                .getResultList();
     }
 
-    private List<Predicate> getDatePredicates(CriteriaBuilder criteriaBuilder, Root<ComposedSummaryEntity> root, FilterDto filter) {
+    private List<Predicate> getDatePredicates(CriteriaBuilder criteriaBuilder, Root<ComposedSummaryEntity> root, Filter filter) {
         List<Predicate> datePredicates = new ArrayList<>();
         Timestamp startDate = filter.getSearch().getTimestampValue(START_DATE);
         Timestamp endDate = filter.getSearch().getTimestampValue(END_DATE);

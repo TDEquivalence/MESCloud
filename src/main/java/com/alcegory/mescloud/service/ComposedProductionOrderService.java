@@ -2,9 +2,10 @@ package com.alcegory.mescloud.service;
 
 import com.alcegory.mescloud.model.dto.ComposedProductionOrderDto;
 import com.alcegory.mescloud.model.dto.ComposedSummaryDto;
-import com.alcegory.mescloud.model.dto.FilterDto;
+import com.alcegory.mescloud.model.dto.PaginatedComposedDto;
 import com.alcegory.mescloud.model.dto.ProductionOrderSummaryDto;
 import com.alcegory.mescloud.model.entity.ComposedProductionOrderEntity;
+import com.alcegory.mescloud.model.filter.Filter;
 import com.alcegory.mescloud.model.request.RequestComposedDto;
 
 import java.util.List;
@@ -24,29 +25,29 @@ public interface ComposedProductionOrderService {
 
     List<ComposedProductionOrderDto> getAll();
 
-    default List<ComposedSummaryDto> findAllSummarizedWithHits() {
+    default PaginatedComposedDto findAllSummarizedWithHits() {
         return findAllSummarized(true);
     }
 
-    default List<ComposedSummaryDto> findAllSummarizedWithoutHits() {
+    default PaginatedComposedDto findAllSummarizedWithoutHits() {
         return findAllSummarized(false);
     }
 
-    default List<ComposedSummaryDto> findSummarizedWithHitsFiltered(FilterDto filter) {
+    default PaginatedComposedDto findSummarizedWithHitsFiltered(Filter filter) {
         return findSummarizedFiltered(true, filter);
     }
 
-    default List<ComposedSummaryDto> findSummarizedWithoutHitsFiltered(FilterDto filter) {
+    default PaginatedComposedDto findSummarizedWithoutHitsFiltered(Filter filter) {
         return findSummarizedFiltered(false, filter);
     }
 
-    List<ComposedSummaryDto> findSummarizedFiltered(boolean withHits, FilterDto filter);
+    PaginatedComposedDto findSummarizedFiltered(boolean withHits, Filter filter);
 
-    List<ComposedSummaryDto> findAllSummarized(boolean withHits);
+    PaginatedComposedDto findAllSummarized(boolean withHits);
 
     List<ComposedSummaryDto> findAllCompleted();
 
-    List<ComposedSummaryDto> findCompletedFiltered(FilterDto filter);
+    PaginatedComposedDto findCompletedFiltered(Filter filter);
 
     void setProductionOrderApproval(ComposedProductionOrderEntity composed, boolean isApproved);
 

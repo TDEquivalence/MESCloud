@@ -2,7 +2,9 @@ package com.alcegory.mescloud.repository;
 
 import com.alcegory.mescloud.model.entity.ComposedProductionOrderEntity;
 import com.alcegory.mescloud.model.entity.ProductionOrderSummaryEntity;
+import com.alcegory.mescloud.model.filter.Filter;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -10,6 +12,9 @@ import org.springframework.stereotype.Repository;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.alcegory.mescloud.model.filter.Filter.Property.END_DATE;
+import static com.alcegory.mescloud.model.filter.Filter.Property.START_DATE;
 
 @AllArgsConstructor
 @Repository
@@ -23,8 +28,17 @@ public class ProductionOrderRepositoryImpl {
 
     private final EntityManager entityManager;
 
-    public List<ProductionOrderSummaryEntity> findCompleted(Timestamp startDate, Timestamp endDate, boolean withoutComposed,
-                                                            String productionOrderCode) {
+    public List<ProductionOrderSummaryEntity> findCompleted(boolean withoutComposed, Filter filter, Timestamp startDate, Timestamp endDate) {
+        String productionOrderCode = null;
+        Integer skip = null;
+        Integer take = null;
+
+        if (filter != null) {
+            productionOrderCode = filter.getSearch().getValue(Filter.Property.PRODUCTION_ORDER_CODE);
+            skip = filter.getSkip();
+            take = filter.getTake();
+        }
+
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<ProductionOrderSummaryEntity> query = criteriaBuilder.createQuery(ProductionOrderSummaryEntity.class);
         Root<ProductionOrderSummaryEntity> root = query.from(ProductionOrderSummaryEntity.class);
@@ -63,8 +77,19 @@ public class ProductionOrderRepositoryImpl {
 
         query.orderBy(orders);
 
-        return entityManager.createQuery(query).getResultList();
+        TypedQuery<ProductionOrderSummaryEntity> typedQuery = entityManager.createQuery(query);
+
+        if (skip != null) {
+            typedQuery.setFirstResult(skip);
+        }
+
+        if (take != null) {
+            typedQuery.setMaxResults(take);
+        }
+
+        return typedQuery.getResultList();
     }
+
 
     public List<ProductionOrderSummaryEntity> findProductionOrderSummaryByComposedId(Long composedProductionOrderId) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();

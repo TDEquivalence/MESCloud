@@ -240,18 +240,29 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
 
     @Override
     public List<ProductionOrderSummaryDto> getCompletedWithoutComposedFiltered() {
-        List<ProductionOrderSummaryEntity> persistedProductionOrders = repository.findCompleted(null, null, true, null);
+        List<ProductionOrderSummaryEntity> persistedProductionOrders = repository.findCompleted(true, null, null, null);
         return summaryConverter.toDto(persistedProductionOrders, ProductionOrderSummaryDto.class);
     }
 
     @Override
-    public List<ProductionOrderSummaryDto> getCompletedWithoutComposedFiltered(FilterDto filter) {
-        Timestamp startDate = filter.getSearch().getTimestampValue(START_DATE);
-        Timestamp endDate = filter.getSearch().getTimestampValue(END_DATE);
-        String productionOrderCode = filter.getSearch().getValue(Filter.Property.PRODUCTION_ORDER_CODE);
-        List<ProductionOrderSummaryEntity> persistedProductionOrders = repository.findCompleted(startDate, endDate, true,
-                productionOrderCode);
-        return summaryConverter.toDto(persistedProductionOrders, ProductionOrderSummaryDto.class);
+    public PaginatedProductionOrderDto getCompletedWithoutComposedFiltered(Filter filter) {
+        int requestedProductionOrders = filter.getTake();
+        filter.setTake(filter.getTake() + 1);
+
+        List<ProductionOrderSummaryEntity> persistedProductionOrders = repository.findCompleted(true, filter,
+                filter.getSearch().getTimestampValue(START_DATE), filter.getSearch().getTimestampValue(END_DATE));
+        boolean hasNextPage = persistedProductionOrders.size() > requestedProductionOrders;
+
+        if (hasNextPage) {
+            persistedProductionOrders.remove(persistedProductionOrders.size() - 1);
+        }
+
+        PaginatedProductionOrderDto paginatedProductionOrderDto = new PaginatedProductionOrderDto();
+        paginatedProductionOrderDto.setHasNextPage(hasNextPage);
+
+        List<ProductionOrderSummaryDto> summaryDtos = summaryConverter.toDto(persistedProductionOrders, ProductionOrderSummaryDto.class);
+        paginatedProductionOrderDto.setProductionOrders(summaryDtos);
+        return paginatedProductionOrderDto;
     }
 
     @Override

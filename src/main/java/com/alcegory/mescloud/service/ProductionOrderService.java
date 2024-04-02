@@ -1,9 +1,11 @@
 package com.alcegory.mescloud.service;
 
 import com.alcegory.mescloud.model.dto.FilterDto;
+import com.alcegory.mescloud.model.dto.PaginatedProductionOrderDto;
 import com.alcegory.mescloud.model.dto.ProductionOrderDto;
 import com.alcegory.mescloud.model.dto.ProductionOrderSummaryDto;
 import com.alcegory.mescloud.model.entity.ProductionOrderEntity;
+import com.alcegory.mescloud.model.filter.Filter;
 
 import java.sql.Timestamp;
 import java.util.Date;
@@ -42,7 +44,7 @@ public interface ProductionOrderService {
 
     List<ProductionOrderSummaryDto> getCompletedWithoutComposedFiltered();
 
-    List<ProductionOrderSummaryDto> getCompletedWithoutComposedFiltered(FilterDto filter);
+    PaginatedProductionOrderDto getCompletedWithoutComposedFiltered(Filter filter);
 
     void setProductionOrderApproval(Long composedOrderId, boolean isApproved);
 
