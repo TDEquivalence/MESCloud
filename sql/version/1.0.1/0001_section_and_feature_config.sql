@@ -42,4 +42,4 @@ CREATE TABLE IF NOT EXISTS counting_equipment_feature (
 
 INSERT INTO audit_script (run_date, process, version, schema)
 VALUES
-    (CURRENT_DATE, '0001_section_and_feature_config', '1.0.1', '1.0.1_0001');
+    (CURRENT_DATE, '0001_section_and_feature_config.sql', '1.0.1', '1.0.1_0001');
