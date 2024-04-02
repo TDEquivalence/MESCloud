@@ -1,8 +1,8 @@
 package com.alcegory.mescloud.repository;
 
-import com.alcegory.mescloud.model.dto.FilterDto;
 import com.alcegory.mescloud.model.entity.ComposedProductionOrderEntity;
 import com.alcegory.mescloud.model.entity.ComposedSummaryEntity;
+import com.alcegory.mescloud.model.filter.Filter;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -20,9 +20,9 @@ public interface ComposedProductionOrderRepository extends JpaRepository<Compose
 
     Optional<ComposedProductionOrderEntity> findTopByOrderByIdDesc();
 
-    List<ComposedSummaryEntity> getOpenComposedSummaries(boolean withHits, FilterDto filter, Long composedId);
+    List<ComposedSummaryEntity> getOpenComposedSummaries(boolean withHits, Filter filter, Long composedId);
 
-    List<ComposedSummaryEntity> findCompleted(FilterDto filter, Long composedId);
+    List<ComposedSummaryEntity> findCompleted(Filter filter, Long composedId);
 
     List<ComposedSummaryEntity> findAllComposed(Timestamp startDate, Timestamp endDate);
 
