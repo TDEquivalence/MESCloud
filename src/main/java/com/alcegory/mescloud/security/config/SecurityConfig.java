@@ -25,6 +25,10 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.Arrays;
 import java.util.Collections;
 
+import static com.alcegory.mescloud.security.role.Authority.OPERATOR_CREATE;
+import static com.alcegory.mescloud.security.role.Role.*;
+import static org.springframework.http.HttpMethod.*;
+
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -47,10 +51,16 @@ public class SecurityConfig {
                 .csrf()
                 .disable()
                 .authorizeHttpRequests()
-                .requestMatchers(HttpMethod.OPTIONS, "/**")
+                .requestMatchers(OPTIONS, "/**")
                 .permitAll()
                 .requestMatchers(CorsUtils::isPreFlightRequest)
                 .permitAll()
+                .requestMatchers("/api/factory/*/section/*/machine-center/equipment/*").hasAnyRole(SUPER_ADMIN.name(),
+                        ADMIN.name(), OPERATOR.name())
+
+                .requestMatchers(POST, "/api/factory/**").hasAuthority(OPERATOR_CREATE.name())
+                .requestMatchers(PUT, "/api/production-orders/**").hasAuthority(OPERATOR_CREATE.name())
+
                 .requestMatchers("/api/auth/register", "/api/auth/login", "/aws/health")
                 .permitAll()
                 .anyRequest()

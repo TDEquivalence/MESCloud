@@ -11,9 +11,35 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public enum Role {
 
-    OPERATOR(Set.of(Authority.USER_READ, Authority.USER_UPDATE, Authority.USER_DELETE, Authority.USER_CREATE)),
-    ADMIN(Set.of(Authority.ADMIN_READ, Authority.ADMIN_UPDATE, Authority.ADMIN_DELETE, Authority.ADMIN_CREATE)),
-    SUPER_ADMIN(Set.of(Authority.ADMIN_READ, Authority.ADMIN_UPDATE, Authority.ADMIN_DELETE, Authority.ADMIN_CREATE));
+    SUPER_ADMIN(Set.of(
+            Authority.SUPER_ADMIN_READ,
+            Authority.SUPER_ADMIN_CREATE,
+            Authority.SUPER_ADMIN_UPDATE,
+            Authority.SUPER_ADMIN_DELETE,
+            Authority.ADMIN_READ,
+            Authority.ADMIN_CREATE,
+            Authority.ADMIN_UPDATE,
+            Authority.ADMIN_DELETE,
+            Authority.OPERATOR_READ,
+            Authority.OPERATOR_CREATE,
+            Authority.OPERATOR_UPDATE,
+            Authority.OPERATOR_DELETE)
+    ),
+    ADMIN(Set.of(
+            Authority.ADMIN_READ,
+            Authority.ADMIN_CREATE,
+            Authority.ADMIN_UPDATE,
+            Authority.ADMIN_DELETE,
+            Authority.OPERATOR_READ,
+            Authority.OPERATOR_UPDATE,
+            Authority.OPERATOR_DELETE)
+    ),
+    OPERATOR(Set.of(
+            Authority.OPERATOR_READ,
+            Authority.OPERATOR_CREATE,
+            Authority.OPERATOR_UPDATE,
+            Authority.OPERATOR_DELETE)
+    );
 
     @Getter
     private final Set<Authority> authorities;
@@ -21,7 +47,7 @@ public enum Role {
     public List<SimpleGrantedAuthority> getRoleAuthorities() {
         var grantedAuthorities = getAuthorities()
                 .stream()
-                .map(authority -> new SimpleGrantedAuthority(authority.name()))
+                .map(authority -> new SimpleGrantedAuthority(authority.getPermission()))
                 .collect(Collectors.toList());
         grantedAuthorities.add(new SimpleGrantedAuthority("ROLE_" + this.name()));
         return grantedAuthorities;

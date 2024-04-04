@@ -35,7 +35,6 @@ public class UserEntity implements UserDetails, Serializable {
 
     @Enumerated(EnumType.STRING)
     private Role role;
-    private String[] userAuthorities;
 
     @OneToMany(mappedBy = "user")
     private transient List<TokenEntity> tokens;
