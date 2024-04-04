@@ -23,23 +23,20 @@ public enum Role {
             Authority.OPERATOR_READ,
             Authority.OPERATOR_CREATE,
             Authority.OPERATOR_UPDATE,
-            Authority.OPERATOR_DELETE)
-    ),
+            Authority.OPERATOR_DELETE
+    )),
     ADMIN(Set.of(
             Authority.ADMIN_READ,
             Authority.ADMIN_CREATE,
             Authority.ADMIN_UPDATE,
-            Authority.ADMIN_DELETE,
-            Authority.OPERATOR_READ,
-            Authority.OPERATOR_UPDATE,
-            Authority.OPERATOR_DELETE)
-    ),
+            Authority.ADMIN_DELETE
+    )),
     OPERATOR(Set.of(
             Authority.OPERATOR_READ,
             Authority.OPERATOR_CREATE,
             Authority.OPERATOR_UPDATE,
-            Authority.OPERATOR_DELETE)
-    );
+            Authority.OPERATOR_DELETE
+    ));
 
     @Getter
     private final Set<Authority> authorities;
