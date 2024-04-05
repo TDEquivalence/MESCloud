@@ -19,4 +19,6 @@ public interface UserService {
     UserDto updateUser(UserDto userDto) throws UserNotFoundException;
 
     UserConfigDto getUserByAuth(AuthenticationResponse authenticateRequest);
+
+    void deleteUser(UserDto user);
 }

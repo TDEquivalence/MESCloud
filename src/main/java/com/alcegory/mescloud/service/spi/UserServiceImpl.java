@@ -63,5 +63,11 @@ public class UserServiceImpl implements UserService {
 
         return userConverter.convertToDtoWithRelatedEntities(userEntity);
     }
+
+    @Override
+    public void deleteUser(UserDto user) {
+        UserEntity userEntity = mapper.convertToEntity(user);
+        userRepository.delete(userEntity);
+    }
 }
 
