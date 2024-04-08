@@ -2,6 +2,7 @@ package com.alcegory.mescloud.service.spi;
 
 import com.alcegory.mescloud.api.mqtt.MqttClient;
 import com.alcegory.mescloud.constant.MqttDTOConstants;
+import com.alcegory.mescloud.exception.ForbiddenAccessException;
 import com.alcegory.mescloud.exception.MesMqttException;
 import com.alcegory.mescloud.model.converter.GenericConverter;
 import com.alcegory.mescloud.model.converter.ProductionOrderConverter;
@@ -113,11 +114,11 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         UserRoleEntity userRole = userRoleService.findUserRoleByUserAndSection(user.getId(), 1L);
 
         if (userRole == null || userRole.getSectionRole().getName() != SectionAuthority.OPERATOR) {
-            return Optional.empty();
+            throw new ForbiddenAccessException("User is not authorized to perform this action");
         }
 
         if (!userRole.getSectionRole().getPermissions().contains(OPERATOR_CREATE.getPermission())) {
-            return Optional.empty();
+            throw new ForbiddenAccessException("User does not have permission to create production orders");
         }
 
         return create(productionOrder);

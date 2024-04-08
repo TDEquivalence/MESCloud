@@ -1,5 +1,6 @@
 package com.alcegory.mescloud.api.rest;
 
+import com.alcegory.mescloud.exception.ForbiddenAccessException;
 import com.alcegory.mescloud.model.dto.PaginatedProductionOrderDto;
 import com.alcegory.mescloud.model.dto.ProductionOrderDto;
 import com.alcegory.mescloud.model.dto.ProductionOrderSummaryDto;
@@ -23,12 +24,17 @@ public class ProductionOrderController {
 
     @PostMapping
     public ResponseEntity<ProductionOrderDto> create(@RequestBody ProductionOrderDto requestProductionOrder, Authentication authentication) {
-        Optional<ProductionOrderDto> productionOrderOpt = service.create(requestProductionOrder, authentication);
-        if (productionOrderOpt.isEmpty()) {
+
+        try {
+            Optional<ProductionOrderDto> productionOrderOpt = service.create(requestProductionOrder, authentication);
+            if (productionOrderOpt.isPresent()) {
+                return new ResponseEntity<>(productionOrderOpt.get(), HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+        } catch (ForbiddenAccessException e) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
-
-        return new ResponseEntity<>(productionOrderOpt.get(), HttpStatus.OK);
     }
 
     @PutMapping("/edit")
