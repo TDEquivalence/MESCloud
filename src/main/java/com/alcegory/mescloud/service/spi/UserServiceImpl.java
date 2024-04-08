@@ -58,10 +58,21 @@ public class UserServiceImpl implements UserService {
         return mapper.convertToDto(dbUserEntity);
     }
 
-    public UserConfigDto getUserByAuth(AuthenticationResponse authenticateRequest) {
-        UserEntity userEntity = userRepository.findUserByUsername(authenticateRequest.getUsername());
+    public UserConfigDto getUserConfigByAuth(AuthenticationResponse authenticateRequest) {
+        if (authenticateRequest == null || authenticateRequest.getUsername() == null) {
+            return null;
+        }
 
+        UserEntity userEntity = userRepository.findUserByUsername(authenticateRequest.getUsername());
         return userConverter.convertToDtoWithRelatedEntities(userEntity);
+    }
+
+    public UserEntity getUserByAuth(AuthenticationResponse authenticateRequest) {
+        if (authenticateRequest == null || authenticateRequest.getUsername() == null) {
+            return null;
+        }
+
+        return userRepository.findUserByUsername(authenticateRequest.getUsername());
     }
 
     @Override

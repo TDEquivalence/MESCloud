@@ -1,15 +1,24 @@
 package com.alcegory.mescloud.service.spi;
 
+import com.alcegory.mescloud.model.converter.UserConverterImpl;
+import com.alcegory.mescloud.model.dto.CompanyDto;
+import com.alcegory.mescloud.model.dto.FactoryDto;
+import com.alcegory.mescloud.model.dto.SectionDto;
+import com.alcegory.mescloud.model.dto.UserConfigDto;
+import com.alcegory.mescloud.model.entity.UserEntity;
 import com.alcegory.mescloud.repository.UserRoleRepository;
 import com.alcegory.mescloud.security.model.UserRoleEntity;
+import com.alcegory.mescloud.security.model.auth.AuthenticationResponse;
 import com.alcegory.mescloud.service.UserRoleService;
+import com.alcegory.mescloud.service.UserService;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -19,6 +28,43 @@ public class UserRoleServiceImpl implements UserRoleService {
 
     private static final String NULL_PARAMETER_ERROR_MSG = "One or more parameters are null.";
     private final UserRoleRepository repository;
+    private final UserService userService;
+    private final UserConverterImpl userConverter;
+
+    public UserConfigDto getUserRoleAndConfigurations(AuthenticationResponse authenticationResponse) {
+        UserEntity user = userService.getUserByAuth(authenticationResponse);
+
+        if (user == null) {
+            return null;
+        }
+
+        UserConfigDto userConfig = userConverter.convertToDtoWithRelatedEntities(user);
+
+        if (userConfig == null || userConfig.getCompany() == null || userConfig.getCompany().getFactoryList() == null) {
+            return userConfig;
+        }
+
+        List<UserRoleEntity> userRole = findByUserId(userConfig.getId());
+        filterSectionsWithRoles(userConfig, userRole, userConfig.getCompany().getFactoryList());
+
+        return userConfig;
+    }
+
+    private void filterSectionsWithRoles(UserConfigDto userConfig, List<UserRoleEntity> userRoles, List<FactoryDto> factoryList) {
+        for (FactoryDto factory : factoryList) {
+            List<SectionDto> sectionsWithRoles = new ArrayList<>();
+            for (SectionDto section : factory.getSectionList()) {
+                Long sectionId = section.getId();
+                boolean hasRole = userRoles.stream()
+                        .anyMatch(role -> role.getSectionId().equals(sectionId));
+                if (hasRole) {
+                    sectionsWithRoles.add(section);
+                }
+            }
+           
+            factory.setSectionList(sectionsWithRoles);
+        }
+    }
 
     @Override
     @Transactional
