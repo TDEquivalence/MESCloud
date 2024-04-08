@@ -1,7 +1,6 @@
 package com.alcegory.mescloud.service.spi;
 
 import com.alcegory.mescloud.model.converter.UserConverterImpl;
-import com.alcegory.mescloud.model.dto.CompanyDto;
 import com.alcegory.mescloud.model.dto.FactoryDto;
 import com.alcegory.mescloud.model.dto.SectionDto;
 import com.alcegory.mescloud.model.dto.UserConfigDto;
@@ -18,7 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -32,26 +31,29 @@ public class UserRoleServiceImpl implements UserRoleService {
     private final UserConverterImpl userConverter;
 
     public UserConfigDto getUserRoleAndConfigurations(AuthenticationResponse authenticationResponse) {
-        UserEntity user = userService.getUserByAuth(authenticationResponse);
-
-        if (user == null) {
+        Optional<UserEntity> optionalUser = Optional.ofNullable(userService.getUserByAuth(authenticationResponse));
+        if (optionalUser.isEmpty()) {
             return null;
         }
 
+        UserEntity user = optionalUser.get();
         UserConfigDto userConfig = userConverter.convertToDtoWithRelatedEntities(user);
 
         if (userConfig == null || userConfig.getCompany() == null || userConfig.getCompany().getFactoryList() == null) {
             return userConfig;
         }
 
-        List<UserRoleEntity> userRole = findByUserId(userConfig.getId());
-        filterSectionsWithRoles(userConfig, userRole, userConfig.getCompany().getFactoryList());
+        List<UserRoleEntity> userRoles = findByUserId(userConfig.getId());
+        filterSectionsWithRoles(userRoles, userConfig.getCompany().getFactoryList());
 
         return userConfig;
     }
 
-    private void filterSectionsWithRoles(UserConfigDto userConfig, List<UserRoleEntity> userRoles, List<FactoryDto> factoryList) {
+    private void filterSectionsWithRoles(List<UserRoleEntity> userRoles, List<FactoryDto> factoryList) {
         for (FactoryDto factory : factoryList) {
+            if (factory.getSectionList() == null || factory.getSectionList().isEmpty()) {
+                continue;
+            }
             List<SectionDto> sectionsWithRoles = new ArrayList<>();
             for (SectionDto section : factory.getSectionList()) {
                 Long sectionId = section.getId();
@@ -61,7 +63,6 @@ public class UserRoleServiceImpl implements UserRoleService {
                     sectionsWithRoles.add(section);
                 }
             }
-           
             factory.setSectionList(sectionsWithRoles);
         }
     }

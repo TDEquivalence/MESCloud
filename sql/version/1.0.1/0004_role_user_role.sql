@@ -10,7 +10,7 @@ CREATE TABLE user_role (
 	user_id INT,
     role_id INT,
     section_id INT,
-    PRIMARY KEY (user_id, role_id),
+    PRIMARY KEY (user_id, role_id, section_id),
     FOREIGN KEY (user_id) REFERENCES "users"(id),
     FOREIGN KEY (role_id) REFERENCES role(id),
     FOREIGN KEY (section_id) REFERENCES section(id)
