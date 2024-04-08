@@ -9,15 +9,21 @@ import com.alcegory.mescloud.model.dto.*;
 import com.alcegory.mescloud.model.entity.CountingEquipmentEntity;
 import com.alcegory.mescloud.model.entity.ProductionOrderEntity;
 import com.alcegory.mescloud.model.entity.ProductionOrderSummaryEntity;
+import com.alcegory.mescloud.model.entity.UserEntity;
 import com.alcegory.mescloud.model.filter.Filter;
 import com.alcegory.mescloud.protocol.MesMqttSettings;
 import com.alcegory.mescloud.repository.CountingEquipmentRepository;
 import com.alcegory.mescloud.repository.ProductionOrderRepository;
+import com.alcegory.mescloud.security.model.SectionAuthority;
+import com.alcegory.mescloud.security.model.SectionPermissions;
+import com.alcegory.mescloud.security.model.UserRoleEntity;
 import com.alcegory.mescloud.service.CountingEquipmentService;
 import com.alcegory.mescloud.service.ProductionOrderService;
+import com.alcegory.mescloud.service.UserRoleService;
 import com.alcegory.mescloud.utility.DateUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
@@ -27,6 +33,7 @@ import java.util.Optional;
 
 import static com.alcegory.mescloud.model.filter.Filter.Property.END_DATE;
 import static com.alcegory.mescloud.model.filter.Filter.Property.START_DATE;
+import static com.alcegory.mescloud.security.model.SectionPermissions.OPERATOR_CREATE;
 
 @Service
 @AllArgsConstructor
@@ -48,6 +55,8 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     private final ProductionOrderConverter converter;
     private final GenericConverter<ProductionOrderSummaryEntity, ProductionOrderSummaryDto> summaryConverter;
     private final GenericConverter<CountingEquipmentEntity, CountingEquipmentDto> equipmentConverter;
+
+    private final UserRoleService userRoleService;
 
     @Override
     public Optional<ProductionOrderDto> complete(long equipmentId) {
@@ -99,7 +108,22 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     }
 
     @Override
-    public Optional<ProductionOrderDto> create(ProductionOrderDto productionOrder) {
+    public Optional<ProductionOrderDto> create(ProductionOrderDto productionOrder, Authentication authentication) {
+        UserEntity user = (UserEntity) authentication.getPrincipal();
+        UserRoleEntity userRole = userRoleService.findUserRoleByUserAndSection(user.getId(), 1L);
+
+        if (userRole == null || userRole.getSectionRole().getName() != SectionAuthority.OPERATOR) {
+            return Optional.empty();
+        }
+
+        if (!userRole.getSectionRole().getPermissions().contains(OPERATOR_CREATE.getPermission())) {
+            return Optional.empty();
+        }
+
+        return create(productionOrder);
+    }
+
+    private Optional<ProductionOrderDto> create(ProductionOrderDto productionOrder) {
 
         Optional<CountingEquipmentEntity> countingEquipmentEntityOpt =
                 countingEquipmentRepository.findById(productionOrder.getEquipmentId());

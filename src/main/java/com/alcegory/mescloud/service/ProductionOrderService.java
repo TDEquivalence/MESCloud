@@ -6,6 +6,7 @@ import com.alcegory.mescloud.model.dto.ProductionOrderDto;
 import com.alcegory.mescloud.model.dto.ProductionOrderSummaryDto;
 import com.alcegory.mescloud.model.entity.ProductionOrderEntity;
 import com.alcegory.mescloud.model.filter.Filter;
+import org.springframework.security.core.Authentication;
 
 import java.sql.Timestamp;
 import java.util.Date;
@@ -20,7 +21,7 @@ public interface ProductionOrderService {
 
     String generateCode();
 
-    Optional<ProductionOrderDto> create(ProductionOrderDto productionOrderDto);
+    Optional<ProductionOrderDto> create(ProductionOrderDto productionOrderDto, Authentication authentication);
 
     boolean hasActiveProductionOrderByEquipmentId(long countingEquipmentId);
 

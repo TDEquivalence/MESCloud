@@ -8,6 +8,7 @@ import com.alcegory.mescloud.service.ProductionOrderService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,10 +22,10 @@ public class ProductionOrderController {
     private final ProductionOrderService service;
 
     @PostMapping
-    public ResponseEntity<ProductionOrderDto> create(@RequestBody ProductionOrderDto requestProductionOrder) {
-        Optional<ProductionOrderDto> productionOrderOpt = service.create(requestProductionOrder);
+    public ResponseEntity<ProductionOrderDto> create(@RequestBody ProductionOrderDto requestProductionOrder, Authentication authentication) {
+        Optional<ProductionOrderDto> productionOrderOpt = service.create(requestProductionOrder, authentication);
         if (productionOrderOpt.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
         return new ResponseEntity<>(productionOrderOpt.get(), HttpStatus.OK);
