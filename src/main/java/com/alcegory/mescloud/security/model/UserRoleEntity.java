@@ -29,6 +29,6 @@ public class UserRoleEntity implements Serializable {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "role_id")
-    private RoleEntity role;
+    private SectionRoleEntity role;
 }
 

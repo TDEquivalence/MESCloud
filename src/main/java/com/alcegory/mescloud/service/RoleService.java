@@ -1,14 +1,14 @@
 package com.alcegory.mescloud.service;
 
-import com.alcegory.mescloud.security.model.RoleEntity;
+import com.alcegory.mescloud.security.model.SectionRoleEntity;
 
 import java.util.Optional;
 
 public interface RoleService {
 
-    RoleEntity saveAndUpdate(RoleEntity role);
+    SectionRoleEntity saveAndUpdate(SectionRoleEntity role);
 
-    void delete(RoleEntity role);
+    void delete(SectionRoleEntity role);
 
-    Optional<RoleEntity> findById(Long id);
+    Optional<SectionRoleEntity> findById(Long id);
 }

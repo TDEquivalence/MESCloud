@@ -5,13 +5,14 @@ import lombok.*;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Set;
 
 @Getter
 @Setter
 @Entity(name = "role")
 @NoArgsConstructor
-public class RoleEntity implements Serializable {
+public class SectionRoleEntity implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -25,6 +26,15 @@ public class RoleEntity implements Serializable {
     @Enumerated(EnumType.STRING)
     @ElementCollection(targetClass = Authority.class)
     private Set<Authority> authorities;
-}
 
+    public Set<String> getPermissions() {
+        Set<String> permissions = new HashSet<>();
+        for (SectionAuthority sectionAuthority : SectionAuthority.values()) {
+            if (sectionAuthority.name().equals(name)) {
+                permissions.add(sectionAuthority.getPermissions());
+            }
+        }
+        return permissions;
+    }
+}
 

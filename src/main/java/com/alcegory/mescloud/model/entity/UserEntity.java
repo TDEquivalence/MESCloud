@@ -1,8 +1,8 @@
 package com.alcegory.mescloud.model.entity;
 
-import com.alcegory.mescloud.security.model.RoleEntity;
-import com.alcegory.mescloud.security.model.token.TokenEntity;
 import com.alcegory.mescloud.security.model.Role;
+import com.alcegory.mescloud.security.model.SectionRoleEntity;
+import com.alcegory.mescloud.security.model.token.TokenEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -38,7 +38,7 @@ public class UserEntity implements UserDetails, Serializable {
     private Role role;
 
     @Transient
-    private RoleEntity roleEntity;
+    private SectionRoleEntity sectionRole;
 
     @OneToMany(mappedBy = "user")
     private transient List<TokenEntity> tokens;
@@ -48,7 +48,7 @@ public class UserEntity implements UserDetails, Serializable {
     private boolean isActive;
     private boolean isNotLocked;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     @JoinColumn(name = "company_id")
     private CompanyEntity company;
 
