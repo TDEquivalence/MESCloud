@@ -1,7 +1,8 @@
 package com.alcegory.mescloud.model.entity;
 
+import com.alcegory.mescloud.security.model.RoleEntity;
 import com.alcegory.mescloud.security.model.token.TokenEntity;
-import com.alcegory.mescloud.security.role.Role;
+import com.alcegory.mescloud.security.model.Role;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -35,6 +36,9 @@ public class UserEntity implements UserDetails, Serializable {
 
     @Enumerated(EnumType.STRING)
     private Role role;
+
+    @Transient
+    private RoleEntity roleEntity;
 
     @OneToMany(mappedBy = "user")
     private transient List<TokenEntity> tokens;

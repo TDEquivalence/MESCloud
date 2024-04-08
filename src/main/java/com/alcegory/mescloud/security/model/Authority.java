@@ -1,4 +1,4 @@
-package com.alcegory.mescloud.security.role;
+package com.alcegory.mescloud.security.model;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

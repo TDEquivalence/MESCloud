@@ -30,8 +30,7 @@ public class ComposedProductionOrderRepositoryImpl {
     private static final String INSERT_HIT_AT = "hitInsertedAt";
 
     private final EntityManager entityManager;
-
-
+    
     public List<ComposedSummaryEntity> findCompleted(Filter filter, Long composedId) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<ComposedSummaryEntity> query = criteriaBuilder.createQuery(ComposedSummaryEntity.class);

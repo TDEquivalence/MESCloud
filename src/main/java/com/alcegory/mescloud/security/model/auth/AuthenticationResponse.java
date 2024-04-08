@@ -1,6 +1,6 @@
 package com.alcegory.mescloud.security.model.auth;
 
-import com.alcegory.mescloud.security.role.Role;
+import com.alcegory.mescloud.security.model.Role;
 import lombok.*;
 
 @Getter

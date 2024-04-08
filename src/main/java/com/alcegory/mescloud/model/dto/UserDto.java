@@ -1,6 +1,6 @@
 package com.alcegory.mescloud.model.dto;
 
-import com.alcegory.mescloud.security.role.Role;
+import com.alcegory.mescloud.security.model.Role;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
