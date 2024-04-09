@@ -24,7 +24,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
-import static com.alcegory.mescloud.security.model.SectionRole.ADMIN;
+import static com.alcegory.mescloud.security.model.SectionRole.MANAGER;
 import static com.alcegory.mescloud.security.utility.AuthorityUtils.checkUserAndRole;
 
 @Service
@@ -188,7 +188,7 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
     public CountingEquipmentDto updateIms(Long equipmentId, Long imsId, Authentication authentication)
             throws EquipmentNotFoundException, ImsNotFoundException, IllegalStateException {
 
-        checkUserAndRole(authentication, this.userRoleService, ADMIN);
+        checkUserAndRole(authentication, this.userRoleService, MANAGER);
 
         Optional<CountingEquipmentEntity> countingEquipmentOpt = repository.findByIdWithLastProductionOrder(equipmentId);
         if (countingEquipmentOpt.isEmpty()) {
@@ -229,7 +229,7 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
     public CountingEquipmentDto updateConfiguration(long equipmentId, RequestConfigurationDto request, Authentication authentication)
             throws IncompleteConfigurationException, EmptyResultDataAccessException, ActiveProductionOrderException, MesMqttException {
 
-        checkUserAndRole(authentication, this.userRoleService, ADMIN);
+        checkUserAndRole(authentication, this.userRoleService, MANAGER);
 
         if (containsNullProperty(request)) {
             throw new IncompleteConfigurationException("Counting equipment configuration is incomplete: properties alias and outputs must be specified.");
