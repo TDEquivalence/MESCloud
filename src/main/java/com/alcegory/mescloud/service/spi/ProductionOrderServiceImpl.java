@@ -57,7 +57,8 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     private final UserRoleService userRoleService;
 
     @Override
-    public Optional<ProductionOrderDto> complete(long equipmentId) {
+    public Optional<ProductionOrderDto> complete(long equipmentId, Authentication authentication) {
+        checkUserAndRole(authentication, this.userRoleService, OPERATOR);
         log.info(() -> String.format("Complete process Production Order started for equipmentId [%s]:", equipmentId));
 
         Optional<CountingEquipmentEntity> countingEquipmentOpt = countingEquipmentRepository.findById(equipmentId);

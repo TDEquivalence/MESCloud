@@ -55,8 +55,8 @@ public class ProductionOrderController {
     }
 
     @PutMapping("{countingEquipmentId}/complete")
-    public ResponseEntity<ProductionOrderDto> complete(@PathVariable long countingEquipmentId) {
-        Optional<ProductionOrderDto> productionOrderOpt = service.complete(countingEquipmentId);
+    public ResponseEntity<ProductionOrderDto> complete(@PathVariable long countingEquipmentId, Authentication authentication) {
+        Optional<ProductionOrderDto> productionOrderOpt = service.complete(countingEquipmentId, authentication);
         if (productionOrderOpt.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }

@@ -26,7 +26,7 @@ public interface ProductionOrderService {
 
     boolean hasActiveProductionOrderByEquipmentCode(String countingEquipmentCode);
 
-    Optional<ProductionOrderDto> complete(long countingEquipmentId);
+    Optional<ProductionOrderDto> complete(long countingEquipmentId, Authentication authentication);
 
     ProductionOrderEntity saveAndUpdate(ProductionOrderEntity productionOrder);
 
