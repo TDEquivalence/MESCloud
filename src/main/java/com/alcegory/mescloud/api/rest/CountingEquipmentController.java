@@ -56,6 +56,8 @@ public class CountingEquipmentController {
             return HttpUtil.responseWithHeaders(HttpStatus.NOT_FOUND, EQUIPMENT_ERROR_CAUSE, e);
         } catch (IllegalStateException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        } catch (ForbiddenAccessException e) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
     }
 
@@ -74,6 +76,8 @@ public class CountingEquipmentController {
             return HttpUtil.responseWithHeaders(HttpStatus.CONFLICT, EQUIPMENT_ERROR_CAUSE, e);
         } catch (MesMqttException e) {
             return HttpUtil.responseWithHeaders(HttpStatus.CONFLICT, PLC_ERROR_CAUSE, e);
+        } catch (ForbiddenAccessException e) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
     }
 }
