@@ -34,8 +34,7 @@ import static com.alcegory.mescloud.model.filter.Filter.Property.END_DATE;
 import static com.alcegory.mescloud.model.filter.Filter.Property.START_DATE;
 import static com.alcegory.mescloud.security.model.SectionAuthority.OPERATOR_CREATE;
 import static com.alcegory.mescloud.security.model.SectionRole.OPERATOR;
-import static com.alcegory.mescloud.security.utility.AuthorityUtils.hasExpectedRole;
-import static com.alcegory.mescloud.security.utility.AuthorityUtils.hasPermission;
+import static com.alcegory.mescloud.security.utility.AuthorityUtils.hasRoleAndPermission;
 
 @Service
 @AllArgsConstructor
@@ -114,12 +113,8 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         UserEntity user = (UserEntity) authentication.getPrincipal();
         UserRoleEntity userRole = userRoleService.findUserRoleByUserAndSection(user.getId(), 1L);
 
-        if (hasExpectedRole(userRole, OPERATOR)) {
+        if (!hasRoleAndPermission(userRole, OPERATOR, OPERATOR_CREATE)) {
             throw new ForbiddenAccessException("User is not authorized to perform this action");
-        }
-
-        if (hasPermission(userRole, OPERATOR_CREATE)) {
-            throw new ForbiddenAccessException("User does not have permission to create production orders");
         }
 
         return create(productionOrder);
