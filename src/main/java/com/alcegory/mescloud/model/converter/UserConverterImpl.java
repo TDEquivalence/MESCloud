@@ -2,7 +2,6 @@ package com.alcegory.mescloud.model.converter;
 
 import com.alcegory.mescloud.model.dto.*;
 import com.alcegory.mescloud.model.entity.*;
-import com.alcegory.mescloud.service.UserRoleService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -12,7 +11,7 @@ import java.util.List;
 @Component
 @AllArgsConstructor
 public class UserConverterImpl implements UserConverter {
-    
+
     @Override
     public UserConfigDto convertToDtoWithRelatedEntities(UserEntity userEntity) {
         UserConfigDto userConfigDto = new UserConfigDto();

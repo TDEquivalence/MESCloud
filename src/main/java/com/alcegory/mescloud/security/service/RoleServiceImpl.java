@@ -1,8 +1,8 @@
-package com.alcegory.mescloud.service.spi;
+package com.alcegory.mescloud.security.service;
 
 import com.alcegory.mescloud.repository.RoleRepository;
+import com.alcegory.mescloud.security.model.SectionRole;
 import com.alcegory.mescloud.security.model.SectionRoleEntity;
-import com.alcegory.mescloud.service.RoleService;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
@@ -29,5 +29,10 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public Optional<SectionRoleEntity> findById(Long id) {
         return repository.findById(id);
+    }
+
+    @Override
+    public Optional<SectionRoleEntity> findByName(SectionRole sectionRole) {
+        return repository.findByName(sectionRole.name());
     }
 }

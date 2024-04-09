@@ -1,4 +1,4 @@
-package com.alcegory.mescloud.service.spi;
+package com.alcegory.mescloud.security.service;
 
 import com.alcegory.mescloud.model.converter.UserConverterImpl;
 import com.alcegory.mescloud.model.dto.FactoryDto;
@@ -8,7 +8,7 @@ import com.alcegory.mescloud.model.entity.UserEntity;
 import com.alcegory.mescloud.repository.UserRoleRepository;
 import com.alcegory.mescloud.security.model.UserRoleEntity;
 import com.alcegory.mescloud.security.model.auth.AuthenticationResponse;
-import com.alcegory.mescloud.service.UserRoleService;
+import com.alcegory.mescloud.security.service.UserRoleService;
 import com.alcegory.mescloud.service.UserService;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -23,7 +23,6 @@ import java.util.Optional;
 @Service
 @AllArgsConstructor
 public class UserRoleServiceImpl implements UserRoleService {
-
 
     private static final String NULL_PARAMETER_ERROR_MSG = "One or more parameters are null.";
     private final UserRoleRepository repository;

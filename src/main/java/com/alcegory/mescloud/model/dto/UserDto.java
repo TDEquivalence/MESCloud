@@ -1,6 +1,7 @@
 package com.alcegory.mescloud.model.dto;
 
 import com.alcegory.mescloud.security.model.Role;
+import com.alcegory.mescloud.security.model.SectionRole;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,5 +17,8 @@ public class UserDto {
     private String username;
     private String firstName;
     private String lastName;
+    private String password;
+    private String email;
     private Role role;
+    private SectionRole sectionRole;
 }

@@ -1,4 +1,4 @@
-package com.alcegory.mescloud.service;
+package com.alcegory.mescloud.security.service;
 
 import com.alcegory.mescloud.model.dto.UserConfigDto;
 import com.alcegory.mescloud.model.entity.UserEntity;

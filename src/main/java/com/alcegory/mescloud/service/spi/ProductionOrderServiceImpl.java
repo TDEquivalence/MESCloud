@@ -15,7 +15,7 @@ import com.alcegory.mescloud.repository.CountingEquipmentRepository;
 import com.alcegory.mescloud.repository.ProductionOrderRepository;
 import com.alcegory.mescloud.service.CountingEquipmentService;
 import com.alcegory.mescloud.service.ProductionOrderService;
-import com.alcegory.mescloud.service.UserRoleService;
+import com.alcegory.mescloud.security.service.UserRoleService;
 import com.alcegory.mescloud.utility.DateUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;

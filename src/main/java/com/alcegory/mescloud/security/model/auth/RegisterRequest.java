@@ -1,5 +1,7 @@
 package com.alcegory.mescloud.security.model.auth;
 
+import com.alcegory.mescloud.security.model.Role;
+import com.alcegory.mescloud.security.model.SectionRole;
 import lombok.*;
 
 @Getter
@@ -14,5 +16,6 @@ public class RegisterRequest {
     private String username;
     private String email;
     private String password;
-    private String role;
+    private Role role;
+    private SectionRole sectionRole;
 }

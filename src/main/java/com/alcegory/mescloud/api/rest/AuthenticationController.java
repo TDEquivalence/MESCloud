@@ -6,7 +6,7 @@ import com.alcegory.mescloud.security.model.auth.AuthenticateRequest;
 import com.alcegory.mescloud.security.model.auth.AuthenticationResponse;
 import com.alcegory.mescloud.security.model.auth.RegisterRequest;
 import com.alcegory.mescloud.security.service.AuthenticationService;
-import com.alcegory.mescloud.service.UserRoleService;
+import com.alcegory.mescloud.security.service.UserRoleService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.management.relation.RoleNotFoundException;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -25,9 +27,13 @@ public class AuthenticationController {
     private final UserRoleService userRoleService;
 
     @PostMapping("/register")
-    public ResponseEntity<AuthenticationResponse> register(@RequestBody RegisterRequest request) throws UsernameExistException {
-        AuthenticationResponse userRegisteredResponse = authenticationService.register(request);
-        return new ResponseEntity<>(userRegisteredResponse, HttpStatus.CREATED);
+    public ResponseEntity<AuthenticationResponse> register(@RequestBody RegisterRequest request) {
+        try {
+            AuthenticationResponse userRegisteredResponse = authenticationService.register(request);
+            return new ResponseEntity<>(userRegisteredResponse, HttpStatus.CREATED);
+        } catch (RoleNotFoundException | UsernameExistException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
     @PostMapping("/login")

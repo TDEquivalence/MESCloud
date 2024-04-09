@@ -7,6 +7,7 @@ import com.alcegory.mescloud.model.filter.Filter;
 import com.alcegory.mescloud.security.exception.UserNotFoundException;
 import com.alcegory.mescloud.security.model.auth.AuthenticationResponse;
 
+import javax.management.relation.RoleNotFoundException;
 import java.util.List;
 
 public interface UserService {
@@ -17,7 +18,7 @@ public interface UserService {
 
     List<UserDto> getFilteredUsers(Filter filter);
 
-    UserDto updateUser(UserDto userDto) throws UserNotFoundException;
+    UserDto updateUser(UserDto userDto) throws UserNotFoundException, RoleNotFoundException;
 
     UserConfigDto getUserConfigByAuth(AuthenticationResponse authenticateRequest);
 
