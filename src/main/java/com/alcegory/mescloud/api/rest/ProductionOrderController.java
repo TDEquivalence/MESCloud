@@ -42,15 +42,16 @@ public class ProductionOrderController {
     public ResponseEntity<ProductionOrderDto> edit(@RequestBody ProductionOrderDto requestProductionOrder,
                                                    Authentication authentication) {
         try {
-            Optional<ProductionOrderDto> productionOrder = service.editProductionOrder(requestProductionOrder, authentication);
-            if (productionOrder.isEmpty()) {
-                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            Optional<ProductionOrderDto> editedProductionOrder = service.editProductionOrder(requestProductionOrder, authentication);
+
+            if (editedProductionOrder.isPresent()) {
+                return ResponseEntity.ok(editedProductionOrder.get());
+            } else {
+                return ResponseEntity.badRequest().build();
             }
         } catch (ForbiddenAccessException e) {
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
-
-        return new ResponseEntity<>(productionOrder.get(), HttpStatus.OK);
     }
 
     @PutMapping("{countingEquipmentId}/complete")
