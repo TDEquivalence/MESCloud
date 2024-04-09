@@ -2,7 +2,6 @@ package com.alcegory.mescloud.service.spi;
 
 import com.alcegory.mescloud.api.mqtt.MqttClient;
 import com.alcegory.mescloud.constant.MqttDTOConstants;
-import com.alcegory.mescloud.exception.ForbiddenAccessException;
 import com.alcegory.mescloud.exception.MesMqttException;
 import com.alcegory.mescloud.model.converter.GenericConverter;
 import com.alcegory.mescloud.model.converter.ProductionOrderConverter;
@@ -10,12 +9,10 @@ import com.alcegory.mescloud.model.dto.*;
 import com.alcegory.mescloud.model.entity.CountingEquipmentEntity;
 import com.alcegory.mescloud.model.entity.ProductionOrderEntity;
 import com.alcegory.mescloud.model.entity.ProductionOrderSummaryEntity;
-import com.alcegory.mescloud.model.entity.UserEntity;
 import com.alcegory.mescloud.model.filter.Filter;
 import com.alcegory.mescloud.protocol.MesMqttSettings;
 import com.alcegory.mescloud.repository.CountingEquipmentRepository;
 import com.alcegory.mescloud.repository.ProductionOrderRepository;
-import com.alcegory.mescloud.security.model.UserRoleEntity;
 import com.alcegory.mescloud.service.CountingEquipmentService;
 import com.alcegory.mescloud.service.ProductionOrderService;
 import com.alcegory.mescloud.service.UserRoleService;
@@ -32,9 +29,8 @@ import java.util.Optional;
 
 import static com.alcegory.mescloud.model.filter.Filter.Property.END_DATE;
 import static com.alcegory.mescloud.model.filter.Filter.Property.START_DATE;
-import static com.alcegory.mescloud.security.model.SectionAuthority.OPERATOR_CREATE;
 import static com.alcegory.mescloud.security.model.SectionRole.OPERATOR;
-import static com.alcegory.mescloud.security.utility.AuthorityUtils.hasRoleAndPermission;
+import static com.alcegory.mescloud.security.utility.AuthorityUtils.checkUserAndRole;
 
 @Service
 @AllArgsConstructor
@@ -110,13 +106,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
 
     @Override
     public Optional<ProductionOrderDto> create(ProductionOrderDto productionOrder, Authentication authentication) {
-        UserEntity user = (UserEntity) authentication.getPrincipal();
-        UserRoleEntity userRole = userRoleService.findUserRoleByUserAndSection(user.getId(), 1L);
-
-        if (!hasRoleAndPermission(userRole, OPERATOR, OPERATOR_CREATE)) {
-            throw new ForbiddenAccessException("User is not authorized to perform this action");
-        }
-
+        checkUserAndRole(authentication, this.userRoleService, OPERATOR);
         return create(productionOrder);
     }
 

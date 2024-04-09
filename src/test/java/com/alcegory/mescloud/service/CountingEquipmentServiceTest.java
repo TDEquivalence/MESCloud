@@ -53,7 +53,7 @@ class CountingEquipmentServiceTest {
         RequestConfigurationDto request = new RequestConfigurationDto();
 
         try {
-            countingEquipmentService.updateConfiguration(equipmentId, request);
+            countingEquipmentService.updateConfiguration(equipmentId, request, authentication);
         } catch (IncompleteConfigurationException | EmptyResultDataAccessException | ActiveProductionOrderException |
                  MesMqttException e) {
             assertTrue(e instanceof IncompleteConfigurationException);

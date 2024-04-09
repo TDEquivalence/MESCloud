@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -44,9 +45,10 @@ public class CountingEquipmentController {
     }
 
     @PutMapping("/{equipmentId}/ims")
-    public ResponseEntity<CountingEquipmentDto> updateIms(@PathVariable long equipmentId, @RequestBody RequestById request) {
+    public ResponseEntity<CountingEquipmentDto> updateIms(@PathVariable long equipmentId, @RequestBody RequestById request,
+                                                          Authentication authentication) {
         try {
-            CountingEquipmentDto updatedIms = service.updateIms(equipmentId, request.getId());
+            CountingEquipmentDto updatedIms = service.updateIms(equipmentId, request.getId(), authentication);
             return new ResponseEntity<>(updatedIms, HttpStatus.OK);
         } catch (EquipmentNotFoundException e) {
             return HttpUtil.responseWithHeaders(HttpStatus.NOT_FOUND, IMS_ERROR_CAUSE, e);
@@ -59,9 +61,10 @@ public class CountingEquipmentController {
 
     @PutMapping("/{equipmentId}/configuration")
     public ResponseEntity<CountingEquipmentDto> updateConfiguration(@PathVariable long equipmentId,
-                                                                    @RequestBody RequestConfigurationDto request) {
+                                                                    @RequestBody RequestConfigurationDto request,
+                                                                    Authentication authentication) {
         try {
-            CountingEquipmentDto countingEquipment = service.updateConfiguration(equipmentId, request);
+            CountingEquipmentDto countingEquipment = service.updateConfiguration(equipmentId, request, authentication);
             return new ResponseEntity<>(countingEquipment, HttpStatus.OK);
         } catch (IncompleteConfigurationException e) {
             return HttpUtil.responseWithHeaders(HttpStatus.BAD_REQUEST, CONFIG_ERROR_CAUSE, e);

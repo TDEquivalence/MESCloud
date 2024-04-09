@@ -19,9 +19,13 @@ import com.alcegory.mescloud.service.*;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+
+import static com.alcegory.mescloud.security.model.SectionRole.ADMIN;
+import static com.alcegory.mescloud.security.utility.AuthorityUtils.checkUserAndRole;
 
 @Service
 @AllArgsConstructor
@@ -46,6 +50,8 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
     private final PlcMqttConverter plcConverter;
     private final GenericConverter<ImsEntity, ImsDto> imsConverter;
     private final ProductionOrderConverter productionOrderConverter;
+
+    private final UserRoleService userRoleService;
 
     @Override
     public List<CountingEquipmentDto> findAllWithLastProductionOrder() {
@@ -179,8 +185,10 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
     }
 
     @Override
-    public CountingEquipmentDto updateIms(Long equipmentId, Long imsId)
+    public CountingEquipmentDto updateIms(Long equipmentId, Long imsId, Authentication authentication)
             throws EquipmentNotFoundException, ImsNotFoundException, IllegalStateException {
+
+        checkUserAndRole(authentication, this.userRoleService, ADMIN);
 
         Optional<CountingEquipmentEntity> countingEquipmentOpt = repository.findByIdWithLastProductionOrder(equipmentId);
         if (countingEquipmentOpt.isEmpty()) {
@@ -218,8 +226,10 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
     }
 
     @Override
-    public CountingEquipmentDto updateConfiguration(long equipmentId, RequestConfigurationDto request)
+    public CountingEquipmentDto updateConfiguration(long equipmentId, RequestConfigurationDto request, Authentication authentication)
             throws IncompleteConfigurationException, EmptyResultDataAccessException, ActiveProductionOrderException, MesMqttException {
+
+        checkUserAndRole(authentication, this.userRoleService, ADMIN);
 
         if (containsNullProperty(request)) {
             throw new IncompleteConfigurationException("Counting equipment configuration is incomplete: properties alias and outputs must be specified.");
@@ -266,10 +276,9 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
     }
 
     @Override
-    public CountingEquipmentDto setOperationStatus(CountingEquipmentEntity countingEquipment, CountingEquipmentEntity.OperationStatus status) {
+    public void setOperationStatus(CountingEquipmentEntity countingEquipment, CountingEquipmentEntity.OperationStatus status) {
         countingEquipment.setOperationStatus(status);
         repository.save(countingEquipment);
-        return converter.convertToDto(countingEquipment);
     }
 
     @Override

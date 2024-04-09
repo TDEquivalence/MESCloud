@@ -1,12 +1,26 @@
 package com.alcegory.mescloud.security.utility;
 
+import com.alcegory.mescloud.exception.ForbiddenAccessException;
+import com.alcegory.mescloud.model.entity.UserEntity;
 import com.alcegory.mescloud.security.model.SectionAuthority;
 import com.alcegory.mescloud.security.model.SectionRole;
 import com.alcegory.mescloud.security.model.UserRoleEntity;
+import com.alcegory.mescloud.service.UserRoleService;
+import org.springframework.security.core.Authentication;
 
 public class AuthorityUtils {
 
     public AuthorityUtils() {
+        //Utility class, not meant for instantiation
+    }
+
+    public static void checkUserAndRole(Authentication authentication, UserRoleService userRoleService, SectionRole expectedRole) {
+        UserEntity user = (UserEntity) authentication.getPrincipal();
+        UserRoleEntity userRole = userRoleService.findUserRoleByUserAndSection(user.getId(), 1L);
+
+        if (!hasExpectedRole(userRole, expectedRole)) {
+            throw new ForbiddenAccessException("User is not authorized to perform this action");
+        }
     }
 
     public static boolean hasPermission(UserRoleEntity userRole, SectionAuthority permissionToCheck) {
