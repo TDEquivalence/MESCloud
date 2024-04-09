@@ -11,7 +11,7 @@ import java.util.List;
 @Component
 @AllArgsConstructor
 public class UserConverterImpl implements UserConverter {
-
+    
     @Override
     public UserConfigDto convertToDtoWithRelatedEntities(UserEntity userEntity) {
         UserConfigDto userConfigDto = new UserConfigDto();

@@ -4,6 +4,7 @@ import com.alcegory.mescloud.model.dto.UserDto;
 import com.alcegory.mescloud.model.filter.Filter;
 import com.alcegory.mescloud.security.exception.UserNotFoundException;
 import com.alcegory.mescloud.service.spi.UserServiceImpl;
+import com.azure.core.annotation.Delete;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -45,6 +46,12 @@ public class UserController {
         } catch (RoleNotFoundException | UserNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+    }
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<String> deleteUser(@RequestBody UserDto user) {
+        userServiceImpl.deleteUser(user);
+        return ResponseEntity.ok("User deleted successfully");
     }
 
     @DeleteMapping("/delete")
