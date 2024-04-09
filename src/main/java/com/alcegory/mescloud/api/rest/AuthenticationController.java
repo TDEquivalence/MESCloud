@@ -6,7 +6,7 @@ import com.alcegory.mescloud.security.model.auth.AuthenticateRequest;
 import com.alcegory.mescloud.security.model.auth.AuthenticationResponse;
 import com.alcegory.mescloud.security.model.auth.RegisterRequest;
 import com.alcegory.mescloud.security.service.AuthenticationService;
-import com.alcegory.mescloud.service.UserService;
+import com.alcegory.mescloud.service.UserRoleService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthenticationController {
 
     private final AuthenticationService authenticationService;
-    private final UserService userService;
+    private final UserRoleService userRoleService;
 
     @PostMapping("/register")
     public ResponseEntity<AuthenticationResponse> register(@RequestBody RegisterRequest request) throws UsernameExistException {
@@ -35,7 +35,7 @@ public class AuthenticationController {
         AuthenticationResponse authenticationResponse = authenticationService.authenticate(request);
         authenticationService.setJwtTokenCookie(authenticationResponse, response);
 
-        UserConfigDto userDto = userService.getUserByAuth(authenticationResponse);
+        UserConfigDto userDto = userRoleService.getUserRoleAndConfigurations(authenticationResponse);
         return new ResponseEntity<>(userDto, HttpStatus.OK);
     }
 }

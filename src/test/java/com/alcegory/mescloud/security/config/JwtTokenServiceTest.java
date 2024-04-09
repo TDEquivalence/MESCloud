@@ -1,7 +1,7 @@
 package com.alcegory.mescloud.security.config;
 
 import com.alcegory.mescloud.model.entity.UserEntity;
-import com.alcegory.mescloud.security.role.Role;
+import com.alcegory.mescloud.security.model.Role;
 import com.alcegory.mescloud.security.service.JwtTokenService;
 import org.junit.Assert;
 import org.junit.Test;
@@ -18,7 +18,7 @@ import static org.mockito.Mockito.verify;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class JwtTokenServiceTest {
-    
+
     @Autowired
     private JwtTokenService jwtTokenService;
 

@@ -11,7 +11,7 @@ import com.alcegory.mescloud.security.model.token.TokenEntity;
 import com.alcegory.mescloud.security.model.token.TokenType;
 import com.alcegory.mescloud.security.repository.TokenRepository;
 import com.alcegory.mescloud.model.entity.UserEntity;
-import com.alcegory.mescloud.security.role.Role;
+import com.alcegory.mescloud.security.model.Role;
 import com.alcegory.mescloud.service.CompanyService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;

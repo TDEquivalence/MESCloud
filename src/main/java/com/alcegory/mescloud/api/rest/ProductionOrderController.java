@@ -1,5 +1,6 @@
 package com.alcegory.mescloud.api.rest;
 
+import com.alcegory.mescloud.exception.ForbiddenAccessException;
 import com.alcegory.mescloud.model.dto.PaginatedProductionOrderDto;
 import com.alcegory.mescloud.model.dto.ProductionOrderDto;
 import com.alcegory.mescloud.model.dto.ProductionOrderSummaryDto;
@@ -8,6 +9,7 @@ import com.alcegory.mescloud.service.ProductionOrderService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,28 +23,40 @@ public class ProductionOrderController {
     private final ProductionOrderService service;
 
     @PostMapping
-    public ResponseEntity<ProductionOrderDto> create(@RequestBody ProductionOrderDto requestProductionOrder) {
-        Optional<ProductionOrderDto> productionOrderOpt = service.create(requestProductionOrder);
-        if (productionOrderOpt.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+    public ResponseEntity<ProductionOrderDto> create(@RequestBody ProductionOrderDto requestProductionOrder,
+                                                     Authentication authentication) {
 
-        return new ResponseEntity<>(productionOrderOpt.get(), HttpStatus.OK);
+        try {
+            Optional<ProductionOrderDto> productionOrderOpt = service.create(requestProductionOrder, authentication);
+            if (productionOrderOpt.isPresent()) {
+                return new ResponseEntity<>(productionOrderOpt.get(), HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+        } catch (ForbiddenAccessException e) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
     }
 
     @PutMapping("/edit")
-    public ResponseEntity<ProductionOrderDto> edit(@RequestBody ProductionOrderDto requestProductionOrder) {
-        Optional<ProductionOrderDto> productionOrder = service.editProductionOrder(requestProductionOrder);
-        if (productionOrder.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+    public ResponseEntity<ProductionOrderDto> edit(@RequestBody ProductionOrderDto requestProductionOrder,
+                                                   Authentication authentication) {
+        try {
+            Optional<ProductionOrderDto> editedProductionOrder = service.editProductionOrder(requestProductionOrder, authentication);
 
-        return new ResponseEntity<>(productionOrder.get(), HttpStatus.OK);
+            if (editedProductionOrder.isPresent()) {
+                return ResponseEntity.ok(editedProductionOrder.get());
+            } else {
+                return ResponseEntity.badRequest().build();
+            }
+        } catch (ForbiddenAccessException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
     }
 
     @PutMapping("{countingEquipmentId}/complete")
-    public ResponseEntity<ProductionOrderDto> complete(@PathVariable long countingEquipmentId) {
-        Optional<ProductionOrderDto> productionOrderOpt = service.complete(countingEquipmentId);
+    public ResponseEntity<ProductionOrderDto> complete(@PathVariable long countingEquipmentId, Authentication authentication) {
+        Optional<ProductionOrderDto> productionOrderOpt = service.complete(countingEquipmentId, authentication);
         if (productionOrderOpt.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }

@@ -1,11 +1,11 @@
 package com.alcegory.mescloud.service;
 
-import com.alcegory.mescloud.model.dto.FilterDto;
 import com.alcegory.mescloud.model.dto.PaginatedProductionOrderDto;
 import com.alcegory.mescloud.model.dto.ProductionOrderDto;
 import com.alcegory.mescloud.model.dto.ProductionOrderSummaryDto;
 import com.alcegory.mescloud.model.entity.ProductionOrderEntity;
 import com.alcegory.mescloud.model.filter.Filter;
+import org.springframework.security.core.Authentication;
 
 import java.sql.Timestamp;
 import java.util.Date;
@@ -20,13 +20,13 @@ public interface ProductionOrderService {
 
     String generateCode();
 
-    Optional<ProductionOrderDto> create(ProductionOrderDto productionOrderDto);
+    Optional<ProductionOrderDto> create(ProductionOrderDto productionOrderDto, Authentication authentication);
 
     boolean hasActiveProductionOrderByEquipmentId(long countingEquipmentId);
 
     boolean hasActiveProductionOrderByEquipmentCode(String countingEquipmentCode);
 
-    Optional<ProductionOrderDto> complete(long countingEquipmentId);
+    Optional<ProductionOrderDto> complete(long countingEquipmentId, Authentication authentication);
 
     ProductionOrderEntity saveAndUpdate(ProductionOrderEntity productionOrder);
 
@@ -57,7 +57,7 @@ public interface ProductionOrderService {
 
     List<ProductionOrderSummaryDto> getProductionOrderByComposedId(Long composedId);
 
-    Optional<ProductionOrderDto> editProductionOrder(ProductionOrderDto requestProductionOrder);
+    Optional<ProductionOrderDto> editProductionOrder(ProductionOrderDto requestProductionOrder, Authentication authentication);
 
     List<ProductionOrderEntity> findByComposedProductionOrderId(Long composedOrderId);
 

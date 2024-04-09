@@ -15,9 +15,11 @@ import com.alcegory.mescloud.repository.CountingEquipmentRepository;
 import com.alcegory.mescloud.repository.ProductionOrderRepository;
 import com.alcegory.mescloud.service.CountingEquipmentService;
 import com.alcegory.mescloud.service.ProductionOrderService;
+import com.alcegory.mescloud.service.UserRoleService;
 import com.alcegory.mescloud.utility.DateUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
@@ -27,6 +29,9 @@ import java.util.Optional;
 
 import static com.alcegory.mescloud.model.filter.Filter.Property.END_DATE;
 import static com.alcegory.mescloud.model.filter.Filter.Property.START_DATE;
+import static com.alcegory.mescloud.security.model.SectionRole.ADMIN;
+import static com.alcegory.mescloud.security.model.SectionRole.OPERATOR;
+import static com.alcegory.mescloud.security.utility.AuthorityUtils.checkUserAndRole;
 
 @Service
 @AllArgsConstructor
@@ -49,8 +54,11 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     private final GenericConverter<ProductionOrderSummaryEntity, ProductionOrderSummaryDto> summaryConverter;
     private final GenericConverter<CountingEquipmentEntity, CountingEquipmentDto> equipmentConverter;
 
+    private final UserRoleService userRoleService;
+
     @Override
-    public Optional<ProductionOrderDto> complete(long equipmentId) {
+    public Optional<ProductionOrderDto> complete(long equipmentId, Authentication authentication) {
+        checkUserAndRole(authentication, this.userRoleService, OPERATOR);
         log.info(() -> String.format("Complete process Production Order started for equipmentId [%s]:", equipmentId));
 
         Optional<CountingEquipmentEntity> countingEquipmentOpt = countingEquipmentRepository.findById(equipmentId);
@@ -99,7 +107,12 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     }
 
     @Override
-    public Optional<ProductionOrderDto> create(ProductionOrderDto productionOrder) {
+    public Optional<ProductionOrderDto> create(ProductionOrderDto productionOrder, Authentication authentication) {
+        checkUserAndRole(authentication, this.userRoleService, OPERATOR);
+        return create(productionOrder);
+    }
+
+    private Optional<ProductionOrderDto> create(ProductionOrderDto productionOrder) {
 
         Optional<CountingEquipmentEntity> countingEquipmentEntityOpt =
                 countingEquipmentRepository.findById(productionOrder.getEquipmentId());
@@ -344,7 +357,9 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     }
 
     @Override
-    public Optional<ProductionOrderDto> editProductionOrder(ProductionOrderDto requestProductionOrder) {
+    public Optional<ProductionOrderDto> editProductionOrder(ProductionOrderDto requestProductionOrder, Authentication authentication) {
+        checkUserAndRole(authentication, this.userRoleService, ADMIN);
+
         if (requestProductionOrder == null) {
             log.warning("Null request Production Order received for editing production order.");
             return Optional.empty();
