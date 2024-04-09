@@ -8,8 +8,9 @@ import lombok.Setter;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -26,13 +27,15 @@ public class SectionRoleEntity implements Serializable {
     private Long id;
 
     @Enumerated(EnumType.STRING)
-    private SectionAuthority name;
+    private SectionRole name;
 
     public Set<String> getPermissions() {
         if (name == null) {
-            return new HashSet<>();
+            return Collections.emptySet();
         }
-        return name.getPermissions();
+        return name.getAuthorities().stream()
+                .map(SectionAuthority::getPermission)
+                .collect(Collectors.toSet());
     }
 }
 

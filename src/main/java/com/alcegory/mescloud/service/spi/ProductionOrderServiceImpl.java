@@ -15,8 +15,6 @@ import com.alcegory.mescloud.model.filter.Filter;
 import com.alcegory.mescloud.protocol.MesMqttSettings;
 import com.alcegory.mescloud.repository.CountingEquipmentRepository;
 import com.alcegory.mescloud.repository.ProductionOrderRepository;
-import com.alcegory.mescloud.security.model.SectionAuthority;
-import com.alcegory.mescloud.security.model.SectionPermissions;
 import com.alcegory.mescloud.security.model.UserRoleEntity;
 import com.alcegory.mescloud.service.CountingEquipmentService;
 import com.alcegory.mescloud.service.ProductionOrderService;
@@ -34,7 +32,10 @@ import java.util.Optional;
 
 import static com.alcegory.mescloud.model.filter.Filter.Property.END_DATE;
 import static com.alcegory.mescloud.model.filter.Filter.Property.START_DATE;
-import static com.alcegory.mescloud.security.model.SectionPermissions.OPERATOR_CREATE;
+import static com.alcegory.mescloud.security.model.SectionAuthority.OPERATOR_CREATE;
+import static com.alcegory.mescloud.security.model.SectionRole.OPERATOR;
+import static com.alcegory.mescloud.security.utility.AuthorityUtils.hasExpectedRole;
+import static com.alcegory.mescloud.security.utility.AuthorityUtils.hasPermission;
 
 @Service
 @AllArgsConstructor
@@ -113,11 +114,11 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         UserEntity user = (UserEntity) authentication.getPrincipal();
         UserRoleEntity userRole = userRoleService.findUserRoleByUserAndSection(user.getId(), 1L);
 
-        if (userRole == null || userRole.getSectionRole().getName() != SectionAuthority.OPERATOR) {
+        if (hasExpectedRole(userRole, OPERATOR)) {
             throw new ForbiddenAccessException("User is not authorized to perform this action");
         }
 
-        if (!userRole.getSectionRole().getPermissions().contains(OPERATOR_CREATE.getPermission())) {
+        if (hasPermission(userRole, OPERATOR_CREATE)) {
             throw new ForbiddenAccessException("User does not have permission to create production orders");
         }
 
