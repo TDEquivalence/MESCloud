@@ -1,6 +1,5 @@
 package com.alcegory.mescloud.service;
 
-import com.alcegory.mescloud.model.dto.FilterDto;
 import com.alcegory.mescloud.model.dto.PaginatedProductionOrderDto;
 import com.alcegory.mescloud.model.dto.ProductionOrderDto;
 import com.alcegory.mescloud.model.dto.ProductionOrderSummaryDto;
@@ -58,7 +57,7 @@ public interface ProductionOrderService {
 
     List<ProductionOrderSummaryDto> getProductionOrderByComposedId(Long composedId);
 
-    Optional<ProductionOrderDto> editProductionOrder(ProductionOrderDto requestProductionOrder);
+    Optional<ProductionOrderDto> editProductionOrder(ProductionOrderDto requestProductionOrder, Authentication authentication);
 
     List<ProductionOrderEntity> findByComposedProductionOrderId(Long composedOrderId);
 

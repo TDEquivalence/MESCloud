@@ -23,7 +23,8 @@ public class ProductionOrderController {
     private final ProductionOrderService service;
 
     @PostMapping
-    public ResponseEntity<ProductionOrderDto> create(@RequestBody ProductionOrderDto requestProductionOrder, Authentication authentication) {
+    public ResponseEntity<ProductionOrderDto> create(@RequestBody ProductionOrderDto requestProductionOrder,
+                                                     Authentication authentication) {
 
         try {
             Optional<ProductionOrderDto> productionOrderOpt = service.create(requestProductionOrder, authentication);
@@ -38,10 +39,15 @@ public class ProductionOrderController {
     }
 
     @PutMapping("/edit")
-    public ResponseEntity<ProductionOrderDto> edit(@RequestBody ProductionOrderDto requestProductionOrder) {
-        Optional<ProductionOrderDto> productionOrder = service.editProductionOrder(requestProductionOrder);
-        if (productionOrder.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    public ResponseEntity<ProductionOrderDto> edit(@RequestBody ProductionOrderDto requestProductionOrder,
+                                                   Authentication authentication) {
+        try {
+            Optional<ProductionOrderDto> productionOrder = service.editProductionOrder(requestProductionOrder, authentication);
+            if (productionOrder.isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+        } catch (ForbiddenAccessException e) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
         return new ResponseEntity<>(productionOrder.get(), HttpStatus.OK);

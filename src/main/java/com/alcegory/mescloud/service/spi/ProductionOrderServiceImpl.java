@@ -29,6 +29,7 @@ import java.util.Optional;
 
 import static com.alcegory.mescloud.model.filter.Filter.Property.END_DATE;
 import static com.alcegory.mescloud.model.filter.Filter.Property.START_DATE;
+import static com.alcegory.mescloud.security.model.SectionRole.ADMIN;
 import static com.alcegory.mescloud.security.model.SectionRole.OPERATOR;
 import static com.alcegory.mescloud.security.utility.AuthorityUtils.checkUserAndRole;
 
@@ -355,7 +356,9 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     }
 
     @Override
-    public Optional<ProductionOrderDto> editProductionOrder(ProductionOrderDto requestProductionOrder) {
+    public Optional<ProductionOrderDto> editProductionOrder(ProductionOrderDto requestProductionOrder, Authentication authentication) {
+        checkUserAndRole(authentication, this.userRoleService, ADMIN);
+
         if (requestProductionOrder == null) {
             log.warning("Null request Production Order received for editing production order.");
             return Optional.empty();
