@@ -2,6 +2,7 @@ package com.alcegory.mescloud.service.spi;
 
 import com.alcegory.mescloud.exception.UserUpdateException;
 import com.alcegory.mescloud.model.converter.UserConverter;
+import com.alcegory.mescloud.model.dto.SectionRoleMapping;
 import com.alcegory.mescloud.model.dto.UserConfigDto;
 import com.alcegory.mescloud.model.dto.UserDto;
 import com.alcegory.mescloud.model.entity.UserEntity;
@@ -24,7 +25,6 @@ import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import javax.management.relation.RoleNotFoundException;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -72,7 +72,7 @@ public class UserServiceImpl implements UserService {
             userRepository.save(dbUserEntity);
 
             UserDto userResponseDto = mapper.convertToDto(dbUserEntity);
-            userResponseDto.setSectionRole(userDto.getSectionRole());
+            userResponseDto.setSectionRoles(userDto.getSectionRoles());
             return userResponseDto;
         } catch (Exception ex) {
             log.error("An error occurred while updating user with username: " + userDto.getUsername(), ex);
@@ -82,10 +82,18 @@ public class UserServiceImpl implements UserService {
     }
 
     private void updateUserData(UserEntity dbUserEntity, UserDto userDto) {
-        dbUserEntity.setFirstName(userDto.getFirstName());
-        dbUserEntity.setLastName(userDto.getLastName());
-        dbUserEntity.setRole(userDto.getRole());
-        dbUserEntity.setEmail(userDto.getEmail());
+        if (userDto.getFirstName() != null) {
+            dbUserEntity.setFirstName(userDto.getFirstName());
+        }
+        if (userDto.getLastName() != null) {
+            dbUserEntity.setLastName(userDto.getLastName());
+        }
+        if (userDto.getRole() != null) {
+            dbUserEntity.setRole(userDto.getRole());
+        }
+        if (userDto.getEmail() != null) {
+            dbUserEntity.setEmail(userDto.getEmail());
+        }
         setPassword(dbUserEntity, userDto);
         dbUserEntity.setUpdatedAt(new Date());
     }
@@ -98,32 +106,29 @@ public class UserServiceImpl implements UserService {
     }
 
     public void updateSectionRole(UserEntity user, UserDto userDto) throws RoleNotFoundException {
-        //TODO: receiving sectionsID
-        long sectionId = 1L; // Assuming sectionId is always 1L
+        List<SectionRoleMapping> sectionRoles = userDto.getSectionRoles();
 
-        Optional<SectionRoleEntity> sectionRoleOptional = roleService.findByName(userDto.getSectionRole());
+        if (sectionRoles != null && !sectionRoles.isEmpty()) {
+            for (SectionRoleMapping sectionRoleMapping : sectionRoles) {
+                SectionRoleEntity sectionRole = roleService.findByName(sectionRoleMapping.getSectionRole())
+                        .orElseThrow(() -> new RoleNotFoundException("Role not found: " + sectionRoleMapping.getSectionRole()));
 
-        if (sectionRoleOptional.isEmpty()) {
-            throw new RoleNotFoundException("Role not found: " + userDto.getSectionRole());
+                long sectionId = sectionRoleMapping.getSectionId();
+
+                UserRoleEntity existingUserRole = userRoleRepository.findByUserIdAndSectionId(user.getId(), sectionId);
+                if (existingUserRole != null) {
+                    userRoleRepository.delete(existingUserRole);
+                    log.info("User role deleted successfully. User ID: {}, Role ID: {}, Section ID: {}", user.getId(), existingUserRole.getRoleId(), sectionId);
+                }
+
+                UserRoleEntity newUserRole = new UserRoleEntity();
+                newUserRole.setUserId(user.getId());
+                newUserRole.setRoleId(sectionRole.getId());
+                newUserRole.setSectionId(sectionId);
+                userRoleRepository.save(newUserRole);
+                log.info("New user role created. User ID: {}, Role ID: {}, Section ID: {}", user.getId(), sectionRole.getId(), sectionId);
+            }
         }
-
-        SectionRoleEntity sectionRole = sectionRoleOptional.get();
-        Optional<UserRoleEntity> existingUserRoleOptional =
-                Optional.ofNullable(userRoleRepository.findByUserIdAndSectionId(user.getId(), sectionId));
-
-        if (existingUserRoleOptional.isPresent()) {
-            UserRoleEntity existingUserRole = existingUserRoleOptional.get();
-            userRoleRepository.delete(existingUserRole); // Delete existing user role
-            log.info("User role deleted successfully. User ID: {}, Role ID: {}, Section ID: {}", user.getId(), existingUserRole.getRoleId(), sectionId);
-        }
-
-        // Create new user role
-        UserRoleEntity newUserRole = new UserRoleEntity();
-        newUserRole.setUserId(user.getId());
-        newUserRole.setRoleId(sectionRole.getId());
-        newUserRole.setSectionId(sectionId);
-        userRoleRepository.save(newUserRole);
-        log.info("New user role created. User ID: {}, Role ID: {}, Section ID: {}", user.getId(), sectionRole.getId(), sectionId);
     }
 
 

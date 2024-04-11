@@ -1,9 +1,13 @@
 package com.alcegory.mescloud.security.service;
 
+import com.alcegory.mescloud.exception.RegistrationException;
+import com.alcegory.mescloud.model.dto.SectionRoleMapping;
 import com.alcegory.mescloud.model.entity.CompanyEntity;
+import com.alcegory.mescloud.model.entity.UserEntity;
 import com.alcegory.mescloud.repository.UserRepository;
 import com.alcegory.mescloud.security.constant.UserServiceImpConstant;
 import com.alcegory.mescloud.security.exception.UsernameExistException;
+import com.alcegory.mescloud.security.model.Role;
 import com.alcegory.mescloud.security.model.SectionRole;
 import com.alcegory.mescloud.security.model.SectionRoleEntity;
 import com.alcegory.mescloud.security.model.auth.AuthenticateRequest;
@@ -12,8 +16,6 @@ import com.alcegory.mescloud.security.model.auth.RegisterRequest;
 import com.alcegory.mescloud.security.model.token.TokenEntity;
 import com.alcegory.mescloud.security.model.token.TokenType;
 import com.alcegory.mescloud.security.repository.TokenRepository;
-import com.alcegory.mescloud.model.entity.UserEntity;
-import com.alcegory.mescloud.security.model.Role;
 import com.alcegory.mescloud.service.CompanyService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
@@ -22,11 +24,10 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.management.relation.RoleNotFoundException;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -41,38 +42,62 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final UserRoleService userRoleService;
     private final RoleService roleService;
 
+    @Transactional(rollbackFor = {UsernameExistException.class, RoleNotFoundException.class})
     public AuthenticationResponse register(RegisterRequest request) throws UsernameExistException, RoleNotFoundException {
-        setUsernameByEmail(request);
-        validateUsername(request);
-        UserEntity user = UserEntity.builder()
+        try {
+            setUsernameByEmail(request);
+            validateUsername(request);
+
+            UserEntity user = buildUserEntity(request);
+            userRepository.save(user);
+
+            saveSectionRolesForUser(request, user);
+
+            return userToAuthenticationResponse(user);
+        } catch (UsernameExistException | RoleNotFoundException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new RegistrationException("Failed to register user", e);
+        }
+    }
+
+    private UserEntity buildUserEntity(RegisterRequest request) {
+        return UserEntity.builder()
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
                 .username(request.getUsername())
                 .company(getCompany())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .role(getRoleEnumName(request.getRole()))
+                .role(request.getRole())
                 .isActive(true)
                 .isNotLocked(true)
                 .createdAt(new Date())
                 .build();
-
-        userRepository.save(user);
-        saveSectionRole(request, user);
-        return userToAuthenticationResponse(user);
     }
 
-    public void saveSectionRole(RegisterRequest request, UserEntity user) throws RoleNotFoundException {
-        Optional<SectionRoleEntity> sectionRoleOptional =
-                roleService.findByName(getSectionRoleEnumName(request.getSectionRole()));
+    public void saveSectionRolesForUser(RegisterRequest request, UserEntity user) throws RoleNotFoundException {
+        List<SectionRoleMapping> sectionRoles = Optional.ofNullable(request.getSectionRoles()).orElse(Collections.emptyList());
 
-        if (sectionRoleOptional.isEmpty()) {
-            throw new RoleNotFoundException("Role not found: " + request.getSectionRole());
+        for (SectionRoleMapping sectionRoleMapping : sectionRoles) {
+            Long sectionId = sectionRoleMapping.getSectionId();
+            Objects.requireNonNull(sectionId, "Section ID cannot be null");
+
+            SectionRole sectionRole = sectionRoleMapping.getSectionRole();
+            Objects.requireNonNull(sectionRole, "Section role cannot be null");
+
+            String sectionRoleName = sectionRole.name();
+            Optional<SectionRoleEntity> sectionRoleOptional = roleService.findByName(sectionRole);
+
+            if (sectionRoleOptional.isEmpty()) {
+                throw new RoleNotFoundException("Role not found: " + sectionRoleName);
+            }
+
+            SectionRoleEntity sectionRoleEntity = sectionRoleOptional.get();
+            userRoleService.saveUserRole(user.getId(), sectionRoleEntity.getId(), sectionId);
         }
-
-        SectionRoleEntity sectionRole = sectionRoleOptional.get();
-        userRoleService.saveUserRole(user.getId(), sectionRole.getId(), 1L);
     }
+
 
     public AuthenticationResponse authenticate(AuthenticateRequest request) {
         authenticationManager.authenticate(
@@ -127,10 +152,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     private Role getRoleEnumName(Role role) {
         return Role.valueOf(role.name());
-    }
-
-    private SectionRole getSectionRoleEnumName(SectionRole sectionRole) {
-        return SectionRole.valueOf(sectionRole.name());
     }
 
     private void saveUserToken(String jwtToken, UserEntity user) {
