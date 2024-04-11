@@ -23,6 +23,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static com.alcegory.mescloud.security.model.SectionRole.ADMIN;
+import static com.alcegory.mescloud.security.utility.AuthorityUtil.checkUserAndRole;
+
 @Slf4j
 @Service
 @AllArgsConstructor
@@ -54,6 +57,7 @@ public class UserRoleServiceImpl implements UserRoleService {
 
     @Override
     public UserConfigDto getCompanyConfigAndUserAuth(UserDto userToUpdate, Authentication authentication) throws UserNotFoundException {
+        checkUserAndRole(authentication, this, ADMIN);
         Optional<UserEntity> userEntityOptional;
         if (userToUpdate.getId() != null) {
             userEntityOptional = Optional.ofNullable(userService.getUserById(userToUpdate.getId()));

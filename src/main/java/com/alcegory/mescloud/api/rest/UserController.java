@@ -1,5 +1,6 @@
 package com.alcegory.mescloud.api.rest;
 
+import com.alcegory.mescloud.exception.ForbiddenAccessException;
 import com.alcegory.mescloud.exception.UserUpdateException;
 import com.alcegory.mescloud.model.dto.UserConfigDto;
 import com.alcegory.mescloud.model.dto.UserDto;
@@ -59,9 +60,14 @@ public class UserController {
     }
 
     @PutMapping("/config")
-    public ResponseEntity<UserConfigDto> getUserConfig(@RequestBody UserDto user, Authentication authentication)
-            throws UserNotFoundException {
-        UserConfigDto userConfigDto = userRoleService.getCompanyConfigAndUserAuth(user, authentication);
-        return new ResponseEntity<>(userConfigDto, HttpStatus.ACCEPTED);
+    public ResponseEntity<UserConfigDto> getUserConfig(@RequestBody UserDto user, Authentication authentication) {
+        try {
+            UserConfigDto userConfigDto = userRoleService.getCompanyConfigAndUserAuth(user, authentication);
+            return new ResponseEntity<>(userConfigDto, HttpStatus.ACCEPTED);
+        } catch (UserNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (ForbiddenAccessException e) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
     }
 }
