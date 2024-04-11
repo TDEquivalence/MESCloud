@@ -1,5 +1,6 @@
 package com.alcegory.mescloud.service.spi;
 
+import com.alcegory.mescloud.exception.UserUpdateException;
 import com.alcegory.mescloud.model.converter.UserConverter;
 import com.alcegory.mescloud.model.dto.UserConfigDto;
 import com.alcegory.mescloud.model.dto.UserDto;
@@ -7,23 +8,24 @@ import com.alcegory.mescloud.model.entity.UserEntity;
 import com.alcegory.mescloud.model.filter.Filter;
 import com.alcegory.mescloud.repository.UserRepository;
 import com.alcegory.mescloud.repository.UserRoleRepository;
-import com.alcegory.mescloud.security.exception.UserNotFoundException;
 import com.alcegory.mescloud.security.mapper.EntityDtoMapper;
 import com.alcegory.mescloud.security.model.SectionRoleEntity;
 import com.alcegory.mescloud.security.model.auth.AuthenticationResponse;
 import com.alcegory.mescloud.security.service.RoleService;
 import com.alcegory.mescloud.service.UserService;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import javax.management.relation.RoleNotFoundException;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-import static com.alcegory.mescloud.security.constant.UserServiceImpConstant.USER_NOT_FOUND_BY_USERNAME;
-
+@Slf4j
 @Service
 @AllArgsConstructor
 public class UserServiceImpl implements UserService {
@@ -50,24 +52,48 @@ public class UserServiceImpl implements UserService {
         return mapper.convertToDto(userEntityList);
     }
 
-    public UserDto updateUser(UserDto userDto) throws UserNotFoundException, RoleNotFoundException {
+    @Transactional(rollbackFor = Exception.class)
+    public UserDto updateUser(UserDto userDto) throws UserUpdateException, RoleNotFoundException {
+        if (userDto == null) {
+            throw new IllegalArgumentException("UserDto cannot be null.");
+        }
+
         UserEntity dbUserEntity = userRepository.findUserByUsername(userDto.getUsername());
 
         if (dbUserEntity == null) {
-            throw new UserNotFoundException(USER_NOT_FOUND_BY_USERNAME);
+            throw new UserUpdateException("User not found with username: " + userDto.getUsername());
         }
 
+        try {
+            updateUserData(dbUserEntity, userDto);
+            updateSectionRole(dbUserEntity, userDto);
+
+            userRepository.save(dbUserEntity);
+
+            UserDto userResponseDto = mapper.convertToDto(dbUserEntity);
+            userResponseDto.setSectionRole(userDto.getSectionRole());
+            return userResponseDto;
+        } catch (Exception ex) {
+            log.error("An error occurred while updating user with username: " + userDto.getUsername(), ex);
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            throw new UserUpdateException("Failed to update user: " + ex.getMessage(), ex);
+        }
+    }
+
+    private void updateUserData(UserEntity dbUserEntity, UserDto userDto) {
         dbUserEntity.setFirstName(userDto.getFirstName());
         dbUserEntity.setLastName(userDto.getLastName());
+        dbUserEntity.setRole(userDto.getRole());
         dbUserEntity.setEmail(userDto.getEmail());
-        dbUserEntity.setPassword(passwordEncoder.encode(userDto.getPassword()));
+        setPassword(dbUserEntity, userDto);
         dbUserEntity.setUpdatedAt(new Date());
+    }
 
-        userRepository.save(dbUserEntity);
-        updateSectionRole(dbUserEntity, userDto);
-        UserDto userDtoResponse = mapper.convertToDto(dbUserEntity);
-        userDtoResponse.setSectionRole(userDto.getSectionRole());
-        return userDtoResponse;
+    private void setPassword(UserEntity dbUserEntity, UserDto userDto) {
+        String password = userDto.getPassword();
+        if (password != null && !password.isEmpty()) {
+            dbUserEntity.setPassword(passwordEncoder.encode(password));
+        }
     }
 
     public void updateSectionRole(UserEntity user, UserDto userDto) throws RoleNotFoundException {
@@ -79,7 +105,6 @@ public class UserServiceImpl implements UserService {
 
         SectionRoleEntity sectionRole = sectionRoleOptional.get();
         userRoleRepository.updateUserRole(user.getId(), sectionRole.getId(), 1L);
-        userDto.setSectionRole(sectionRole.getName());
     }
 
     public UserConfigDto getUserConfigByAuth(AuthenticationResponse authenticateRequest) {

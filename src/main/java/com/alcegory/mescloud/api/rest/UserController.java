@@ -1,8 +1,8 @@
 package com.alcegory.mescloud.api.rest;
 
+import com.alcegory.mescloud.exception.UserUpdateException;
 import com.alcegory.mescloud.model.dto.UserDto;
 import com.alcegory.mescloud.model.filter.Filter;
-import com.alcegory.mescloud.security.exception.UserNotFoundException;
 import com.alcegory.mescloud.service.spi.UserServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -42,7 +42,7 @@ public class UserController {
         try {
             UserDto userDto = userServiceImpl.updateUser(user);
             return new ResponseEntity<>(userDto, HttpStatus.ACCEPTED);
-        } catch (RoleNotFoundException | UserNotFoundException e) {
+        } catch (RoleNotFoundException | UserUpdateException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
