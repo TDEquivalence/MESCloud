@@ -1,21 +1,26 @@
 package com.alcegory.mescloud.security.service;
 
 import com.alcegory.mescloud.model.converter.UserConverterImpl;
-import com.alcegory.mescloud.model.dto.FactoryDto;
 import com.alcegory.mescloud.model.dto.SectionDto;
 import com.alcegory.mescloud.model.dto.UserConfigDto;
+import com.alcegory.mescloud.model.dto.UserDto;
 import com.alcegory.mescloud.model.entity.UserEntity;
 import com.alcegory.mescloud.repository.UserRoleRepository;
+import com.alcegory.mescloud.security.exception.UserNotFoundException;
+import com.alcegory.mescloud.security.model.SectionRoleEntity;
 import com.alcegory.mescloud.security.model.UserRoleEntity;
 import com.alcegory.mescloud.security.model.auth.AuthenticationResponse;
 import com.alcegory.mescloud.service.UserService;
+import com.alcegory.mescloud.utility.SectionConfigUtil;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Slf4j
@@ -37,33 +42,91 @@ public class UserRoleServiceImpl implements UserRoleService {
         }
 
         UserConfigDto userConfig = userConverter.convertToDtoWithRelatedEntities(user);
-
         if (userConfig == null || userConfig.getCompany() == null || userConfig.getCompany().getFactoryList() == null) {
             return userConfig;
         }
 
         List<UserRoleEntity> userRoles = findByUserId(userConfig.getId());
-        filterSectionsWithRoles(userRoles, userConfig.getCompany().getFactoryList());
+        SectionConfigUtil.filterSectionsWithRoles(userRoles, userConfig.getCompany().getFactoryList());
 
         return userConfig;
     }
 
-    private void filterSectionsWithRoles(List<UserRoleEntity> userRoles, List<FactoryDto> factoryList) {
-        for (FactoryDto factory : factoryList) {
-            if (factory.getSectionList() == null || factory.getSectionList().isEmpty()) {
-                continue;
-            }
-            List<SectionDto> sectionsWithRoles = new ArrayList<>();
-            for (SectionDto section : factory.getSectionList()) {
-                Long sectionId = section.getId();
-                boolean hasRole = userRoles.stream()
-                        .anyMatch(role -> role.getSectionId().equals(sectionId));
-                if (hasRole) {
-                    sectionsWithRoles.add(section);
-                }
-            }
-            factory.setSectionList(sectionsWithRoles);
+    @Override
+    public UserConfigDto getCompanyConfigAndUserAuth(UserDto userToUpdate, Authentication authentication) throws UserNotFoundException {
+        Optional<UserEntity> userEntityOptional;
+        if (userToUpdate.getId() != null) {
+            userEntityOptional = Optional.ofNullable(userService.getUserById(userToUpdate.getId()));
+        } else {
+            userEntityOptional = userService.findByUsername(userToUpdate.getUsername());
         }
+        if (userEntityOptional.isEmpty()) {
+            throw new UserNotFoundException("User not found for username: " + userToUpdate.getUsername());
+        }
+
+        UserConfigDto authenticateUserConfig = userService.getUserConfigByAuth(authentication);
+        UserConfigDto userToUpdateConfig = userService.getUserConfigByAuth(userEntityOptional.get());
+
+        UserConfigDto mergedUsers = mergeUserConfigs(authenticateUserConfig, userToUpdateConfig);
+
+        List<UserRoleEntity> userRoles = findByUserId(mergedUsers.getId());
+
+        List<SectionDto> sections = mergedUsers.getCompany().getFactoryList().stream()
+                .flatMap(factory -> factory.getSectionList().stream())
+                .toList();
+
+        mapUserRolesToSections(userRoles, sections);
+
+        return mergedUsers;
+    }
+
+
+    public void mapUserRolesToSections(List<UserRoleEntity> userRoles, List<SectionDto> sections) {
+        Map<Long, SectionRoleEntity> sectionRoleMap = new HashMap<>();
+        for (UserRoleEntity userRole : userRoles) {
+            sectionRoleMap.put(userRole.getSectionId(), userRole.getSectionRole());
+        }
+
+        for (SectionDto section : sections) {
+            Long sectionId = section.getId();
+            SectionRoleEntity sectionRole = sectionRoleMap.get(sectionId);
+            if (sectionRole != null) {
+                section.setSectionRole(sectionRole.getName());
+            }
+        }
+    }
+
+    private UserConfigDto mergeUserConfigs(UserConfigDto authenticateUserConfig, UserConfigDto userToUpdateConfig) {
+        UserConfigDto mergedConfig = new UserConfigDto();
+
+        mergedConfig.setId(userToUpdateConfig.getId());
+        mergedConfig.setUsername(userToUpdateConfig.getUsername());
+        mergedConfig.setFirstName(userToUpdateConfig.getFirstName());
+        mergedConfig.setLastName(userToUpdateConfig.getLastName());
+        mergedConfig.setRole(userToUpdateConfig.getRole());
+        mergedConfig.setCompany(userToUpdateConfig.getCompany());
+
+        // If any fields are null in userToUpdateConfig, populate them with values from authenticateUserConfig
+        if (userToUpdateConfig.getId() == null) {
+            mergedConfig.setId(authenticateUserConfig.getId());
+        }
+        if (userToUpdateConfig.getUsername() == null) {
+            mergedConfig.setUsername(authenticateUserConfig.getUsername());
+        }
+        if (userToUpdateConfig.getFirstName() == null) {
+            mergedConfig.setFirstName(authenticateUserConfig.getFirstName());
+        }
+        if (userToUpdateConfig.getLastName() == null) {
+            mergedConfig.setLastName(authenticateUserConfig.getLastName());
+        }
+        if (userToUpdateConfig.getRole() == null) {
+            mergedConfig.setRole(authenticateUserConfig.getRole());
+        }
+        if (userToUpdateConfig.getCompany() == null) {
+            mergedConfig.setCompany(authenticateUserConfig.getCompany());
+        }
+
+        return mergedConfig;
     }
 
     @Override

@@ -26,7 +26,7 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 import static com.alcegory.mescloud.security.model.SectionRole.MANAGER;
-import static com.alcegory.mescloud.security.utility.AuthorityUtils.checkUserAndRole;
+import static com.alcegory.mescloud.security.utility.AuthorityUtil.checkUserAndRole;
 
 @Service
 @AllArgsConstructor

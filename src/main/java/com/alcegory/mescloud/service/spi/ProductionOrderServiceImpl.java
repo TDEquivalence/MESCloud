@@ -31,7 +31,7 @@ import static com.alcegory.mescloud.model.filter.Filter.Property.END_DATE;
 import static com.alcegory.mescloud.model.filter.Filter.Property.START_DATE;
 import static com.alcegory.mescloud.security.model.SectionRole.ADMIN;
 import static com.alcegory.mescloud.security.model.SectionRole.OPERATOR;
-import static com.alcegory.mescloud.security.utility.AuthorityUtils.checkUserAndRole;
+import static com.alcegory.mescloud.security.utility.AuthorityUtil.checkUserAndRole;
 
 @Service
 @AllArgsConstructor

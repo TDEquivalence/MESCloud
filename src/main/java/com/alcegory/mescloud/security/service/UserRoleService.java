@@ -1,8 +1,11 @@
 package com.alcegory.mescloud.security.service;
 
 import com.alcegory.mescloud.model.dto.UserConfigDto;
+import com.alcegory.mescloud.model.dto.UserDto;
+import com.alcegory.mescloud.security.exception.UserNotFoundException;
 import com.alcegory.mescloud.security.model.UserRoleEntity;
 import com.alcegory.mescloud.security.model.auth.AuthenticationResponse;
+import org.springframework.security.core.Authentication;
 
 import java.util.List;
 
@@ -21,4 +24,6 @@ public interface UserRoleService {
     UserRoleEntity findUserRoleByUserAndSection(Long userId, Long sectionId);
 
     UserConfigDto getUserRoleAndConfigurations(AuthenticationResponse authenticationResponse);
+
+    UserConfigDto getCompanyConfigAndUserAuth(UserDto userToUpdate, Authentication authentication) throws UserNotFoundException;
 }

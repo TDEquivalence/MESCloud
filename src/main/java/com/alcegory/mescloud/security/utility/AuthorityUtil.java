@@ -8,9 +8,9 @@ import com.alcegory.mescloud.security.model.UserRoleEntity;
 import com.alcegory.mescloud.security.service.UserRoleService;
 import org.springframework.security.core.Authentication;
 
-public class AuthorityUtils {
+public class AuthorityUtil {
 
-    public AuthorityUtils() {
+    private AuthorityUtil() {
         //Utility class, not meant for instantiation
     }
 

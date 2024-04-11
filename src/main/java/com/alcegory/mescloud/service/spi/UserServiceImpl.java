@@ -17,6 +17,7 @@ import com.alcegory.mescloud.security.service.RoleService;
 import com.alcegory.mescloud.service.UserService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +26,7 @@ import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import javax.management.relation.RoleNotFoundException;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -38,21 +40,30 @@ public class UserServiceImpl implements UserService {
     private final UserRoleRepository userRoleRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public UserDto getUserById(Long id) {
+    @Override
+    public UserDto getUserDtoById(Long id) {
         UserEntity userEntity = userRepository.findUserById(id);
         return mapper.convertToDto(userEntity);
     }
 
+    @Override
+    public UserEntity getUserById(Long id) {
+        return userRepository.findUserById(id);
+    }
+
+    @Override
     public List<UserDto> getFilteredUsers() {
         List<UserEntity> userEntityList = userRepository.findAll();
         return mapper.convertToDto(userEntityList);
     }
 
+    @Override
     public List<UserDto> getFilteredUsers(Filter filter) {
         List<UserEntity> userEntityList = userRepository.getFilteredUsers(filter);
         return mapper.convertToDto(userEntityList);
     }
 
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public UserDto updateUser(UserDto userDto) throws UserUpdateException, RoleNotFoundException {
         if (userDto == null) {
@@ -105,7 +116,7 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    public void updateSectionRole(UserEntity user, UserDto userDto) throws RoleNotFoundException {
+    private void updateSectionRole(UserEntity user, UserDto userDto) throws RoleNotFoundException {
         List<SectionRoleMapping> sectionRoles = userDto.getSectionRoles();
 
         if (sectionRoles != null && !sectionRoles.isEmpty()) {
@@ -131,16 +142,31 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-
-    public UserConfigDto getUserConfigByAuth(AuthenticationResponse authenticateRequest) {
-        if (authenticateRequest == null || authenticateRequest.getUsername() == null) {
+    @Override
+    public UserConfigDto getUserConfigByAuth(Authentication authentication) {
+        UserEntity user = (UserEntity) authentication.getPrincipal();
+        if (user == null) {
             return null;
         }
 
-        UserEntity userEntity = userRepository.findUserByUsername(authenticateRequest.getUsername());
+        return processGetUserConfigByAuth(user);
+    }
+
+    @Override
+    public UserConfigDto getUserConfigByAuth(UserEntity user) {
+        if (user == null) {
+            return null;
+        }
+
+        return processGetUserConfigByAuth(user);
+    }
+
+    private UserConfigDto processGetUserConfigByAuth(UserEntity user) {
+        UserEntity userEntity = userRepository.findUserByUsername(user.getUsername());
         return userConverter.convertToDtoWithRelatedEntities(userEntity);
     }
 
+    @Override
     public UserEntity getUserByAuth(AuthenticationResponse authenticateRequest) {
         if (authenticateRequest == null || authenticateRequest.getUsername() == null) {
             return null;
@@ -153,6 +179,11 @@ public class UserServiceImpl implements UserService {
     public void deleteUser(UserDto user) {
         UserEntity userEntity = mapper.convertToEntity(user);
         userRepository.delete(userEntity);
+    }
+
+    @Override
+    public Optional<UserEntity> findByUsername(String username) {
+        return userRepository.findByUsername(username);
     }
 }
 

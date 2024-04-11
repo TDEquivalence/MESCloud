@@ -1,12 +1,16 @@
 package com.alcegory.mescloud.api.rest;
 
 import com.alcegory.mescloud.exception.UserUpdateException;
+import com.alcegory.mescloud.model.dto.UserConfigDto;
 import com.alcegory.mescloud.model.dto.UserDto;
 import com.alcegory.mescloud.model.filter.Filter;
+import com.alcegory.mescloud.security.exception.UserNotFoundException;
+import com.alcegory.mescloud.security.service.UserRoleService;
 import com.alcegory.mescloud.service.spi.UserServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import javax.management.relation.RoleNotFoundException;
@@ -18,10 +22,11 @@ import java.util.List;
 public class UserController {
 
     private final UserServiceImpl userServiceImpl;
+    private final UserRoleService userRoleService;
 
     @GetMapping("/{id}")
     public ResponseEntity<UserDto> findUser(@PathVariable long id) {
-        UserDto userDto = userServiceImpl.getUserById(id);
+        UserDto userDto = userServiceImpl.getUserDtoById(id);
         return new ResponseEntity<>(userDto, HttpStatus.OK);
     }
 
@@ -51,5 +56,12 @@ public class UserController {
     public ResponseEntity<String> deleteUser(@RequestBody UserDto user) {
         userServiceImpl.deleteUser(user);
         return ResponseEntity.ok("User deleted successfully");
+    }
+
+    @PutMapping("/config")
+    public ResponseEntity<UserConfigDto> getUserConfig(@RequestBody UserDto user, Authentication authentication)
+            throws UserNotFoundException {
+        UserConfigDto userConfigDto = userRoleService.getCompanyConfigAndUserAuth(user, authentication);
+        return new ResponseEntity<>(userConfigDto, HttpStatus.ACCEPTED);
     }
 }
