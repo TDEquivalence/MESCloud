@@ -7,7 +7,6 @@ CREATE TABLE role (
 
 -- Create UserRole table
 CREATE TABLE user_role (
-    id int GENERATED ALWAYS AS IDENTITY,
 	user_id INT,
     role_id INT,
     section_id INT,

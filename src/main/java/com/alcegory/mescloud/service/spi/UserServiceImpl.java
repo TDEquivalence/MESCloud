@@ -10,6 +10,7 @@ import com.alcegory.mescloud.repository.UserRepository;
 import com.alcegory.mescloud.repository.UserRoleRepository;
 import com.alcegory.mescloud.security.mapper.EntityDtoMapper;
 import com.alcegory.mescloud.security.model.SectionRoleEntity;
+import com.alcegory.mescloud.security.model.UserRoleEntity;
 import com.alcegory.mescloud.security.model.auth.AuthenticationResponse;
 import com.alcegory.mescloud.security.service.RoleService;
 import com.alcegory.mescloud.service.UserService;
@@ -97,6 +98,9 @@ public class UserServiceImpl implements UserService {
     }
 
     public void updateSectionRole(UserEntity user, UserDto userDto) throws RoleNotFoundException {
+        //TODO: receiving sectionsID
+        long sectionId = 1L; // Assuming sectionId is always 1L
+
         Optional<SectionRoleEntity> sectionRoleOptional = roleService.findByName(userDto.getSectionRole());
 
         if (sectionRoleOptional.isEmpty()) {
@@ -104,8 +108,24 @@ public class UserServiceImpl implements UserService {
         }
 
         SectionRoleEntity sectionRole = sectionRoleOptional.get();
-        userRoleRepository.updateUserRole(user.getId(), sectionRole.getId(), 1L);
+        Optional<UserRoleEntity> existingUserRoleOptional =
+                Optional.ofNullable(userRoleRepository.findByUserIdAndSectionId(user.getId(), sectionId));
+
+        if (existingUserRoleOptional.isPresent()) {
+            UserRoleEntity existingUserRole = existingUserRoleOptional.get();
+            userRoleRepository.delete(existingUserRole); // Delete existing user role
+            log.info("User role deleted successfully. User ID: {}, Role ID: {}, Section ID: {}", user.getId(), existingUserRole.getRoleId(), sectionId);
+        }
+
+        // Create new user role
+        UserRoleEntity newUserRole = new UserRoleEntity();
+        newUserRole.setUserId(user.getId());
+        newUserRole.setRoleId(sectionRole.getId());
+        newUserRole.setSectionId(sectionId);
+        userRoleRepository.save(newUserRole);
+        log.info("New user role created. User ID: {}, Role ID: {}, Section ID: {}", user.getId(), sectionRole.getId(), sectionId);
     }
+
 
     public UserConfigDto getUserConfigByAuth(AuthenticationResponse authenticateRequest) {
         if (authenticateRequest == null || authenticateRequest.getUsername() == null) {

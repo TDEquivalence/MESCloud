@@ -8,7 +8,6 @@ import com.alcegory.mescloud.model.entity.UserEntity;
 import com.alcegory.mescloud.repository.UserRoleRepository;
 import com.alcegory.mescloud.security.model.UserRoleEntity;
 import com.alcegory.mescloud.security.model.auth.AuthenticationResponse;
-import com.alcegory.mescloud.security.service.UserRoleService;
 import com.alcegory.mescloud.service.UserService;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -25,17 +24,18 @@ import java.util.Optional;
 public class UserRoleServiceImpl implements UserRoleService {
 
     private static final String NULL_PARAMETER_ERROR_MSG = "One or more parameters are null.";
+
     private final UserRoleRepository repository;
     private final UserService userService;
     private final UserConverterImpl userConverter;
 
+    @Override
     public UserConfigDto getUserRoleAndConfigurations(AuthenticationResponse authenticationResponse) {
-        Optional<UserEntity> optionalUser = Optional.ofNullable(userService.getUserByAuth(authenticationResponse));
-        if (optionalUser.isEmpty()) {
+        UserEntity user = userService.getUserByAuth(authenticationResponse);
+        if (user == null) {
             return null;
         }
 
-        UserEntity user = optionalUser.get();
         UserConfigDto userConfig = userConverter.convertToDtoWithRelatedEntities(user);
 
         if (userConfig == null || userConfig.getCompany() == null || userConfig.getCompany().getFactoryList() == null) {
@@ -70,42 +70,54 @@ public class UserRoleServiceImpl implements UserRoleService {
     @Transactional
     public void saveUserRole(Long userId, Long roleId, Long sectionId) {
         if (userId == null || roleId == null || sectionId == null) {
-            log.error("Failed to save user role: " + NULL_PARAMETER_ERROR_MSG);
+            log.error("Failed to save user role: {}", NULL_PARAMETER_ERROR_MSG);
             throw new IllegalArgumentException(NULL_PARAMETER_ERROR_MSG);
         }
-        repository.saveUserRole(userId, roleId, sectionId);
+        UserRoleEntity userRole = new UserRoleEntity();
+        userRole.setUserId(userId);
+        userRole.setRoleId(roleId);
+        userRole.setSectionId(sectionId);
+        repository.save(userRole);
         log.info("User role saved successfully. User ID: {}, Role ID: {}, Section ID: {}", userId, roleId, sectionId);
     }
 
     @Override
     @Transactional
-    public void updateUserRole(Long userRoleId, Long roleId, Long sectionId) {
-        if (userRoleId == null || roleId == null || sectionId == null) {
-            log.error("Failed to update user role: " + NULL_PARAMETER_ERROR_MSG);
+    public void updateUserRole(Long userId, Long newRoleId, Long newSectionId) {
+        if (userId == null || newRoleId == null || newSectionId == null) {
+            log.error("Failed to update user role: {}", NULL_PARAMETER_ERROR_MSG);
             throw new IllegalArgumentException(NULL_PARAMETER_ERROR_MSG);
         }
-        repository.updateUserRole(userRoleId, roleId, sectionId);
-        log.info("User role updated successfully. User Role ID: {}, Role ID: {}, Section ID: {}", userRoleId, roleId, sectionId);
+
+        List<UserRoleEntity> userRoles = repository.findByUserId(userId);
+        if (userRoles.isEmpty()) {
+            log.error("Failed to update user role: User roles for User ID {} not found.", userId);
+            throw new IllegalArgumentException("User roles not found.");
+        }
+
+        for (UserRoleEntity userRole : userRoles) {
+            userRole.setRoleId(newRoleId);
+            userRole.setSectionId(newSectionId);
+            repository.save(userRole);
+        }
+
+        log.info("User roles updated successfully for User ID {}. New Role ID: {}, New Section ID: {}", userId, newRoleId, newSectionId);
     }
 
     @Override
     @Transactional
-    public void deleteUserRoleById(Long userRoleId) {
-        if (userRoleId == null) {
-            log.error("Failed to delete user role: User role ID is null.");
-            throw new IllegalArgumentException("User role ID is null.");
+    public void deleteUserRolesByUserId(Long userId) {
+        if (userId == null) {
+            log.error("Failed to delete user roles: User ID is null.");
+            throw new IllegalArgumentException("User ID is null.");
         }
-        repository.deleteUserRoleById(userRoleId);
-        log.info("User role deleted successfully. User Role ID: {}", userRoleId);
+        repository.deleteByUserId(userId);
+        log.info("User roles deleted successfully for User ID: {}", userId);
     }
 
     @Override
     public List<UserRoleEntity> findByUser(Long userId) {
-        if (userId == null) {
-            log.error("Failed to find user roles: User ID is null.");
-            throw new IllegalArgumentException("User ID is null.");
-        }
-        return repository.findByUser(userId);
+        return repository.findByUserId(userId);
     }
 
     @Override
@@ -120,9 +132,11 @@ public class UserRoleServiceImpl implements UserRoleService {
     @Override
     public UserRoleEntity findUserRoleByUserAndSection(Long userId, Long sectionId) {
         if (userId == null || sectionId == null) {
-            log.error("Failed to find user role: " + NULL_PARAMETER_ERROR_MSG);
+            log.error("Failed to find user role: {}", NULL_PARAMETER_ERROR_MSG);
             throw new IllegalArgumentException(NULL_PARAMETER_ERROR_MSG);
         }
-        return repository.findUserRoleByUserAndSection(userId, sectionId);
+        return repository.findByUserIdAndSectionId(userId, sectionId);
     }
 }
+
+
