@@ -59,7 +59,7 @@ public class UserController {
         return ResponseEntity.ok("User deleted successfully");
     }
 
-    @PutMapping("/config")
+    @PostMapping("/config")
     public ResponseEntity<UserConfigDto> getUserConfig(@RequestBody UserDto user, Authentication authentication) {
         try {
             UserConfigDto userConfigDto = userRoleService.getCompanyConfigAndUserAuth(user, authentication);
