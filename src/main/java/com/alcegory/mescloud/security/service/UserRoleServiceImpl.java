@@ -3,7 +3,6 @@ package com.alcegory.mescloud.security.service;
 import com.alcegory.mescloud.model.converter.UserConverterImpl;
 import com.alcegory.mescloud.model.dto.SectionDto;
 import com.alcegory.mescloud.model.dto.UserConfigDto;
-import com.alcegory.mescloud.model.dto.UserDto;
 import com.alcegory.mescloud.model.entity.UserEntity;
 import com.alcegory.mescloud.repository.UserRoleRepository;
 import com.alcegory.mescloud.security.exception.UserNotFoundException;
@@ -56,23 +55,19 @@ public class UserRoleServiceImpl implements UserRoleService {
     }
 
     @Override
-    public UserConfigDto getCompanyConfigAndUserAuth(UserDto userToUpdate, Authentication authentication) throws UserNotFoundException {
+    public UserConfigDto getCompanyConfigAndUserAuth(long userId, Authentication authentication) throws UserNotFoundException {
         checkUserAndRole(authentication, this, ADMIN);
-        Optional<UserEntity> userEntityOptional;
-        if (userToUpdate.getId() != null) {
-            userEntityOptional = Optional.ofNullable(userService.getUserById(userToUpdate.getId()));
-        } else {
-            userEntityOptional = userService.findByUsername(userToUpdate.getUsername());
-        }
+
+        Optional<UserEntity> userEntityOptional = Optional.ofNullable(userService.getUserById(userId));
+
         if (userEntityOptional.isEmpty()) {
-            throw new UserNotFoundException("User not found for username: " + userToUpdate.getUsername());
+            throw new UserNotFoundException("User not found for username: " + userId);
         }
 
         UserConfigDto authenticateUserConfig = userService.getUserConfigByAuth(authentication);
         UserConfigDto userToUpdateConfig = userService.getUserConfigByAuth(userEntityOptional.get());
 
         UserConfigDto mergedUsers = mergeUserConfigs(authenticateUserConfig, userToUpdateConfig);
-
         List<UserRoleEntity> userRoles = findByUserId(mergedUsers.getId());
 
         List<SectionDto> sections = mergedUsers.getCompany().getFactoryList().stream()
@@ -80,7 +75,6 @@ public class UserRoleServiceImpl implements UserRoleService {
                 .toList();
 
         mapUserRolesToSections(userRoles, sections);
-
         return mergedUsers;
     }
 
@@ -110,7 +104,6 @@ public class UserRoleServiceImpl implements UserRoleService {
         mergedConfig.setRole(userToUpdateConfig.getRole());
         mergedConfig.setCompany(userToUpdateConfig.getCompany());
 
-        // If any fields are null in userToUpdateConfig, populate them with values from authenticateUserConfig
         if (userToUpdateConfig.getId() == null) {
             mergedConfig.setId(authenticateUserConfig.getId());
         }

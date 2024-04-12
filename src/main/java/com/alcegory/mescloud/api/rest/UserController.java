@@ -59,10 +59,10 @@ public class UserController {
         return ResponseEntity.ok("User deleted successfully");
     }
 
-    @PostMapping("/config")
-    public ResponseEntity<UserConfigDto> getUserConfig(@RequestBody UserDto user, Authentication authentication) {
+    @GetMapping("/{id}/config")
+    public ResponseEntity<UserConfigDto> getUserConfig(@PathVariable long id, Authentication authentication) {
         try {
-            UserConfigDto userConfigDto = userRoleService.getCompanyConfigAndUserAuth(user, authentication);
+            UserConfigDto userConfigDto = userRoleService.getCompanyConfigAndUserAuth(id, authentication);
             return new ResponseEntity<>(userConfigDto, HttpStatus.ACCEPTED);
         } catch (UserNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
