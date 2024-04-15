@@ -2,6 +2,7 @@ package com.alcegory.mescloud.security.utility;
 
 import com.alcegory.mescloud.exception.ForbiddenAccessException;
 import com.alcegory.mescloud.model.entity.UserEntity;
+import com.alcegory.mescloud.security.model.Role;
 import com.alcegory.mescloud.security.model.SectionAuthority;
 import com.alcegory.mescloud.security.model.SectionRole;
 import com.alcegory.mescloud.security.model.UserRoleEntity;
@@ -14,11 +15,19 @@ public class AuthorityUtil {
         //Utility class, not meant for instantiation
     }
 
-    public static void checkUserAndRole(Authentication authentication, UserRoleService userRoleService, SectionRole expectedRole) {
+    public static void checkUserAndRole(Authentication authentication, Role expectedRole) {
+        UserEntity user = (UserEntity) authentication.getPrincipal();
+
+        if (user.getRole() != expectedRole) {
+            throw new ForbiddenAccessException("User is not authorized to perform this action");
+        }
+    }
+
+    public static void checkUserAndSectionRole(Authentication authentication, UserRoleService userRoleService, SectionRole expectedRole) {
         UserEntity user = (UserEntity) authentication.getPrincipal();
         UserRoleEntity userRole = userRoleService.findUserRoleByUserAndSection(user.getId(), 1L);
 
-        if (!hasExpectedRole(userRole, expectedRole)) {
+        if (!hasExpectedSectionRole(userRole, expectedRole)) {
             throw new ForbiddenAccessException("User is not authorized to perform this action");
         }
     }
@@ -30,13 +39,13 @@ public class AuthorityUtil {
                 userRole.getSectionRole().getPermissions().contains(permissionToCheck.getPermission());
     }
 
-    public static boolean hasExpectedRole(UserRoleEntity userRole, SectionRole expectedRole) {
+    public static boolean hasExpectedSectionRole(UserRoleEntity userRole, SectionRole expectedRole) {
         return userRole != null &&
                 userRole.getSectionRole() != null &&
                 userRole.getSectionRole().getName() == expectedRole;
     }
 
     public static boolean hasRoleAndPermission(UserRoleEntity userRole, SectionRole expectedRole, SectionAuthority permissionToCheck) {
-        return hasExpectedRole(userRole, expectedRole) && hasPermission(userRole, permissionToCheck);
+        return hasExpectedSectionRole(userRole, expectedRole) && hasPermission(userRole, permissionToCheck);
     }
 }

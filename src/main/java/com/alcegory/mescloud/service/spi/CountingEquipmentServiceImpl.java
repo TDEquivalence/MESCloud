@@ -27,7 +27,7 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 import static com.alcegory.mescloud.security.model.SectionRole.ADMIN;
-import static com.alcegory.mescloud.security.utility.AuthorityUtil.checkUserAndRole;
+import static com.alcegory.mescloud.security.utility.AuthorityUtil.checkUserAndSectionRole;
 
 @Service
 @AllArgsConstructor
@@ -190,7 +190,7 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
     public CountingEquipmentDto updateIms(Long equipmentId, Long imsId, Authentication authentication)
             throws EquipmentNotFoundException, ImsNotFoundException, IllegalStateException {
 
-        checkUserAndRole(authentication, this.userRoleService, ADMIN);
+        checkUserAndSectionRole(authentication, this.userRoleService, ADMIN);
 
         Optional<CountingEquipmentEntity> countingEquipmentOpt = repository.findByIdWithLastProductionOrder(equipmentId);
         if (countingEquipmentOpt.isEmpty()) {

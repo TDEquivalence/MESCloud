@@ -22,12 +22,16 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.management.relation.RoleNotFoundException;
 import java.util.*;
+
+import static com.alcegory.mescloud.security.model.Role.ADMIN;
+import static com.alcegory.mescloud.security.utility.AuthorityUtil.checkUserAndRole;
 
 @Service
 @RequiredArgsConstructor
@@ -43,7 +47,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final RoleService roleService;
 
     @Transactional(rollbackFor = {UsernameExistException.class, RoleNotFoundException.class})
-    public AuthenticationResponse register(RegisterRequest request) throws UsernameExistException, RoleNotFoundException {
+    public AuthenticationResponse register(RegisterRequest request, Authentication authentication) throws UsernameExistException, RoleNotFoundException {
+        checkUserAndRole(authentication, ADMIN);
         try {
             setUsernameByEmail(request);
             validateUsername(request);

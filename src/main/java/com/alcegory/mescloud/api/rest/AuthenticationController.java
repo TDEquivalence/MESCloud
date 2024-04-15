@@ -12,7 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,10 +29,9 @@ public class AuthenticationController {
     private final UserRoleService userRoleService;
 
     @PostMapping("/register")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<AuthenticationResponse> register(@RequestBody RegisterRequest request) {
+    public ResponseEntity<AuthenticationResponse> register(@RequestBody RegisterRequest request, Authentication authentication) {
         try {
-            AuthenticationResponse userRegisteredResponse = authenticationService.register(request);
+            AuthenticationResponse userRegisteredResponse = authenticationService.register(request, authentication);
             return new ResponseEntity<>(userRegisteredResponse, HttpStatus.CREATED);
         } catch (RoleNotFoundException | UsernameExistException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
