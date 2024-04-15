@@ -7,11 +7,12 @@ import com.alcegory.mescloud.security.model.auth.AuthenticationResponse;
 import com.alcegory.mescloud.security.model.auth.RegisterRequest;
 import com.alcegory.mescloud.security.service.AuthenticationService;
 import com.alcegory.mescloud.security.service.UserRoleService;
-
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,12 +29,15 @@ public class AuthenticationController {
     private final UserRoleService userRoleService;
 
     @PostMapping("/register")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<AuthenticationResponse> register(@RequestBody RegisterRequest request) {
         try {
             AuthenticationResponse userRegisteredResponse = authenticationService.register(request);
             return new ResponseEntity<>(userRegisteredResponse, HttpStatus.CREATED);
         } catch (RoleNotFoundException | UsernameExistException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (AccessDeniedException e) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
     }
 
