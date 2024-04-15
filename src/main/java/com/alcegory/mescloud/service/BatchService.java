@@ -6,6 +6,7 @@ import com.alcegory.mescloud.model.entity.BatchEntity;
 import com.alcegory.mescloud.model.request.RequestBatchDto;
 import com.alcegory.mescloud.model.request.RequestById;
 import com.alcegory.mescloud.model.request.RequestToRejectBatchDto;
+import org.springframework.security.core.Authentication;
 
 import java.util.List;
 import java.util.Optional;
@@ -24,5 +25,5 @@ public interface BatchService {
 
     BatchDto rejectComposed(RequestToRejectBatchDto requestToRejectBatchDto);
 
-    List<ProductionOrderDto> removeBatch(RequestById request);
+    List<ProductionOrderDto> removeBatch(RequestById request, Authentication authentication);
 }

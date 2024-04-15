@@ -11,18 +11,23 @@ import com.alcegory.mescloud.model.entity.SampleEntity;
 import com.alcegory.mescloud.model.request.RequestById;
 import com.alcegory.mescloud.model.request.RequestSampleDto;
 import com.alcegory.mescloud.repository.SampleRepository;
+import com.alcegory.mescloud.security.service.UserRoleService;
 import com.alcegory.mescloud.service.ComposedProductionOrderService;
 import com.alcegory.mescloud.service.ProductionOrderService;
 import com.alcegory.mescloud.service.SampleService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+
+import static com.alcegory.mescloud.security.model.SectionAuthority.ADMIN_DELETE;
+import static com.alcegory.mescloud.security.model.SectionAuthority.OPERATOR_CREATE;
 
 @Service
 @AllArgsConstructor
@@ -36,9 +41,12 @@ public class SampleServiceImpl implements SampleService {
 
     private final ComposedProductionOrderService composedService;
     private final ProductionOrderService productionOrderService;
+    private final UserRoleService userRoleService;
 
     @Override
-    public SampleDto create(RequestSampleDto requestSampleDto) {
+    public SampleDto create(RequestSampleDto requestSampleDto, Authentication authentication) {
+        //TODO: sectionID
+        userRoleService.checkAuthority(authentication, 1L, OPERATOR_CREATE);
         ComposedProductionOrderEntity composedEntity = createComposed(requestSampleDto);
         return createSample(requestSampleDto, composedEntity);
     }
@@ -84,7 +92,9 @@ public class SampleServiceImpl implements SampleService {
     }
 
     @Override
-    public List<ProductionOrderDto> removeProductionOrderFromComposed(RequestById request) {
+    public List<ProductionOrderDto> removeProductionOrderFromComposed(RequestById request, Authentication authentication) {
+        //TODO: sectionID
+        userRoleService.checkAuthority(authentication, 1L, ADMIN_DELETE);
 
         Optional<ProductionOrderEntity> productionOrderOpt = productionOrderService.findById(request.getId());
 

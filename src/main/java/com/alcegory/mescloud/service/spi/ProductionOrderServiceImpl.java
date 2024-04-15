@@ -13,7 +13,6 @@ import com.alcegory.mescloud.model.filter.Filter;
 import com.alcegory.mescloud.protocol.MesMqttSettings;
 import com.alcegory.mescloud.repository.CountingEquipmentRepository;
 import com.alcegory.mescloud.repository.ProductionOrderRepository;
-import com.alcegory.mescloud.security.model.SectionAuthority;
 import com.alcegory.mescloud.security.service.UserRoleService;
 import com.alcegory.mescloud.service.CountingEquipmentService;
 import com.alcegory.mescloud.service.ProductionOrderService;
@@ -30,6 +29,8 @@ import java.util.Optional;
 
 import static com.alcegory.mescloud.model.filter.Filter.Property.END_DATE;
 import static com.alcegory.mescloud.model.filter.Filter.Property.START_DATE;
+import static com.alcegory.mescloud.security.model.SectionAuthority.OPERATOR_CREATE;
+import static com.alcegory.mescloud.security.model.SectionAuthority.OPERATOR_UPDATE;
 
 @Service
 @AllArgsConstructor
@@ -57,7 +58,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     @Override
     public Optional<ProductionOrderDto> complete(long equipmentId, Authentication authentication) {
         //TODO: sectionId
-        userRoleService.checkAuthority(authentication, 1L, SectionAuthority.OPERATOR_UPDATE);
+        userRoleService.checkAuthority(authentication, 1L, OPERATOR_UPDATE);
         log.info(() -> String.format("Complete process Production Order started for equipmentId [%s]:", equipmentId));
 
         Optional<CountingEquipmentEntity> countingEquipmentOpt = countingEquipmentRepository.findById(equipmentId);
@@ -108,7 +109,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     @Override
     public Optional<ProductionOrderDto> create(ProductionOrderDto productionOrder, Authentication authentication) {
         //TODO: sectionId
-        userRoleService.checkAuthority(authentication, 1L, SectionAuthority.OPERATOR_CREATE);
+        userRoleService.checkAuthority(authentication, 1L, OPERATOR_CREATE);
         return create(productionOrder);
     }
 
@@ -359,7 +360,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     @Override
     public Optional<ProductionOrderDto> editProductionOrder(ProductionOrderDto requestProductionOrder, Authentication authentication) {
         //TODO: sectionId
-        userRoleService.checkAuthority(authentication, 1L, SectionAuthority.OPERATOR_UPDATE);
+        userRoleService.checkAuthority(authentication, 1L, OPERATOR_UPDATE);
 
         if (requestProductionOrder == null) {
             log.warning("Null request Production Order received for editing production order.");

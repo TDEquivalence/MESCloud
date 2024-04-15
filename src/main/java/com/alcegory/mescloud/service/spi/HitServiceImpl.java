@@ -11,6 +11,7 @@ import com.alcegory.mescloud.model.entity.SampleEntity;
 import com.alcegory.mescloud.model.request.RequestById;
 import com.alcegory.mescloud.model.request.RequestHitDto;
 import com.alcegory.mescloud.repository.HitRepository;
+import com.alcegory.mescloud.security.service.UserRoleService;
 import com.alcegory.mescloud.service.ComposedProductionOrderService;
 import com.alcegory.mescloud.service.HitService;
 import com.alcegory.mescloud.service.ProductionOrderService;
@@ -18,11 +19,14 @@ import com.alcegory.mescloud.service.SampleService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+
+import static com.alcegory.mescloud.security.model.SectionAuthority.ADMIN_DELETE;
 
 @Service
 @AllArgsConstructor
@@ -35,6 +39,7 @@ public class HitServiceImpl implements HitService {
     private final SampleService sampleService;
     private final ComposedProductionOrderService composedService;
     private final ProductionOrderService productionOrderService;
+    private final UserRoleService userRoleService;
 
     private final HitRepository repository;
 
@@ -137,7 +142,9 @@ public class HitServiceImpl implements HitService {
     }
 
     @Override
-    public List<ProductionOrderDto> removeHits(RequestById request) {
+    public List<ProductionOrderDto> removeHits(RequestById request, Authentication authentication) {
+        //TODO: sectionID
+        userRoleService.checkAuthority(authentication, 1L, ADMIN_DELETE);
         Optional<ComposedProductionOrderEntity> composedOpt = composedService.findById(request.getId());
 
         if (composedOpt.isEmpty()) {

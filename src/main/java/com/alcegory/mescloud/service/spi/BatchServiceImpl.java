@@ -12,16 +12,20 @@ import com.alcegory.mescloud.model.request.RequestBatchDto;
 import com.alcegory.mescloud.model.request.RequestById;
 import com.alcegory.mescloud.model.request.RequestToRejectBatchDto;
 import com.alcegory.mescloud.repository.BatchRepository;
+import com.alcegory.mescloud.security.service.UserRoleService;
 import com.alcegory.mescloud.service.BatchService;
 import com.alcegory.mescloud.service.ComposedProductionOrderService;
 import com.alcegory.mescloud.service.ProductionOrderService;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+
+import static com.alcegory.mescloud.security.model.SectionAuthority.ADMIN_DELETE;
 
 @Service
 @AllArgsConstructor
@@ -31,6 +35,7 @@ public class BatchServiceImpl implements BatchService {
     private final BatchRepository repository;
     private final ComposedProductionOrderService composedService;
     private final ProductionOrderService productionOrderService;
+    private final UserRoleService userRoleService;
 
     private final GenericConverter<BatchEntity, BatchDto> converter;
     private final ProductionOrderConverter productionOrderConverter;
@@ -62,7 +67,9 @@ public class BatchServiceImpl implements BatchService {
     }
 
     @Override
-    public List<ProductionOrderDto> removeBatch(RequestById request) {
+    public List<ProductionOrderDto> removeBatch(RequestById request, Authentication authentication) {
+        //TODO: sectionID
+        userRoleService.checkAuthority(authentication, 1L, ADMIN_DELETE);
         Optional<ComposedProductionOrderEntity> composedOpt = composedService.findById(request.getId());
 
         if (composedOpt.isEmpty()) {
@@ -87,7 +94,7 @@ public class BatchServiceImpl implements BatchService {
         repository.delete(batch);
         composedOpt.get().setApprovedAt(null);
         composedService.saveAndUpdate(composedOpt.get());
-        
+
         return productionOrderConverter.toDto(productionOrders);
     }
 
