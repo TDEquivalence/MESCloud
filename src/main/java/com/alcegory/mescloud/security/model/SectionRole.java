@@ -16,20 +16,13 @@ public enum SectionRole {
             SectionAuthority.ADMIN_UPDATE,
             SectionAuthority.ADMIN_CREATE,
             SectionAuthority.ADMIN_DELETE,
-            SectionAuthority.MANAGER_READ,
-            SectionAuthority.MANAGER_UPDATE,
-            SectionAuthority.MANAGER_CREATE,
-            SectionAuthority.MANAGER_DELETE
-    )),
-    MANAGER(Set.of(
-            SectionAuthority.MANAGER_READ,
-            SectionAuthority.MANAGER_UPDATE,
-            SectionAuthority.MANAGER_CREATE,
-            SectionAuthority.MANAGER_DELETE,
             SectionAuthority.OPERATOR_READ,
             SectionAuthority.OPERATOR_UPDATE,
             SectionAuthority.OPERATOR_CREATE,
             SectionAuthority.OPERATOR_DELETE
+    )),
+    ANALYST(Set.of(
+            SectionAuthority.ANALYST_READ
     )),
     OPERATOR(Set.of(
             SectionAuthority.OPERATOR_READ,

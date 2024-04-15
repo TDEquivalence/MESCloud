@@ -1,6 +1,6 @@
 package com.alcegory.mescloud.security.service;
 
-import com.alcegory.mescloud.repository.RoleRepository;
+import com.alcegory.mescloud.security.repository.RoleRepository;
 import com.alcegory.mescloud.security.model.SectionRole;
 import com.alcegory.mescloud.security.model.SectionRoleEntity;
 import lombok.AllArgsConstructor;

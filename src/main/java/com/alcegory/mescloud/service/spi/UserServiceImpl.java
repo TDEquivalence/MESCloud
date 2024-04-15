@@ -8,7 +8,7 @@ import com.alcegory.mescloud.model.dto.UserDto;
 import com.alcegory.mescloud.model.entity.UserEntity;
 import com.alcegory.mescloud.model.filter.Filter;
 import com.alcegory.mescloud.repository.UserRepository;
-import com.alcegory.mescloud.repository.UserRoleRepository;
+import com.alcegory.mescloud.security.repository.UserRoleRepository;
 import com.alcegory.mescloud.security.mapper.EntityDtoMapper;
 import com.alcegory.mescloud.security.model.SectionRoleEntity;
 import com.alcegory.mescloud.security.model.UserRoleEntity;

@@ -15,6 +15,7 @@ import com.alcegory.mescloud.model.request.RequestConfigurationDto;
 import com.alcegory.mescloud.protocol.MesMqttSettings;
 import com.alcegory.mescloud.repository.CountingEquipmentRepository;
 import com.alcegory.mescloud.repository.ProductionOrderRepository;
+import com.alcegory.mescloud.security.model.SectionAuthority;
 import com.alcegory.mescloud.security.service.UserRoleService;
 import com.alcegory.mescloud.service.*;
 import lombok.AllArgsConstructor;
@@ -25,7 +26,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
-import static com.alcegory.mescloud.security.model.SectionRole.MANAGER;
+import static com.alcegory.mescloud.security.model.SectionRole.ADMIN;
 import static com.alcegory.mescloud.security.utility.AuthorityUtil.checkUserAndRole;
 
 @Service
@@ -189,7 +190,7 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
     public CountingEquipmentDto updateIms(Long equipmentId, Long imsId, Authentication authentication)
             throws EquipmentNotFoundException, ImsNotFoundException, IllegalStateException {
 
-        checkUserAndRole(authentication, this.userRoleService, MANAGER);
+        checkUserAndRole(authentication, this.userRoleService, ADMIN);
 
         Optional<CountingEquipmentEntity> countingEquipmentOpt = repository.findByIdWithLastProductionOrder(equipmentId);
         if (countingEquipmentOpt.isEmpty()) {
@@ -230,7 +231,8 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
     public CountingEquipmentDto updateConfiguration(long equipmentId, RequestConfigurationDto request, Authentication authentication)
             throws IncompleteConfigurationException, EmptyResultDataAccessException, ActiveProductionOrderException, MesMqttException {
 
-        checkUserAndRole(authentication, this.userRoleService, MANAGER);
+        //TODO: sectionID
+        userRoleService.checkAuthority(authentication, 1L, SectionAuthority.ADMIN_UPDATE);
 
         if (containsNullProperty(request)) {
             throw new IncompleteConfigurationException("Counting equipment configuration is incomplete: properties alias and outputs must be specified.");

@@ -1,14 +1,16 @@
 package com.alcegory.mescloud.security.service;
 
+import com.alcegory.mescloud.exception.ForbiddenAccessException;
 import com.alcegory.mescloud.model.converter.UserConverterImpl;
 import com.alcegory.mescloud.model.dto.SectionDto;
 import com.alcegory.mescloud.model.dto.UserConfigDto;
 import com.alcegory.mescloud.model.entity.UserEntity;
-import com.alcegory.mescloud.repository.UserRoleRepository;
 import com.alcegory.mescloud.security.exception.UserNotFoundException;
+import com.alcegory.mescloud.security.model.SectionAuthority;
 import com.alcegory.mescloud.security.model.SectionRoleEntity;
 import com.alcegory.mescloud.security.model.UserRoleEntity;
 import com.alcegory.mescloud.security.model.auth.AuthenticationResponse;
+import com.alcegory.mescloud.security.repository.UserRoleRepository;
 import com.alcegory.mescloud.service.UserService;
 import com.alcegory.mescloud.utility.SectionConfigUtil;
 import jakarta.transaction.Transactional;
@@ -196,6 +198,23 @@ public class UserRoleServiceImpl implements UserRoleService {
             throw new IllegalArgumentException(NULL_PARAMETER_ERROR_MSG);
         }
         return repository.findByUserIdAndSectionId(userId, sectionId);
+    }
+
+    public void checkAuthority(Authentication authentication, Long sectionId, SectionAuthority authority) {
+        UserEntity user = (UserEntity) authentication.getPrincipal();
+        checkAuthority(user.getId(), sectionId, authority);
+    }
+
+    public void checkAuthority(Long userId, Long sectionId, SectionAuthority authority) {
+        UserRoleEntity userRole = findUserRoleByUserAndSection(userId, sectionId);
+        if (userRole != null) {
+            SectionRoleEntity roleEntity = userRole.getSectionRole();
+            if (!roleEntity.getPermissions().contains(authority.getPermission())) {
+                throw new ForbiddenAccessException("User is not authorized to perform this action");
+            }
+        } else {
+            throw new ForbiddenAccessException("User is not authorized to perform this action");
+        }
     }
 }
 

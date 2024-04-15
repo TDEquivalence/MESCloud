@@ -1,4 +1,4 @@
-package com.alcegory.mescloud.repository;
+package com.alcegory.mescloud.security.repository;
 
 import com.alcegory.mescloud.security.model.UserRoleEntity;
 import jakarta.persistence.EntityManager;
