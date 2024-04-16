@@ -30,7 +30,7 @@ public class ComposedProductionOrderRepositoryImpl {
     private static final String INSERT_HIT_AT = "hitInsertedAt";
 
     private final EntityManager entityManager;
-    
+
     public List<ComposedSummaryEntity> findCompleted(Filter filter, Long composedId) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<ComposedSummaryEntity> query = criteriaBuilder.createQuery(ComposedSummaryEntity.class);
@@ -133,6 +133,9 @@ public class ComposedProductionOrderRepositoryImpl {
         // Ordering by created_at or insert_hit_at based on withHits condition
         query.orderBy(withHits ? criteriaBuilder.desc(root.get(INSERT_HIT_AT)) : criteriaBuilder.desc(root.get(CREATED_AT)));
 
+        if (filter == null) {
+            throw new IllegalArgumentException("Filter cannot be null");
+        }
         // Execute the query and return results
         return entityManager.createQuery(query)
                 .setFirstResult(filter.getSkip())
