@@ -17,6 +17,4 @@ public interface AuthenticationService {
     AuthenticationResponse authenticate(AuthenticateRequest request);
 
     void setJwtTokenCookie(AuthenticationResponse authenticationResponse, HttpServletResponse response);
-
-
 }

@@ -17,6 +17,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+import static com.alcegory.mescloud.security.constant.SecurityConstant.JWT_EXPIRATION;
+import static com.alcegory.mescloud.security.constant.SecurityConstant.REFRESH_JWT_EXPIRATION;
+
 @Service
 public class JwtTokenService {
 
@@ -37,22 +40,30 @@ public class JwtTokenService {
     }
 
     public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
+        return buildToken(extraClaims, userDetails, JWT_EXPIRATION);
+    }
+
+    public String generateRefreshToken(UserDetails userDetails) {
+        return buildToken(new HashMap<>(), userDetails, REFRESH_JWT_EXPIRATION);
+    }
+
+    private String buildToken(Map<String, Object> extraClaims, UserDetails userDetails, long tokenExpiration) {
         return Jwts
                 .builder()
                 .setClaims(extraClaims)
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + SecurityConstant.EXPIRATION_TIME))
+                .setExpiration(new Date(System.currentTimeMillis() + tokenExpiration))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername()) &&!isTokenExpired(token));
+        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
 
-    private boolean isTokenExpired(String token) {
+    public boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
     }
 
@@ -63,6 +74,7 @@ public class JwtTokenService {
     private Claims extractAllClaims(String jwtToken) {
         return Jwts
                 .parserBuilder()
+                .setAllowedClockSkewSeconds(60)
                 .setSigningKey(getSigningKey())
                 .build()
                 .parseClaimsJws(jwtToken)
@@ -78,6 +90,17 @@ public class JwtTokenService {
         if (cookies != null) {
             for (Cookie cookie : cookies) {
                 if (cookie.getName().equals(SecurityConstant.COOKIE_TOKEN_NAME)) {
+                    return cookie.getValue();
+                }
+            }
+        }
+        return null;
+    }
+
+    public String getRefreshJwtTokenFromCookie(Cookie[] cookies) {
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals(SecurityConstant.COOKIE_REFRESH_TOKEN_NAME)) {
                     return cookie.getValue();
                 }
             }
