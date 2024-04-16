@@ -7,7 +7,6 @@ import com.alcegory.mescloud.model.entity.UserEntity;
 import com.alcegory.mescloud.repository.UserRepository;
 import com.alcegory.mescloud.security.constant.UserServiceImpConstant;
 import com.alcegory.mescloud.security.exception.UsernameExistException;
-import com.alcegory.mescloud.security.model.Role;
 import com.alcegory.mescloud.security.model.SectionRole;
 import com.alcegory.mescloud.security.model.SectionRoleEntity;
 import com.alcegory.mescloud.security.model.auth.AuthenticateRequest;
@@ -154,11 +153,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .role(userEntity.getRole())
                 .build();
     }
-
-    private Role getRoleEnumName(Role role) {
-        return Role.valueOf(role.name());
-    }
-
+    
     private void saveUserToken(String jwtToken, UserEntity user) {
         TokenEntity token = TokenEntity.builder()
                 .user(user)

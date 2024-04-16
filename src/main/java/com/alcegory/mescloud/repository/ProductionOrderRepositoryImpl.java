@@ -13,9 +13,6 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.alcegory.mescloud.model.filter.Filter.Property.END_DATE;
-import static com.alcegory.mescloud.model.filter.Filter.Property.START_DATE;
-
 @AllArgsConstructor
 @Repository
 public class ProductionOrderRepositoryImpl {
