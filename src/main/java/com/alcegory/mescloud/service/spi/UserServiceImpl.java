@@ -8,11 +8,11 @@ import com.alcegory.mescloud.model.dto.UserDto;
 import com.alcegory.mescloud.model.entity.UserEntity;
 import com.alcegory.mescloud.model.filter.Filter;
 import com.alcegory.mescloud.repository.UserRepository;
-import com.alcegory.mescloud.security.repository.UserRoleRepository;
 import com.alcegory.mescloud.security.mapper.EntityDtoMapper;
 import com.alcegory.mescloud.security.model.SectionRoleEntity;
 import com.alcegory.mescloud.security.model.UserRoleEntity;
 import com.alcegory.mescloud.security.model.auth.AuthenticationResponse;
+import com.alcegory.mescloud.security.repository.UserRoleRepository;
 import com.alcegory.mescloud.security.service.RoleService;
 import com.alcegory.mescloud.service.UserService;
 import lombok.AllArgsConstructor;
@@ -52,13 +52,18 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserDto> getFilteredUsers() {
+    public List<UserDto> getDtoUsers() {
         List<UserEntity> userEntityList = userRepository.findAll();
         return mapper.convertToDto(userEntityList);
     }
 
     @Override
-    public List<UserDto> getFilteredUsers(Filter filter) {
+    public List<UserEntity> getUsers() {
+        return userRepository.findAll();
+    }
+
+    @Override
+    public List<UserDto> getDtoUsers(Filter filter) {
         List<UserEntity> userEntityList = userRepository.getFilteredUsers(filter);
         return mapper.convertToDto(userEntityList);
     }

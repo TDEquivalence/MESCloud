@@ -18,9 +18,11 @@ public interface UserService {
 
     UserDto getUserDtoById(Long id);
 
-    List<UserDto> getFilteredUsers();
+    List<UserDto> getDtoUsers();
 
-    List<UserDto> getFilteredUsers(Filter filter);
+    List<UserEntity> getUsers();
+
+    List<UserDto> getDtoUsers(Filter filter);
 
     UserDto updateUser(UserDto userDto) throws UserNotFoundException, RoleNotFoundException;
 
