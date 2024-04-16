@@ -46,7 +46,7 @@ public class SampleServiceImpl implements SampleService {
     @Override
     public SampleDto create(RequestSampleDto requestSampleDto, Authentication authentication) {
         //TODO: sectionID
-        userRoleService.checkAuthority(authentication, 1L, OPERATOR_CREATE);
+        userRoleService.checkSectionAuthority(authentication, 1L, OPERATOR_CREATE);
         ComposedProductionOrderEntity composedEntity = createComposed(requestSampleDto);
         return createSample(requestSampleDto, composedEntity);
     }
@@ -94,7 +94,7 @@ public class SampleServiceImpl implements SampleService {
     @Override
     public List<ProductionOrderDto> removeProductionOrderFromComposed(RequestById request, Authentication authentication) {
         //TODO: sectionID
-        userRoleService.checkAuthority(authentication, 1L, ADMIN_DELETE);
+        userRoleService.checkSectionAuthority(authentication, 1L, ADMIN_DELETE);
 
         Optional<ProductionOrderEntity> productionOrderOpt = productionOrderService.findById(request.getId());
 

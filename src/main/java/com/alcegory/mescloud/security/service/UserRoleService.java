@@ -29,7 +29,7 @@ public interface UserRoleService {
 
     List<UserConfigDto> getAllCompanyConfigAndUserAuth(Authentication authentication);
 
-    void checkAuthority(Authentication authentication, Long sectionId, SectionAuthority authority);
+    void checkSectionAuthority(Authentication authentication, Long sectionId, SectionAuthority authority);
 
-    void checkAuthority(Long userId, Long sectionId, SectionAuthority authority);
+    void checkSectionAuthority(Long userId, Long sectionId, SectionAuthority authority);
 }

@@ -232,7 +232,7 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
             throws IncompleteConfigurationException, EmptyResultDataAccessException, ActiveProductionOrderException, MesMqttException {
 
         //TODO: sectionID
-        userRoleService.checkAuthority(authentication, 1L, SectionAuthority.ADMIN_UPDATE);
+        userRoleService.checkSectionAuthority(authentication, 1L, SectionAuthority.ADMIN_UPDATE);
 
         if (containsNullProperty(request)) {
             throw new IncompleteConfigurationException("Counting equipment configuration is incomplete: properties alias and outputs must be specified.");

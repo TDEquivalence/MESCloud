@@ -6,6 +6,7 @@ import com.alcegory.mescloud.model.dto.SectionDto;
 import com.alcegory.mescloud.model.dto.UserConfigDto;
 import com.alcegory.mescloud.model.entity.UserEntity;
 import com.alcegory.mescloud.security.exception.UserNotFoundException;
+import com.alcegory.mescloud.security.model.Authority;
 import com.alcegory.mescloud.security.model.SectionAuthority;
 import com.alcegory.mescloud.security.model.SectionRoleEntity;
 import com.alcegory.mescloud.security.model.UserRoleEntity;
@@ -21,8 +22,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
-import static com.alcegory.mescloud.security.model.Role.ADMIN;
-import static com.alcegory.mescloud.security.utility.AuthorityUtil.checkUserAndRole;
+import static com.alcegory.mescloud.security.utility.AuthorityUtil.checkPermission;
 
 @Slf4j
 @Service
@@ -55,7 +55,7 @@ public class UserRoleServiceImpl implements UserRoleService {
 
     @Override
     public UserConfigDto getCompanyConfigAndUserAuth(long userId, Authentication authentication) throws UserNotFoundException {
-        checkUserAndRole(authentication, ADMIN);
+        checkPermission(authentication, Authority.ADMIN_READ);
         Optional<UserEntity> userEntityOptional = Optional.ofNullable(userService.getUserById(userId));
 
         if (userEntityOptional.isEmpty()) {
@@ -77,7 +77,7 @@ public class UserRoleServiceImpl implements UserRoleService {
     }
 
     public List<UserConfigDto> getAllCompanyConfigAndUserAuth(Authentication authentication) {
-        checkUserAndRole(authentication, ADMIN);
+        checkPermission(authentication, Authority.ADMIN_READ);
 
         List<UserEntity> users = userService.getUsers();
 
@@ -220,12 +220,12 @@ public class UserRoleServiceImpl implements UserRoleService {
         return repository.findByUserIdAndSectionId(userId, sectionId);
     }
 
-    public void checkAuthority(Authentication authentication, Long sectionId, SectionAuthority authority) {
+    public void checkSectionAuthority(Authentication authentication, Long sectionId, SectionAuthority authority) {
         UserEntity user = (UserEntity) authentication.getPrincipal();
-        checkAuthority(user.getId(), sectionId, authority);
+        checkSectionAuthority(user.getId(), sectionId, authority);
     }
 
-    public void checkAuthority(Long userId, Long sectionId, SectionAuthority authority) {
+    public void checkSectionAuthority(Long userId, Long sectionId, SectionAuthority authority) {
         UserRoleEntity userRole = findUserRoleByUserAndSection(userId, sectionId);
         if (userRole != null) {
             SectionRoleEntity roleEntity = userRole.getSectionRole();

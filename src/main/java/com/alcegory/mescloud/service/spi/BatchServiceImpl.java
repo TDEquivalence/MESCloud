@@ -69,7 +69,7 @@ public class BatchServiceImpl implements BatchService {
     @Override
     public List<ProductionOrderDto> removeBatch(RequestById request, Authentication authentication) {
         //TODO: sectionID
-        userRoleService.checkAuthority(authentication, 1L, ADMIN_DELETE);
+        userRoleService.checkSectionAuthority(authentication, 1L, ADMIN_DELETE);
         Optional<ComposedProductionOrderEntity> composedOpt = composedService.findById(request.getId());
 
         if (composedOpt.isEmpty()) {

@@ -58,7 +58,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     @Override
     public Optional<ProductionOrderDto> complete(long equipmentId, Authentication authentication) {
         //TODO: sectionId
-        userRoleService.checkAuthority(authentication, 1L, OPERATOR_UPDATE);
+        userRoleService.checkSectionAuthority(authentication, 1L, OPERATOR_UPDATE);
         log.info(() -> String.format("Complete process Production Order started for equipmentId [%s]:", equipmentId));
 
         Optional<CountingEquipmentEntity> countingEquipmentOpt = countingEquipmentRepository.findById(equipmentId);
@@ -109,7 +109,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     @Override
     public Optional<ProductionOrderDto> create(ProductionOrderDto productionOrder, Authentication authentication) {
         //TODO: sectionId
-        userRoleService.checkAuthority(authentication, 1L, OPERATOR_CREATE);
+        userRoleService.checkSectionAuthority(authentication, 1L, OPERATOR_CREATE);
         return create(productionOrder);
     }
 
@@ -360,7 +360,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     @Override
     public Optional<ProductionOrderDto> editProductionOrder(ProductionOrderDto requestProductionOrder, Authentication authentication) {
         //TODO: sectionId
-        userRoleService.checkAuthority(authentication, 1L, OPERATOR_UPDATE);
+        userRoleService.checkSectionAuthority(authentication, 1L, OPERATOR_UPDATE);
 
         if (requestProductionOrder == null) {
             log.warning("Null request Production Order received for editing production order.");
