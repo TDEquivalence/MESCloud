@@ -8,6 +8,7 @@ public class SecurityConstant {
     public static final int REFRESH_JWT_EXPIRATION = 604800 * 1000; // 7 days in milliseconds
     public static final String ACCESS_DENIED_MESSAGE = "You do not have permission to access this page";
     public static final String FORBIDDEN_MESSAGE = "You need to login to access this page";
+    public static final int ALLOWED_CLOCK_SKEW = 120;
 
     private SecurityConstant() {
     }

@@ -17,8 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
-import static com.alcegory.mescloud.security.constant.SecurityConstant.JWT_EXPIRATION;
-import static com.alcegory.mescloud.security.constant.SecurityConstant.REFRESH_JWT_EXPIRATION;
+import static com.alcegory.mescloud.security.constant.SecurityConstant.*;
 
 @Service
 public class JwtTokenService {
@@ -74,7 +73,7 @@ public class JwtTokenService {
     private Claims extractAllClaims(String jwtToken) {
         return Jwts
                 .parserBuilder()
-                .setAllowedClockSkewSeconds(60)
+                .setAllowedClockSkewSeconds(ALLOWED_CLOCK_SKEW)
                 .setSigningKey(getSigningKey())
                 .build()
                 .parseClaimsJws(jwtToken)
