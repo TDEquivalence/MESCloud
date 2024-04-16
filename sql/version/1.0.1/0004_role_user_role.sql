@@ -2,7 +2,7 @@
 CREATE TABLE role (
     id SERIAL PRIMARY KEY,
     name VARCHAR(50) NOT NULL,
-    CONSTRAINT valid_role_name CHECK (name IN ('ADMIN', 'MANAGER', 'ANALYST', 'OPERATOR'))
+    CONSTRAINT valid_role_name CHECK (name IN ('ADMIN', 'ANALYST', 'OPERATOR'))
 );
 
 -- Create UserRole table
