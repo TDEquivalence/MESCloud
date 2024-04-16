@@ -19,6 +19,9 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
+import static com.alcegory.mescloud.security.constant.SecurityConstant.COOKIE_TOKEN_NAME;
+import static com.alcegory.mescloud.security.constant.SecurityConstant.JWT_EXPIRATION;
+
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -33,20 +36,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         final String jwtToken;
         final String username;
 
-        if(cookies == null || !jwtTokenService.isTokenInCookie(cookies)) {
+        if (cookies == null || !jwtTokenService.isTokenInCookie(cookies)) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        jwtToken  = jwtTokenService.getJwtTokenFromCookie(cookies);
+        jwtToken = jwtTokenService.getJwtTokenFromCookie(cookies);
         username = jwtTokenService.extractUsername(jwtToken);
 
-        if(username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
             boolean isTokenValid = tokenRepository.findByToken(jwtToken)
                     .map(token -> !token.isExpired() && !token.isRevoked())
                     .orElse(false);
-            if(jwtTokenService.isTokenValid(jwtToken, userDetails) && isTokenValid) {
+            if (jwtTokenService.isTokenValid(jwtToken, userDetails) && isTokenValid) {
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         userDetails,
                         null,
@@ -57,7 +60,38 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 );
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
+
+            if (jwtTokenService.isTokenExpired(jwtToken)) {
+                refreshToken(request, response);
+            }
+
             filterChain.doFilter(request, response);
+        }
+    }
+
+    public void refreshToken(HttpServletRequest request, HttpServletResponse response) {
+        Cookie[] cookies = request.getCookies();
+        final String refreshJwtToken;
+        final String username;
+
+        if (cookies == null || !jwtTokenService.isTokenInCookie(cookies)) {
+            return;
+        }
+
+        refreshJwtToken = jwtTokenService.getRefreshJwtTokenFromCookie(cookies);
+        username = jwtTokenService.extractUsername(refreshJwtToken);
+
+        if (username != null) {
+            UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
+            if (jwtTokenService.isTokenValid(refreshJwtToken, userDetails)) {
+                String accessToken = jwtTokenService.generateToken(userDetails);
+                Cookie cookie = new Cookie(COOKIE_TOKEN_NAME, accessToken);
+                cookie.setMaxAge(JWT_EXPIRATION);
+                cookie.setPath("/");
+                cookie.setSecure(true);
+                cookie.setHttpOnly(true);
+                response.addCookie(cookie);
+            }
         }
     }
 }
