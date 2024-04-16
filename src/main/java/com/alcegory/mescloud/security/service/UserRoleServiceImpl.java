@@ -19,10 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static com.alcegory.mescloud.security.model.Role.ADMIN;
 import static com.alcegory.mescloud.security.utility.AuthorityUtil.checkUserAndRole;
@@ -79,6 +76,30 @@ public class UserRoleServiceImpl implements UserRoleService {
         return mergedUsers;
     }
 
+    public List<UserConfigDto> getAllCompanyConfigAndUserAuth(Authentication authentication) {
+        checkUserAndRole(authentication, ADMIN);
+
+        List<UserEntity> users = userService.getUsers();
+
+        List<UserConfigDto> mergedUserConfigs = new ArrayList<>();
+        UserConfigDto authenticateUserConfig = userService.getUserConfigByAuth(authentication);
+
+        for (UserEntity user : users) {
+            UserConfigDto userToUpdateConfig = userService.getUserConfigByAuth(user);
+            UserConfigDto mergedUsers = mergeUserConfigs(authenticateUserConfig, userToUpdateConfig);
+            List<UserRoleEntity> userRoles = findByUserId(mergedUsers.getId());
+
+            List<SectionDto> sections = mergedUsers.getCompany().getFactoryList().stream()
+                    .flatMap(factory -> factory.getSectionList().stream())
+                    .toList();
+
+            mapUserRolesToSections(userRoles, sections);
+
+            mergedUserConfigs.add(mergedUsers);
+        }
+
+        return mergedUserConfigs;
+    }
 
     public void mapUserRolesToSections(List<UserRoleEntity> userRoles, List<SectionDto> sections) {
         Map<Long, SectionRoleEntity> sectionRoleMap = new HashMap<>();

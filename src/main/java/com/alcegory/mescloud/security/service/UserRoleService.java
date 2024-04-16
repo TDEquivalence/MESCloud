@@ -27,6 +27,8 @@ public interface UserRoleService {
 
     UserConfigDto getCompanyConfigAndUserAuth(long userId, Authentication authentication) throws UserNotFoundException;
 
+    List<UserConfigDto> getAllCompanyConfigAndUserAuth(Authentication authentication);
+
     void checkAuthority(Authentication authentication, Long sectionId, SectionAuthority authority);
 
     void checkAuthority(Long userId, Long sectionId, SectionAuthority authority);
