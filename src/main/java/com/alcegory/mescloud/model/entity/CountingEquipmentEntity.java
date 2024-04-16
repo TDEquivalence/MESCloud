@@ -15,11 +15,11 @@ public class CountingEquipmentEntity implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
-    
+
     @OneToMany(mappedBy = "equipment", fetch = FetchType.LAZY)
-    List<ProductionOrderEntity> productionOrders;
+    private List<ProductionOrderEntity> productionOrders;
     @OneToMany(mappedBy = "countingEquipment", fetch = FetchType.LAZY)
-    List<EquipmentStatusRecordEntity> equipmentStatusRecords;
+    private List<EquipmentStatusRecordEntity> equipmentStatusRecords;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
