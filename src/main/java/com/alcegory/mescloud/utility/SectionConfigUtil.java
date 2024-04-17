@@ -2,10 +2,12 @@ package com.alcegory.mescloud.utility;
 
 import com.alcegory.mescloud.model.dto.FactoryDto;
 import com.alcegory.mescloud.model.dto.SectionDto;
+import com.alcegory.mescloud.security.model.SectionRoleEntity;
 import com.alcegory.mescloud.security.model.UserRoleEntity;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class SectionConfigUtil {
 
@@ -24,6 +26,13 @@ public class SectionConfigUtil {
                 boolean hasRole = userRoles.stream()
                         .anyMatch(role -> role.getSectionId().equals(sectionId));
                 if (hasRole) {
+                    Optional<UserRoleEntity> matchingUserRole = userRoles.stream()
+                            .filter(role -> role.getSectionId().equals(sectionId))
+                            .findFirst();
+                    matchingUserRole.ifPresent(userRole -> {
+                        SectionRoleEntity roleSection = userRole.getSectionRole();
+                        section.setSectionRole(roleSection.getName());
+                    });
                     sectionsWithRoles.add(section);
                 }
             }

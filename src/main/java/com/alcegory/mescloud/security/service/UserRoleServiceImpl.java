@@ -6,7 +6,6 @@ import com.alcegory.mescloud.model.dto.SectionDto;
 import com.alcegory.mescloud.model.dto.UserConfigDto;
 import com.alcegory.mescloud.model.entity.UserEntity;
 import com.alcegory.mescloud.security.exception.UserNotFoundException;
-import com.alcegory.mescloud.security.model.Authority;
 import com.alcegory.mescloud.security.model.SectionAuthority;
 import com.alcegory.mescloud.security.model.SectionRoleEntity;
 import com.alcegory.mescloud.security.model.UserRoleEntity;
@@ -22,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
+import static com.alcegory.mescloud.security.model.Authority.ADMIN_READ;
 import static com.alcegory.mescloud.security.utility.AuthorityUtil.checkPermission;
 
 @Slf4j
@@ -55,7 +55,7 @@ public class UserRoleServiceImpl implements UserRoleService {
 
     @Override
     public UserConfigDto getCompanyConfigAndUserAuth(long userId, Authentication authentication) throws UserNotFoundException {
-        checkPermission(authentication, Authority.ADMIN_READ);
+        checkPermission(authentication, ADMIN_READ);
         Optional<UserEntity> userEntityOptional = Optional.ofNullable(userService.getUserById(userId));
 
         if (userEntityOptional.isEmpty()) {
@@ -77,8 +77,7 @@ public class UserRoleServiceImpl implements UserRoleService {
     }
 
     public List<UserConfigDto> getAllCompanyConfigAndUserAuth(Authentication authentication) {
-        checkPermission(authentication, Authority.ADMIN_READ);
-
+        checkPermission(authentication, ADMIN_READ);
         List<UserEntity> users = userService.getUsers();
 
         List<UserConfigDto> mergedUserConfigs = new ArrayList<>();
