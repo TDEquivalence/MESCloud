@@ -16,8 +16,6 @@ import com.alcegory.mescloud.security.model.token.TokenEntity;
 import com.alcegory.mescloud.security.model.token.TokenType;
 import com.alcegory.mescloud.security.repository.TokenRepository;
 import com.alcegory.mescloud.service.CompanyService;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -30,7 +28,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.management.relation.RoleNotFoundException;
 import java.util.*;
 
-import static com.alcegory.mescloud.security.constant.SecurityConstant.*;
 import static com.alcegory.mescloud.security.model.Role.ADMIN;
 import static com.alcegory.mescloud.security.utility.AuthorityUtil.checkUserAndRole;
 
@@ -139,19 +136,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         String jwtToken = jwtTokenService.generateToken(user);
         String refreshToken = jwtTokenService.generateRefreshToken(user);
 
-        Cookie cookie = new Cookie(COOKIE_TOKEN_NAME, jwtToken);
-        cookie.setMaxAge(JWT_EXPIRATION);
-        cookie.setPath("/");
-        cookie.setSecure(true);
-        cookie.setHttpOnly(true);
-        response.addCookie(cookie);
-
-        Cookie refreshTokenCookie = new Cookie(COOKIE_REFRESH_TOKEN_NAME, refreshToken);
-        refreshTokenCookie.setMaxAge(REFRESH_JWT_EXPIRATION);
-        refreshTokenCookie.setPath("/");
-        refreshTokenCookie.setSecure(true);
-        refreshTokenCookie.setHttpOnly(true);
-        response.addCookie(refreshTokenCookie);
+        jwtTokenService.setJwtTokenCookie(response, jwtToken);
+        jwtTokenService.setRefreshTokenCookie(response, refreshToken);
     }
 
     private AuthenticationResponse userToAuthenticationResponse(UserEntity userEntity) {

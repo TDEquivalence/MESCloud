@@ -7,6 +7,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,9 @@ public class JwtTokenService {
 
     @Value("${jwt.secretKey}")
     private String secretKey;
+
+    @Value("${jwt.cookie-domain}")
+    private String cookieDomain;
 
     public String extractUsername(String jwtToken) {
         return extractClaim(jwtToken, Claims::getSubject);
@@ -116,5 +120,25 @@ public class JwtTokenService {
             }
         }
         return false;
+    }
+
+    public void setJwtTokenCookie(HttpServletResponse response, String jwtToken) {
+        Cookie cookie = new Cookie(COOKIE_TOKEN_NAME, jwtToken);
+        cookie.setMaxAge(JWT_EXPIRATION);
+        cookie.setPath("/");
+        cookie.setSecure(true);
+        cookie.setHttpOnly(true);
+        cookie.setDomain(cookieDomain);
+        response.addCookie(cookie);
+    }
+
+    public void setRefreshTokenCookie(HttpServletResponse response, String refreshToken) {
+        Cookie refreshTokenCookie = new Cookie(COOKIE_REFRESH_TOKEN_NAME, refreshToken);
+        refreshTokenCookie.setMaxAge(REFRESH_JWT_EXPIRATION);
+        refreshTokenCookie.setPath("/");
+        refreshTokenCookie.setSecure(true);
+        refreshTokenCookie.setHttpOnly(true);
+        refreshTokenCookie.setDomain(cookieDomain);
+        response.addCookie(refreshTokenCookie);
     }
 }

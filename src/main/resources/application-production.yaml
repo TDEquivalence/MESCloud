@@ -3,6 +3,7 @@ server:
 
 jwt:
   secretKey: ${SECURITY_KEY}
+  cookie-domain: ${COOKIE_DOMAIN_KEY}
 
 spring:
   datasource:
