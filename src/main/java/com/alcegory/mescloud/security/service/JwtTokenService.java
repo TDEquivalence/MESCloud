@@ -26,9 +26,6 @@ public class JwtTokenService {
     @Value("${jwt.secretKey}")
     private String secretKey;
 
-    @Value("${jwt.cookie-domain}")
-    private String cookieDomain;
-
     public String extractUsername(String jwtToken) {
         return extractClaim(jwtToken, Claims::getSubject);
     }
@@ -128,7 +125,6 @@ public class JwtTokenService {
         cookie.setPath("/");
         cookie.setSecure(true);
         cookie.setHttpOnly(true);
-        cookie.setDomain(cookieDomain);
         response.addCookie(cookie);
     }
 
@@ -138,7 +134,6 @@ public class JwtTokenService {
         refreshTokenCookie.setPath("/");
         refreshTokenCookie.setSecure(true);
         refreshTokenCookie.setHttpOnly(true);
-        refreshTokenCookie.setDomain(cookieDomain);
         response.addCookie(refreshTokenCookie);
     }
 }
