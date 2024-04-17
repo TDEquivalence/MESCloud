@@ -107,7 +107,7 @@ public class UserRoleServiceImpl implements UserRoleService {
     }
 
     private List<SectionDto> getSections(UserConfigDto userConfig) {
-        if (userConfig == null || userConfig.getCompany() == null) {
+        if (userConfig == null || userConfig.getCompany() == null || userConfig.getCompany().getFactoryList() == null) {
             return Collections.emptyList();
         }
         return userConfig.getCompany().getFactoryList().stream()
