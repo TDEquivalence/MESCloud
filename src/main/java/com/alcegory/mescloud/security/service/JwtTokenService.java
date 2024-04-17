@@ -123,7 +123,6 @@ public class JwtTokenService {
         Cookie cookie = new Cookie(COOKIE_TOKEN_NAME, jwtToken);
         cookie.setMaxAge(JWT_EXPIRATION);
         cookie.setPath("/");
-        cookie.setDomain(".mescloud.pt");
         cookie.setSecure(true);
         cookie.setHttpOnly(true);
         response.addCookie(cookie);
@@ -133,7 +132,6 @@ public class JwtTokenService {
         Cookie refreshTokenCookie = new Cookie(COOKIE_REFRESH_TOKEN_NAME, refreshToken);
         refreshTokenCookie.setMaxAge(REFRESH_JWT_EXPIRATION);
         refreshTokenCookie.setPath("/");
-        refreshTokenCookie.setDomain(".mescloud.pt");
         refreshTokenCookie.setSecure(true);
         refreshTokenCookie.setHttpOnly(true);
         response.addCookie(refreshTokenCookie);
