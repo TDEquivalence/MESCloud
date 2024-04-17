@@ -81,7 +81,6 @@ public class UserRoleServiceImpl implements UserRoleService {
         List<UserEntity> users = userService.getUsers();
 
         List<UserConfigDto> mergedUserConfigs = new ArrayList<>();
-        UserConfigDto authenticateUserConfig = userService.getUserConfigByAuth(authentication);
 
         for (UserEntity user : users) {
             UserConfigDto userToUpdateConfig = userService.getUserConfigByAuth(user);
@@ -102,14 +101,14 @@ public class UserRoleServiceImpl implements UserRoleService {
 
     private List<UserRoleEntity> getUserRoles(UserConfigDto userConfig) {
         if (userConfig == null) {
-            return null;
+            return Collections.emptyList();
         }
         return findByUserId(userConfig.getId());
     }
 
     private List<SectionDto> getSections(UserConfigDto userConfig) {
         if (userConfig == null || userConfig.getCompany() == null) {
-            return null;
+            return Collections.emptyList();
         }
         return userConfig.getCompany().getFactoryList().stream()
                 .flatMap(factory -> factory.getSectionList().stream())
