@@ -41,7 +41,6 @@ CREATE TABLE users (
   email VARCHAR(50),
   password VARCHAR(255) NOT NULL,
   role VARCHAR(50),
-  user_authorities TEXT[],
   created_at TIMESTAMP,
   updated_at TIMESTAMP,
   is_active BOOLEAN,

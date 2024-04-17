@@ -85,35 +85,60 @@ public class UserRoleServiceImpl implements UserRoleService {
 
         for (UserEntity user : users) {
             UserConfigDto userToUpdateConfig = userService.getUserConfigByAuth(user);
-            UserConfigDto mergedUsers = mergeUserConfigs(authenticateUserConfig, userToUpdateConfig);
-            List<UserRoleEntity> userRoles = findByUserId(mergedUsers.getId());
+            List<UserRoleEntity> userRoles = getUserRoles(userToUpdateConfig);
 
-            List<SectionDto> sections = mergedUsers.getCompany().getFactoryList().stream()
-                    .flatMap(factory -> factory.getSectionList().stream())
-                    .toList();
+            if (userRoles != null) {
+                List<SectionDto> sections = getSections(userToUpdateConfig);
 
-            mapUserRolesToSections(userRoles, sections);
-
-            mergedUserConfigs.add(mergedUsers);
+                if (sections != null) {
+                    mapUserRolesToSections(userRoles, sections);
+                    mergedUserConfigs.add(userToUpdateConfig);
+                }
+            }
         }
 
         return mergedUserConfigs;
     }
 
+    private List<UserRoleEntity> getUserRoles(UserConfigDto userConfig) {
+        if (userConfig == null) {
+            return null;
+        }
+        return findByUserId(userConfig.getId());
+    }
+
+    private List<SectionDto> getSections(UserConfigDto userConfig) {
+        if (userConfig == null || userConfig.getCompany() == null) {
+            return null;
+        }
+        return userConfig.getCompany().getFactoryList().stream()
+                .flatMap(factory -> factory.getSectionList().stream())
+                .toList();
+    }
+
     public void mapUserRolesToSections(List<UserRoleEntity> userRoles, List<SectionDto> sections) {
+        if (userRoles == null || sections == null) {
+            return;
+        }
+
         Map<Long, SectionRoleEntity> sectionRoleMap = new HashMap<>();
         for (UserRoleEntity userRole : userRoles) {
-            sectionRoleMap.put(userRole.getSectionId(), userRole.getSectionRole());
+            if (userRole.getSectionId() != null && userRole.getSectionRole() != null) {
+                sectionRoleMap.put(userRole.getSectionId(), userRole.getSectionRole());
+            }
         }
 
         for (SectionDto section : sections) {
-            Long sectionId = section.getId();
-            SectionRoleEntity sectionRole = sectionRoleMap.get(sectionId);
-            if (sectionRole != null) {
-                section.setSectionRole(sectionRole.getName());
+            if (section != null && section.getId() != null) {
+                Long sectionId = section.getId();
+                SectionRoleEntity sectionRole = sectionRoleMap.get(sectionId);
+                if (sectionRole != null) {
+                    section.setSectionRole(sectionRole.getName());
+                }
             }
         }
     }
+
 
     private UserConfigDto mergeUserConfigs(UserConfigDto authenticateUserConfig, UserConfigDto userToUpdateConfig) {
         UserConfigDto mergedConfig = new UserConfigDto();
