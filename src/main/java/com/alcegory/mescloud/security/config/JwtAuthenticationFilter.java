@@ -2,6 +2,7 @@ package com.alcegory.mescloud.security.config;
 
 import com.alcegory.mescloud.security.repository.TokenRepository;
 import com.alcegory.mescloud.security.service.JwtTokenService;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -19,8 +20,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-import static com.alcegory.mescloud.security.constant.SecurityConstant.COOKIE_TOKEN_NAME;
-import static com.alcegory.mescloud.security.constant.SecurityConstant.JWT_EXPIRATION;
+import static com.alcegory.mescloud.security.constant.SecurityConstant.*;
 
 @Component
 @RequiredArgsConstructor
@@ -32,40 +32,45 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
-        Cookie[] cookies = request.getCookies();
-        final String jwtToken;
-        final String username;
+        try {
+            Cookie[] cookies = request.getCookies();
+            final String jwtToken;
+            final String username;
 
-        if (cookies == null || !jwtTokenService.isTokenInCookie(cookies)) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        jwtToken = jwtTokenService.getJwtTokenFromCookie(cookies);
-        username = jwtTokenService.extractUsername(jwtToken);
-
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
-            boolean isTokenValid = tokenRepository.findByToken(jwtToken)
-                    .map(token -> !token.isExpired() && !token.isRevoked())
-                    .orElse(false);
-            if (jwtTokenService.isTokenValid(jwtToken, userDetails) && isTokenValid) {
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        userDetails,
-                        null,
-                        userDetails.getAuthorities()
-                );
-                authToken.setDetails(
-                        new WebAuthenticationDetailsSource().buildDetails(request)
-                );
-                SecurityContextHolder.getContext().setAuthentication(authToken);
+            if (cookies == null || !jwtTokenService.isTokenInCookie(cookies)) {
+                filterChain.doFilter(request, response);
+                return;
             }
 
-            if (jwtTokenService.isTokenExpired(jwtToken)) {
-                refreshToken(request, response);
-            }
+            jwtToken = jwtTokenService.getJwtTokenFromCookie(cookies);
+            username = jwtTokenService.extractUsername(jwtToken);
 
-            filterChain.doFilter(request, response);
+            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
+                boolean isTokenValid = tokenRepository.findByToken(jwtToken)
+                        .map(token -> !token.isExpired() && !token.isRevoked())
+                        .orElse(false);
+                if (jwtTokenService.isTokenValid(jwtToken, userDetails) && isTokenValid) {
+                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                            userDetails,
+                            null,
+                            userDetails.getAuthorities()
+                    );
+                    authToken.setDetails(
+                            new WebAuthenticationDetailsSource().buildDetails(request)
+                    );
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                }
+
+                if (jwtTokenService.isTokenExpired(jwtToken)) {
+                    refreshToken(request, response);
+                }
+
+                filterChain.doFilter(request, response);
+            }
+        } catch (JwtException ex) {
+            cleanCookies(response);
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid token");
         }
     }
 
@@ -93,5 +98,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 response.addCookie(cookie);
             }
         }
+    }
+
+    public void cleanCookies(HttpServletResponse response) {
+        Cookie jwtTokenCookie = new Cookie(COOKIE_TOKEN_NAME, null);
+        jwtTokenCookie.setMaxAge(0);
+        jwtTokenCookie.setPath("/");
+        response.addCookie(jwtTokenCookie);
+
+        Cookie refreshTokenCookie = new Cookie(COOKIE_REFRESH_TOKEN_NAME, null);
+        refreshTokenCookie.setMaxAge(0);
+        refreshTokenCookie.setPath("/");
+        response.addCookie(refreshTokenCookie);
     }
 }
