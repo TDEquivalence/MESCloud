@@ -23,6 +23,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 import static com.alcegory.mescloud.security.constant.SecurityConstant.JWT_EXPIRATION;
@@ -117,11 +118,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (jwtTokenService.isTokenValid(refreshJwtToken, userDetails)) {
                 String accessToken = jwtTokenService.generateToken(userDetails);
                 addJwtTokenToCookie(response, accessToken);
-                UserEntity user = userRepository.findUserByUsername(userDetails.getUsername());
-                tokenRepository.deleteAllByUserId(user.getId());
+                revokeTokens(userDetails.getUsername());
                 saveUserToken(accessToken, userDetails);
             }
         }
+    }
+
+    private void revokeTokens(String username) {
+        UserEntity user = userRepository.findUserByUsername(username);
+        List<TokenEntity> persistedTokens = tokenRepository.findAllTokensByUserId(user.getId());
+
+        for (TokenEntity token : persistedTokens) {
+            token.setRevoked(true);
+            token.setExpired(true);
+        }
+
+        tokenRepository.saveAll(persistedTokens);
     }
 
     private void saveUserToken(String jwtToken, UserDetails userDetails) {

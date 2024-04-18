@@ -120,6 +120,7 @@ public class JwtTokenService {
         Cookie refreshTokenCookie = new Cookie(COOKIE_REFRESH_TOKEN_NAME, refreshToken);
         refreshTokenCookie.setMaxAge(REFRESH_JWT_EXPIRATION);
         refreshTokenCookie.setPath("/");
+        refreshTokenCookie.setDomain(".mescloud.pt");
         refreshTokenCookie.setSecure(true);
         refreshTokenCookie.setHttpOnly(true);
         response.addCookie(refreshTokenCookie);
