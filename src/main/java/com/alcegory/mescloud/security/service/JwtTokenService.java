@@ -86,28 +86,17 @@ public class JwtTokenService {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String getJwtTokenFromCookie(Cookie[] cookies) {
+    public String getJwtTokenFromCookie(Cookie[] cookies, String securityConstant) {
         if (cookies != null) {
             for (Cookie cookie : cookies) {
-                if (cookie.getName().equals(SecurityConstant.COOKIE_TOKEN_NAME)) {
+                if (cookie.getName().equals(securityConstant)) {
                     return cookie.getValue();
                 }
             }
         }
         return null;
     }
-
-    public String getRefreshJwtTokenFromCookie(Cookie[] cookies) {
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if (cookie.getName().equals(SecurityConstant.COOKIE_REFRESH_TOKEN_NAME)) {
-                    return cookie.getValue();
-                }
-            }
-        }
-        return null;
-    }
-
+    
     public boolean isTokenInCookie(Cookie[] cookies) {
         if (cookies != null) {
             for (Cookie cookie : cookies) {

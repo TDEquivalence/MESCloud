@@ -29,7 +29,7 @@ public class LogoutService implements LogoutHandler {
             return;
         }
 
-        jwtToken = jwtTokenService.getJwtTokenFromCookie(cookies);
+        jwtToken = jwtTokenService.getJwtTokenFromCookie(cookies, COOKIE_TOKEN_NAME);
         removeCookie(request, response);
         TokenEntity storedToken = tokenRepository.findByToken(jwtToken)
                 .orElse(null);

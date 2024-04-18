@@ -184,11 +184,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void deleteUser(UserDto user) {
         UserEntity userEntity = mapper.convertToEntity(user);
         deleteTokensByUserId(userEntity.getId());
         deleteUserRolesByUserId(userEntity.getId());
-        
+
         userRepository.delete(userEntity);
     }
 

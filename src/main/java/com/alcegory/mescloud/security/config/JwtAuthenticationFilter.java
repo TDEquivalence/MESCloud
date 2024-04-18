@@ -42,7 +42,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 return;
             }
 
-            jwtToken = jwtTokenService.getJwtTokenFromCookie(cookies);
+            jwtToken = jwtTokenService.getJwtTokenFromCookie(cookies, COOKIE_TOKEN_NAME);
             username = jwtTokenService.extractUsername(jwtToken);
 
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
@@ -83,7 +83,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        refreshJwtToken = jwtTokenService.getRefreshJwtTokenFromCookie(cookies);
+        refreshJwtToken = jwtTokenService.getJwtTokenFromCookie(cookies, COOKIE_REFRESH_TOKEN_NAME);
         username = jwtTokenService.extractUsername(refreshJwtToken);
 
         if (username != null) {

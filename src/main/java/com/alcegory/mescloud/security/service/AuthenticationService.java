@@ -1,5 +1,7 @@
 package com.alcegory.mescloud.security.service;
 
+import com.alcegory.mescloud.model.dto.UserConfigDto;
+import com.alcegory.mescloud.model.entity.UserEntity;
 import com.alcegory.mescloud.security.exception.UsernameExistException;
 import com.alcegory.mescloud.security.model.auth.AuthenticateRequest;
 import com.alcegory.mescloud.security.model.auth.AuthenticationResponse;
@@ -14,7 +16,7 @@ public interface AuthenticationService {
     AuthenticationResponse register(RegisterRequest request, Authentication authentication) throws UsernameExistException,
             RoleNotFoundException;
 
-    AuthenticationResponse authenticate(AuthenticateRequest request);
+    UserConfigDto authenticate(AuthenticateRequest request, HttpServletResponse response);
 
-    void setJwtTokenCookie(AuthenticationResponse authenticationResponse, HttpServletResponse response);
+    String setJwtTokenCookie(UserEntity user, HttpServletResponse response);
 }

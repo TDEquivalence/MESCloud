@@ -2,6 +2,7 @@ package com.alcegory.mescloud.security.service;
 
 import com.alcegory.mescloud.exception.RegistrationException;
 import com.alcegory.mescloud.model.dto.SectionRoleMapping;
+import com.alcegory.mescloud.model.dto.UserConfigDto;
 import com.alcegory.mescloud.model.entity.CompanyEntity;
 import com.alcegory.mescloud.model.entity.UserEntity;
 import com.alcegory.mescloud.repository.UserRepository;
@@ -102,7 +103,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
 
-    public AuthenticationResponse authenticate(AuthenticateRequest request) {
+    public UserConfigDto authenticate(AuthenticateRequest request, HttpServletResponse response) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.getUsername(),
@@ -111,11 +112,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         );
 
         UserEntity user = userRepository.findUserByUsername(request.getUsername());
-        String jwtToken = jwtTokenService.generateToken(user);
+        String jwtToken = setJwtTokenCookie(user, response);
         revokeAllUserTokens(user);
         saveUserToken(jwtToken, user);
         removeLastInvalidUserTokens(user);
-        return userToAuthenticationResponse(user);
+        AuthenticationResponse authenticationResponse = userToAuthenticationResponse(user);
+
+        return userRoleService.getUserRoleAndConfigurations(authenticationResponse);
     }
 
     private void setUsernameByEmail(RegisterRequest request) {
@@ -131,13 +134,14 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         }
     }
 
-    public void setJwtTokenCookie(AuthenticationResponse authenticationResponse, HttpServletResponse response) {
-        UserEntity user = userRepository.findUserByUsername(authenticationResponse.getUsername());
+    public String setJwtTokenCookie(UserEntity user, HttpServletResponse response) {
         String jwtToken = jwtTokenService.generateToken(user);
         String refreshToken = jwtTokenService.generateRefreshToken(user);
 
         jwtTokenService.setJwtTokenCookie(response, jwtToken);
         jwtTokenService.setRefreshTokenCookie(response, refreshToken);
+
+        return jwtToken;
     }
 
     private AuthenticationResponse userToAuthenticationResponse(UserEntity userEntity) {

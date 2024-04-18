@@ -42,10 +42,7 @@ public class AuthenticationController {
 
     @PostMapping("/login")
     public ResponseEntity<UserConfigDto> login(@RequestBody AuthenticateRequest request, HttpServletResponse response) {
-        AuthenticationResponse authenticationResponse = authenticationService.authenticate(request);
-        authenticationService.setJwtTokenCookie(authenticationResponse, response);
-
-        UserConfigDto userDto = userRoleService.getUserRoleAndConfigurations(authenticationResponse);
-        return new ResponseEntity<>(userDto, HttpStatus.OK);
+        UserConfigDto authenticationResponse = authenticationService.authenticate(request, response);
+        return new ResponseEntity<>(authenticationResponse, HttpStatus.OK);
     }
 }
