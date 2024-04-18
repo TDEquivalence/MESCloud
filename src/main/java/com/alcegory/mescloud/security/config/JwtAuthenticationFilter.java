@@ -9,7 +9,6 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -20,46 +19,36 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-import static com.alcegory.mescloud.security.constant.SecurityConstant.*;
+import static com.alcegory.mescloud.security.constant.SecurityConstant.JWT_EXPIRATION;
 
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
+
+    private static final String COOKIE_TOKEN_NAME = "jwtToken";
+    private static final String COOKIE_REFRESH_TOKEN_NAME = "refreshToken";
+    private static final String INVALID_TOKEN_MESSAGE = "Invalid token";
 
     private final JwtTokenService jwtTokenService;
     private final UserDetailsService userDetailsService;
     private final TokenRepository tokenRepository;
 
     @Override
-    protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
             Cookie[] cookies = request.getCookies();
-            final String jwtToken;
-            final String username;
-
             if (cookies == null || !jwtTokenService.isTokenInCookie(cookies)) {
                 filterChain.doFilter(request, response);
                 return;
             }
 
-            jwtToken = jwtTokenService.getJwtTokenFromCookie(cookies, COOKIE_TOKEN_NAME);
-            username = jwtTokenService.extractUsername(jwtToken);
+            String jwtToken = jwtTokenService.getJwtTokenFromCookie(cookies, COOKIE_TOKEN_NAME);
+            String username = jwtTokenService.extractUsername(jwtToken);
 
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
-                boolean isTokenValid = tokenRepository.findByToken(jwtToken)
-                        .map(token -> !token.isExpired() && !token.isRevoked())
-                        .orElse(false);
-                if (jwtTokenService.isTokenValid(jwtToken, userDetails) && isTokenValid) {
-                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                            userDetails,
-                            null,
-                            userDetails.getAuthorities()
-                    );
-                    authToken.setDetails(
-                            new WebAuthenticationDetailsSource().buildDetails(request)
-                    );
-                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                UserDetails userDetails = loadUserByUsername(username);
+                if (isTokenValid(jwtToken, userDetails)) {
+                    authenticateUser(request, userDetails);
                 }
 
                 if (jwtTokenService.isTokenExpired(jwtToken)) {
@@ -69,38 +58,54 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 filterChain.doFilter(request, response);
             }
         } catch (JwtException ex) {
-            cleanCookies(response);
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid token");
+            handleInvalidToken(response);
         }
     }
 
-    public void refreshToken(HttpServletRequest request, HttpServletResponse response) {
-        Cookie[] cookies = request.getCookies();
-        final String refreshJwtToken;
-        final String username;
+    private UserDetails loadUserByUsername(String username) {
+        return userDetailsService.loadUserByUsername(username);
+    }
 
+    private boolean isTokenValid(String jwtToken, UserDetails userDetails) {
+        return tokenRepository.findByToken(jwtToken)
+                .map(token -> !token.isExpired() && !token.isRevoked())
+                .orElse(false) && jwtTokenService.isTokenValid(jwtToken, userDetails);
+    }
+
+    private void authenticateUser(HttpServletRequest request, UserDetails userDetails) {
+        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                userDetails,
+                null,
+                userDetails.getAuthorities()
+        );
+        authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+        SecurityContextHolder.getContext().setAuthentication(authToken);
+    }
+
+    private void refreshToken(HttpServletRequest request, HttpServletResponse response) {
+        Cookie[] cookies = request.getCookies();
         if (cookies == null || !jwtTokenService.isTokenInCookie(cookies)) {
             return;
         }
 
-        refreshJwtToken = jwtTokenService.getJwtTokenFromCookie(cookies, COOKIE_REFRESH_TOKEN_NAME);
-        username = jwtTokenService.extractUsername(refreshJwtToken);
+        String refreshJwtToken = jwtTokenService.getJwtTokenFromCookie(cookies, COOKIE_REFRESH_TOKEN_NAME);
+        String username = jwtTokenService.extractUsername(refreshJwtToken);
 
         if (username != null) {
-            UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
+            UserDetails userDetails = loadUserByUsername(username);
             if (jwtTokenService.isTokenValid(refreshJwtToken, userDetails)) {
                 String accessToken = jwtTokenService.generateToken(userDetails);
-                Cookie cookie = new Cookie(COOKIE_TOKEN_NAME, accessToken);
-                cookie.setMaxAge(JWT_EXPIRATION);
-                cookie.setPath("/");
-                cookie.setSecure(true);
-                cookie.setHttpOnly(true);
-                response.addCookie(cookie);
+                addJwtTokenToCookie(response, accessToken);
             }
         }
     }
 
-    public void cleanCookies(HttpServletResponse response) {
+    private void handleInvalidToken(HttpServletResponse response) throws IOException {
+        cleanCookies(response);
+        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, INVALID_TOKEN_MESSAGE);
+    }
+
+    private void cleanCookies(HttpServletResponse response) {
         removeCookie(response, COOKIE_TOKEN_NAME);
         removeCookie(response, COOKIE_REFRESH_TOKEN_NAME);
     }
@@ -109,6 +114,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         Cookie cookie = new Cookie(cookieName, null);
         cookie.setMaxAge(0);
         cookie.setPath("/");
+        response.addCookie(cookie);
+    }
+
+    private void addJwtTokenToCookie(HttpServletResponse response, String accessToken) {
+        Cookie cookie = new Cookie(COOKIE_TOKEN_NAME, accessToken);
+        cookie.setMaxAge(JWT_EXPIRATION);
+        cookie.setPath("/");
+        cookie.setSecure(true);
+        cookie.setHttpOnly(true);
         response.addCookie(cookie);
     }
 }

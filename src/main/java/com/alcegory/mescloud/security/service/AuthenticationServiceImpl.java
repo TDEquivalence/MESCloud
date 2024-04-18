@@ -58,10 +58,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             saveSectionRolesForUser(request, user);
 
             return userToAuthenticationResponse(user);
-        } catch (UsernameExistException | RoleNotFoundException e) {
-            throw e;
+        } catch (UsernameExistException e) {
+            throw new UsernameExistException("Username already exists");
+        } catch (RoleNotFoundException e) {
+            throw new RoleNotFoundException();
         } catch (Exception e) {
-            throw new RegistrationException("Failed to register user", e);
+            throw new RegistrationException("Failed to register user");
         }
     }
 

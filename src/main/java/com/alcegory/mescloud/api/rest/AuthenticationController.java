@@ -1,12 +1,13 @@
 package com.alcegory.mescloud.api.rest;
 
+import com.alcegory.mescloud.api.rest.response.ErrorResponse;
 import com.alcegory.mescloud.model.dto.UserConfigDto;
+import com.alcegory.mescloud.security.constant.HttpResponseConstant;
 import com.alcegory.mescloud.security.exception.UsernameExistException;
 import com.alcegory.mescloud.security.model.auth.AuthenticateRequest;
 import com.alcegory.mescloud.security.model.auth.AuthenticationResponse;
 import com.alcegory.mescloud.security.model.auth.RegisterRequest;
 import com.alcegory.mescloud.security.service.AuthenticationService;
-import com.alcegory.mescloud.security.service.UserRoleService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -26,17 +27,18 @@ import javax.management.relation.RoleNotFoundException;
 public class AuthenticationController {
 
     private final AuthenticationService authenticationService;
-    private final UserRoleService userRoleService;
 
     @PostMapping("/register")
-    public ResponseEntity<AuthenticationResponse> register(@RequestBody RegisterRequest request, Authentication authentication) {
+    public ResponseEntity<?> register(@RequestBody RegisterRequest request, Authentication authentication) {
         try {
             AuthenticationResponse userRegisteredResponse = authenticationService.register(request, authentication);
             return new ResponseEntity<>(userRegisteredResponse, HttpStatus.CREATED);
-        } catch (RoleNotFoundException | UsernameExistException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (RoleNotFoundException e) {
+            return new ResponseEntity<>(new ErrorResponse(HttpResponseConstant.NOT_ENOUGH_PERMISSION), HttpStatus.NOT_FOUND);
+        } catch (UsernameExistException e) {
+            return new ResponseEntity<>(new ErrorResponse(HttpResponseConstant.USERNAME_ALREADY_EXISTS), HttpStatus.CONFLICT);
         } catch (AccessDeniedException e) {
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+            return new ResponseEntity<>(new ErrorResponse(HttpResponseConstant.ACCOUNT_DISABLED), HttpStatus.FORBIDDEN);
         }
     }
 
