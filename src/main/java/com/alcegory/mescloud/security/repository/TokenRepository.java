@@ -21,4 +21,7 @@ public interface TokenRepository extends JpaRepository<TokenEntity, Long> {
     List<TokenEntity> findAllInvalidTokenByUser(Long userId);
 
     Optional<TokenEntity> findByToken(String token);
+
+    @Query("DELETE FROM token t WHERE t.user.id = :userId")
+    void deleteAllByUserId(Long userId);
 }

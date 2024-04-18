@@ -19,4 +19,6 @@ public interface AuthenticationService {
     UserConfigDto authenticate(AuthenticateRequest request, HttpServletResponse response);
 
     String setJwtTokenCookie(UserEntity user, HttpServletResponse response);
+
+    void handleUserTokens(UserEntity user, String jwtToken);
 }

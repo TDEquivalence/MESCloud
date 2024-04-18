@@ -115,12 +115,17 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         UserEntity user = userRepository.findUserByUsername(request.getUsername());
         String jwtToken = setJwtTokenCookie(user, response);
-        revokeAllUserTokens(user);
-        saveUserToken(jwtToken, user);
-        removeLastInvalidUserTokens(user);
+        handleUserTokens(user, jwtToken);
         AuthenticationResponse authenticationResponse = userToAuthenticationResponse(user);
 
         return userRoleService.getUserRoleAndConfigurations(authenticationResponse);
+    }
+
+    @Override
+    public void handleUserTokens(UserEntity user, String jwtToken) {
+        revokeAllUserTokens(user);
+        saveUserToken(jwtToken, user);
+        removeLastInvalidUserTokens(user);
     }
 
     private void setUsernameByEmail(RegisterRequest request) {

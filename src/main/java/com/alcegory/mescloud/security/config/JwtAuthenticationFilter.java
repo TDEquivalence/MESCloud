@@ -1,5 +1,9 @@
 package com.alcegory.mescloud.security.config;
 
+import com.alcegory.mescloud.model.entity.UserEntity;
+import com.alcegory.mescloud.repository.UserRepository;
+import com.alcegory.mescloud.security.model.token.TokenEntity;
+import com.alcegory.mescloud.security.model.token.TokenType;
 import com.alcegory.mescloud.security.repository.TokenRepository;
 import com.alcegory.mescloud.security.service.JwtTokenService;
 import io.jsonwebtoken.JwtException;
@@ -8,6 +12,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,6 +23,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Optional;
 
 import static com.alcegory.mescloud.security.constant.SecurityConstant.JWT_EXPIRATION;
 
@@ -26,15 +32,17 @@ import static com.alcegory.mescloud.security.constant.SecurityConstant.JWT_EXPIR
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private static final String COOKIE_TOKEN_NAME = "jwtToken";
-    private static final String COOKIE_REFRESH_TOKEN_NAME = "refreshToken";
+    private static final String COOKIE_REFRESH_TOKEN_NAME = "refreshJwtToken";
     private static final String INVALID_TOKEN_MESSAGE = "Invalid token";
 
     private final JwtTokenService jwtTokenService;
     private final UserDetailsService userDetailsService;
     private final TokenRepository tokenRepository;
+    private final UserRepository userRepository;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
+                                    @NonNull FilterChain filterChain) throws ServletException, IOException {
         try {
             Cookie[] cookies = request.getCookies();
             if (cookies == null || !jwtTokenService.isTokenInCookie(cookies)) {
@@ -43,7 +51,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
 
             String jwtToken = jwtTokenService.getJwtTokenFromCookie(cookies, COOKIE_TOKEN_NAME);
-            String username = jwtTokenService.extractUsername(jwtToken);
+            String refreshToken = jwtTokenService.getJwtTokenFromCookie(cookies, COOKIE_REFRESH_TOKEN_NAME);
+
+            String username;
+            if (jwtToken != null) {
+                username = jwtTokenService.extractUsername(jwtToken);
+            } else {
+                username = jwtTokenService.extractUsername(refreshToken);
+            }
+
 
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = loadUserByUsername(username);
@@ -67,9 +83,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private boolean isTokenValid(String jwtToken, UserDetails userDetails) {
-        return tokenRepository.findByToken(jwtToken)
-                .map(token -> !token.isExpired() && !token.isRevoked())
-                .orElse(false) && jwtTokenService.isTokenValid(jwtToken, userDetails);
+        Optional<TokenEntity> optionalToken = tokenRepository.findByToken(jwtToken);
+        if (optionalToken.isPresent()) {
+            TokenEntity token = optionalToken.get();
+            if (!token.isExpired() && !token.isRevoked()) {
+                return jwtTokenService.isTokenValid(jwtToken, userDetails);
+            }
+        }
+        return false;
     }
 
     private void authenticateUser(HttpServletRequest request, UserDetails userDetails) {
@@ -96,8 +117,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (jwtTokenService.isTokenValid(refreshJwtToken, userDetails)) {
                 String accessToken = jwtTokenService.generateToken(userDetails);
                 addJwtTokenToCookie(response, accessToken);
+                UserEntity user = userRepository.findUserByUsername(userDetails.getUsername());
+                tokenRepository.deleteAllByUserId(user.getId());
+                saveUserToken(accessToken, userDetails);
             }
         }
+    }
+
+    private void saveUserToken(String jwtToken, UserDetails userDetails) {
+        UserEntity user = userRepository.findUserByUsername(userDetails.getUsername());
+        TokenEntity token = TokenEntity.builder()
+                .user(user)
+                .token(jwtToken)
+                .tokenType(TokenType.BEARER)
+                .expired(false)
+                .revoked(false)
+                .build();
+        tokenRepository.save(token);
     }
 
     private void handleInvalidToken(HttpServletResponse response) throws IOException {

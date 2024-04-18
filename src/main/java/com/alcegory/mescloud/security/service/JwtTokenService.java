@@ -1,6 +1,5 @@
 package com.alcegory.mescloud.security.service;
 
-import com.alcegory.mescloud.security.constant.SecurityConstant;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -40,27 +39,27 @@ public class JwtTokenService {
     }
 
     public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
-        return buildToken(extraClaims, userDetails, JWT_EXPIRATION);
+        return buildToken(extraClaims, userDetails);
     }
 
     public String generateRefreshToken(UserDetails userDetails) {
-        return buildToken(new HashMap<>(), userDetails, REFRESH_JWT_EXPIRATION);
+        return buildToken(new HashMap<>(), userDetails);
     }
 
-    private String buildToken(Map<String, Object> extraClaims, UserDetails userDetails, long tokenExpiration) {
+    private String buildToken(Map<String, Object> extraClaims, UserDetails userDetails) {
         return Jwts
                 .builder()
                 .setClaims(extraClaims)
                 .setSubject(userDetails.getUsername())
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + tokenExpiration))
+                .setIssuedAt(new Date())
+                .setExpiration(getExpirationDate())
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+        return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
     }
 
     public boolean isTokenExpired(String token) {
@@ -86,21 +85,21 @@ public class JwtTokenService {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String getJwtTokenFromCookie(Cookie[] cookies, String securityConstant) {
+    public String getJwtTokenFromCookie(Cookie[] cookies, String tokenName) {
         if (cookies != null) {
             for (Cookie cookie : cookies) {
-                if (cookie.getName().equals(securityConstant)) {
+                if (cookie.getName().equals(tokenName)) {
                     return cookie.getValue();
                 }
             }
         }
         return null;
     }
-    
+
     public boolean isTokenInCookie(Cookie[] cookies) {
         if (cookies != null) {
             for (Cookie cookie : cookies) {
-                if (cookie.getName().equals(SecurityConstant.COOKIE_TOKEN_NAME)) {
+                if (cookie.getName().equals(COOKIE_TOKEN_NAME) || cookie.getName().equals(COOKIE_REFRESH_TOKEN_NAME)) {
                     return true;
                 }
             }
