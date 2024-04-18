@@ -53,27 +53,26 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             String jwtToken = jwtTokenService.getJwtTokenFromCookie(cookies, COOKIE_TOKEN_NAME);
             String refreshToken = jwtTokenService.getJwtTokenFromCookie(cookies, COOKIE_REFRESH_TOKEN_NAME);
+            String tokenToCheck = jwtToken != null ? jwtToken : refreshToken;
 
-            String username;
-            if (jwtToken != null) {
-                username = jwtTokenService.extractUsername(jwtToken);
-            } else {
-                username = jwtTokenService.extractUsername(refreshToken);
+            if (tokenToCheck != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                String username = jwtTokenService.extractUsername(tokenToCheck);
+                if (username != null) {
+                    UserDetails userDetails = loadUserByUsername(username);
+                    Optional<TokenEntity> optionalToken = tokenRepository.findByToken(jwtToken);
+                    if (optionalToken.isPresent()) {
+                        TokenEntity token = optionalToken.get();
+                        if (!token.isExpired() && !token.isRevoked() && jwtTokenService.isTokenValid(jwtToken, userDetails)) {
+                            authenticateUser(request, userDetails);
+                        } else if (token.isExpired() && !token.isRevoked()) {
+                            refreshToken(request, response);
+                        }
+                    }
+                }
             }
 
+            filterChain.doFilter(request, response);
 
-            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                UserDetails userDetails = loadUserByUsername(username);
-                if (isTokenValid(jwtToken, userDetails)) {
-                    authenticateUser(request, userDetails);
-                }
-
-                if (jwtTokenService.isTokenExpired(jwtToken)) {
-                    refreshToken(request, response);
-                }
-
-                filterChain.doFilter(request, response);
-            }
         } catch (JwtException ex) {
             handleInvalidToken(response);
         }
@@ -81,17 +80,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private UserDetails loadUserByUsername(String username) {
         return userDetailsService.loadUserByUsername(username);
-    }
-
-    private boolean isTokenValid(String jwtToken, UserDetails userDetails) {
-        Optional<TokenEntity> optionalToken = tokenRepository.findByToken(jwtToken);
-        if (optionalToken.isPresent()) {
-            TokenEntity token = optionalToken.get();
-            if (!token.isExpired() && !token.isRevoked()) {
-                return jwtTokenService.isTokenValid(jwtToken, userDetails);
-            }
-        }
-        return false;
     }
 
     private void authenticateUser(HttpServletRequest request, UserDetails userDetails) {
