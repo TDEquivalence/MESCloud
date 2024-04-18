@@ -12,6 +12,8 @@ import com.alcegory.mescloud.security.mapper.EntityDtoMapper;
 import com.alcegory.mescloud.security.model.SectionRoleEntity;
 import com.alcegory.mescloud.security.model.UserRoleEntity;
 import com.alcegory.mescloud.security.model.auth.AuthenticationResponse;
+import com.alcegory.mescloud.security.model.token.TokenEntity;
+import com.alcegory.mescloud.security.repository.TokenRepository;
 import com.alcegory.mescloud.security.repository.UserRoleRepository;
 import com.alcegory.mescloud.security.service.RoleService;
 import com.alcegory.mescloud.service.UserService;
@@ -36,9 +38,10 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final EntityDtoMapper mapper;
     private final UserConverter userConverter;
-    private final RoleService roleService;
+    private final RoleService sectionRoleService;
     private final UserRoleRepository userRoleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final TokenRepository tokenRepository;
 
     @Override
     public UserDto getUserDtoById(Long id) {
@@ -70,7 +73,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public UserDto updateUser(UserDto userDto) throws UserUpdateException, RoleNotFoundException {
+    public UserDto updateUser(UserDto userDto) throws UserUpdateException {
         if (userDto == null) {
             throw new IllegalArgumentException("UserDto cannot be null.");
         }
@@ -126,7 +129,7 @@ public class UserServiceImpl implements UserService {
 
         if (sectionRoles != null && !sectionRoles.isEmpty()) {
             for (SectionRoleMapping sectionRoleMapping : sectionRoles) {
-                SectionRoleEntity sectionRole = roleService.findByName(sectionRoleMapping.getSectionRole())
+                SectionRoleEntity sectionRole = sectionRoleService.findByName(sectionRoleMapping.getSectionRole())
                         .orElseThrow(() -> new RoleNotFoundException("Role not found: " + sectionRoleMapping.getSectionRole()));
 
                 long sectionId = sectionRoleMapping.getSectionId();
@@ -183,7 +186,20 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteUser(UserDto user) {
         UserEntity userEntity = mapper.convertToEntity(user);
+        deleteTokensByUserId(userEntity.getId());
+        deleteUserRolesByUserId(userEntity.getId());
+        
         userRepository.delete(userEntity);
+    }
+
+    private void deleteTokensByUserId(Long userId) {
+        List<TokenEntity> tokens = tokenRepository.findAllTokensByUserId(userId);
+        tokenRepository.deleteAll(tokens);
+    }
+
+    private void deleteUserRolesByUserId(Long userId) {
+        List<UserRoleEntity> userRoles = userRoleRepository.findByUserId(userId);
+        userRoleRepository.deleteAll(userRoles);
     }
 
     @Override

@@ -101,14 +101,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     public void cleanCookies(HttpServletResponse response) {
-        Cookie jwtTokenCookie = new Cookie(COOKIE_TOKEN_NAME, null);
-        jwtTokenCookie.setMaxAge(0);
-        jwtTokenCookie.setPath("/");
-        response.addCookie(jwtTokenCookie);
+        removeCookie(response, COOKIE_TOKEN_NAME);
+        removeCookie(response, COOKIE_REFRESH_TOKEN_NAME);
+    }
 
-        Cookie refreshTokenCookie = new Cookie(COOKIE_REFRESH_TOKEN_NAME, null);
-        refreshTokenCookie.setMaxAge(0);
-        refreshTokenCookie.setPath("/");
-        response.addCookie(refreshTokenCookie);
+    private void removeCookie(HttpServletResponse response, String cookieName) {
+        Cookie cookie = new Cookie(cookieName, null);
+        cookie.setMaxAge(0);
+        cookie.setPath("/");
+        response.addCookie(cookie);
     }
 }
