@@ -1,6 +1,7 @@
 package com.alcegory.mescloud.service.spi;
 
 import com.alcegory.mescloud.exception.DeleteUserException;
+import com.alcegory.mescloud.exception.ForbiddenAccessException;
 import com.alcegory.mescloud.exception.UserUpdateException;
 import com.alcegory.mescloud.model.converter.UserConverter;
 import com.alcegory.mescloud.model.dto.SectionRoleMapping;
@@ -28,6 +29,9 @@ import javax.management.relation.RoleNotFoundException;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+
+import static com.alcegory.mescloud.security.model.Authority.ADMIN_DELETE;
+import static com.alcegory.mescloud.security.utility.AuthorityUtil.checkUserAndAuthority;
 
 @Slf4j
 @Service
@@ -183,11 +187,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void deleteUser(UserDto user) {
+    public void deleteUser(UserDto user, Authentication authentication) {
         try {
+            checkUserAndAuthority(authentication, ADMIN_DELETE);
             UserEntity userEntity = mapper.convertToEntity(user);
             deleteUserRolesByUserId(userEntity.getId());
             userRepository.delete(userEntity);
+        } catch (ForbiddenAccessException e) {
+            log.error("User is not authorized to delete: {}", e.getMessage());
+            throw e;
         } catch (Exception e) {
             log.error("Failed to delete user: {}", e.getMessage());
             throw new DeleteUserException("Failed to delete user", e);

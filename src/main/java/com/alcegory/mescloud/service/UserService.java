@@ -32,7 +32,7 @@ public interface UserService {
 
     UserEntity getUserByAuth(AuthenticationResponse authenticateRequest);
 
-    void deleteUser(UserDto user);
+    void deleteUser(UserDto user, Authentication authentication);
 
     Optional<UserEntity> findByUsername(String username);
 }

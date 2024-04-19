@@ -57,11 +57,16 @@ public class UserController {
         }
     }
 
+
     @DeleteMapping("/delete")
-    public ResponseEntity<Object> deleteUser(@RequestBody UserDto user) {
+    public ResponseEntity<Object> deleteUser(@RequestBody UserDto user, Authentication authentication) {
         try {
-            userService.deleteUser(user);
+            userService.deleteUser(user, authentication);
             return ResponseEntity.ok("User deleted successfully");
+        } catch (ForbiddenAccessException e) {
+            log.error("User is not authorized to delete: {}", e.getMessage());
+            ErrorResponse errorResponse = new ErrorResponse("User is not authorized to perform this action: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse);
         } catch (DeleteUserException e) {
             log.error("Failed to delete user: {}", e.getMessage());
             ErrorResponse errorResponse = new ErrorResponse("Failed to delete user: " + e.getMessage());
