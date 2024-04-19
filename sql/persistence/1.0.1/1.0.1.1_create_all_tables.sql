@@ -18,7 +18,6 @@ DROP TABLE IF EXISTS counting_equipment;
 DROP TABLE IF EXISTS equipment_output_alias;
 DROP TABLE IF EXISTS composed_production_order;
 DROP TABLE IF EXISTS section;
-DROP TABLE IF EXISTS token;
 DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS factory;
 DROP TABLE IF EXISTS ims;
@@ -49,15 +48,20 @@ CREATE TABLE users (
   PRIMARY KEY(id)
 );
 
-CREATE TABLE token (
-  id SERIAL PRIMARY KEY,
-  token VARCHAR(255) NOT NULL,
-  token_type VARCHAR(10) NOT NULL,
-  expired BOOLEAN,
-  revoked BOOLEAN,
-  user_id INTEGER NOT NULL,
+CREATE TABLE role (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(50) NOT NULL,
+    CONSTRAINT valid_role_name CHECK (name IN ('ADMIN', 'ANALYST', 'OPERATOR'))
+);
 
-  FOREIGN KEY (user_id) REFERENCES users (id)
+CREATE TABLE user_role (
+	user_id INT,
+    role_id INT,
+    section_id INT,
+    PRIMARY KEY (user_id, role_id, section_id),
+    FOREIGN KEY (user_id) REFERENCES "users"(id),
+    FOREIGN KEY (role_id) REFERENCES role(id),
+    FOREIGN KEY (section_id) REFERENCES section(id)
 );
 
 CREATE TABLE factory (
@@ -105,7 +109,6 @@ CREATE TABLE ims (
 
     PRIMARY KEY(id)
 );
-
 
 CREATE TABLE counting_equipment (
     id int GENERATED ALWAYS AS IDENTITY,
