@@ -1,5 +1,7 @@
 package com.alcegory.mescloud.api.rest;
 
+import com.alcegory.mescloud.api.rest.response.ErrorResponse;
+import com.alcegory.mescloud.exception.DeleteUserException;
 import com.alcegory.mescloud.exception.ForbiddenAccessException;
 import com.alcegory.mescloud.exception.UserUpdateException;
 import com.alcegory.mescloud.model.dto.UserConfigDto;
@@ -9,6 +11,7 @@ import com.alcegory.mescloud.security.exception.UserNotFoundException;
 import com.alcegory.mescloud.security.service.UserRoleService;
 import com.alcegory.mescloud.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -17,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.management.relation.RoleNotFoundException;
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("api/user")
 @RequiredArgsConstructor
@@ -48,17 +52,25 @@ public class UserController {
         try {
             UserDto userDto = userService.updateUser(user);
             return new ResponseEntity<>(userDto, HttpStatus.ACCEPTED);
-        } catch (RoleNotFoundException | UserUpdateException e) {
+        } catch (RoleNotFoundException | UserUpdateException | UserNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } catch (UserNotFoundException e) {
-            throw new RuntimeException(e);
         }
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<String> deleteUser(@RequestBody UserDto user) {
-        userService.deleteUser(user);
-        return ResponseEntity.ok("User deleted successfully");
+    public ResponseEntity<Object> deleteUser(@RequestBody UserDto user) {
+        try {
+            userService.deleteUser(user);
+            return ResponseEntity.ok("User deleted successfully");
+        } catch (DeleteUserException e) {
+            log.error("Failed to delete user: {}", e.getMessage());
+            ErrorResponse errorResponse = new ErrorResponse("Failed to delete user: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        } catch (Exception e) {
+            log.error("An unexpected error occurred: {}", e.getMessage());
+            ErrorResponse errorResponse = new ErrorResponse("An unexpected error occurred: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
     }
 
     @GetMapping("/{id}/config")

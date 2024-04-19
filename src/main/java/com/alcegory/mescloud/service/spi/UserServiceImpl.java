@@ -1,5 +1,6 @@
 package com.alcegory.mescloud.service.spi;
 
+import com.alcegory.mescloud.exception.DeleteUserException;
 import com.alcegory.mescloud.exception.UserUpdateException;
 import com.alcegory.mescloud.model.converter.UserConverter;
 import com.alcegory.mescloud.model.dto.SectionRoleMapping;
@@ -183,10 +184,14 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteUser(UserDto user) {
-        UserEntity userEntity = mapper.convertToEntity(user);
-        deleteUserRolesByUserId(userEntity.getId());
-
-        userRepository.delete(userEntity);
+        try {
+            UserEntity userEntity = mapper.convertToEntity(user);
+            deleteUserRolesByUserId(userEntity.getId());
+            userRepository.delete(userEntity);
+        } catch (Exception e) {
+            log.error("Failed to delete user: {}", e.getMessage());
+            throw new DeleteUserException("Failed to delete user", e);
+        }
     }
 
     private void deleteUserRolesByUserId(Long userId) {

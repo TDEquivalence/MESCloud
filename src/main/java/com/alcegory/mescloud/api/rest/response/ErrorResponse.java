@@ -1,5 +1,10 @@
 package com.alcegory.mescloud.api.rest.response;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Setter
+@Getter
 public class ErrorResponse {
 
     private String message;
@@ -8,11 +13,4 @@ public class ErrorResponse {
         this.message = message;
     }
 
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
 }
