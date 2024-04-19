@@ -1,10 +1,5 @@
 package com.alcegory.mescloud.security.config;
 
-import com.alcegory.mescloud.model.entity.UserEntity;
-import com.alcegory.mescloud.repository.UserRepository;
-import com.alcegory.mescloud.security.model.token.TokenEntity;
-import com.alcegory.mescloud.security.model.token.TokenType;
-import com.alcegory.mescloud.security.repository.TokenRepository;
 import com.alcegory.mescloud.security.service.JwtTokenService;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
@@ -23,8 +18,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Optional;
 
 import static com.alcegory.mescloud.security.constant.SecurityConstant.JWT_EXPIRATION;
 
@@ -38,8 +31,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenService jwtTokenService;
     private final UserDetailsService userDetailsService;
-    private final TokenRepository tokenRepository;
-    private final UserRepository userRepository;
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
@@ -56,25 +47,26 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String tokenToCheck = jwtToken != null ? jwtToken : refreshToken;
 
             if (tokenToCheck != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                String username = jwtTokenService.extractUsername(tokenToCheck);
-                if (username != null) {
-                    UserDetails userDetails = loadUserByUsername(username);
-                    Optional<TokenEntity> optionalToken = tokenRepository.findByToken(jwtToken);
-                    if (optionalToken.isPresent()) {
-                        TokenEntity token = optionalToken.get();
-                        if (!token.isExpired() && !token.isRevoked() && jwtTokenService.isTokenValid(jwtToken, userDetails)) {
-                            authenticateUser(request, userDetails);
-                        } else if (token.isExpired() && !token.isRevoked()) {
-                            refreshToken(request, response);
-                        }
-                    }
-                }
+                processToken(tokenToCheck, request, response);
             }
 
             filterChain.doFilter(request, response);
 
         } catch (JwtException ex) {
             handleInvalidToken(response);
+        }
+    }
+
+    private void processToken(String tokenToCheck, HttpServletRequest request, HttpServletResponse response) {
+        String username = jwtTokenService.extractUsername(tokenToCheck);
+        if (username != null) {
+            UserDetails userDetails = loadUserByUsername(username);
+            if (jwtTokenService.isTokenValid(tokenToCheck, userDetails)) {
+                authenticateUser(request, userDetails);
+                if (jwtTokenService.isTokenRefreshable(tokenToCheck)) {
+                    refreshToken(request, response, userDetails);
+                }
+            }
         }
     }
 
@@ -92,48 +84,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         SecurityContextHolder.getContext().setAuthentication(authToken);
     }
 
-    private void refreshToken(HttpServletRequest request, HttpServletResponse response) {
-        Cookie[] cookies = request.getCookies();
-        if (cookies == null || !jwtTokenService.isTokenInCookie(cookies)) {
-            return;
-        }
-
-        String refreshJwtToken = jwtTokenService.getJwtTokenFromCookie(cookies, COOKIE_REFRESH_TOKEN_NAME);
-        String username = jwtTokenService.extractUsername(refreshJwtToken);
-
-        if (username != null) {
-            UserDetails userDetails = loadUserByUsername(username);
-            if (jwtTokenService.isTokenValid(refreshJwtToken, userDetails)) {
-                String accessToken = jwtTokenService.generateToken(userDetails);
-                addJwtTokenToCookie(response, accessToken);
-                revokeTokens(userDetails.getUsername());
-                saveUserToken(accessToken, userDetails);
-            }
-        }
-    }
-
-    private void revokeTokens(String username) {
-        UserEntity user = userRepository.findUserByUsername(username);
-        List<TokenEntity> persistedTokens = tokenRepository.findAllTokensByUserId(user.getId());
-
-        for (TokenEntity token : persistedTokens) {
-            token.setRevoked(true);
-            token.setExpired(true);
-        }
-
-        tokenRepository.saveAll(persistedTokens);
-    }
-
-    private void saveUserToken(String jwtToken, UserDetails userDetails) {
-        UserEntity user = userRepository.findUserByUsername(userDetails.getUsername());
-        TokenEntity token = TokenEntity.builder()
-                .user(user)
-                .token(jwtToken)
-                .tokenType(TokenType.BEARER)
-                .expired(false)
-                .revoked(false)
-                .build();
-        tokenRepository.save(token);
+    private void refreshToken(HttpServletRequest request, HttpServletResponse response, UserDetails userDetails) {
+        String accessToken = jwtTokenService.generateToken(userDetails);
+        addJwtTokenToCookie(response, accessToken);
     }
 
     private void handleInvalidToken(HttpServletResponse response) throws IOException {
@@ -142,15 +95,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private void cleanCookies(HttpServletResponse response) {
-        removeCookie(response, COOKIE_TOKEN_NAME);
-        removeCookie(response, COOKIE_REFRESH_TOKEN_NAME);
-    }
-
-    private void removeCookie(HttpServletResponse response, String cookieName) {
-        Cookie cookie = new Cookie(cookieName, null);
-        cookie.setMaxAge(0);
-        cookie.setPath("/");
-        response.addCookie(cookie);
+        jwtTokenService.removeCookie(response, COOKIE_TOKEN_NAME);
+        jwtTokenService.removeCookie(response, COOKIE_REFRESH_TOKEN_NAME);
     }
 
     private void addJwtTokenToCookie(HttpServletResponse response, String accessToken) {
@@ -162,3 +108,4 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         response.addCookie(cookie);
     }
 }
+

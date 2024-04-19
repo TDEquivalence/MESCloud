@@ -46,6 +46,14 @@ public class JwtTokenService {
         return buildToken(new HashMap<>(), userDetails);
     }
 
+    public boolean isTokenRefreshable(String token) {
+        final Date expiration = extractExpiration(token);
+        final Date now = new Date();
+        final long refreshThreshold = expiration.getTime() - (REFRESH_JWT_EXPIRATION * 1000);
+
+        return now.getTime() > refreshThreshold;
+    }
+
     private String buildToken(Map<String, Object> extraClaims, UserDetails userDetails) {
         return Jwts
                 .builder()
@@ -105,6 +113,13 @@ public class JwtTokenService {
             }
         }
         return false;
+    }
+    
+    public void removeCookie(HttpServletResponse response, String cookieName) {
+        Cookie cookie = new Cookie(cookieName, null);
+        cookie.setMaxAge(0);
+        cookie.setPath("/");
+        response.addCookie(cookie);
     }
 
     public void setJwtTokenCookie(HttpServletResponse response, String jwtToken) {

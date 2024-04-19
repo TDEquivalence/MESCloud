@@ -13,9 +13,6 @@ import com.alcegory.mescloud.security.model.SectionRoleEntity;
 import com.alcegory.mescloud.security.model.auth.AuthenticateRequest;
 import com.alcegory.mescloud.security.model.auth.AuthenticationResponse;
 import com.alcegory.mescloud.security.model.auth.RegisterRequest;
-import com.alcegory.mescloud.security.model.token.TokenEntity;
-import com.alcegory.mescloud.security.model.token.TokenType;
-import com.alcegory.mescloud.security.repository.TokenRepository;
 import com.alcegory.mescloud.service.CompanyService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +34,6 @@ import static com.alcegory.mescloud.security.utility.AuthorityUtil.checkUserAndR
 public class AuthenticationServiceImpl implements AuthenticationService {
 
     private final UserRepository userRepository;
-    private final TokenRepository tokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenService jwtTokenService;
     private final AuthenticationManager authenticationManager;
@@ -115,17 +111,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         UserEntity user = userRepository.findUserByUsername(request.getUsername());
         String jwtToken = setJwtTokenCookie(user, response);
-        handleUserTokens(user, jwtToken);
         AuthenticationResponse authenticationResponse = userToAuthenticationResponse(user);
 
         return userRoleService.getUserRoleAndConfigurations(authenticationResponse);
-    }
-
-    @Override
-    public void handleUserTokens(UserEntity user, String jwtToken) {
-        revokeAllUserTokens(user);
-        saveUserToken(jwtToken, user);
-        removeLastInvalidUserTokens(user);
     }
 
     private void setUsernameByEmail(RegisterRequest request) {
@@ -159,36 +147,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .username(userEntity.getUsername())
                 .role(userEntity.getRole())
                 .build();
-    }
-
-    private void saveUserToken(String jwtToken, UserEntity user) {
-        TokenEntity token = TokenEntity.builder()
-                .user(user)
-                .token(jwtToken)
-                .tokenType(TokenType.BEARER)
-                .expired(false)
-                .revoked(false)
-                .build();
-        tokenRepository.save(token);
-    }
-
-    private void revokeAllUserTokens(UserEntity user) {
-        List<TokenEntity> validUserTokens = tokenRepository.findAllValidTokenByUser(user.getId());
-        if (validUserTokens.isEmpty()) {
-            return;
-        }
-        validUserTokens.forEach(token -> {
-            token.setExpired(true);
-            token.setRevoked(true);
-        });
-        tokenRepository.saveAll(validUserTokens);
-    }
-
-    private void removeLastInvalidUserTokens(UserEntity user) {
-        List<TokenEntity> invalidUserTokens = tokenRepository.findAllInvalidTokenByUser(user.getId());
-        if (!invalidUserTokens.isEmpty()) {
-            invalidUserTokens.forEach(tokenRepository::delete);
-        }
     }
 
     private CompanyEntity getCompany() {

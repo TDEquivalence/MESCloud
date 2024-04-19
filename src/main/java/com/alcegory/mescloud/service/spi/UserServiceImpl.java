@@ -12,8 +12,6 @@ import com.alcegory.mescloud.security.mapper.EntityDtoMapper;
 import com.alcegory.mescloud.security.model.SectionRoleEntity;
 import com.alcegory.mescloud.security.model.UserRoleEntity;
 import com.alcegory.mescloud.security.model.auth.AuthenticationResponse;
-import com.alcegory.mescloud.security.model.token.TokenEntity;
-import com.alcegory.mescloud.security.repository.TokenRepository;
 import com.alcegory.mescloud.security.repository.UserRoleRepository;
 import com.alcegory.mescloud.security.service.RoleService;
 import com.alcegory.mescloud.service.UserService;
@@ -41,7 +39,6 @@ public class UserServiceImpl implements UserService {
     private final RoleService sectionRoleService;
     private final UserRoleRepository userRoleRepository;
     private final PasswordEncoder passwordEncoder;
-    private final TokenRepository tokenRepository;
 
     @Override
     public UserDto getUserDtoById(Long id) {
@@ -187,15 +184,9 @@ public class UserServiceImpl implements UserService {
     @Transactional(rollbackFor = Exception.class)
     public void deleteUser(UserDto user) {
         UserEntity userEntity = mapper.convertToEntity(user);
-        deleteTokensByUserId(userEntity.getId());
         deleteUserRolesByUserId(userEntity.getId());
 
         userRepository.delete(userEntity);
-    }
-
-    private void deleteTokensByUserId(Long userId) {
-        List<TokenEntity> tokens = tokenRepository.findAllTokensByUserId(userId);
-        tokenRepository.deleteAll(tokens);
     }
 
     private void deleteUserRolesByUserId(Long userId) {
