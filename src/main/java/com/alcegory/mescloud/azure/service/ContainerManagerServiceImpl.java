@@ -48,6 +48,29 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
     }
 
     @Override
+    public ContainerInfoSummary getRandomData() {
+        ImageInfoDto imageInfoDto = publicContainerService.getRandomImageReference();
+        if (imageInfoDto == null) {
+            return new ContainerInfoSummary();
+        }
+
+        ImageAnnotationDto imageAnnotationDto =
+                pendingContainerService.getImageAnnotationFromContainer(imageInfoDto.getPath());
+
+        if (imageAnnotationDto == null) {
+            log.info("The image at path '{}' was not found in the pending container and has been successfully deleted.",
+                    imageInfoDto.getPath());
+            return new ContainerInfoSummary();
+        }
+
+        ContainerInfoDto containerInfoDto = new ContainerInfoDto();
+        containerInfoDto.setJpg(imageInfoDto);
+        containerInfoDto.setImageAnnotationDto(imageAnnotationDto);
+
+        return convertToSummary(containerInfoDto);
+    }
+
+    @Override
     public ImageAnnotationDto processSaveToApprovedContainer(ContainerInfoUpdate containerInfoUpdate, Authentication authentication) {
         if (containerInfoUpdate == null || containerInfoUpdate.getFileName() == null) {
             throw new IllegalArgumentException("ContainerInfoUpdate or FileName cannot be null");
@@ -70,7 +93,6 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
 
         return saveToApprovedContainer(containerInfoDto);
     }
-
 
     private ImageAnnotationDto saveToApprovedContainer(ContainerInfoDto containerInfoDto) {
         if (containerInfoDto == null || containerInfoDto.getImageAnnotationDto() == null) {

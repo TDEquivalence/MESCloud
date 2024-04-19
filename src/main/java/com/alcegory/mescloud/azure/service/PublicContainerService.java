@@ -10,6 +10,8 @@ public interface PublicContainerService {
 
     ImageInfoDto getImageReference();
 
+    ImageInfoDto getRandomImageReference();
+
     void deleteBlob(String blobName);
 
     String getSasToken();

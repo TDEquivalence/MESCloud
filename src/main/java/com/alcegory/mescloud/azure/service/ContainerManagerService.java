@@ -9,5 +9,7 @@ public interface ContainerManagerService {
 
     ContainerInfoSummary getData();
 
+    ContainerInfoSummary getRandomData();
+
     ImageAnnotationDto processSaveToApprovedContainer(ContainerInfoUpdate containerInfoUpdate, Authentication authentication);
 }

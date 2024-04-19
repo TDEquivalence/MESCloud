@@ -21,4 +21,6 @@ public class ImageAnnotationDto {
     private boolean userApproval;
     private List<String> rejection;
     private String comments;
+    @JsonProperty("log_decision")
+    private String logDecision;
 }

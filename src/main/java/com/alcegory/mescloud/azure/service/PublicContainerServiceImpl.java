@@ -53,6 +53,15 @@ public class PublicContainerServiceImpl implements PublicContainerService {
     }
 
     @Override
+    public ImageInfoDto getRandomImageReference() {
+        return ContainerServiceUtil.getRandomImageReference(
+                accountUrl,
+                containerName,
+                sasToken
+        );
+    }
+
+    @Override
     public void deleteBlob(String blobUrl) {
         String blobName = extractBlobName(blobUrl);
         BlobClient blobClient = getBlobClient(blobName);

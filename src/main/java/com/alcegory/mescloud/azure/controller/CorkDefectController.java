@@ -30,7 +30,7 @@ public class CorkDefectController {
 
     @GetMapping("/corkDetails")
     public ResponseEntity<ContainerInfoSummary> getImageAnnotation() {
-        ContainerInfoSummary containerInfoSummary = containerManagerService.getData();
+        ContainerInfoSummary containerInfoSummary = containerManagerService.getRandomData();
         return new ResponseEntity<>(containerInfoSummary, HttpStatus.OK);
     }
 
