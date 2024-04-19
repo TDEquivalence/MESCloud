@@ -58,10 +58,10 @@ public class UserController {
     }
 
 
-    @DeleteMapping("/delete")
-    public ResponseEntity<Object> deleteUser(@RequestBody UserDto user, Authentication authentication) {
+    @DeleteMapping("/delete/{userId}")
+    public ResponseEntity<Object> deleteUser(@PathVariable Long userId, Authentication authentication) {
         try {
-            userService.deleteUser(user, authentication);
+            userService.deleteUser(userId, authentication);
             return ResponseEntity.ok("User deleted successfully");
         } catch (ForbiddenAccessException e) {
             log.error("User is not authorized to delete: {}", e.getMessage());
@@ -70,7 +70,7 @@ public class UserController {
         } catch (DeleteUserException e) {
             log.error("Failed to delete user: {}", e.getMessage());
             ErrorResponse errorResponse = new ErrorResponse("Failed to delete user: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
         } catch (Exception e) {
             log.error("An unexpected error occurred: {}", e.getMessage());
             ErrorResponse errorResponse = new ErrorResponse("An unexpected error occurred: " + e.getMessage());

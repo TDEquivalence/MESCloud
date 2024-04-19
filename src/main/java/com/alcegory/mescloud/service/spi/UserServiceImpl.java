@@ -187,12 +187,18 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void deleteUser(UserDto user, Authentication authentication) {
+    public void deleteUser(Long userId, Authentication authentication) {
         try {
             checkUserAndAuthority(authentication, ADMIN_DELETE);
-            UserEntity userEntity = mapper.convertToEntity(user);
-            deleteUserRolesByUserId(userEntity.getId());
-            userRepository.delete(userEntity);
+
+            Optional<UserEntity> optionalUser = userRepository.findById(userId);
+            if (optionalUser.isEmpty()) {
+                log.warn("User with ID {} does not exist. Skipping deletion.", userId);
+                throw new DeleteUserException("User with ID " + userId + " does not exist.");
+            }
+
+            deleteUserRolesByUserId(userId);
+            userRepository.deleteById(userId);
         } catch (ForbiddenAccessException e) {
             log.error("User is not authorized to delete: {}", e.getMessage());
             throw e;
