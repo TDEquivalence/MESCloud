@@ -9,6 +9,7 @@ import com.alcegory.mescloud.azure.service.PublicContainerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -34,8 +35,10 @@ public class CorkDefectController {
     }
 
     @PostMapping("/updateCorkDetails")
-    public ResponseEntity<ImageAnnotationDto> updateImageAnnotation(@RequestBody ContainerInfoUpdate containerInfoUpdate) {
-        ImageAnnotationDto updatedImageAnnotationDto = containerManagerService.processSaveToApprovedContainer(containerInfoUpdate);
+    public ResponseEntity<ImageAnnotationDto> updateImageAnnotation(@RequestBody ContainerInfoUpdate containerInfoUpdate,
+                                                                    Authentication authentication) {
+        ImageAnnotationDto updatedImageAnnotationDto =
+                containerManagerService.processSaveToApprovedContainer(containerInfoUpdate, authentication);
         return new ResponseEntity<>(updatedImageAnnotationDto, HttpStatus.OK);
     }
 }

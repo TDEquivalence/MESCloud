@@ -2,6 +2,7 @@ package com.alcegory.mescloud.azure.service;
 
 import com.alcegory.mescloud.azure.dto.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -47,10 +48,26 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
     }
 
     @Override
-    public ImageAnnotationDto processSaveToApprovedContainer(ContainerInfoUpdate containerInfoUpdate) {
+    public ImageAnnotationDto processSaveToApprovedContainer(ContainerInfoUpdate containerInfoUpdate, Authentication authentication) {
+        if (containerInfoUpdate == null || containerInfoUpdate.getFileName() == null) {
+            throw new IllegalArgumentException("ContainerInfoUpdate or FileName cannot be null");
+        }
+
         ImageAnnotationDto imageAnnotationDto =
                 pendingContainerService.getImageAnnotationFromContainer(containerInfoUpdate.getFileName());
+
+        if (imageAnnotationDto == null) {
+            throw new IllegalStateException("ImageAnnotationDto is null");
+        }
+
         ContainerInfoDto containerInfoDto = convertToContainerInfo(imageAnnotationDto, containerInfoUpdate);
+
+        if (authentication != null && authentication.getName() != null) {
+            containerInfoDto.setUsername(authentication.getName());
+        } else {
+            throw new IllegalStateException("Authentication or Username is null");
+        }
+
         return saveToApprovedContainer(containerInfoDto);
     }
 
