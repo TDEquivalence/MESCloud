@@ -26,8 +26,8 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.management.relation.RoleNotFoundException;
 import java.util.*;
 
-import static com.alcegory.mescloud.security.model.Role.ADMIN;
-import static com.alcegory.mescloud.security.utility.AuthorityUtil.checkUserAndRole;
+import static com.alcegory.mescloud.security.model.Authority.ADMIN_CREATE;
+import static com.alcegory.mescloud.security.utility.AuthorityUtil.checkUserAndAuthority;
 
 @Service
 @RequiredArgsConstructor
@@ -43,7 +43,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Transactional(rollbackFor = {UsernameExistException.class, RoleNotFoundException.class})
     public AuthenticationResponse register(RegisterRequest request, Authentication authentication) throws UsernameExistException, RoleNotFoundException {
-        checkUserAndRole(authentication, ADMIN);
+        checkUserAndAuthority(authentication, ADMIN_CREATE);
         try {
             setUsernameByEmail(request);
             validateUsername(request);

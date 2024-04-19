@@ -4,6 +4,7 @@ import com.alcegory.mescloud.exception.ForbiddenAccessException;
 import com.alcegory.mescloud.model.entity.UserEntity;
 import com.alcegory.mescloud.security.model.*;
 import com.alcegory.mescloud.security.service.UserRoleService;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.core.Authentication;
 
 public class AuthorityUtil {
@@ -18,6 +19,20 @@ public class AuthorityUtil {
         if (user.getRole() != expectedRole) {
             throw new ForbiddenAccessException("User is not authorized to perform this action");
         }
+    }
+
+    public static void checkUserAndAuthority(Authentication authentication, Authority authority) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new AuthenticationCredentialsNotFoundException("User is not authenticated");
+        }
+
+        UserEntity user = (UserEntity) authentication.getPrincipal();
+        Role role = user.getRole();
+        if (role.getAuthorities().contains(authority)) {
+            return;
+        }
+
+        throw new ForbiddenAccessException("User is not authorized to perform this action");
     }
 
     public static void checkUserAndSectionRole(Authentication authentication, UserRoleService userRoleService, SectionRole expectedRole) {
