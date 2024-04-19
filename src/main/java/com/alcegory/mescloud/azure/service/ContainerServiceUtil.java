@@ -128,7 +128,7 @@ public class ContainerServiceUtil {
         }
 
         long blobCount = blobContainerClient.listBlobs().stream().count();
-        long randomIndex = new Random().nextLong(blobCount);
+        long randomIndex = random.nextLong(blobCount);
 
         for (long i = 0; i < randomIndex; i++) {
             if (!blobIterator.hasNext()) {
