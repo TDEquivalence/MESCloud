@@ -1,6 +1,9 @@
 package com.alcegory.mescloud.azure.service;
 
-import com.alcegory.mescloud.azure.dto.*;
+import com.alcegory.mescloud.azure.model.converter.ImageAnnotationConverter;
+import com.alcegory.mescloud.azure.model.dto.*;
+import com.alcegory.mescloud.azure.repository.AnnotationRepository;
+import com.alcegory.mescloud.azure.repository.ImageAnnotationRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -16,16 +19,22 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
     private final PendingContainerService pendingContainerService;
     private final ApprovedContainerService approvedContainerService;
 
+    private final ImageAnnotationService imageAnnotationService;
+
+
     public ContainerManagerServiceImpl(PublicContainerService publicContainerService,
                                        PendingContainerService pendingContainerService,
-                                       ApprovedContainerService approvedContainerService) {
+                                       ApprovedContainerService approvedContainerService,
+                                       ImageAnnotationRepository imageAnnotationRepository,
+                                       AnnotationRepository annotationRepository, ImageAnnotationConverter converter, ImageAnnotationService imageAnnotationService) {
         this.publicContainerService = publicContainerService;
         this.pendingContainerService = pendingContainerService;
         this.approvedContainerService = approvedContainerService;
+        this.imageAnnotationService = imageAnnotationService;
     }
 
     @Override
-    public ContainerInfoSummary getData() {
+    public ContainerInfoSummary getData(Authentication authentication) {
         ImageInfoDto imageInfoDto = publicContainerService.getImageReference();
         if (imageInfoDto == null) {
             return new ContainerInfoSummary();
@@ -33,6 +42,8 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
 
         ImageAnnotationDto imageAnnotationDto =
                 pendingContainerService.getImageAnnotationFromContainer(imageInfoDto.getPath());
+
+        imageAnnotationService.saveImageAnnotation(imageAnnotationDto, authentication);
 
         if (imageAnnotationDto == null) {
             log.info("The image at path '{}' was not found in the pending container and has been successfully deleted.",
@@ -48,7 +59,7 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
     }
 
     @Override
-    public ContainerInfoSummary getRandomData() {
+    public ContainerInfoSummary getRandomData(Authentication authentication) {
         ImageInfoDto imageInfoDto = publicContainerService.getRandomImageReference();
         if (imageInfoDto == null) {
             return new ContainerInfoSummary();
@@ -67,6 +78,7 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
         containerInfoDto.setJpg(imageInfoDto);
         containerInfoDto.setImageAnnotationDto(imageAnnotationDto);
 
+        imageAnnotationService.saveImageAnnotation(imageAnnotationDto, authentication);
         return convertToSummary(containerInfoDto);
     }
 
@@ -83,6 +95,7 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
             throw new IllegalStateException("ImageAnnotationDto is null");
         }
 
+        imageAnnotationService.saveImageAnnotation(imageAnnotationDto, authentication);
         ContainerInfoDto containerInfoDto = convertToContainerInfo(imageAnnotationDto, containerInfoUpdate);
 
         if (authentication != null && authentication.getName() != null) {
@@ -91,10 +104,10 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
             throw new IllegalStateException("Authentication or Username is null");
         }
 
-        return saveToApprovedContainer(containerInfoDto);
+        return saveToApprovedContainer(containerInfoDto, authentication);
     }
 
-    private ImageAnnotationDto saveToApprovedContainer(ContainerInfoDto containerInfoDto) {
+    private ImageAnnotationDto saveToApprovedContainer(ContainerInfoDto containerInfoDto, Authentication authentication) {
         if (containerInfoDto == null || containerInfoDto.getImageAnnotationDto() == null) {
             return null;
         }
@@ -106,6 +119,9 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
             publicContainerService.deleteBlob(image);
             pendingContainerService.deleteJpgAndJsonBlobs(image);
         }
+
+        boolean isApproved = containerInfoDto.getImageAnnotationDto().isUserApproval();
+        imageAnnotationService.saveApprovedImageAnnotation(uploadedImageAnnotationDto, isApproved, authentication);
         return uploadedImageAnnotationDto;
     }
 

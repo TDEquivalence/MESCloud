@@ -1,6 +1,6 @@
 package com.alcegory.mescloud.azure.service;
 
-import com.alcegory.mescloud.azure.dto.ImageInfoDto;
+import com.alcegory.mescloud.azure.model.dto.ImageInfoDto;
 import com.azure.storage.blob.BlobClient;
 import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.BlobContainerClientBuilder;
