@@ -5,7 +5,7 @@ import lombok.Getter;
 @Getter
 public enum Status {
 
-    RECEIVED("RECEIVED"),
+    INITIAL("INITIAL"),
     APPROVED("APPROVED"),
     REJECTED("REJECTED");
 

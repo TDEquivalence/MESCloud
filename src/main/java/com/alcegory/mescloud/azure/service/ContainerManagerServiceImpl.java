@@ -34,7 +34,7 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
     }
 
     @Override
-    public ContainerInfoSummary getData() {
+    public ContainerInfoSummary getData(Authentication authentication) {
         ImageInfoDto imageInfoDto = publicContainerService.getImageReference();
         if (imageInfoDto == null) {
             return new ContainerInfoSummary();
@@ -43,7 +43,7 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
         ImageAnnotationDto imageAnnotationDto =
                 pendingContainerService.getImageAnnotationFromContainer(imageInfoDto.getPath());
 
-        imageAnnotationService.saveImageAnnotation(imageAnnotationDto);
+        imageAnnotationService.saveImageAnnotation(imageAnnotationDto, authentication);
 
         if (imageAnnotationDto == null) {
             log.info("The image at path '{}' was not found in the pending container and has been successfully deleted.",
@@ -59,7 +59,7 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
     }
 
     @Override
-    public ContainerInfoSummary getRandomData() {
+    public ContainerInfoSummary getRandomData(Authentication authentication) {
         ImageInfoDto imageInfoDto = publicContainerService.getRandomImageReference();
         if (imageInfoDto == null) {
             return new ContainerInfoSummary();
@@ -78,8 +78,7 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
         containerInfoDto.setJpg(imageInfoDto);
         containerInfoDto.setImageAnnotationDto(imageAnnotationDto);
 
-        imageAnnotationService.saveImageAnnotation(imageAnnotationDto);
-
+        imageAnnotationService.saveImageAnnotation(imageAnnotationDto, authentication);
         return convertToSummary(containerInfoDto);
     }
 
@@ -96,6 +95,7 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
             throw new IllegalStateException("ImageAnnotationDto is null");
         }
 
+        imageAnnotationService.saveImageAnnotation(imageAnnotationDto, authentication);
         ContainerInfoDto containerInfoDto = convertToContainerInfo(imageAnnotationDto, containerInfoUpdate);
 
         if (authentication != null && authentication.getName() != null) {
@@ -104,10 +104,10 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
             throw new IllegalStateException("Authentication or Username is null");
         }
 
-        return saveToApprovedContainer(containerInfoDto);
+        return saveToApprovedContainer(containerInfoDto, authentication);
     }
 
-    private ImageAnnotationDto saveToApprovedContainer(ContainerInfoDto containerInfoDto) {
+    private ImageAnnotationDto saveToApprovedContainer(ContainerInfoDto containerInfoDto, Authentication authentication) {
         if (containerInfoDto == null || containerInfoDto.getImageAnnotationDto() == null) {
             return null;
         }
@@ -119,6 +119,9 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
             publicContainerService.deleteBlob(image);
             pendingContainerService.deleteJpgAndJsonBlobs(image);
         }
+
+        boolean isApproved = containerInfoDto.getImageAnnotationDto().isUserApproval();
+        imageAnnotationService.saveApprovedImageAnnotation(uploadedImageAnnotationDto, isApproved, authentication);
         return uploadedImageAnnotationDto;
     }
 

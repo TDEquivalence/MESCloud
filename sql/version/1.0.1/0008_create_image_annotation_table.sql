@@ -11,7 +11,8 @@ CREATE TABLE image_annotation (
     comments TEXT,
     log_decision TEXT,
     registered_at TIMESTAMP,
-    status TEXT
+    status TEXT,
+    user_id INT REFERENCES users(id)
 );
 
 CREATE TABLE annotation (

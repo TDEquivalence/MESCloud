@@ -1,6 +1,7 @@
 package com.alcegory.mescloud.azure.model;
 
 import com.alcegory.mescloud.azure.model.constant.Status;
+import com.alcegory.mescloud.model.entity.UserEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -30,8 +31,6 @@ public class ImageAnnotationEntity {
 
     private boolean userApproval;
 
-    @ElementCollection
-    @CollectionTable(name = "image_rejection")
     private List<String> rejection;
 
     private String comments;
@@ -42,4 +41,8 @@ public class ImageAnnotationEntity {
 
     @Enumerated(EnumType.STRING)
     private Status status;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private UserEntity user;
 }

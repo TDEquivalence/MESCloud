@@ -31,9 +31,9 @@ public class CorkDefectController {
     }
 
     @GetMapping("/corkDetails")
-    public ResponseEntity<Object> getImageAnnotation() {
+    public ResponseEntity<Object> getImageAnnotation(Authentication authentication) {
         try {
-            ContainerInfoSummary containerInfoSummary = containerManagerService.getRandomData();
+            ContainerInfoSummary containerInfoSummary = containerManagerService.getRandomData(authentication);
             return new ResponseEntity<>(containerInfoSummary, HttpStatus.OK);
         } catch (ImageAnnotationSaveException ex) {
             ErrorResponse errorResponse = new ErrorResponse("Internal server error occurred while saving image annotation");

@@ -7,9 +7,9 @@ import org.springframework.security.core.Authentication;
 
 public interface ContainerManagerService {
 
-    ContainerInfoSummary getData();
+    ContainerInfoSummary getData(Authentication authentication);
 
-    ContainerInfoSummary getRandomData();
+    ContainerInfoSummary getRandomData(Authentication authentication);
 
     ImageAnnotationDto processSaveToApprovedContainer(ContainerInfoUpdate containerInfoUpdate, Authentication authentication);
 }

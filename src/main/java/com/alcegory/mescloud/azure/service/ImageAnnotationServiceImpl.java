@@ -2,19 +2,21 @@ package com.alcegory.mescloud.azure.service;
 
 import com.alcegory.mescloud.azure.model.AnnotationEntity;
 import com.alcegory.mescloud.azure.model.ImageAnnotationEntity;
+import com.alcegory.mescloud.azure.model.constant.Status;
 import com.alcegory.mescloud.azure.model.converter.ImageAnnotationConverter;
 import com.alcegory.mescloud.azure.model.dto.ImageAnnotationDto;
 import com.alcegory.mescloud.azure.repository.AnnotationRepository;
 import com.alcegory.mescloud.azure.repository.ImageAnnotationRepository;
 import com.alcegory.mescloud.exception.ImageAnnotationSaveException;
+import com.alcegory.mescloud.model.entity.UserEntity;
+import com.alcegory.mescloud.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
-
-import static com.alcegory.mescloud.azure.model.constant.Status.RECEIVED;
 
 @Service
 @AllArgsConstructor
@@ -23,17 +25,37 @@ public class ImageAnnotationServiceImpl implements ImageAnnotationService {
 
     private final ImageAnnotationRepository imageAnnotationRepository;
     private final AnnotationRepository annotationRepository;
+    private final UserRepository userRepository;
     private final ImageAnnotationConverter converter;
 
     @Override
-    public void saveImageAnnotation(ImageAnnotationDto imageAnnotationDto) {
+    public void saveImageAnnotation(ImageAnnotationDto imageAnnotationDto, Authentication authentication) {
         if (imageAnnotationDto == null) {
             throw new IllegalArgumentException("ImageAnnotationDto cannot be null");
         }
 
         ImageAnnotationEntity imageAnnotation = converter.dtoToEntity(imageAnnotationDto);
+        imageAnnotation.setUser(getUser(authentication.getName()));
         imageAnnotation.setRegisteredAt(new Date());
-        imageAnnotation.setStatus(RECEIVED);
+        setStatusAndSaveImageWithTransaction(imageAnnotation, Status.INITIAL);
+    }
+
+    public void saveApprovedImageAnnotation(ImageAnnotationDto imageAnnotationDto, boolean isApproved,
+                                            Authentication authentication) {
+        if (imageAnnotationDto == null) {
+            throw new IllegalArgumentException("ImageAnnotationDto cannot be null");
+        }
+
+        ImageAnnotationEntity imageAnnotation = converter.dtoToEntity(imageAnnotationDto);
+        imageAnnotation.setUser(getUser(authentication.getName()));
+        imageAnnotation.setRegisteredAt(new Date());
+
+        Status status = isApproved ? Status.APPROVED : Status.REJECTED;
+        setStatusAndSaveImageWithTransaction(imageAnnotation, status);
+    }
+
+    private void setStatusAndSaveImageWithTransaction(ImageAnnotationEntity imageAnnotation, Status status) {
+        imageAnnotation.setStatus(status);
         saveImageWithTransaction(imageAnnotation);
     }
 
@@ -55,5 +77,9 @@ public class ImageAnnotationServiceImpl implements ImageAnnotationService {
         } catch (Exception e) {
             throw new ImageAnnotationSaveException("Failed to save image annotation", e);
         }
+    }
+
+    private UserEntity getUser(String username) {
+        return userRepository.findUserByUsername(username);
     }
 }
