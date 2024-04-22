@@ -1,6 +1,8 @@
 package com.alcegory.mescloud.api.rest;
 
+import com.alcegory.mescloud.api.rest.response.ErrorResponse;
 import com.alcegory.mescloud.exception.ForbiddenAccessException;
+import com.alcegory.mescloud.exception.InconsistentPropertiesException;
 import com.alcegory.mescloud.model.dto.ProductionOrderDto;
 import com.alcegory.mescloud.model.dto.SampleDto;
 import com.alcegory.mescloud.model.request.RequestById;
@@ -24,13 +26,17 @@ public class SampleController {
     private final SampleService sampleService;
 
     @PostMapping
-    public ResponseEntity<SampleDto> create(@RequestBody RequestSampleDto requestSampleDto, Authentication authentication) {
-        SampleDto sampleDto = sampleService.create(requestSampleDto, authentication);
-        if (sampleDto == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    public ResponseEntity<Object> create(@RequestBody RequestSampleDto requestSampleDto, Authentication authentication) {
+        try {
+            SampleDto sampleDto = sampleService.create(requestSampleDto, authentication);
+            return ResponseEntity.ok(sampleDto);
+        } catch (InconsistentPropertiesException ex) {
+            ErrorResponse errorResponse = new ErrorResponse("Inconsistent properties: " + ex.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        } catch (Exception e) {
+            ErrorResponse errorResponse = new ErrorResponse("Internal server error occurred");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
-
-        return new ResponseEntity<>(sampleDto, HttpStatus.OK);
     }
 
     @GetMapping

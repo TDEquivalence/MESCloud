@@ -1,5 +1,6 @@
 package com.alcegory.mescloud.service.spi;
 
+import com.alcegory.mescloud.exception.InconsistentPropertiesException;
 import com.alcegory.mescloud.model.converter.GenericConverter;
 import com.alcegory.mescloud.model.dto.*;
 import com.alcegory.mescloud.model.entity.ComposedProductionOrderEntity;
@@ -109,15 +110,17 @@ public class ComposedProductionOrderServiceImpl implements ComposedProductionOrd
 
     private boolean haveSameProperties(List<Long> productionOrderIds) {
         if (productionOrderIds.isEmpty()) {
-            return false;
+            throw new IllegalArgumentException("Production order IDs list cannot be empty");
         }
 
         List<ProductionOrderDto> productionOrderDtos = getProductionOrderDtos(productionOrderIds);
         ProductionOrderDto firstProductionOrder = productionOrderDtos.get(0);
 
-        return productionOrderDtos.stream().skip(1).allMatch(order ->
-                propertiesAreEqual(order, firstProductionOrder)
-        );
+        if (!productionOrderDtos.stream().skip(1).allMatch(order -> propertiesAreEqual(order, firstProductionOrder))) {
+            throw new InconsistentPropertiesException("Production orders do not have the same properties");
+        }
+
+        return true;
     }
 
     private boolean propertiesAreEqual(ProductionOrderDto orderToCompare, ProductionOrderDto order) {
