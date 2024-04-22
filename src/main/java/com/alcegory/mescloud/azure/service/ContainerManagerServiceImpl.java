@@ -78,7 +78,6 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
         containerInfoDto.setJpg(imageInfoDto);
         containerInfoDto.setImageAnnotationDto(imageAnnotationDto);
 
-        imageAnnotationService.saveImageAnnotation(imageAnnotationDto, authentication);
         return convertToSummary(containerInfoDto);
     }
 
