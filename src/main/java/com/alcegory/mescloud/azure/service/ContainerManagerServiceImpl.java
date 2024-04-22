@@ -42,9 +42,7 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
 
         ImageAnnotationDto imageAnnotationDto =
                 pendingContainerService.getImageAnnotationFromContainer(imageInfoDto.getPath());
-
-        imageAnnotationService.saveImageAnnotation(imageAnnotationDto, authentication);
-
+        
         if (imageAnnotationDto == null) {
             log.info("The image at path '{}' was not found in the pending container and has been successfully deleted.",
                     imageInfoDto.getPath());
