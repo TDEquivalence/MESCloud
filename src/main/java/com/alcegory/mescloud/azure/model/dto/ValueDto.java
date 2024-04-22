@@ -1,4 +1,4 @@
-package com.alcegory.mescloud.azure.dto;
+package com.alcegory.mescloud.azure.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;

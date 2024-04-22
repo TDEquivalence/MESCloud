@@ -1,9 +1,9 @@
 package com.alcegory.mescloud.azure.controller;
 
-import com.alcegory.mescloud.azure.dto.ContainerInfoSummary;
-import com.alcegory.mescloud.azure.dto.ContainerInfoUpdate;
-import com.alcegory.mescloud.azure.dto.ImageAnnotationDto;
-import com.alcegory.mescloud.azure.dto.ImageInfoDto;
+import com.alcegory.mescloud.azure.model.dto.ContainerInfoSummary;
+import com.alcegory.mescloud.azure.model.dto.ContainerInfoUpdate;
+import com.alcegory.mescloud.azure.model.dto.ImageAnnotationDto;
+import com.alcegory.mescloud.azure.model.dto.ImageInfoDto;
 import com.alcegory.mescloud.azure.service.ContainerManagerService;
 import com.alcegory.mescloud.azure.service.PublicContainerService;
 import lombok.RequiredArgsConstructor;

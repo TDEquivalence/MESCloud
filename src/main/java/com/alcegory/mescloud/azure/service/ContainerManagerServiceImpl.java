@@ -1,6 +1,9 @@
 package com.alcegory.mescloud.azure.service;
 
-import com.alcegory.mescloud.azure.dto.*;
+import com.alcegory.mescloud.azure.model.converter.ImageAnnotationConverter;
+import com.alcegory.mescloud.azure.model.dto.*;
+import com.alcegory.mescloud.azure.repository.AnnotationRepository;
+import com.alcegory.mescloud.azure.repository.ImageAnnotationRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -16,12 +19,18 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
     private final PendingContainerService pendingContainerService;
     private final ApprovedContainerService approvedContainerService;
 
+    private final ImageAnnotationService imageAnnotationService;
+
+
     public ContainerManagerServiceImpl(PublicContainerService publicContainerService,
                                        PendingContainerService pendingContainerService,
-                                       ApprovedContainerService approvedContainerService) {
+                                       ApprovedContainerService approvedContainerService,
+                                       ImageAnnotationRepository imageAnnotationRepository,
+                                       AnnotationRepository annotationRepository, ImageAnnotationConverter converter, ImageAnnotationService imageAnnotationService) {
         this.publicContainerService = publicContainerService;
         this.pendingContainerService = pendingContainerService;
         this.approvedContainerService = approvedContainerService;
+        this.imageAnnotationService = imageAnnotationService;
     }
 
     @Override
@@ -33,6 +42,8 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
 
         ImageAnnotationDto imageAnnotationDto =
                 pendingContainerService.getImageAnnotationFromContainer(imageInfoDto.getPath());
+
+        imageAnnotationService.saveImageAnnotation(imageAnnotationDto);
 
         if (imageAnnotationDto == null) {
             log.info("The image at path '{}' was not found in the pending container and has been successfully deleted.",
@@ -66,6 +77,8 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
         ContainerInfoDto containerInfoDto = new ContainerInfoDto();
         containerInfoDto.setJpg(imageInfoDto);
         containerInfoDto.setImageAnnotationDto(imageAnnotationDto);
+
+        imageAnnotationService.saveImageAnnotation(imageAnnotationDto);
 
         return convertToSummary(containerInfoDto);
     }
