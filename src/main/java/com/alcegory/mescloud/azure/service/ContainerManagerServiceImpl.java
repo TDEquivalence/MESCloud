@@ -42,7 +42,7 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
 
         ImageAnnotationDto imageAnnotationDto =
                 pendingContainerService.getImageAnnotationFromContainer(imageInfoDto.getPath());
-        
+
         if (imageAnnotationDto == null) {
             log.info("The image at path '{}' was not found in the pending container and has been successfully deleted.",
                     imageInfoDto.getPath());
@@ -96,7 +96,7 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
         ContainerInfoDto containerInfoDto = convertToContainerInfo(imageAnnotationDto, containerInfoUpdate);
 
         if (authentication != null && authentication.getName() != null) {
-            containerInfoDto.setUsername(authentication.getName());
+            containerInfoDto.getImageAnnotationDto().setUsername(authentication.getName());
         } else {
             throw new IllegalStateException("Authentication or Username is null");
         }

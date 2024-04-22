@@ -9,5 +9,4 @@ public class ContainerInfoDto {
 
     private ImageInfoDto jpg;
     private ImageAnnotationDto imageAnnotationDto;
-    private String username;
 }
