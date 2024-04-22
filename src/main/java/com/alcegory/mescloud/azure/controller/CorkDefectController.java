@@ -1,11 +1,13 @@
 package com.alcegory.mescloud.azure.controller;
 
+import com.alcegory.mescloud.api.rest.response.ErrorResponse;
 import com.alcegory.mescloud.azure.model.dto.ContainerInfoSummary;
 import com.alcegory.mescloud.azure.model.dto.ContainerInfoUpdate;
 import com.alcegory.mescloud.azure.model.dto.ImageAnnotationDto;
 import com.alcegory.mescloud.azure.model.dto.ImageInfoDto;
 import com.alcegory.mescloud.azure.service.ContainerManagerService;
 import com.alcegory.mescloud.azure.service.PublicContainerService;
+import com.alcegory.mescloud.exception.ImageAnnotationSaveException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,9 +31,14 @@ public class CorkDefectController {
     }
 
     @GetMapping("/corkDetails")
-    public ResponseEntity<ContainerInfoSummary> getImageAnnotation() {
-        ContainerInfoSummary containerInfoSummary = containerManagerService.getRandomData();
-        return new ResponseEntity<>(containerInfoSummary, HttpStatus.OK);
+    public ResponseEntity<Object> getImageAnnotation() {
+        try {
+            ContainerInfoSummary containerInfoSummary = containerManagerService.getRandomData();
+            return new ResponseEntity<>(containerInfoSummary, HttpStatus.OK);
+        } catch (ImageAnnotationSaveException ex) {
+            ErrorResponse errorResponse = new ErrorResponse("Internal server error occurred while saving image annotation");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
     }
 
     @PostMapping("/updateCorkDetails")

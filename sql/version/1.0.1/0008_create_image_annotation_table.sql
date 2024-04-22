@@ -9,7 +9,9 @@ CREATE TABLE image_annotation (
     user_approval BOOLEAN,
     rejection TEXT[],
     comments TEXT,
-    log_decision TEXT
+    log_decision TEXT,
+    registered_at TIMESTAMP,
+    status TEXT
 );
 
 CREATE TABLE annotation (

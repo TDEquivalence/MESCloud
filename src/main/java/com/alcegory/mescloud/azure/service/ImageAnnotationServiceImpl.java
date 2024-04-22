@@ -11,7 +11,10 @@ import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
+
+import static com.alcegory.mescloud.azure.model.constant.Status.RECEIVED;
 
 @Service
 @AllArgsConstructor
@@ -29,9 +32,11 @@ public class ImageAnnotationServiceImpl implements ImageAnnotationService {
         }
 
         ImageAnnotationEntity imageAnnotation = converter.dtoToEntity(imageAnnotationDto);
+        imageAnnotation.setRegisteredAt(new Date());
+        imageAnnotation.setStatus(RECEIVED);
         saveImageWithTransaction(imageAnnotation);
     }
-    
+
     public void saveImageWithTransaction(ImageAnnotationEntity imageAnnotation) {
         if (imageAnnotation == null) {
             throw new IllegalArgumentException("ImageAnnotationEntity cannot be null");
