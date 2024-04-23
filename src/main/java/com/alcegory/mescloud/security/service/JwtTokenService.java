@@ -114,11 +114,13 @@ public class JwtTokenService {
         }
         return false;
     }
-    
+
     public void removeCookie(HttpServletResponse response, String cookieName) {
         Cookie cookie = new Cookie(cookieName, null);
         cookie.setMaxAge(0);
-        cookie.setPath("/");
+        cookie.setPath(PATH);
+        cookie.setSecure(true);
+        cookie.setHttpOnly(true);
         response.addCookie(cookie);
     }
 
