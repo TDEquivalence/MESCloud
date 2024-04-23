@@ -1,9 +1,6 @@
 package com.alcegory.mescloud.azure.service;
 
-import com.alcegory.mescloud.azure.model.converter.ImageAnnotationConverter;
 import com.alcegory.mescloud.azure.model.dto.*;
-import com.alcegory.mescloud.azure.repository.AnnotationRepository;
-import com.alcegory.mescloud.azure.repository.ImageAnnotationRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -25,8 +22,7 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
     public ContainerManagerServiceImpl(PublicContainerService publicContainerService,
                                        PendingContainerService pendingContainerService,
                                        ApprovedContainerService approvedContainerService,
-                                       ImageAnnotationRepository imageAnnotationRepository,
-                                       AnnotationRepository annotationRepository, ImageAnnotationConverter converter, ImageAnnotationService imageAnnotationService) {
+                                       ImageAnnotationService imageAnnotationService) {
         this.publicContainerService = publicContainerService;
         this.pendingContainerService = pendingContainerService;
         this.approvedContainerService = approvedContainerService;

@@ -46,9 +46,8 @@ public class ComposedProductionOrderServiceImpl implements ComposedProductionOrd
     public Optional<ComposedProductionOrderDto> create(List<Long> productionOrderIds) {
 
         List<Long> validProductionOrderIds = getValidProductionOrders(productionOrderIds);
-        if (!haveSameProperties(productionOrderIds)) {
-            throw new IllegalArgumentException("Production order list doesn't have same properties");
-        }
+        validateProductionOrderProperties(productionOrderIds);
+
         ComposedProductionOrderEntity composedEntity = createComposed();
 
         setProductionOrdersWithComposed(validProductionOrderIds, composedEntity);
@@ -108,7 +107,7 @@ public class ComposedProductionOrderServiceImpl implements ComposedProductionOrd
         return String.format(FIVE_DIGIT_NUMBER_FORMAT, ++lastCodeValue);
     }
 
-    private boolean haveSameProperties(List<Long> productionOrderIds) {
+    private void validateProductionOrderProperties(List<Long> productionOrderIds) {
         if (productionOrderIds.isEmpty()) {
             throw new IllegalArgumentException("Production order IDs list cannot be empty");
         }
@@ -116,11 +115,13 @@ public class ComposedProductionOrderServiceImpl implements ComposedProductionOrd
         List<ProductionOrderDto> productionOrderDtos = getProductionOrderDtos(productionOrderIds);
         ProductionOrderDto firstProductionOrder = productionOrderDtos.get(0);
 
-        if (!productionOrderDtos.stream().skip(1).allMatch(order -> propertiesAreEqual(order, firstProductionOrder))) {
+        boolean allPropertiesEqual = productionOrderDtos.stream()
+                .skip(1)
+                .allMatch(order -> propertiesAreEqual(order, firstProductionOrder));
+
+        if (!allPropertiesEqual) {
             throw new InconsistentPropertiesException("Production orders do not have the same properties");
         }
-
-        return true;
     }
 
     private boolean propertiesAreEqual(ProductionOrderDto orderToCompare, ProductionOrderDto order) {

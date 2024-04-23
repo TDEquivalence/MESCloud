@@ -9,6 +9,8 @@ import org.springframework.security.core.Authentication;
 
 public class AuthorityUtil {
 
+    public static final String NOT_AUTHORIZED_MESSAGE = "User is not authorized to perform this action";
+
     private AuthorityUtil() {
         //Utility class, not meant for instantiation
     }
@@ -17,7 +19,7 @@ public class AuthorityUtil {
         UserEntity user = (UserEntity) authentication.getPrincipal();
 
         if (user.getRole() != expectedRole) {
-            throw new ForbiddenAccessException("User is not authorized to perform this action");
+            throw new ForbiddenAccessException(NOT_AUTHORIZED_MESSAGE);
         }
     }
 
@@ -32,7 +34,7 @@ public class AuthorityUtil {
             return;
         }
 
-        throw new ForbiddenAccessException("User is not authorized to perform this action");
+        throw new ForbiddenAccessException(NOT_AUTHORIZED_MESSAGE);
     }
 
     public static void checkUserAndSectionRole(Authentication authentication, UserRoleService userRoleService, SectionRole expectedRole) {
@@ -40,14 +42,14 @@ public class AuthorityUtil {
         UserRoleEntity userRole = userRoleService.findUserRoleByUserAndSection(user.getId(), 1L);
 
         if (!hasExpectedSectionRole(userRole, expectedRole)) {
-            throw new ForbiddenAccessException("User is not authorized to perform this action");
+            throw new ForbiddenAccessException(NOT_AUTHORIZED_MESSAGE);
         }
     }
 
     public static void checkPermission(Authentication authentication, Authority authorityToCheck) {
         UserEntity user = (UserEntity) authentication.getPrincipal();
         if (user == null || user.getRole() == null || !user.getRole().getAuthorities().contains(authorityToCheck)) {
-            throw new ForbiddenAccessException("User is not authorized to perform this action");
+            throw new ForbiddenAccessException(NOT_AUTHORIZED_MESSAGE);
         }
     }
 

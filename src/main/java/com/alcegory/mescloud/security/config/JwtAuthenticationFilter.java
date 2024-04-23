@@ -64,7 +64,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (jwtTokenService.isTokenValid(tokenToCheck, userDetails)) {
                 authenticateUser(request, userDetails);
                 if (jwtTokenService.isTokenRefreshable(tokenToCheck)) {
-                    refreshToken(request, response, userDetails);
+                    refreshToken(response, userDetails);
                 }
             }
         }
@@ -84,7 +84,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         SecurityContextHolder.getContext().setAuthentication(authToken);
     }
 
-    private void refreshToken(HttpServletRequest request, HttpServletResponse response, UserDetails userDetails) {
+    private void refreshToken(HttpServletResponse response, UserDetails userDetails) {
         String accessToken = jwtTokenService.generateToken(userDetails);
         addJwtTokenToCookie(response, accessToken);
     }

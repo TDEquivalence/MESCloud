@@ -110,7 +110,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         );
 
         UserEntity user = userRepository.findUserByUsername(request.getUsername());
-        String jwtToken = setJwtTokenCookie(user, response);
+        setJwtTokenCookie(user, response);
         AuthenticationResponse authenticationResponse = userToAuthenticationResponse(user);
 
         return userRoleService.getUserRoleAndConfigurations(authenticationResponse);
