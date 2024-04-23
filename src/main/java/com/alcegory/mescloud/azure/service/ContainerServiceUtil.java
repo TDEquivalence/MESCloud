@@ -170,5 +170,4 @@ public class ContainerServiceUtil {
             return blobContainerClient.getBlobClient(blobItem.getName());
         }
     }
-
 }

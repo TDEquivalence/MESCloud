@@ -1,4 +1,4 @@
-package com.alcegory.mescloud.service;
+package com.alcegory.mescloud.service.spi;
 
 import com.alcegory.mescloud.repository.ProductionOrderRepository;
 import com.alcegory.mescloud.model.entity.ProductionOrderEntity;
@@ -66,7 +66,7 @@ class ProductionOrderServiceTest {
 
         assertEquals(expectedIds, result);
     }
-    
+
     @Test
     void testGenerateCodeWithProperlyFormattedCode() {
         ProductionOrderEntity productionOrderEntity = new ProductionOrderEntity();

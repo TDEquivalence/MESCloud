@@ -1,6 +1,5 @@
-package com.alcegory.mescloud.util;
+package com.alcegory.mescloud.utility;
 
-import com.alcegory.mescloud.utility.BinaryUtil;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;

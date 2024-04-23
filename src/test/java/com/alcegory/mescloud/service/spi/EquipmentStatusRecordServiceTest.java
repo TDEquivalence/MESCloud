@@ -1,4 +1,4 @@
-package com.alcegory.mescloud.service;
+package com.alcegory.mescloud.service.spi;
 
 import com.alcegory.mescloud.constant.EquipmentStatus;
 import com.alcegory.mescloud.repository.EquipmentStatusRecordRepository;

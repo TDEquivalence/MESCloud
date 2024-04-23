@@ -1,6 +1,5 @@
-package com.alcegory.mescloud.util;
+package com.alcegory.mescloud.utility;
 
-import com.alcegory.mescloud.utility.DateUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

@@ -1,6 +1,5 @@
-package com.alcegory.mescloud.util;
+package com.alcegory.mescloud.utility;
 
-import com.alcegory.mescloud.utility.HttpUtil;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;

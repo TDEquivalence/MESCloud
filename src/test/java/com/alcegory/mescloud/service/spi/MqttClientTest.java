@@ -1,4 +1,4 @@
-package com.alcegory.mescloud.service;
+package com.alcegory.mescloud.service.spi;
 
 import com.alcegory.mescloud.api.mqtt.MqttClient;
 import com.alcegory.mescloud.exception.MesMqttException;
@@ -26,7 +26,7 @@ class MqttClientTest {
     }
 
     @Test
-     void subscribe() throws MesMqttException {
+    void subscribe() throws MesMqttException {
         mqttClient.subscribe("Test topic");
         Assertions.assertDoesNotThrow(() -> mqttClient.subscribe("Test topic"));
     }
