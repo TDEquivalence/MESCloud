@@ -30,29 +30,6 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
     }
 
     @Override
-    public ContainerInfoSummary getData(Authentication authentication) {
-        ImageInfoDto imageInfoDto = publicContainerService.getImageReference();
-        if (imageInfoDto == null) {
-            return new ContainerInfoSummary();
-        }
-
-        ImageAnnotationDto imageAnnotationDto =
-                pendingContainerService.getImageAnnotationFromContainer(imageInfoDto.getPath());
-
-        if (imageAnnotationDto == null) {
-            log.info("The image at path '{}' was not found in the pending container and has been successfully deleted.",
-                    imageInfoDto.getPath());
-            return new ContainerInfoSummary();
-        }
-
-        ContainerInfoDto containerInfoDto = new ContainerInfoDto();
-        containerInfoDto.setJpg(imageInfoDto);
-        containerInfoDto.setImageAnnotationDto(imageAnnotationDto);
-
-        return convertToSummary(containerInfoDto);
-    }
-
-    @Override
     public ContainerInfoSummary getRandomData(Authentication authentication) {
         ImageInfoDto imageInfoDto = publicContainerService.getRandomImageReference();
         if (imageInfoDto == null) {

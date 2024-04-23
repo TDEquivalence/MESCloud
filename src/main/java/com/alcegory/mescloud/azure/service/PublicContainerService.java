@@ -8,8 +8,6 @@ public interface PublicContainerService {
 
     List<ImageInfoDto> getAllImageReference();
 
-    ImageInfoDto getImageReference();
-
     ImageInfoDto getRandomImageReference();
 
     void deleteBlob(String blobName);

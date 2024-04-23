@@ -44,15 +44,6 @@ public class PublicContainerServiceImpl implements PublicContainerService {
     }
 
     @Override
-    public ImageInfoDto getImageReference() {
-        return ContainerServiceUtil.getImageReference(
-                accountUrl,
-                containerName,
-                sasToken
-        );
-    }
-
-    @Override
     public ImageInfoDto getRandomImageReference() {
         return ContainerServiceUtil.getRandomImageReference(
                 accountUrl,

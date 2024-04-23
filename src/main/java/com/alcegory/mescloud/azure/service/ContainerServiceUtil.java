@@ -84,33 +84,6 @@ public class ContainerServiceUtil {
         return containerInfoList;
     }
 
-    public static ImageInfoDto getImageReference(
-            String accountUrl,
-            String containerName,
-            String sasToken) {
-
-        String containerUriWithSAS = String.format(IMAGE_URL_FORMAT, accountUrl, containerName, sasToken);
-        BlobContainerClient blobContainerClient = new BlobContainerClientBuilder()
-                .endpoint(containerUriWithSAS)
-                .buildClient();
-
-        for (BlobItem blobItem : blobContainerClient.listBlobs()) {
-            String blobName = blobItem.getName();
-            if (blobName.toLowerCase().endsWith(JPG_EXTENSION)) {
-                BlobClient blobClient = getBlobClient(blobContainerClient, blobItem);
-                try {
-                    ImageInfoDto imageInfo = new ImageInfoDto();
-                    imageInfo.setPath(blobClient.getBlobUrl());
-                    return imageInfo;
-                } catch (Exception e) {
-                    log.error(ERROR_MESSAGE, blobName, e);
-                }
-            }
-        }
-
-        return null;
-    }
-
     public static ImageInfoDto getRandomImageReference(
             String accountUrl,
             String containerName,
