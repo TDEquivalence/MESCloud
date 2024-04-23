@@ -5,12 +5,7 @@ INSERT INTO user_role (user_id, role_id, section_id) VALUES
 (2, 1, 1),
 (4, 4, 1),
 (5, 4, 1),
-(6, 1, 1),
-(1, 1, 2),
-(2, 1, 2),
-(4, 4, 2),
-(5, 4, 2),
-(6, 1, 2);
+(6, 1, 1);
 
 INSERT INTO audit_script (run_date, process, version, schema)
 VALUES
