@@ -25,7 +25,7 @@ public class ContainerServiceUtil {
     private static final String JSON_EXTENSION = ".json";
     private static final String IMAGE_URL_FORMAT = "%s%s?%s";
     private static final String ERROR_MESSAGE = "An error occurred while processing blob: {}";
-    private static Random random = new Random();
+    private static final Random random = new Random();
 
     private ContainerServiceUtil() {
     }
