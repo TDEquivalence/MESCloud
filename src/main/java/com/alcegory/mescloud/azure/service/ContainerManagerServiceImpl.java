@@ -30,10 +30,10 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
     }
 
     @Override
-    public ContainerInfoSummary getRandomData(Authentication authentication) {
+    public ImageAnnotationDto getRandomData(Authentication authentication) {
         ImageInfoDto imageInfoDto = publicContainerService.getRandomImageReference();
         if (imageInfoDto == null) {
-            return new ContainerInfoSummary();
+            return new ImageAnnotationDto();
         }
 
         ImageAnnotationDto imageAnnotationDto =
@@ -42,14 +42,10 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
         if (imageAnnotationDto == null) {
             log.info("The image at path '{}' was not found in the pending container and has been successfully deleted.",
                     imageInfoDto.getPath());
-            return new ContainerInfoSummary();
+            return new ImageAnnotationDto();
         }
 
-        ContainerInfoDto containerInfoDto = new ContainerInfoDto();
-        containerInfoDto.setJpg(imageInfoDto);
-        containerInfoDto.setImageAnnotationDto(imageAnnotationDto);
-
-        return convertToSummary(containerInfoDto);
+        return imageAnnotationDto;
     }
 
     @Override
@@ -90,6 +86,7 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
             pendingContainerService.deleteJpgAndJsonBlobs(image);
         }
 
+        //TODO: REFACTOR -> ERROR isUserApproval is from the cork machine -> NOT MES
         boolean isApproved = containerInfoDto.getImageAnnotationDto().isUserApproval();
         imageAnnotationService.saveApprovedImageAnnotation(uploadedImageAnnotationDto, isApproved, authentication);
         return uploadedImageAnnotationDto;
