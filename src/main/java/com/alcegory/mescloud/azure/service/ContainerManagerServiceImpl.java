@@ -101,7 +101,15 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
     }
 
     private void checkImageOccurrencesToRemove(ContainerInfoDto containerInfoDto, ImageAnnotationDto uploadedImageAnnotationDto) {
+        if (containerInfoDto == null || containerInfoDto.getImageAnnotationDto() == null) {
+            return;
+        }
+
         String image = containerInfoDto.getImageAnnotationDto().getData().getImage();
+        if (image == null) {
+            return;
+        }
+
         int imageOccurrencesNotInitial = imageAnnotationService.countByImageAndStatusNotInitial(image);
         if (uploadedImageAnnotationDto != null && imageOccurrencesNotInitial >= 3) {
             publicContainerService.deleteBlob(image);
