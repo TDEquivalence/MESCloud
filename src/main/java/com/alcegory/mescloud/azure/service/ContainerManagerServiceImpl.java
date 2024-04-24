@@ -16,7 +16,6 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
     private final PublicContainerService publicContainerService;
     private final PendingContainerService pendingContainerService;
     private final ApprovedContainerService approvedContainerService;
-
     private final ImageAnnotationService imageAnnotationService;
 
 
@@ -92,16 +91,17 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
 
         ImageAnnotationDto uploadedImageAnnotationDto =
                 approvedContainerService.saveToApprovedContainer(containerInfoDto.getImageAnnotationDto());
-        String image = containerInfoDto.getImageAnnotationDto().getData().getImage();
+        
+        boolean isApproved = containerInfoDto.getImageAnnotationDto().isUserApproval();
+        imageAnnotationService.saveApprovedImageAnnotation(uploadedImageAnnotationDto, isApproved, authentication);
 
+        String image = containerInfoDto.getImageAnnotationDto().getData().getImage();
         int imageOccurrencesNotInitial = imageAnnotationService.countByImageAndStatusNotInitial(image);
         if (uploadedImageAnnotationDto != null && imageOccurrencesNotInitial >= 3) {
             publicContainerService.deleteBlob(image);
             pendingContainerService.deleteJpgAndJsonBlobs(image);
         }
 
-        boolean isApproved = containerInfoDto.getImageAnnotationDto().isUserApproval();
-        imageAnnotationService.saveApprovedImageAnnotation(uploadedImageAnnotationDto, isApproved, authentication);
         return uploadedImageAnnotationDto;
     }
 
