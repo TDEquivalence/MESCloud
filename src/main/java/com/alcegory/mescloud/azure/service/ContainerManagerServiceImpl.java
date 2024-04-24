@@ -1,6 +1,7 @@
 package com.alcegory.mescloud.azure.service;
 
 import com.alcegory.mescloud.azure.model.dto.*;
+import com.alcegory.mescloud.model.entity.UserEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -31,21 +32,32 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
 
     @Override
     public ImageAnnotationDto getRandomData(Authentication authentication) {
-        ImageInfoDto imageInfoDto = publicContainerService.getRandomImageReference();
-        if (imageInfoDto == null) {
-            return new ImageAnnotationDto();
-        }
+        ImageAnnotationDto imageAnnotationDto;
+        do {
+            ImageInfoDto imageInfoDto = publicContainerService.getRandomImageReference();
+            if (imageInfoDto == null) {
+                return new ImageAnnotationDto();
+            }
 
-        ImageAnnotationDto imageAnnotationDto =
-                pendingContainerService.getImageAnnotationFromContainer(imageInfoDto.getPath());
+            imageAnnotationDto = pendingContainerService.getImageAnnotationFromContainer(imageInfoDto.getPath());
 
-        if (imageAnnotationDto == null) {
-            log.info("The image at path '{}' was not found in the pending container and has been successfully deleted.",
-                    imageInfoDto.getPath());
-            return new ImageAnnotationDto();
-        }
+            if (imageAnnotationDto == null) {
+                log.info("The image at path '{}' was not found in the pending container and has been successfully deleted.",
+                        imageInfoDto.getPath());
+                return new ImageAnnotationDto();
+            }
+        } while (hasUserDecisionOnImage(imageAnnotationDto, authentication));
 
         return imageAnnotationDto;
+    }
+
+    private boolean hasUserDecisionOnImage(ImageAnnotationDto imageAnnotationDto, Authentication authentication) {
+        if (imageAnnotationDto == null || imageAnnotationDto.getData() == null || imageAnnotationDto.getData().getImage() == null) {
+            return false;
+        }
+
+        UserEntity user = (UserEntity) authentication.getPrincipal();
+        return imageAnnotationService.existsByUserIdAndImage(user.getId(), imageAnnotationDto.getData().getImage());
     }
 
     @Override
@@ -81,7 +93,9 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
         ImageAnnotationDto uploadedImageAnnotationDto =
                 approvedContainerService.saveToApprovedContainer(containerInfoDto.getImageAnnotationDto());
         String image = containerInfoDto.getImageAnnotationDto().getData().getImage();
-        if (uploadedImageAnnotationDto != null && image != null) {
+
+        int imageOccurrencesNotInitial = imageAnnotationService.countByImageAndStatusNotInitial(image);
+        if (uploadedImageAnnotationDto != null && imageOccurrencesNotInitial >= 3) {
             publicContainerService.deleteBlob(image);
             pendingContainerService.deleteJpgAndJsonBlobs(image);
         }

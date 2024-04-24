@@ -54,6 +54,30 @@ public class ImageAnnotationServiceImpl implements ImageAnnotationService {
         setStatusAndSaveImageWithTransaction(imageAnnotation, status);
     }
 
+    @Override
+    public boolean existsByUserIdAndImage(Long userId, String image) {
+        if (userId == null || image == null) {
+            return false;
+        }
+        return imageAnnotationRepository.existsByUserIdAndImage(userId, image);
+    }
+
+    @Override
+    public int countByImage(String image) {
+        if (image == null) {
+            return 0;
+        }
+        return imageAnnotationRepository.countByImage(image);
+    }
+
+    @Override
+    public int countByImageAndStatusNotInitial(String image) {
+        if (image == null) {
+            return 0;
+        }
+        return imageAnnotationRepository.countByImageAndStatusNotInitial(image);
+    }
+
     private void setStatusAndSaveImageWithTransaction(ImageAnnotationEntity imageAnnotation, Status status) {
         imageAnnotation.setStatus(status);
         saveImageWithTransaction(imageAnnotation);
