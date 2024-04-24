@@ -2,15 +2,16 @@ BEGIN;
 
 CREATE TABLE image_annotation (
     id SERIAL PRIMARY KEY,
-    image TEXT,
+    image TEXT NOT NULL,
     model_decision TEXT,
+    mes_user_decision TEXT,
     user_decision TEXT,
     classification TEXT,
     user_approval BOOLEAN,
     rejection TEXT[],
     comments TEXT,
     log_decision TEXT,
-    registered_at TIMESTAMP,
+    registered_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     status TEXT,
     user_id INT REFERENCES users(id)
 );

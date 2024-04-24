@@ -27,6 +27,8 @@ public class ImageAnnotationEntity {
 
     private String userDecision;
 
+    private String mesUserDecision;
+
     private String classification;
 
     private boolean userApproval;

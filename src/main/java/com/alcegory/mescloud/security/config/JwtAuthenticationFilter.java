@@ -27,7 +27,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private static final String COOKIE_TOKEN_NAME = "jwtToken";
     private static final String COOKIE_REFRESH_TOKEN_NAME = "refreshJwtToken";
-    private static final String INVALID_TOKEN_MESSAGE = "Invalid token";
+    private static final String EXPIRED_TOKEN_MESSAGE = "TOKEN EXPIRED";
 
     private final JwtTokenService jwtTokenService;
     private final UserDetailsService userDetailsService;
@@ -91,7 +91,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private void handleInvalidToken(HttpServletResponse response) throws IOException {
         cleanCookies(response);
-        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, INVALID_TOKEN_MESSAGE);
+        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, EXPIRED_TOKEN_MESSAGE);
     }
 
     private void cleanCookies(HttpServletResponse response) {

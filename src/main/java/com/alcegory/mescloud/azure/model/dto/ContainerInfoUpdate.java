@@ -14,4 +14,5 @@ public class ContainerInfoUpdate {
     private boolean userApproval;
     private List<String> rejection;
     private String comments;
+    private String mesUserDecision;
 }

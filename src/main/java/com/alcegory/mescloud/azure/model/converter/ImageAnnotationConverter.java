@@ -44,6 +44,7 @@ public class ImageAnnotationConverter {
         imageAnnotationEntity.setRejection(imageAnnotationDto.getRejection());
         imageAnnotationEntity.setComments(imageAnnotationDto.getComments());
         imageAnnotationEntity.setLogDecision(imageAnnotationDto.getLogDecision());
+        imageAnnotationEntity.setMesUserDecision(imageAnnotationDto.getMesUserDecision());
         return imageAnnotationEntity;
     }
 

@@ -16,6 +16,7 @@ public class ImageAnnotationDto {
     private String modelDecision;
     @JsonProperty("user_decision")
     private String userDecision;
+    private String mesUserDecision;
     private String classification;
     @JsonProperty("user_approval")
     private boolean userApproval;

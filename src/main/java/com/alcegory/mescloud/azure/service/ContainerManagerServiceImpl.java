@@ -86,7 +86,6 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
             pendingContainerService.deleteJpgAndJsonBlobs(image);
         }
 
-        //TODO: REFACTOR -> ERROR isUserApproval is from the cork machine -> NOT MES
         boolean isApproved = containerInfoDto.getImageAnnotationDto().isUserApproval();
         imageAnnotationService.saveApprovedImageAnnotation(uploadedImageAnnotationDto, isApproved, authentication);
         return uploadedImageAnnotationDto;
@@ -102,6 +101,7 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
         imageAnnotationDto.setRejection(containerInfoUpdate.getRejection());
         imageAnnotationDto.setComments(containerInfoUpdate.getComments());
         imageAnnotationDto.setUserApproval(containerInfoUpdate.isUserApproval());
+        imageAnnotationDto.setMesUserDecision(containerInfoUpdate.getMesUserDecision());
 
         ContainerInfoDto containerInfoDto = new ContainerInfoDto();
         containerInfoDto.setImageAnnotationDto(imageAnnotationDto);
