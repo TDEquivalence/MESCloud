@@ -19,7 +19,7 @@ import static org.mockito.Mockito.anyLong;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
-public class UserServiceImplTest {
+class UserServiceImplTest {
 
     @Mock
     private UserRepository userRepository;
