@@ -1,6 +1,7 @@
 package com.alcegory.mescloud.azure.controller;
 
 import com.alcegory.mescloud.api.rest.response.ErrorResponse;
+import com.alcegory.mescloud.azure.model.dto.ContainerInfoSummary;
 import com.alcegory.mescloud.azure.model.dto.ContainerInfoUpdate;
 import com.alcegory.mescloud.azure.model.dto.ImageAnnotationDto;
 import com.alcegory.mescloud.azure.model.dto.ImageInfoDto;
@@ -32,7 +33,7 @@ public class CorkDefectController {
     @GetMapping("/corkDetails")
     public ResponseEntity<Object> getImageAnnotation(Authentication authentication) {
         try {
-            ImageAnnotationDto imageAnnotation = containerManagerService.getRandomData(authentication);
+            ContainerInfoSummary imageAnnotation = containerManagerService.getRandomData(authentication);
             return new ResponseEntity<>(imageAnnotation, HttpStatus.OK);
         } catch (ImageAnnotationSaveException ex) {
             ErrorResponse errorResponse = new ErrorResponse("Internal server error occurred while saving image annotation");

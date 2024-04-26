@@ -30,12 +30,12 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
     }
 
     @Override
-    public ImageAnnotationDto getRandomData(Authentication authentication) {
+    public ContainerInfoSummary getRandomData(Authentication authentication) {
         ImageAnnotationDto imageAnnotationDto;
         do {
             ImageInfoDto imageInfoDto = publicContainerService.getRandomImageReference();
             if (imageInfoDto == null) {
-                return new ImageAnnotationDto();
+                return new ContainerInfoSummary();
             }
 
             imageAnnotationDto = pendingContainerService.getImageAnnotationFromContainer(imageInfoDto.getPath());
@@ -43,11 +43,11 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
             if (imageAnnotationDto == null) {
                 log.info("The image at path '{}' was not found in the pending container and has been successfully deleted.",
                         imageInfoDto.getPath());
-                return new ImageAnnotationDto();
+                return new ContainerInfoSummary();
             }
         } while (hasUserDecisionOnImage(imageAnnotationDto, authentication));
 
-        return imageAnnotationDto;
+        return convertToSummary(imageAnnotationDto);
     }
 
     private boolean hasUserDecisionOnImage(ImageAnnotationDto imageAnnotationDto, Authentication authentication) {
@@ -134,17 +134,14 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
         return containerInfoDto;
     }
 
-    private ContainerInfoSummary convertToSummary(ContainerInfoDto containerInfoDto) {
-        if (containerInfoDto == null || containerInfoDto.getImageAnnotationDto() == null
-                || containerInfoDto.getImageAnnotationDto().getData() == null) {
+    private ContainerInfoSummary convertToSummary(ImageAnnotationDto imageAnnotationDto) {
+        if (imageAnnotationDto == null) {
             return null;
         }
 
         ContainerInfoSummary summary = new ContainerInfoSummary();
-        summary.setImageUrl(containerInfoDto.getJpg().getPath());
+        summary.setImageAnnotationDto(imageAnnotationDto);
         summary.setSasToken(publicContainerService.getSasToken());
-        summary.setModelDecision(containerInfoDto.getImageAnnotationDto().getModelDecision());
-        summary.setAnnotations(getRectangleLabels(containerInfoDto.getImageAnnotationDto().getAnnotations()));
 
         return summary;
     }
