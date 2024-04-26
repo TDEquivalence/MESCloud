@@ -32,8 +32,9 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
     @Override
     public ContainerInfoSummary getRandomData(Authentication authentication) {
         ImageAnnotationDto imageAnnotationDto;
+        ImageInfoDto imageInfoDto;
         do {
-            ImageInfoDto imageInfoDto = publicContainerService.getRandomImageReference();
+            imageInfoDto = publicContainerService.getRandomImageReference();
             if (imageInfoDto == null) {
                 return new ContainerInfoSummary();
             }
@@ -47,7 +48,7 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
             }
         } while (hasUserDecisionOnImage(imageAnnotationDto, authentication));
 
-        return convertToSummary(imageAnnotationDto);
+        return convertToSummary(imageAnnotationDto, imageInfoDto);
     }
 
     private boolean hasUserDecisionOnImage(ImageAnnotationDto imageAnnotationDto, Authentication authentication) {
@@ -134,7 +135,7 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
         return containerInfoDto;
     }
 
-    private ContainerInfoSummary convertToSummary(ImageAnnotationDto imageAnnotationDto) {
+    private ContainerInfoSummary convertToSummary(ImageAnnotationDto imageAnnotationDto, ImageInfoDto imageInfoDto) {
         if (imageAnnotationDto == null) {
             return null;
         }
@@ -142,6 +143,7 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
         ContainerInfoSummary summary = new ContainerInfoSummary();
         summary.setImageAnnotationDto(imageAnnotationDto);
         summary.setSasToken(publicContainerService.getSasToken());
+        summary.setPath(imageInfoDto.getPath());
 
         return summary;
     }
