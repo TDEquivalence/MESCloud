@@ -11,7 +11,7 @@ public class SecurityConstant {
     public static final int JWT_EXPIRATION = 86400;
     public static final int REFRESH_JWT_EXPIRATION = 604800;
     public static final String ACCESS_DENIED_MESSAGE = "You do not have permission to access this page";
-    public static final String UNAUTHORIZED_MESSAGE = "You need to login to access this page";
+    public static final String FORBIDDEN_MESSAGE = "You need to login to access this page";
     public static final int ALLOWED_CLOCK_SKEW = 120;
     public static final String PATH = "/";
     private static final int EXPIRATION_PERIOD_HOURS = 24;
