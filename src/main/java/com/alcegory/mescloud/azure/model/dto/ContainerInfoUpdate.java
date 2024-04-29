@@ -15,4 +15,5 @@ public class ContainerInfoUpdate {
     private List<String> rejection;
     private String comments;
     private String mesUserDecision;
+    private List<AnnotationDto> annotations;
 }

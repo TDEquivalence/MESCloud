@@ -129,6 +129,7 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
         imageAnnotationDto.setComments(containerInfoUpdate.getComments());
         imageAnnotationDto.setUserApproval(containerInfoUpdate.isUserApproval());
         imageAnnotationDto.setMesUserDecision(containerInfoUpdate.getMesUserDecision());
+        imageAnnotationDto.setAnnotations(containerInfoUpdate.getAnnotations());
 
         ContainerInfoDto containerInfoDto = new ContainerInfoDto();
         containerInfoDto.setImageAnnotationDto(imageAnnotationDto);

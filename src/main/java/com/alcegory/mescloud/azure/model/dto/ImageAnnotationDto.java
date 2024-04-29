@@ -1,5 +1,6 @@
 package com.alcegory.mescloud.azure.model.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,6 +17,7 @@ public class ImageAnnotationDto {
     private String modelDecision;
     @JsonProperty("user_decision")
     private String userDecision;
+    @JsonIgnore
     private String mesUserDecision;
     private String classification;
     @JsonProperty("user_approval")
