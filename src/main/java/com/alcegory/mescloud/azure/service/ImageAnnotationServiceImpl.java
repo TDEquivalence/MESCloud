@@ -18,6 +18,8 @@ import org.springframework.stereotype.Service;
 import java.util.Date;
 import java.util.List;
 
+import static com.alcegory.mescloud.azure.model.constant.Status.*;
+
 @Service
 @AllArgsConstructor
 @Log
@@ -35,9 +37,10 @@ public class ImageAnnotationServiceImpl implements ImageAnnotationService {
         }
 
         ImageAnnotationEntity imageAnnotation = converter.dtoToEntity(imageAnnotationDto);
-        imageAnnotation.setUser(getUser(authentication.getName()));
         imageAnnotation.setRegisteredAt(new Date());
-        setStatusAndSaveImageWithTransaction(imageAnnotation, Status.INITIAL);
+        imageAnnotation.setUser(getUser(authentication));
+
+        setStatusAndSaveImageWithTransaction(imageAnnotation, INITIAL);
     }
 
     public void saveApprovedImageAnnotation(ImageAnnotationDto imageAnnotationDto, boolean isApproved,
@@ -47,10 +50,10 @@ public class ImageAnnotationServiceImpl implements ImageAnnotationService {
         }
 
         ImageAnnotationEntity imageAnnotation = converter.dtoToEntity(imageAnnotationDto);
-        imageAnnotation.setUser(getUser(authentication.getName()));
+        imageAnnotation.setUser(getUser(authentication));
         imageAnnotation.setRegisteredAt(new Date());
 
-        Status status = isApproved ? Status.APPROVED : Status.REJECTED;
+        Status status = isApproved ? APPROVED : REJECTED;
         setStatusAndSaveImageWithTransaction(imageAnnotation, status);
     }
 
@@ -103,7 +106,17 @@ public class ImageAnnotationServiceImpl implements ImageAnnotationService {
         }
     }
 
-    private UserEntity getUser(String username) {
+    private UserEntity getUser(Authentication authentication) {
+        if (authentication == null) {
+            throw new IllegalArgumentException("Authentication cannot be null");
+        }
+
+        String username = authentication.getName();
+
+        if (username == null) {
+            throw new IllegalArgumentException("Username cannot be null");
+        }
+
         return userRepository.findUserByUsername(username);
     }
 }

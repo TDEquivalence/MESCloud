@@ -61,11 +61,26 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
     }
 
     @Override
-    public ImageAnnotationDto processSaveToApprovedContainer(ContainerInfoUpdate containerInfoUpdate, Authentication authentication) {
+    public ImageAnnotationDto processSaveToApprovedContainer(ContainerInfoUpdate containerInfoUpdate,
+                                                             Authentication authentication) {
         if (containerInfoUpdate == null || containerInfoUpdate.getFileName() == null) {
             throw new IllegalArgumentException("ContainerInfoUpdate or FileName cannot be null");
         }
 
+        ImageAnnotationDto imageAnnotationDto = updateAndSaveImageAnnotation(containerInfoUpdate, authentication);
+        ContainerInfoDto containerInfoDto = convertToContainerInfo(imageAnnotationDto, containerInfoUpdate);
+
+        if (authentication != null && authentication.getName() != null && containerInfoDto != null) {
+            containerInfoDto.getImageAnnotationDto().setUsername(authentication.getName());
+        } else {
+            throw new IllegalStateException("Authentication or Username is null");
+        }
+
+        return saveToApprovedContainer(containerInfoDto, authentication);
+    }
+
+    public ImageAnnotationDto updateAndSaveImageAnnotation(ContainerInfoUpdate containerInfoUpdate,
+                                                           Authentication authentication) {
         ImageAnnotationDto imageAnnotationDto =
                 pendingContainerService.getImageAnnotationFromContainer(containerInfoUpdate.getFileName());
 
@@ -78,15 +93,7 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
         }
 
         imageAnnotationService.saveImageAnnotation(imageAnnotationDto, authentication);
-        ContainerInfoDto containerInfoDto = convertToContainerInfo(imageAnnotationDto, containerInfoUpdate);
-
-        if (authentication != null && authentication.getName() != null) {
-            containerInfoDto.getImageAnnotationDto().setUsername(authentication.getName());
-        } else {
-            throw new IllegalStateException("Authentication or Username is null");
-        }
-
-        return saveToApprovedContainer(containerInfoDto, authentication);
+        return imageAnnotationDto;
     }
 
     private ImageAnnotationDto saveToApprovedContainer(ContainerInfoDto containerInfoDto, Authentication authentication) {
