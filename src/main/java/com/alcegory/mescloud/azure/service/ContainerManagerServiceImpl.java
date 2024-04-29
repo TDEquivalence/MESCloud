@@ -73,6 +73,10 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
             throw new IllegalStateException("ImageAnnotationDto is null");
         }
 
+        if (containerInfoUpdate.getAnnotations() != null) {
+            imageAnnotationDto.setAnnotations(containerInfoUpdate.getAnnotations());
+        }
+
         imageAnnotationService.saveImageAnnotation(imageAnnotationDto, authentication);
         ContainerInfoDto containerInfoDto = convertToContainerInfo(imageAnnotationDto, containerInfoUpdate);
 
@@ -129,7 +133,6 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
         imageAnnotationDto.setComments(containerInfoUpdate.getComments());
         imageAnnotationDto.setUserApproval(containerInfoUpdate.isUserApproval());
         imageAnnotationDto.setMesUserDecision(containerInfoUpdate.getMesUserDecision());
-        imageAnnotationDto.setAnnotations(containerInfoUpdate.getAnnotations());
 
         ContainerInfoDto containerInfoDto = new ContainerInfoDto();
         containerInfoDto.setImageAnnotationDto(imageAnnotationDto);
