@@ -10,7 +10,7 @@ CREATE TABLE image_annotation (
     user_approval BOOLEAN,
     rejection TEXT[],
     comments TEXT,
-    log_decision TEXT,
+    log_decision TEXT[],
     registered_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     status TEXT,
     user_id INT REFERENCES users(id)
@@ -29,6 +29,7 @@ CREATE TABLE annotation (
     height DOUBLE PRECISION,
     rotation DOUBLE PRECISION,
     rectangle_labels TEXT[],
+    score INTEGER,
     image_annotation_id INTEGER REFERENCES image_annotation(id)
 );
 
