@@ -15,6 +15,7 @@ public class ValueDto {
     private Double width;
     private Double height;
     private Double rotation;
+    private Integer score;
     @JsonProperty("rectanglelabels")
     private List<String> rectangleLabels;
 }

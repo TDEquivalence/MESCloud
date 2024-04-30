@@ -17,33 +17,20 @@ public class ImageAnnotationEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String image;
-
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "imageAnnotation")
     private List<AnnotationEntity> annotations;
-
     private String modelDecision;
-
     private String userDecision;
-
     private String mesUserDecision;
-
     private String classification;
-
     private boolean userApproval;
-
     private List<String> rejection;
-
     private String comments;
-
-    private String logDecision;
-
+    private List<String> logDecision;
     private Date registeredAt;
-
     @Enumerated(EnumType.STRING)
     private Status status;
-
     @ManyToOne
     @JoinColumn(name = "user_id")
     private UserEntity user;

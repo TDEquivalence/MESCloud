@@ -25,6 +25,6 @@ public class ImageAnnotationDto {
     private List<String> rejection;
     private String comments;
     @JsonProperty("log_decision")
-    private String logDecision;
+    private List<String> logDecision;
     private String username;
 }

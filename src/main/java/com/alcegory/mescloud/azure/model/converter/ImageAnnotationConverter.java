@@ -28,7 +28,7 @@ public class ImageAnnotationConverter {
 
         ImageAnnotationEntity imageAnnotationEntity = imageAnnotationDtoToEntity(imageAnnotationDto);
         if (annotationDtos != null) {
-            List<AnnotationEntity> annotationEntities = annotationDtosToEntities(annotationDtos);
+            List<AnnotationEntity> annotationEntities = annotationDtoToEntities(annotationDtos);
             imageAnnotationEntity.setAnnotations(annotationEntities);
         }
         return imageAnnotationEntity;
@@ -48,14 +48,14 @@ public class ImageAnnotationConverter {
         return imageAnnotationEntity;
     }
 
-    private List<AnnotationEntity> annotationDtosToEntities(List<AnnotationDto> annotationDtos) {
-        if (annotationDtos == null) {
+    private List<AnnotationEntity> annotationDtoToEntities(List<AnnotationDto> annotationDto) {
+        if (annotationDto == null) {
             return Collections.emptyList();
         }
 
         List<AnnotationEntity> annotations = new ArrayList<>();
-        for (AnnotationDto annotationDto : annotationDtos) {
-            for (ResultDto result : annotationDto.getResult()) {
+        for (AnnotationDto annotation : annotationDto) {
+            for (ResultDto result : annotation.getResult()) {
                 AnnotationEntity annotationEntity = resultDtoToEntity(result);
                 annotations.add(annotationEntity);
             }
@@ -88,6 +88,7 @@ public class ImageAnnotationConverter {
             annotation.setWidth(value.getWidth());
             annotation.setHeight(value.getHeight());
             annotation.setRotation(value.getRotation());
+            annotation.setScore(value.getScore());
             annotation.setRectangleLabels(value.getRectangleLabels());
         }
     }
