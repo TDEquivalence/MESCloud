@@ -126,7 +126,7 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
         }
 
         if (uploadedImageAnnotationDto != null && imageOccurrencesNotInitial != 0) {
-            String imageDataOccurrence = image + "_" + imageOccurrencesNotInitial;
+            String imageDataOccurrence = image + "(" + imageOccurrencesNotInitial + ")";
             uploadedImageAnnotationDto.getData().setImage(imageDataOccurrence);
         }
 
