@@ -101,32 +101,41 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
             return null;
         }
 
-        ImageAnnotationDto uploadedImageAnnotationDto =
-                approvedContainerService.saveToApprovedContainer(containerInfoDto.getImageAnnotationDto());
+        ImageAnnotationDto uploadedImageAnnotationDto = approvedContainerService.saveToApprovedContainer(containerInfoDto.getImageAnnotationDto());
 
         boolean isApproved = containerInfoDto.getImageAnnotationDto().isUserApproval();
+        ImageAnnotationDto uploadedImageAnnotation = checkImageOccurrencesToRemove(containerInfoDto, uploadedImageAnnotationDto);
         imageAnnotationService.saveApprovedImageAnnotation(uploadedImageAnnotationDto, isApproved, authentication);
 
-        checkImageOccurrencesToRemove(containerInfoDto, uploadedImageAnnotationDto);
-
-        return uploadedImageAnnotationDto;
+        return uploadedImageAnnotation;
     }
 
-    private void checkImageOccurrencesToRemove(ContainerInfoDto containerInfoDto, ImageAnnotationDto uploadedImageAnnotationDto) {
+    private ImageAnnotationDto checkImageOccurrencesToRemove(ContainerInfoDto containerInfoDto, ImageAnnotationDto uploadedImageAnnotationDto) {
         if (containerInfoDto == null || containerInfoDto.getImageAnnotationDto() == null) {
-            return;
+            return null;
         }
 
         String image = containerInfoDto.getImageAnnotationDto().getData().getImage();
         if (image == null) {
-            return;
+            return null;
         }
 
         int imageOccurrencesNotInitial = imageAnnotationService.countByImageAndStatusNotInitial(image);
         if (uploadedImageAnnotationDto != null && imageOccurrencesNotInitial >= 3) {
-            publicContainerService.deleteBlob(image);
-            pendingContainerService.deleteJpgAndJsonBlobs(image);
+            deleteBlobsForImage(image);
         }
+
+        if (uploadedImageAnnotationDto != null && imageOccurrencesNotInitial != 0) {
+            String imageDataOccurrence = image + "_" + imageOccurrencesNotInitial;
+            uploadedImageAnnotationDto.getData().setImage(imageDataOccurrence);
+        }
+
+        return uploadedImageAnnotationDto;
+    }
+
+    private void deleteBlobsForImage(String image) {
+        publicContainerService.deleteBlob(image);
+        pendingContainerService.deleteJpgAndJsonBlobs(image);
     }
 
     private ContainerInfoDto convertToContainerInfo(ImageAnnotationDto imageAnnotationDto,
