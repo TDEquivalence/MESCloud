@@ -1,7 +1,6 @@
 package com.alcegory.mescloud.model.entity;
 
 import com.alcegory.mescloud.security.model.Role;
-import com.alcegory.mescloud.security.model.SectionRoleEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -34,9 +33,6 @@ public class UserEntity implements UserDetails, Serializable {
 
     @Enumerated(EnumType.STRING)
     private Role role;
-
-    @Transient
-    private SectionRoleEntity sectionRole;
 
     private Date createdAt;
     private Date updatedAt;

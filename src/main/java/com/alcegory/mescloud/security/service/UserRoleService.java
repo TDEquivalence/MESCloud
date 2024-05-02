@@ -11,11 +11,11 @@ import java.util.List;
 
 public interface UserRoleService {
 
-    void saveUserRole(Long userId, Long roleId, Long sectionId);
+    void saveSectionUserRole(Long userId, Long roleId, Long sectionId);
 
-    void updateUserRole(Long userId, Long roleId, Long sectionId);
+    void updateSectionUserRole(Long userId, Long roleId, Long sectionId);
 
-    void deleteUserRolesByUserId(Long userRoleId);
+    void deleteSectionUserRolesByUserId(Long userRoleId);
 
     List<UserRoleEntity> findByUser(Long userId);
 

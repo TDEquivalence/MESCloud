@@ -96,7 +96,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             }
 
             SectionRoleEntity sectionRoleEntity = sectionRoleOptional.get();
-            userRoleService.saveUserRole(user.getId(), sectionRoleEntity.getId(), sectionId);
+            userRoleService.saveSectionUserRole(user.getId(), sectionRoleEntity.getId(), sectionId);
         }
     }
 

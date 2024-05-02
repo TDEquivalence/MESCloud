@@ -173,7 +173,7 @@ public class UserRoleServiceImpl implements UserRoleService {
 
     @Override
     @Transactional
-    public void saveUserRole(Long userId, Long roleId, Long sectionId) {
+    public void saveSectionUserRole(Long userId, Long roleId, Long sectionId) {
         if (userId == null || roleId == null || sectionId == null) {
             log.error("Failed to save user role: {}", NULL_PARAMETER_ERROR_MSG);
             throw new IllegalArgumentException(NULL_PARAMETER_ERROR_MSG);
@@ -188,7 +188,7 @@ public class UserRoleServiceImpl implements UserRoleService {
 
     @Override
     @Transactional
-    public void updateUserRole(Long userId, Long newRoleId, Long newSectionId) {
+    public void updateSectionUserRole(Long userId, Long newRoleId, Long newSectionId) {
         if (userId == null || newRoleId == null || newSectionId == null) {
             log.error("Failed to update user role: {}", NULL_PARAMETER_ERROR_MSG);
             throw new IllegalArgumentException(NULL_PARAMETER_ERROR_MSG);
@@ -211,7 +211,7 @@ public class UserRoleServiceImpl implements UserRoleService {
 
     @Override
     @Transactional
-    public void deleteUserRolesByUserId(Long userId) {
+    public void deleteSectionUserRolesByUserId(Long userId) {
         if (userId == null) {
             log.error("Failed to delete user roles: User ID is null.");
             throw new IllegalArgumentException("User ID is null.");
