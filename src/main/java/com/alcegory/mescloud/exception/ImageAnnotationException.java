@@ -4,13 +4,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-public class ImageAnnotationSaveException extends RuntimeException {
+public class ImageAnnotationException extends RuntimeException {
 
-    public ImageAnnotationSaveException(String message) {
+    public ImageAnnotationException(String message) {
         super(message);
     }
 
-    public ImageAnnotationSaveException(String message, Throwable cause) {
+    public ImageAnnotationException(String message, Throwable cause) {
         super(message, cause);
     }
 }

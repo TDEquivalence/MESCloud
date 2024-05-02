@@ -1,6 +1,7 @@
 package com.alcegory.mescloud.azure.service;
 
 import com.alcegory.mescloud.azure.model.dto.*;
+import com.alcegory.mescloud.exception.ImageAnnotationException;
 import com.alcegory.mescloud.model.entity.UserEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
@@ -87,7 +88,7 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
         ImageAnnotationDto imageAnnotationDto = pendingContainerService.getImageAnnotationFromContainer(containerInfoUpdate.getFileName());
 
         if (imageAnnotationDto == null) {
-            throw new IllegalStateException("ImageAnnotationDto is null");
+            throw new ImageAnnotationException("ImageAnnotationDto is null. The image might have been deleted from the pending container.");
         }
 
         if (containerInfoUpdate.getAnnotations() != null) {
@@ -126,7 +127,6 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
         if (uploadedImageAnnotationDto != null && imageOccurrencesNotInitial >= 3) {
             deleteBlobsForImage(image);
         }
-
     }
 
     private void saveInitialApprovedImageAnnotation(ContainerInfoDto containerInfoDto, Authentication authentication, int imageOccurrencesNotInitial) {

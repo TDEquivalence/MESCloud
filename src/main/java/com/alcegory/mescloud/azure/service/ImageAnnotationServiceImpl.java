@@ -7,7 +7,7 @@ import com.alcegory.mescloud.azure.model.converter.ImageAnnotationConverter;
 import com.alcegory.mescloud.azure.model.dto.ImageAnnotationDto;
 import com.alcegory.mescloud.azure.repository.AnnotationRepository;
 import com.alcegory.mescloud.azure.repository.ImageAnnotationRepository;
-import com.alcegory.mescloud.exception.ImageAnnotationSaveException;
+import com.alcegory.mescloud.exception.ImageAnnotationException;
 import com.alcegory.mescloud.model.entity.UserEntity;
 import com.alcegory.mescloud.repository.UserRepository;
 import lombok.AllArgsConstructor;
@@ -102,7 +102,7 @@ public class ImageAnnotationServiceImpl implements ImageAnnotationService {
                 annotationRepository.saveAll(annotationEntities);
             }
         } catch (Exception e) {
-            throw new ImageAnnotationSaveException("Failed to save image annotation", e);
+            throw new ImageAnnotationException("Failed to save image annotation", e);
         }
     }
 

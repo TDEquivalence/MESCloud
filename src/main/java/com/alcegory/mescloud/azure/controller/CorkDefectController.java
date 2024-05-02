@@ -7,7 +7,7 @@ import com.alcegory.mescloud.azure.model.dto.ImageAnnotationDto;
 import com.alcegory.mescloud.azure.model.dto.ImageInfoDto;
 import com.alcegory.mescloud.azure.service.ContainerManagerService;
 import com.alcegory.mescloud.azure.service.PublicContainerService;
-import com.alcegory.mescloud.exception.ImageAnnotationSaveException;
+import com.alcegory.mescloud.exception.ImageAnnotationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,17 +35,25 @@ public class CorkDefectController {
         try {
             ContainerInfoSummary imageAnnotation = containerManagerService.getRandomData(authentication);
             return new ResponseEntity<>(imageAnnotation, HttpStatus.OK);
-        } catch (ImageAnnotationSaveException ex) {
+        } catch (ImageAnnotationException ex) {
             ErrorResponse errorResponse = new ErrorResponse("Internal server error occurred while saving image annotation");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
     }
 
     @PostMapping("/updateCorkDetails")
-    public ResponseEntity<ImageAnnotationDto> updateImageAnnotation(@RequestBody ContainerInfoUpdate containerInfoUpdate,
-                                                                    Authentication authentication) {
-        ImageAnnotationDto updatedImageAnnotationDto =
-                containerManagerService.processSaveToApprovedContainer(containerInfoUpdate, authentication);
-        return new ResponseEntity<>(updatedImageAnnotationDto, HttpStatus.OK);
+    public ResponseEntity<Object> updateImageAnnotation(@RequestBody ContainerInfoUpdate containerInfoUpdate,
+                                                        Authentication authentication) {
+        try {
+            ImageAnnotationDto updatedImageAnnotationDto =
+                    containerManagerService.processSaveToApprovedContainer(containerInfoUpdate, authentication);
+            return ResponseEntity.ok(updatedImageAnnotationDto);
+        } catch (ImageAnnotationException ex) {
+            ErrorResponse errorResponse = new ErrorResponse("ImageAnnotationDto is null. " +
+                    "The image might have been deleted from the pending container.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred.");
+        }
     }
 }
