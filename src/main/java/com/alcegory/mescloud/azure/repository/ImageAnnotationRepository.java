@@ -15,6 +15,6 @@ public interface ImageAnnotationRepository extends JpaRepository<ImageAnnotation
     @Query(value = "SELECT COUNT(*) FROM image_annotation WHERE image = :image", nativeQuery = true)
     int countByImage(@Param("image") String image);
 
-    @Query(value = "SELECT COUNT(*) FROM image_annotation WHERE image = :image AND status != 'INITIAL'", nativeQuery = true)
-    int countByImageAndStatusNotInitial(@Param("image") String image);
+    @Query(value = "SELECT COUNT(*) FROM image_annotation WHERE image LIKE CONCAT(:imageBase, '%') AND status != 'INITIAL'", nativeQuery = true)
+    int countByImageAndStatusNotInitial(@Param("imageBase") String imageBase);
 }

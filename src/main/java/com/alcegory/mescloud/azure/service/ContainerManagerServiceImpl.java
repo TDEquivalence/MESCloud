@@ -63,26 +63,28 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
     @Override
     public ImageAnnotationDto processSaveToApprovedContainer(ContainerInfoUpdate containerInfoUpdate,
                                                              Authentication authentication) {
-        if (containerInfoUpdate == null || containerInfoUpdate.getFileName() == null) {
+        validateContainerInfoUpdate(containerInfoUpdate);
+
+        ImageAnnotationDto imageAnnotationDto = updateImageAnnotation(containerInfoUpdate);
+        ContainerInfoDto containerInfoDto = convertToContainerInfo(imageAnnotationDto, containerInfoUpdate);
+
+        if (containerInfoDto == null) {
             throw new IllegalArgumentException("ContainerInfoUpdate or FileName cannot be null");
         }
 
-        ImageAnnotationDto imageAnnotationDto = updateAndSaveImageAnnotation(containerInfoUpdate, authentication);
-        ContainerInfoDto containerInfoDto = convertToContainerInfo(imageAnnotationDto, containerInfoUpdate);
-
-        if (authentication != null && authentication.getName() != null && containerInfoDto != null) {
-            containerInfoDto.getImageAnnotationDto().setUsername(authentication.getName());
-        } else {
-            throw new IllegalStateException("Authentication or Username is null");
-        }
+        containerInfoDto.getImageAnnotationDto().setUsername(authentication.getName());
 
         return saveToApprovedContainer(containerInfoDto, authentication);
     }
 
-    public ImageAnnotationDto updateAndSaveImageAnnotation(ContainerInfoUpdate containerInfoUpdate,
-                                                           Authentication authentication) {
-        ImageAnnotationDto imageAnnotationDto =
-                pendingContainerService.getImageAnnotationFromContainer(containerInfoUpdate.getFileName());
+    private void validateContainerInfoUpdate(ContainerInfoUpdate containerInfoUpdate) {
+        if (containerInfoUpdate == null || containerInfoUpdate.getFileName() == null) {
+            throw new IllegalArgumentException("ContainerInfoUpdate or FileName cannot be null");
+        }
+    }
+
+    public ImageAnnotationDto updateImageAnnotation(ContainerInfoUpdate containerInfoUpdate) {
+        ImageAnnotationDto imageAnnotationDto = pendingContainerService.getImageAnnotationFromContainer(containerInfoUpdate.getFileName());
 
         if (imageAnnotationDto == null) {
             throw new IllegalStateException("ImageAnnotationDto is null");
@@ -92,7 +94,6 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
             imageAnnotationDto.setAnnotations(containerInfoUpdate.getAnnotations());
         }
 
-        imageAnnotationService.saveImageAnnotation(imageAnnotationDto, authentication);
         return imageAnnotationDto;
     }
 
@@ -103,13 +104,14 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
 
         String image = containerInfoDto.getImageAnnotationDto().getData().getImage();
         int imageOccurrencesNotInitial = imageAnnotationService.countByImageAndStatusNotInitial(image);
+
+        saveInitialApprovedImageAnnotation(containerInfoDto, authentication, imageOccurrencesNotInitial);
         updateImageName(containerInfoDto.getImageAnnotationDto(), image, imageOccurrencesNotInitial);
 
         ImageAnnotationDto uploadedImageAnnotationDto = approvedContainerService.saveToApprovedContainer(containerInfoDto.getImageAnnotationDto());
 
-        boolean isApproved = containerInfoDto.getImageAnnotationDto().isUserApproval();
-        handleImageOccurrences(containerInfoDto, uploadedImageAnnotationDto, image, imageOccurrencesNotInitial, isApproved, authentication);
-
+        handleImageOccurrences(uploadedImageAnnotationDto, image, imageOccurrencesNotInitial);
+        saveApprovedImageAnnotation(uploadedImageAnnotationDto, containerInfoDto.getImageAnnotationDto().isUserApproval(), authentication);
         return uploadedImageAnnotationDto;
     }
 
@@ -120,12 +122,17 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
         }
     }
 
-    private void handleImageOccurrences(ContainerInfoDto containerInfoDto, ImageAnnotationDto uploadedImageAnnotationDto,
-                                        String image, int imageOccurrencesNotInitial, boolean isApproved, Authentication authentication) {
+    private void handleImageOccurrences(ImageAnnotationDto uploadedImageAnnotationDto, String image, int imageOccurrencesNotInitial) {
         if (uploadedImageAnnotationDto != null && imageOccurrencesNotInitial >= 3) {
             deleteBlobsForImage(image);
         }
-        saveApprovedImageAnnotation(uploadedImageAnnotationDto, isApproved, authentication);
+
+    }
+
+    private void saveInitialApprovedImageAnnotation(ContainerInfoDto containerInfoDto, Authentication authentication, int imageOccurrencesNotInitial) {
+        if (imageOccurrencesNotInitial == 0) {
+            imageAnnotationService.saveImageAnnotation(containerInfoDto.getImageAnnotationDto(), authentication);
+        }
     }
 
     private void saveApprovedImageAnnotation(ImageAnnotationDto uploadedImageAnnotationDto, boolean isApproved, Authentication authentication) {
