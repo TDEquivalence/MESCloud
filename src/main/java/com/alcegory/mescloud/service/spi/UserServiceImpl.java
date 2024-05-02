@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import javax.management.relation.RoleNotFoundException;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -128,33 +129,42 @@ public class UserServiceImpl implements UserService {
     }
 
     private void updateSectionRole(UserEntity user, UserDto userDto) throws RoleNotFoundException {
-        List<SectionRoleMapping> sectionRoles = userDto.getSectionRoles();
+        List<SectionRoleMapping> sectionRoles = Optional.ofNullable(userDto.getSectionRoles()).orElse(Collections.emptyList());
 
-        if (sectionRoles != null && !sectionRoles.isEmpty()) {
-            for (SectionRoleMapping sectionRoleMapping : sectionRoles) {
-                SectionRoleEntity sectionRole = sectionRoleService.findByName(sectionRoleMapping.getSectionRole())
-                        .orElseThrow(() -> new RoleNotFoundException("Role not found: " + sectionRoleMapping.getSectionRole()));
+        for (SectionRoleMapping sectionRoleMapping : sectionRoles) {
+            long sectionId = sectionRoleMapping.getSectionId();
 
-                long sectionId = sectionRoleMapping.getSectionId();
-
-                UserRoleEntity existingUserRole = userRoleRepository.findByUserIdAndSectionId(user.getId(), sectionId);
-                if (existingUserRole != null) {
-                    userRoleRepository.delete(existingUserRole);
-                    log.info("User role deleted successfully. User ID: {}, Role ID: {}, Section ID: {}", user.getId(),
-                            existingUserRole.getRoleId(), sectionId);
-                }
-
-                if (!sectionRoleMapping.getSectionRole().equals(SectionRole.NONE)) {
-                    UserRoleEntity newUserRole = new UserRoleEntity();
-                    newUserRole.setUserId(user.getId());
-                    newUserRole.setRoleId(sectionRole.getId());
-                    newUserRole.setSectionId(sectionId);
-                    userRoleRepository.save(newUserRole);
-                    log.info("New user role created. User ID: {}, Role ID: {}, Section ID: {}", user.getId(), sectionRole.getId(),
-                            sectionId);
-                }
+            if (sectionRoleMapping.getSectionRole().equals(SectionRole.NONE)) {
+                deleteExistingUserRole(user.getId(), sectionId);
+            } else {
+                SectionRoleEntity sectionRole = findSectionRole(String.valueOf(sectionRoleMapping.getSectionRole()));
+                deleteExistingUserRole(user.getId(), sectionId);
+                createNewUserRole(user.getId(), sectionRole.getId(), sectionId);
             }
         }
+    }
+
+    private void deleteExistingUserRole(Long userId, Long sectionId) {
+        UserRoleEntity existingUserRole = userRoleRepository.findByUserIdAndSectionId(userId, sectionId);
+        if (existingUserRole != null) {
+            userRoleRepository.delete(existingUserRole);
+            log.info("User role deleted successfully. User ID: {}, Role ID: {}, Section ID: {}", userId,
+                    existingUserRole.getRoleId(), sectionId);
+        }
+    }
+
+    private SectionRoleEntity findSectionRole(String roleName) throws RoleNotFoundException {
+        return sectionRoleService.findByName(SectionRole.valueOf(roleName))
+                .orElseThrow(() -> new RoleNotFoundException("Role not found: " + roleName));
+    }
+
+    private void createNewUserRole(Long userId, Long roleId, Long sectionId) {
+        UserRoleEntity newUserRole = new UserRoleEntity();
+        newUserRole.setUserId(userId);
+        newUserRole.setRoleId(roleId);
+        newUserRole.setSectionId(sectionId);
+        userRoleRepository.save(newUserRole);
+        log.info("New user role created. User ID: {}, Role ID: {}, Section ID: {}", userId, roleId, sectionId);
     }
 
     @Override
