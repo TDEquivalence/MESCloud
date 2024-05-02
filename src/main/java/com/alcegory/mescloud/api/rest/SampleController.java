@@ -33,6 +33,8 @@ public class SampleController {
         } catch (InconsistentPropertiesException ex) {
             ErrorResponse errorResponse = new ErrorResponse("Inconsistent properties: " + ex.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        } catch (ForbiddenAccessException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         } catch (Exception e) {
             ErrorResponse errorResponse = new ErrorResponse("Internal server error occurred");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
