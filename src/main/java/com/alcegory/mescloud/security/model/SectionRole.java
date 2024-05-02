@@ -29,7 +29,9 @@ public enum SectionRole {
             SectionAuthority.OPERATOR_UPDATE,
             SectionAuthority.OPERATOR_CREATE,
             SectionAuthority.OPERATOR_DELETE
-    ));
+    )),
+
+    NONE(Set.of());
 
     @Getter
     private final Set<SectionAuthority> authorities;

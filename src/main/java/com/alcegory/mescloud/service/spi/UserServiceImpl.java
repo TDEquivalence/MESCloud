@@ -11,6 +11,7 @@ import com.alcegory.mescloud.model.entity.UserEntity;
 import com.alcegory.mescloud.model.filter.Filter;
 import com.alcegory.mescloud.repository.UserRepository;
 import com.alcegory.mescloud.security.mapper.EntityDtoMapper;
+import com.alcegory.mescloud.security.model.SectionRole;
 import com.alcegory.mescloud.security.model.SectionRoleEntity;
 import com.alcegory.mescloud.security.model.UserRoleEntity;
 import com.alcegory.mescloud.security.model.auth.AuthenticationResponse;
@@ -143,7 +144,7 @@ public class UserServiceImpl implements UserService {
                             existingUserRole.getRoleId(), sectionId);
                 }
 
-                if (sectionRoleMapping.getSectionRole() != null) {
+                if (!sectionRoleMapping.getSectionRole().equals(SectionRole.NONE)) {
                     UserRoleEntity newUserRole = new UserRoleEntity();
                     newUserRole.setUserId(user.getId());
                     newUserRole.setRoleId(sectionRole.getId());
