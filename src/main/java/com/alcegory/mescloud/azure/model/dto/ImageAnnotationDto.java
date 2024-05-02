@@ -27,4 +27,5 @@ public class ImageAnnotationDto {
     @JsonProperty("log_decision")
     private List<String> logDecision;
     private String username;
+    private List<Integer> limits;
 }
