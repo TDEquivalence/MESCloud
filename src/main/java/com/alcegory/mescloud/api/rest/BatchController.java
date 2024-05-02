@@ -46,8 +46,8 @@ public class BatchController {
     }
 
     @PostMapping("/reject")
-    public ResponseEntity<BatchDto> rejected(@RequestBody RequestToRejectBatchDto requestBatchDto) {
-        BatchDto batchDto = batchService.rejectComposed(requestBatchDto);
+    public ResponseEntity<BatchDto> rejected(@RequestBody RequestToRejectBatchDto requestBatchDto, Authentication authentication) {
+        BatchDto batchDto = batchService.rejectComposed(requestBatchDto, authentication);
         if (batchDto == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
