@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.alcegory.mescloud.security.model.SectionAuthority.ADMIN_DELETE;
+import static com.alcegory.mescloud.security.model.SectionAuthority.OPERATOR_CREATE;
 
 @Service
 @AllArgsConstructor
@@ -47,7 +48,10 @@ public class HitServiceImpl implements HitService {
     private final ProductionOrderConverter productionOrderConverter;
 
     @Override
-    public List<HitDto> create(RequestHitDto requestHitDto) {
+    public List<HitDto> create(RequestHitDto requestHitDto, Authentication authentication) {
+        //TODO: sectionID
+        userRoleService.checkSectionAuthority(authentication, 1L, OPERATOR_CREATE);
+
         if (requestHitDto.getHits() == null || requestHitDto.getHits().isEmpty()) {
             throw new IllegalArgumentException("Hits list are not valid");
         }

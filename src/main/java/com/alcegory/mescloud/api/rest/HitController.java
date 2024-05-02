@@ -24,13 +24,18 @@ public class HitController {
     private final HitService hitService;
 
     @PostMapping
-    public ResponseEntity<List<HitDto>> create(@RequestBody RequestHitDto requestHitDto) {
-        List<HitDto> createdHits = hitService.create(requestHitDto);
-        if (createdHits.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+    public ResponseEntity<List<HitDto>> create(@RequestBody RequestHitDto requestHitDto, Authentication authentication) {
+        try {
+            List<HitDto> createdHits = hitService.create(requestHitDto, authentication);
 
-        return new ResponseEntity<>(createdHits, HttpStatus.OK);
+            if (createdHits.isEmpty()) {
+                return ResponseEntity.notFound().build();
+            }
+
+            return ResponseEntity.ok(createdHits);
+        } catch (ForbiddenAccessException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
     }
 
     @GetMapping

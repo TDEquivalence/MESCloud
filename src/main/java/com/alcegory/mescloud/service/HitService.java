@@ -12,7 +12,7 @@ import java.util.Optional;
 
 public interface HitService {
 
-    List<HitDto> create(RequestHitDto requestHitDto);
+    List<HitDto> create(RequestHitDto requestHitDto, Authentication authentication);
 
     HitEntity saveAndUpdate(HitEntity hitEntity);
 
