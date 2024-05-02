@@ -35,6 +35,8 @@ public class HitController {
             return ResponseEntity.ok(createdHits);
         } catch (ForbiddenAccessException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Collections.emptyList());
         }
     }
 

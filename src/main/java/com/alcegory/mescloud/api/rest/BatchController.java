@@ -36,6 +36,8 @@ public class BatchController {
             return ResponseEntity.ok(batchDto);
         } catch (ForbiddenAccessException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
