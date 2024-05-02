@@ -25,13 +25,18 @@ public class BatchController {
     private final BatchService batchService;
 
     @PostMapping
-    public ResponseEntity<BatchDto> create(@RequestBody RequestBatchDto requestBatchDto) {
-        BatchDto batchDto = batchService.create(requestBatchDto);
-        if (batchDto == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+    public ResponseEntity<BatchDto> create(@RequestBody RequestBatchDto requestBatchDto, Authentication authentication) {
+        try {
+            BatchDto batchDto = batchService.create(requestBatchDto, authentication);
 
-        return new ResponseEntity<>(batchDto, HttpStatus.OK);
+            if (batchDto == null) {
+                return ResponseEntity.notFound().build();
+            }
+
+            return ResponseEntity.ok(batchDto);
+        } catch (ForbiddenAccessException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
     }
 
     @GetMapping

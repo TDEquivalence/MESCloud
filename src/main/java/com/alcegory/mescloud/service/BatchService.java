@@ -19,11 +19,11 @@ public interface BatchService {
 
     Optional<BatchEntity> findById(Long id);
 
-    BatchDto create(RequestBatchDto requestBatchDto);
+    BatchDto create(RequestBatchDto requestBatchDto, Authentication authentication);
 
     List<BatchDto> getAll();
 
-    BatchDto rejectComposed(RequestToRejectBatchDto requestToRejectBatchDto);
+    BatchDto rejectComposed(RequestToRejectBatchDto requestToRejectBatchDto, Authentication authentication);
 
     List<ProductionOrderDto> removeBatch(RequestById request, Authentication authentication);
 }
