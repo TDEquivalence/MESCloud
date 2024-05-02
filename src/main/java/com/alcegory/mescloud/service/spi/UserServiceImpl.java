@@ -139,15 +139,19 @@ public class UserServiceImpl implements UserService {
                 UserRoleEntity existingUserRole = userRoleRepository.findByUserIdAndSectionId(user.getId(), sectionId);
                 if (existingUserRole != null) {
                     userRoleRepository.delete(existingUserRole);
-                    log.info("User role deleted successfully. User ID: {}, Role ID: {}, Section ID: {}", user.getId(), existingUserRole.getRoleId(), sectionId);
+                    log.info("User role deleted successfully. User ID: {}, Role ID: {}, Section ID: {}", user.getId(),
+                            existingUserRole.getRoleId(), sectionId);
                 }
 
-                UserRoleEntity newUserRole = new UserRoleEntity();
-                newUserRole.setUserId(user.getId());
-                newUserRole.setRoleId(sectionRole.getId());
-                newUserRole.setSectionId(sectionId);
-                userRoleRepository.save(newUserRole);
-                log.info("New user role created. User ID: {}, Role ID: {}, Section ID: {}", user.getId(), sectionRole.getId(), sectionId);
+                if (sectionRoleMapping.getSectionRole() != null) {
+                    UserRoleEntity newUserRole = new UserRoleEntity();
+                    newUserRole.setUserId(user.getId());
+                    newUserRole.setRoleId(sectionRole.getId());
+                    newUserRole.setSectionId(sectionId);
+                    userRoleRepository.save(newUserRole);
+                    log.info("New user role created. User ID: {}, Role ID: {}, Section ID: {}", user.getId(), sectionRole.getId(),
+                            sectionId);
+                }
             }
         }
     }
