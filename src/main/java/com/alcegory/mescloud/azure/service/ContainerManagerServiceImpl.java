@@ -101,36 +101,37 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
             return null;
         }
 
+        String image = containerInfoDto.getImageAnnotationDto().getData().getImage();
+        int imageOccurrencesNotInitial = imageAnnotationService.countByImageAndStatusNotInitial(image);
+        updateImageName(containerInfoDto.getImageAnnotationDto(), image, imageOccurrencesNotInitial);
+
         ImageAnnotationDto uploadedImageAnnotationDto = approvedContainerService.saveToApprovedContainer(containerInfoDto.getImageAnnotationDto());
 
         boolean isApproved = containerInfoDto.getImageAnnotationDto().isUserApproval();
-        ImageAnnotationDto uploadedImageAnnotation = checkImageOccurrencesToRemove(containerInfoDto, uploadedImageAnnotationDto);
-        imageAnnotationService.saveApprovedImageAnnotation(uploadedImageAnnotationDto, isApproved, authentication);
+        handleImageOccurrences(containerInfoDto, uploadedImageAnnotationDto, image, imageOccurrencesNotInitial, isApproved, authentication);
 
-        return uploadedImageAnnotation;
+        return uploadedImageAnnotationDto;
     }
 
-    private ImageAnnotationDto checkImageOccurrencesToRemove(ContainerInfoDto containerInfoDto, ImageAnnotationDto uploadedImageAnnotationDto) {
-        if (containerInfoDto == null || containerInfoDto.getImageAnnotationDto() == null) {
-            return null;
-        }
-
-        String image = containerInfoDto.getImageAnnotationDto().getData().getImage();
-        if (image == null) {
-            return null;
-        }
-
-        int imageOccurrencesNotInitial = imageAnnotationService.countByImageAndStatusNotInitial(image);
-        if (uploadedImageAnnotationDto != null && imageOccurrencesNotInitial >= 3) {
-            deleteBlobsForImage(image);
-        }
-
+    private void updateImageName(ImageAnnotationDto uploadedImageAnnotationDto, String image, int imageOccurrencesNotInitial) {
         if (uploadedImageAnnotationDto != null && imageOccurrencesNotInitial != 0) {
             String imageDataOccurrence = image + "(" + imageOccurrencesNotInitial + ")";
             uploadedImageAnnotationDto.getData().setImage(imageDataOccurrence);
         }
+    }
 
-        return uploadedImageAnnotationDto;
+    private void handleImageOccurrences(ContainerInfoDto containerInfoDto, ImageAnnotationDto uploadedImageAnnotationDto,
+                                        String image, int imageOccurrencesNotInitial, boolean isApproved, Authentication authentication) {
+        if (uploadedImageAnnotationDto != null && imageOccurrencesNotInitial >= 3) {
+            deleteBlobsForImage(image);
+        }
+        saveApprovedImageAnnotation(uploadedImageAnnotationDto, isApproved, authentication);
+    }
+
+    private void saveApprovedImageAnnotation(ImageAnnotationDto uploadedImageAnnotationDto, boolean isApproved, Authentication authentication) {
+        if (uploadedImageAnnotationDto != null) {
+            imageAnnotationService.saveApprovedImageAnnotation(uploadedImageAnnotationDto, isApproved, authentication);
+        }
     }
 
     private void deleteBlobsForImage(String image) {
