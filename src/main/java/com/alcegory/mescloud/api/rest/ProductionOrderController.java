@@ -56,12 +56,16 @@ public class ProductionOrderController {
 
     @PutMapping("{countingEquipmentId}/complete")
     public ResponseEntity<ProductionOrderDto> complete(@PathVariable long countingEquipmentId, Authentication authentication) {
-        Optional<ProductionOrderDto> productionOrderOpt = service.complete(countingEquipmentId, authentication);
-        if (productionOrderOpt.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        try {
+            Optional<ProductionOrderDto> productionOrderOpt = service.complete(countingEquipmentId, authentication);
+            if (productionOrderOpt.isPresent()) {
+                return ResponseEntity.ok(productionOrderOpt.get());
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (ForbiddenAccessException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
-
-        return new ResponseEntity<>(productionOrderOpt.get(), HttpStatus.OK);
     }
 
     @GetMapping("/completed")
