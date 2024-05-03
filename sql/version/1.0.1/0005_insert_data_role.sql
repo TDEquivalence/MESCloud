@@ -4,9 +4,10 @@ INSERT INTO role (name) VALUES ('ADMIN'), ('ANALYST'), ('OPERATOR');
 
 INSERT INTO user_role (user_id, role_id, section_id) VALUES
 (1, 1, 1),
+(1, 1, 2),
 (2, 1, 1),
-(4, 4, 1),
-(5, 4, 1),
+(4, 3, 1),
+(5, 3, 1),
 (6, 1, 1);
 
 INSERT INTO audit_script (run_date, process, version, schema)
