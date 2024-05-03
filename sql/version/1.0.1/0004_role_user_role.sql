@@ -1,3 +1,4 @@
+BEGIN;
 -- Create Role table
 CREATE TABLE role (
     id SERIAL PRIMARY KEY,
@@ -19,3 +20,5 @@ CREATE TABLE user_role (
 INSERT INTO audit_script (run_date, process, version, schema)
 VALUES
     (CURRENT_DATE, '0004_role_user_role.sql', '1.0.1', '1.0.1_0004');
+
+COMMIT;

@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.tde</groupId>
     <artifactId>mescloud</artifactId>
-    <version>0.0.4-SNAPSHOT</version>
+    <version>1.0.4-SNAPSHOT</version>
     <name>mescloud</name>
     <description>Mes Cloud Project</description>
     <properties>
