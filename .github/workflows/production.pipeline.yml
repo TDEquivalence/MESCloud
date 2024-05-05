@@ -184,8 +184,8 @@ jobs:
           aws_secret_key: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
           aws_session_token: ${{ secrets.AWS_SESSION_TOKEN }}
           use_existing_version_if_available: true
-          application_name: MESCloud
-          environment_name: MESCloud-env
+          application_name: Mescloud-app
+          environment_name: Mescloud-prod
           version_label: ${{ github.SHA }}
           region: eu-west-1
           deployment_package: mescloud-0.0.1-SNAPSHOT.jar
