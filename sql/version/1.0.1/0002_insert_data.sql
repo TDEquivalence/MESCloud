@@ -58,4 +58,4 @@ VALUES
 
 INSERT INTO audit_script (run_date, process, version, schema)
 VALUES
-    (CURRENT_DATE, '0002_section_and_feature_config', '1.0.1', '1.0.1_0002');
+    (CURRENT_DATE, '0002_section_and_feature_config.sql', '1.0.1', '1.0.1_0002');

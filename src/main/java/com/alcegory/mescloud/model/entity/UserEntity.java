@@ -1,7 +1,6 @@
 package com.alcegory.mescloud.model.entity;
 
-import com.alcegory.mescloud.security.model.token.TokenEntity;
-import com.alcegory.mescloud.security.role.Role;
+import com.alcegory.mescloud.security.model.Role;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -11,7 +10,6 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
-import java.util.List;
 
 @Getter
 @Setter
@@ -35,17 +33,13 @@ public class UserEntity implements UserDetails, Serializable {
 
     @Enumerated(EnumType.STRING)
     private Role role;
-    private String[] userAuthorities;
-
-    @OneToMany(mappedBy = "user")
-    private transient List<TokenEntity> tokens;
 
     private Date createdAt;
     private Date updatedAt;
     private boolean isActive;
     private boolean isNotLocked;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     @JoinColumn(name = "company_id")
     private CompanyEntity company;
 

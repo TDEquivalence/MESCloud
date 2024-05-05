@@ -8,8 +8,7 @@ import java.util.List;
 
 @Repository
 public class UserRepositoryImpl extends AbstractFilterRepository<Filter.Property, UserEntity> {
-
-
+    
     public List<UserEntity> getFilteredUsers(Filter filter) {
         return super.findAllWithFilter(filter, UserEntity.class);
     }

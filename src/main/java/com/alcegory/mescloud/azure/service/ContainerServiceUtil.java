@@ -1,8 +1,8 @@
 package com.alcegory.mescloud.azure.service;
 
-import com.alcegory.mescloud.azure.dto.ContainerInfoDto;
-import com.alcegory.mescloud.azure.dto.ImageAnnotationDto;
-import com.alcegory.mescloud.azure.dto.ImageInfoDto;
+import com.alcegory.mescloud.azure.model.dto.ContainerInfoDto;
+import com.alcegory.mescloud.azure.model.dto.ImageAnnotationDto;
+import com.alcegory.mescloud.azure.model.dto.ImageInfoDto;
 import com.azure.storage.blob.BlobClient;
 import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.BlobContainerClientBuilder;
@@ -15,10 +15,7 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 @Component
@@ -26,10 +23,9 @@ public class ContainerServiceUtil {
 
     private static final String JPG_EXTENSION = ".jpg";
     private static final String JSON_EXTENSION = ".json";
-
     private static final String IMAGE_URL_FORMAT = "%s%s?%s";
-
     private static final String ERROR_MESSAGE = "An error occurred while processing blob: {}";
+    private static final Random random = new Random();
 
     private ContainerServiceUtil() {
     }
@@ -88,7 +84,7 @@ public class ContainerServiceUtil {
         return containerInfoList;
     }
 
-    public static ImageInfoDto getImageReference(
+    public static ImageInfoDto getRandomImageReference(
             String accountUrl,
             String containerName,
             String sasToken) {
@@ -98,22 +94,40 @@ public class ContainerServiceUtil {
                 .endpoint(containerUriWithSAS)
                 .buildClient();
 
-        for (BlobItem blobItem : blobContainerClient.listBlobs()) {
-            String blobName = blobItem.getName();
-            if (blobName.toLowerCase().endsWith(JPG_EXTENSION)) {
-                BlobClient blobClient = getBlobClient(blobContainerClient, blobItem);
-                try {
-                    ImageInfoDto imageInfo = new ImageInfoDto();
-                    imageInfo.setPath(blobClient.getBlobUrl());
-                    return imageInfo;
-                } catch (Exception e) {
-                    log.error(ERROR_MESSAGE, blobName, e);
-                }
-            }
+        Iterator<BlobItem> blobIterator = blobContainerClient.listBlobs().iterator();
+
+        if (!blobIterator.hasNext()) {
+            return null;
         }
 
-        return null;
+        long blobCount = blobContainerClient.listBlobs().stream().count();
+        long randomIndex = random.nextLong(blobCount);
+
+        for (long i = 0; i < randomIndex; i++) {
+            if (!blobIterator.hasNext()) {
+                blobIterator = blobContainerClient.listBlobs().iterator();
+            }
+            blobIterator.next();
+        }
+
+        BlobItem randomBlob = blobIterator.next();
+        String blobName = randomBlob.getName();
+
+        if (!blobName.toLowerCase().endsWith(JPG_EXTENSION)) {
+            return null;
+        }
+
+        BlobClient blobClient = getBlobClient(blobContainerClient, randomBlob);
+        try {
+            ImageInfoDto imageInfo = new ImageInfoDto();
+            imageInfo.setPath(blobClient.getBlobUrl());
+            return imageInfo;
+        } catch (Exception e) {
+            log.error(ERROR_MESSAGE, blobName, e);
+            return null;
+        }
     }
+
 
     public static List<ImageInfoDto> getAllImageReference(
             String accountUrl,
@@ -156,5 +170,4 @@ public class ContainerServiceUtil {
             return blobContainerClient.getBlobClient(blobItem.getName());
         }
     }
-
 }

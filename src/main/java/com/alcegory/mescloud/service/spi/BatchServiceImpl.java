@@ -12,16 +12,21 @@ import com.alcegory.mescloud.model.request.RequestBatchDto;
 import com.alcegory.mescloud.model.request.RequestById;
 import com.alcegory.mescloud.model.request.RequestToRejectBatchDto;
 import com.alcegory.mescloud.repository.BatchRepository;
+import com.alcegory.mescloud.security.service.UserRoleService;
 import com.alcegory.mescloud.service.BatchService;
 import com.alcegory.mescloud.service.ComposedProductionOrderService;
 import com.alcegory.mescloud.service.ProductionOrderService;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+
+import static com.alcegory.mescloud.security.model.SectionAuthority.ADMIN_DELETE;
+import static com.alcegory.mescloud.security.model.SectionAuthority.OPERATOR_CREATE;
 
 @Service
 @AllArgsConstructor
@@ -31,12 +36,16 @@ public class BatchServiceImpl implements BatchService {
     private final BatchRepository repository;
     private final ComposedProductionOrderService composedService;
     private final ProductionOrderService productionOrderService;
+    private final UserRoleService userRoleService;
 
     private final GenericConverter<BatchEntity, BatchDto> converter;
     private final ProductionOrderConverter productionOrderConverter;
 
     @Override
-    public BatchDto create(RequestBatchDto requestBatch) {
+    public BatchDto create(RequestBatchDto requestBatch, Authentication authentication) {
+        //TODO: sectionID
+        userRoleService.checkSectionAuthority(authentication, 1L, OPERATOR_CREATE);
+        
         BatchEntity batch = createBatch(requestBatch);
         BatchEntity savedBatch = saveAndUpdate(batch);
         setProductionOrderApproval(savedBatch);
@@ -49,7 +58,7 @@ public class BatchServiceImpl implements BatchService {
         return batch;
     }
 
-    public BatchDto rejectComposed(RequestToRejectBatchDto requestToRejectBatchDto) {
+    public BatchDto rejectComposed(RequestToRejectBatchDto requestToRejectBatchDto, Authentication authentication) {
         Optional<ComposedProductionOrderDto> composedProductionOrderDto = composedService.create(requestToRejectBatchDto.getProductionOrderIds());
 
         if (composedProductionOrderDto.isEmpty()) {
@@ -58,11 +67,13 @@ public class BatchServiceImpl implements BatchService {
 
         ComposedProductionOrderDto composed = composedProductionOrderDto.get();
         requestToRejectBatchDto.getRequestBatchDto().setComposedId(composed.getId());
-        return create(requestToRejectBatchDto.getRequestBatchDto());
+        return create(requestToRejectBatchDto.getRequestBatchDto(), authentication);
     }
 
     @Override
-    public List<ProductionOrderDto> removeBatch(RequestById request) {
+    public List<ProductionOrderDto> removeBatch(RequestById request, Authentication authentication) {
+        //TODO: sectionID
+        userRoleService.checkSectionAuthority(authentication, 1L, ADMIN_DELETE);
         Optional<ComposedProductionOrderEntity> composedOpt = composedService.findById(request.getId());
 
         if (composedOpt.isEmpty()) {
@@ -87,7 +98,7 @@ public class BatchServiceImpl implements BatchService {
         repository.delete(batch);
         composedOpt.get().setApprovedAt(null);
         composedService.saveAndUpdate(composedOpt.get());
-        
+
         return productionOrderConverter.toDto(productionOrders);
     }
 

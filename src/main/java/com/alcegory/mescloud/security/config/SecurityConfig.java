@@ -51,7 +51,7 @@ public class SecurityConfig {
                 .permitAll()
                 .requestMatchers(CorsUtils::isPreFlightRequest)
                 .permitAll()
-                .requestMatchers("/api/auth/register", "/api/auth/login", "/aws/health")
+                .requestMatchers("/api/auth/login", "/aws/health")
                 .permitAll()
                 .anyRequest()
                 .authenticated()

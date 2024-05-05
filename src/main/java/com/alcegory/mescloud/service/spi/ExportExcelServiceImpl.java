@@ -35,6 +35,11 @@ public class ExportExcelServiceImpl implements ExportExcelService {
     private final ProductionOrderRepository productionOrderRepository;
     private final ComposedProductionOrderRepository composedRepository;
 
+    public static Timestamp stringToTimestamp(String dateString) {
+        LocalDateTime localDateTime = LocalDateTime.parse(dateString, DateTimeFormatter.ISO_DATE_TIME);
+        return Timestamp.valueOf(localDateTime);
+    }
+
     @Override
     public void exportProductionAndComposedToExcelFiltered(HttpServletResponse response, Map<String, String> requestPayload) {
         Timestamp startDate = stringToTimestamp(requestPayload.get(START_DATE));
@@ -42,7 +47,7 @@ public class ExportExcelServiceImpl implements ExportExcelService {
 
         setExcelResponseHeaders(response, COMPOSED_PRODUCTION_ORDERS_COMPLETED);
 
-        List<ProductionOrderSummaryEntity> productionOrderViews = productionOrderRepository.findCompleted(startDate, endDate, false, null);
+        List<ProductionOrderSummaryEntity> productionOrderViews = productionOrderRepository.findCompleted(false, null, startDate, endDate);
         List<ComposedSummaryEntity> composedList = composedRepository.findAllComposed(startDate, endDate);
 
         try {
@@ -65,12 +70,6 @@ public class ExportExcelServiceImpl implements ExportExcelService {
             workbook.write(outputStream);
         }
     }
-
-    public static Timestamp stringToTimestamp(String dateString) {
-        LocalDateTime localDateTime = LocalDateTime.parse(dateString, DateTimeFormatter.ISO_DATE_TIME);
-        return Timestamp.valueOf(localDateTime);
-    }
-
 
     private void setExcelResponseHeaders(HttpServletResponse response, String filename) {
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");

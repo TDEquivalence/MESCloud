@@ -2,12 +2,14 @@ package com.alcegory.mescloud.model.converter;
 
 import com.alcegory.mescloud.model.dto.*;
 import com.alcegory.mescloud.model.entity.*;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.List;
 
 @Component
+@AllArgsConstructor
 public class UserConverterImpl implements UserConverter {
 
     @Override
@@ -19,9 +21,9 @@ public class UserConverterImpl implements UserConverter {
             userConfigDto.setLastName(userEntity.getLastName());
             userConfigDto.setUsername(userEntity.getUsername());
             userConfigDto.setRole(userEntity.getRole());
-            // Convert company
             userConfigDto.setCompany(convertToCompanyDto(userEntity.getCompany()));
         }
+
         return userConfigDto;
     }
 

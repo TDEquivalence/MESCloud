@@ -5,6 +5,7 @@ import com.alcegory.mescloud.model.dto.CountingEquipmentDto;
 import com.alcegory.mescloud.model.entity.CountingEquipmentEntity;
 import com.alcegory.mescloud.model.request.RequestConfigurationDto;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.security.core.Authentication;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,13 +24,13 @@ public interface CountingEquipmentService {
 
     Optional<CountingEquipmentDto> updateEquipmentStatus(String equipmentCode, int equipmentStatus);
 
-    CountingEquipmentDto updateIms(Long equipmentId, Long imsId)
+    CountingEquipmentDto updateIms(Long equipmentId, Long imsId, Authentication authentication)
             throws EquipmentNotFoundException, ImsNotFoundException, IllegalStateException;
 
-    CountingEquipmentDto updateConfiguration(long equipmentId, RequestConfigurationDto request)
+    CountingEquipmentDto updateConfiguration(long equipmentId, RequestConfigurationDto request, Authentication authentication)
             throws IncompleteConfigurationException, EmptyResultDataAccessException, ActiveProductionOrderException, MesMqttException;
 
-    CountingEquipmentDto setOperationStatus(CountingEquipmentEntity countingEquipment, CountingEquipmentEntity.OperationStatus status);
+    void setOperationStatus(CountingEquipmentEntity countingEquipment, CountingEquipmentEntity.OperationStatus status);
 
     void setOperationStatusByCode(String equipmentCode, CountingEquipmentEntity.OperationStatus idle);
 

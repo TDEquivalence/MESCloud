@@ -13,11 +13,13 @@ import com.alcegory.mescloud.model.filter.Filter;
 import com.alcegory.mescloud.protocol.MesMqttSettings;
 import com.alcegory.mescloud.repository.CountingEquipmentRepository;
 import com.alcegory.mescloud.repository.ProductionOrderRepository;
+import com.alcegory.mescloud.security.service.UserRoleService;
 import com.alcegory.mescloud.service.CountingEquipmentService;
 import com.alcegory.mescloud.service.ProductionOrderService;
 import com.alcegory.mescloud.utility.DateUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
@@ -27,6 +29,8 @@ import java.util.Optional;
 
 import static com.alcegory.mescloud.model.filter.Filter.Property.END_DATE;
 import static com.alcegory.mescloud.model.filter.Filter.Property.START_DATE;
+import static com.alcegory.mescloud.security.model.SectionAuthority.OPERATOR_CREATE;
+import static com.alcegory.mescloud.security.model.SectionAuthority.OPERATOR_UPDATE;
 
 @Service
 @AllArgsConstructor
@@ -49,8 +53,12 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     private final GenericConverter<ProductionOrderSummaryEntity, ProductionOrderSummaryDto> summaryConverter;
     private final GenericConverter<CountingEquipmentEntity, CountingEquipmentDto> equipmentConverter;
 
+    private final UserRoleService userRoleService;
+
     @Override
-    public Optional<ProductionOrderDto> complete(long equipmentId) {
+    public Optional<ProductionOrderDto> complete(long equipmentId, Authentication authentication) {
+        //TODO: sectionId
+        userRoleService.checkSectionAuthority(authentication, 1L, OPERATOR_UPDATE);
         log.info(() -> String.format("Complete process Production Order started for equipmentId [%s]:", equipmentId));
 
         Optional<CountingEquipmentEntity> countingEquipmentOpt = countingEquipmentRepository.findById(equipmentId);
@@ -99,7 +107,13 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     }
 
     @Override
-    public Optional<ProductionOrderDto> create(ProductionOrderDto productionOrder) {
+    public Optional<ProductionOrderDto> create(ProductionOrderDto productionOrder, Authentication authentication) {
+        //TODO: sectionId
+        userRoleService.checkSectionAuthority(authentication, 1L, OPERATOR_CREATE);
+        return create(productionOrder);
+    }
+
+    private Optional<ProductionOrderDto> create(ProductionOrderDto productionOrder) {
 
         Optional<CountingEquipmentEntity> countingEquipmentEntityOpt =
                 countingEquipmentRepository.findById(productionOrder.getEquipmentId());
@@ -240,18 +254,29 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
 
     @Override
     public List<ProductionOrderSummaryDto> getCompletedWithoutComposedFiltered() {
-        List<ProductionOrderSummaryEntity> persistedProductionOrders = repository.findCompleted(null, null, true, null);
+        List<ProductionOrderSummaryEntity> persistedProductionOrders = repository.findCompleted(true, null, null, null);
         return summaryConverter.toDto(persistedProductionOrders, ProductionOrderSummaryDto.class);
     }
 
     @Override
-    public List<ProductionOrderSummaryDto> getCompletedWithoutComposedFiltered(FilterDto filter) {
-        Timestamp startDate = filter.getSearch().getTimestampValue(START_DATE);
-        Timestamp endDate = filter.getSearch().getTimestampValue(END_DATE);
-        String productionOrderCode = filter.getSearch().getValue(Filter.Property.PRODUCTION_ORDER_CODE);
-        List<ProductionOrderSummaryEntity> persistedProductionOrders = repository.findCompleted(startDate, endDate, true,
-                productionOrderCode);
-        return summaryConverter.toDto(persistedProductionOrders, ProductionOrderSummaryDto.class);
+    public PaginatedProductionOrderDto getCompletedWithoutComposedFiltered(Filter filter) {
+        int requestedProductionOrders = filter.getTake();
+        filter.setTake(filter.getTake() + 1);
+
+        List<ProductionOrderSummaryEntity> persistedProductionOrders = repository.findCompleted(true, filter,
+                filter.getSearch().getTimestampValue(START_DATE), filter.getSearch().getTimestampValue(END_DATE));
+        boolean hasNextPage = persistedProductionOrders.size() > requestedProductionOrders;
+
+        if (hasNextPage) {
+            persistedProductionOrders.remove(persistedProductionOrders.size() - 1);
+        }
+
+        PaginatedProductionOrderDto paginatedProductionOrderDto = new PaginatedProductionOrderDto();
+        paginatedProductionOrderDto.setHasNextPage(hasNextPage);
+
+        List<ProductionOrderSummaryDto> summaryDtos = summaryConverter.toDto(persistedProductionOrders, ProductionOrderSummaryDto.class);
+        paginatedProductionOrderDto.setProductionOrders(summaryDtos);
+        return paginatedProductionOrderDto;
     }
 
     @Override
@@ -333,7 +358,10 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     }
 
     @Override
-    public Optional<ProductionOrderDto> editProductionOrder(ProductionOrderDto requestProductionOrder) {
+    public Optional<ProductionOrderDto> editProductionOrder(ProductionOrderDto requestProductionOrder, Authentication authentication) {
+        //TODO: sectionId
+        userRoleService.checkSectionAuthority(authentication, 1L, OPERATOR_UPDATE);
+
         if (requestProductionOrder == null) {
             log.warning("Null request Production Order received for editing production order.");
             return Optional.empty();

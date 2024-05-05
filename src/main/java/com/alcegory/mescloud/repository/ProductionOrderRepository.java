@@ -2,6 +2,7 @@ package com.alcegory.mescloud.repository;
 
 import com.alcegory.mescloud.model.entity.ProductionOrderEntity;
 import com.alcegory.mescloud.model.entity.ProductionOrderSummaryEntity;
+import com.alcegory.mescloud.model.filter.Filter;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -37,8 +38,7 @@ public interface ProductionOrderRepository extends JpaRepository<ProductionOrder
 
     List<ProductionOrderEntity> findByIdIn(List<Long> ids);
 
-    List<ProductionOrderSummaryEntity> findCompleted(Timestamp startDate, Timestamp endDate, boolean withoutComposed,
-                                                     String productionOrderCode);
+    List<ProductionOrderSummaryEntity> findCompleted(boolean withoutComposed, Filter filter, Timestamp startDate, Timestamp endDate);
 
     List<ProductionOrderEntity> findByComposedProductionOrderId(Long composedProductionOrderId);
 

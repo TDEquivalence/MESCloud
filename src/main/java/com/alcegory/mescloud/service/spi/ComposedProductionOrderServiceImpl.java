@@ -1,5 +1,6 @@
 package com.alcegory.mescloud.service.spi;
 
+import com.alcegory.mescloud.exception.InconsistentPropertiesException;
 import com.alcegory.mescloud.model.converter.GenericConverter;
 import com.alcegory.mescloud.model.dto.*;
 import com.alcegory.mescloud.model.entity.ComposedProductionOrderEntity;
@@ -27,18 +28,14 @@ import java.util.logging.Logger;
 public class ComposedProductionOrderServiceImpl implements ComposedProductionOrderService {
 
     private static final java.util.logging.Logger logger = Logger.getLogger(ComposedProductionOrderServiceImpl.class.getName());
-
-    private final ComposedProductionOrderRepository repository;
-    private final ProductionOrderService productionOrderService;
-
-    private final GenericConverter<ComposedProductionOrderEntity, ComposedProductionOrderDto> converter;
-    private final GenericConverter<ComposedSummaryEntity, ComposedSummaryDto> summaryConverter;
-
     private static final String OBO_SECTION_PREFIX = "OBO";
     private static final String CODE_PREFIX = "CP";
     private static final int FIRST_CODE_VALUE = 1;
     private static final String FIVE_DIGIT_NUMBER_FORMAT = "%05d";
-
+    private final ComposedProductionOrderRepository repository;
+    private final ProductionOrderService productionOrderService;
+    private final GenericConverter<ComposedProductionOrderEntity, ComposedProductionOrderDto> converter;
+    private final GenericConverter<ComposedSummaryEntity, ComposedSummaryDto> summaryConverter;
 
     @Override
     public Optional<ComposedProductionOrderDto> create(RequestComposedDto requestComposedDto) {
@@ -49,9 +46,8 @@ public class ComposedProductionOrderServiceImpl implements ComposedProductionOrd
     public Optional<ComposedProductionOrderDto> create(List<Long> productionOrderIds) {
 
         List<Long> validProductionOrderIds = getValidProductionOrders(productionOrderIds);
-        if (!haveSameProperties(productionOrderIds)) {
-            throw new IllegalArgumentException("Production order list doesn't have same properties");
-        }
+        validateProductionOrderProperties(productionOrderIds);
+
         ComposedProductionOrderEntity composedEntity = createComposed();
 
         setProductionOrdersWithComposed(validProductionOrderIds, composedEntity);
@@ -111,17 +107,21 @@ public class ComposedProductionOrderServiceImpl implements ComposedProductionOrd
         return String.format(FIVE_DIGIT_NUMBER_FORMAT, ++lastCodeValue);
     }
 
-    private boolean haveSameProperties(List<Long> productionOrderIds) {
+    private void validateProductionOrderProperties(List<Long> productionOrderIds) {
         if (productionOrderIds.isEmpty()) {
-            return false;
+            throw new IllegalArgumentException("Production order IDs list cannot be empty");
         }
 
         List<ProductionOrderDto> productionOrderDtos = getProductionOrderDtos(productionOrderIds);
         ProductionOrderDto firstProductionOrder = productionOrderDtos.get(0);
 
-        return productionOrderDtos.stream().skip(1).allMatch(order ->
-                propertiesAreEqual(order, firstProductionOrder)
-        );
+        boolean allPropertiesEqual = productionOrderDtos.stream()
+                .skip(1)
+                .allMatch(order -> propertiesAreEqual(order, firstProductionOrder));
+
+        if (!allPropertiesEqual) {
+            throw new InconsistentPropertiesException("Production orders do not have the same properties");
+        }
     }
 
     private boolean propertiesAreEqual(ProductionOrderDto orderToCompare, ProductionOrderDto order) {
@@ -165,23 +165,37 @@ public class ComposedProductionOrderServiceImpl implements ComposedProductionOrd
     }
 
     @Override
-    public List<ComposedSummaryDto> findAllSummarized(boolean withHits) {
+    public PaginatedComposedDto findAllSummarized(boolean withHits) {
         return getOpenComposedSummaries(withHits, null);
     }
 
     @Override
-    public List<ComposedSummaryDto> findSummarizedFiltered(boolean withHits, FilterDto filter) {
+    public PaginatedComposedDto findSummarizedFiltered(boolean withHits, Filter filter) {
         return getOpenComposedSummaries(withHits, filter);
     }
 
-    private List<ComposedSummaryDto> getOpenComposedSummaries(boolean withHits, FilterDto filter) {
-        Long composedId = getComposedIdFromFilter(filter);
+    private PaginatedComposedDto getOpenComposedSummaries(boolean withHits, Filter filter) {
+        int requestedComposed = filter.getTake();
+        filter.setTake(filter.getTake() + 1);
 
+        Long composedId = getComposedIdFromFilter(filter);
         List<ComposedSummaryEntity> composedWithoutHits = repository.getOpenComposedSummaries(withHits, filter, composedId);
-        return summaryConverter.toDto(composedWithoutHits, ComposedSummaryDto.class);
+
+        boolean hasNextPage = composedWithoutHits.size() > requestedComposed;
+
+        if (hasNextPage) {
+            composedWithoutHits.remove(composedWithoutHits.size() - 1);
+        }
+
+        List<ComposedSummaryDto> composedSummaryDtos = summaryConverter.toDto(composedWithoutHits, ComposedSummaryDto.class);
+        PaginatedComposedDto paginatedComposedDto = new PaginatedComposedDto();
+        paginatedComposedDto.setHasNextPage(hasNextPage);
+        paginatedComposedDto.setComposedProductionOrders(composedSummaryDtos);
+
+        return paginatedComposedDto;
     }
 
-    private Long getComposedIdFromFilter(FilterDto filter) {
+    private Long getComposedIdFromFilter(Filter filter) {
         if (filter != null && filter.getSearch() != null && filter.getSearch().getValue(Filter.Property.PRODUCTION_ORDER_CODE) != null) {
             String productionOrderCode = filter.getSearch().getValue(Filter.Property.PRODUCTION_ORDER_CODE).trim();
             if (!productionOrderCode.isEmpty()) {
@@ -191,7 +205,6 @@ public class ComposedProductionOrderServiceImpl implements ComposedProductionOrd
         return null;
     }
 
-
     @Override
     public List<ComposedSummaryDto> findAllCompleted() {
         List<ComposedSummaryEntity> composedCompleted = repository.findCompleted(null, null);
@@ -199,11 +212,25 @@ public class ComposedProductionOrderServiceImpl implements ComposedProductionOrd
     }
 
     @Override
-    public List<ComposedSummaryDto> findCompletedFiltered(FilterDto filter) {
+    public PaginatedComposedDto findCompletedFiltered(Filter filter) {
+        int requestedComposed = filter.getTake();
+        filter.setTake(filter.getTake() + 1);
         Long composedId = getComposedIdFromFilter(filter);
 
         List<ComposedSummaryEntity> composedCompleted = repository.findCompleted(filter, composedId);
-        return summaryConverter.toDto(composedCompleted, ComposedSummaryDto.class);
+
+        boolean hasNextPage = composedCompleted.size() > requestedComposed;
+
+        if (hasNextPage) {
+            composedCompleted.remove(composedCompleted.size() - 1);
+        }
+
+        List<ComposedSummaryDto> summaryDtos = summaryConverter.toDto(composedCompleted, ComposedSummaryDto.class);
+        PaginatedComposedDto paginatedComposedDto = new PaginatedComposedDto();
+        paginatedComposedDto.setHasNextPage(hasNextPage);
+        paginatedComposedDto.setComposedProductionOrders(summaryDtos);
+
+        return paginatedComposedDto;
     }
 
     @Override
