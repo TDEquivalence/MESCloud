@@ -70,13 +70,25 @@ public class ProductionOrderController {
 
     @GetMapping("/completed")
     public ResponseEntity<List<ProductionOrderSummaryDto>> getAllCompleted() {
-        List<ProductionOrderSummaryDto> completedOrders = service.getCompletedWithoutComposedFiltered();
-        return new ResponseEntity<>(completedOrders, HttpStatus.OK);
+        try {
+            List<ProductionOrderSummaryDto> completedOrders = service.getCompletedWithoutComposedFiltered();
+            return ResponseEntity.ok(completedOrders);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @PostMapping("/completed/filtered")
     public ResponseEntity<PaginatedProductionOrderDto> getCompletedFiltered(@RequestBody Filter filter) {
-        PaginatedProductionOrderDto completedOrders = service.getCompletedWithoutComposedFiltered(filter);
-        return new ResponseEntity<>(completedOrders, HttpStatus.OK);
+        try {
+            if (filter == null) {
+                return ResponseEntity.badRequest().build();
+            }
+
+            PaginatedProductionOrderDto completedOrders = service.getCompletedWithoutComposedFiltered(filter);
+            return ResponseEntity.ok(completedOrders);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 }

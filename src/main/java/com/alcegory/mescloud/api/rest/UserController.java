@@ -31,20 +31,40 @@ public class UserController {
 
     @GetMapping("/{id}")
     public ResponseEntity<UserDto> findUser(@PathVariable long id) {
-        UserDto userDto = userService.getUserDtoById(id);
-        return new ResponseEntity<>(userDto, HttpStatus.OK);
+        try {
+            UserDto userDto = userService.getUserDtoById(id);
+            if (userDto != null) {
+                return ResponseEntity.ok(userDto);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @GetMapping
     public ResponseEntity<List<UserConfigDto>> getAllUsers(Authentication authentication) {
-        List<UserConfigDto> users = userRoleService.getAllCompanyConfigAndUserAuth(authentication);
-        return new ResponseEntity<>(users, HttpStatus.OK);
+        try {
+            List<UserConfigDto> users = userRoleService.getAllCompanyConfigAndUserAuth(authentication);
+            return ResponseEntity.ok(users);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @PostMapping("/filter")
     public ResponseEntity<List<UserDto>> getFilteredUsers(@RequestBody Filter filter) {
-        List<UserDto> users = userService.getDtoUsers(filter);
-        return new ResponseEntity<>(users, HttpStatus.OK);
+        try {
+            if (filter == null) {
+                return ResponseEntity.badRequest().build();
+            }
+
+            List<UserDto> users = userService.getDtoUsers(filter);
+            return ResponseEntity.ok(users);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @PutMapping("/update")

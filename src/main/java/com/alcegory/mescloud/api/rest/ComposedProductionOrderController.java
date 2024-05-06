@@ -25,54 +25,106 @@ public class ComposedProductionOrderController {
 
     @PostMapping
     public ResponseEntity<ComposedProductionOrderDto> create(@RequestBody RequestComposedDto productionOrderIds) {
-        Optional<ComposedProductionOrderDto> composedProductionOpt = composedService.create(productionOrderIds);
-        if (composedProductionOpt.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        try {
+            Optional<ComposedProductionOrderDto> composedProductionOpt = composedService.create(productionOrderIds);
+            if (composedProductionOpt.isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+            return new ResponseEntity<>(composedProductionOpt.get(), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
-        return new ResponseEntity<>(composedProductionOpt.get(), HttpStatus.OK);
     }
 
     @GetMapping
     public ResponseEntity<List<ComposedProductionOrderDto>> findAll() {
-        List<ComposedProductionOrderDto> composedDtos = composedService.getAll();
-        return new ResponseEntity<>(composedDtos, HttpStatus.OK);
+        try {
+            List<ComposedProductionOrderDto> composedDtos = composedService.getAll();
+            if (composedDtos.isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+            return new ResponseEntity<>(composedDtos, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @GetMapping("/insert-hits")
     public ResponseEntity<PaginatedComposedDto> findAllToInsertHits() {
-        PaginatedComposedDto composedWithoutHits = composedService.findAllSummarizedWithoutHits();
-        return new ResponseEntity<>(composedWithoutHits, HttpStatus.OK);
+        try {
+            PaginatedComposedDto composedWithoutHits = composedService.findAllSummarizedWithoutHits();
+            if (composedWithoutHits == null || composedWithoutHits.getComposedProductionOrders().isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+            return new ResponseEntity<>(composedWithoutHits, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @PostMapping("/insert-hits/filtered")
     public ResponseEntity<PaginatedComposedDto> findToInsertHitsFiltered(@RequestBody Filter filter) {
-        PaginatedComposedDto composedWithoutHits = composedService.findSummarizedWithoutHitsFiltered(filter);
-        return new ResponseEntity<>(composedWithoutHits, HttpStatus.OK);
+        try {
+            PaginatedComposedDto composedWithoutHits = composedService.findSummarizedWithoutHitsFiltered(filter);
+            if (composedWithoutHits == null || composedWithoutHits.getComposedProductionOrders().isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+            return new ResponseEntity<>(composedWithoutHits, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @GetMapping("/approval")
     public ResponseEntity<PaginatedComposedDto> findAllForApproval() {
-        PaginatedComposedDto composedWithoutHits = composedService.findAllSummarizedWithHits();
-        return new ResponseEntity<>(composedWithoutHits, HttpStatus.OK);
+        try {
+            PaginatedComposedDto composedWithHits = composedService.findAllSummarizedWithHits();
+            if (composedWithHits == null || composedWithHits.getComposedProductionOrders().isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+            return new ResponseEntity<>(composedWithHits, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @PostMapping("/approval/filtered")
     public ResponseEntity<PaginatedComposedDto> findForApprovalFiltered(@RequestBody Filter filter) {
-        PaginatedComposedDto composedWithoutHits = composedService.findSummarizedWithHitsFiltered(filter);
-        return new ResponseEntity<>(composedWithoutHits, HttpStatus.OK);
+        try {
+            PaginatedComposedDto composedWithHits = composedService.findSummarizedWithHitsFiltered(filter);
+            if (composedWithHits == null || composedWithHits.getComposedProductionOrders().isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+            return new ResponseEntity<>(composedWithHits, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @GetMapping("/completed")
     public ResponseEntity<List<ComposedSummaryDto>> findAllCompleted() {
-        List<ComposedSummaryDto> composedCompleted = composedService.findAllCompleted();
-        return new ResponseEntity<>(composedCompleted, HttpStatus.OK);
+        try {
+            List<ComposedSummaryDto> composedCompleted = composedService.findAllCompleted();
+            if (composedCompleted.isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+            return new ResponseEntity<>(composedCompleted, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @PostMapping("/completed/filtered")
     public ResponseEntity<PaginatedComposedDto> findCompletedFiltered(@RequestBody Filter filter) {
-        PaginatedComposedDto composedCompleted = composedService.findCompletedFiltered(filter);
-        return new ResponseEntity<>(composedCompleted, HttpStatus.OK);
+        try {
+            PaginatedComposedDto composedCompleted = composedService.findCompletedFiltered(filter);
+            if (composedCompleted == null || composedCompleted.getComposedProductionOrders().isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+            return new ResponseEntity<>(composedCompleted, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @PostMapping("/production-orders")
@@ -82,7 +134,8 @@ public class ComposedProductionOrderController {
         }
 
         try {
-            List<ProductionOrderSummaryDto> productionOrderSummary = composedService.getProductionOrderSummaryByComposedId(request.getId());
+            List<ProductionOrderSummaryDto> productionOrderSummary =
+                    composedService.getProductionOrderSummaryByComposedId(request.getId());
             return new ResponseEntity<>(productionOrderSummary, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

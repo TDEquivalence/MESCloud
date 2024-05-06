@@ -19,13 +19,25 @@ public class ImsController {
 
     @PostMapping()
     public ResponseEntity<ImsDto> create(@RequestBody ImsDto imsDto) {
-        ImsDto createdIms = imsService.create(imsDto);
-        return new ResponseEntity<>(createdIms, HttpStatus.OK);
+        try {
+            if (imsDto == null) {
+                return ResponseEntity.badRequest().build();
+            }
+
+            ImsDto createdIms = imsService.create(imsDto);
+            return ResponseEntity.status(HttpStatus.CREATED).body(createdIms);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @GetMapping
     public ResponseEntity<List<ImsDto>> findAll() {
-        List<ImsDto> imsDtos = imsService.getAll();
-        return new ResponseEntity<>(imsDtos, HttpStatus.OK);
+        try {
+            List<ImsDto> imsDtos = imsService.getAll();
+            return ResponseEntity.ok(imsDtos);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 }

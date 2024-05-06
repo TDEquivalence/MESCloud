@@ -21,13 +21,29 @@ CounterRecordController {
 
     @PostMapping("/filter")
     public ResponseEntity<PaginatedCounterRecordsDto> getFilteredAndPaginated(@RequestBody Filter filter) {
-        PaginatedCounterRecordsDto paginatedCounterRecords = service.getFilteredAndPaginated(filter);
-        return new ResponseEntity<>(paginatedCounterRecords, HttpStatus.OK);
+        if (filter == null) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        try {
+            PaginatedCounterRecordsDto paginatedCounterRecords = service.getFilteredAndPaginated(filter);
+            return ResponseEntity.ok(paginatedCounterRecords);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @PostMapping("/completion")
     public ResponseEntity<PaginatedCounterRecordsDto> getLastPerProductionOrder(@RequestBody Filter filter) {
-        PaginatedCounterRecordsDto paginatedCounterRecords = service.filterConclusionRecordsPaginated(filter);
-        return new ResponseEntity<>(paginatedCounterRecords, HttpStatus.OK);
+        if (filter == null) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        try {
+            PaginatedCounterRecordsDto paginatedCounterRecords = service.filterConclusionRecordsPaginated(filter);
+            return ResponseEntity.ok(paginatedCounterRecords);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 }

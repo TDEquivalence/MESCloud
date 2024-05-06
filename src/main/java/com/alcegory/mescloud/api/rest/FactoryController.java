@@ -16,17 +16,30 @@ public class FactoryController {
 
     @GetMapping("/{id}")
     public ResponseEntity<CompanyDto> getCompanyById(@PathVariable("id") Long id) {
-        CompanyDto companyDto = companyService.getCompanyDtoById(id);
-        if (companyDto != null) {
-            return ResponseEntity.ok(companyDto);
-        } else {
-            return ResponseEntity.notFound().build();
+        try {
+            CompanyDto companyDtoOptional = companyService.getCompanyDtoById(id);
+            if (companyDtoOptional != null) {
+                return ResponseEntity.ok(companyDtoOptional);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
+
     @PostMapping("/save")
-    public ResponseEntity<CompanyDto> saveComapny(@RequestBody CompanyDto companyDto) {
-        CompanyDto savedCompanyDto = companyService.saveCompany(companyDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedCompanyDto);
+    public ResponseEntity<CompanyDto> saveCompany(@RequestBody CompanyDto companyDto) {
+        try {
+            if (companyDto == null) {
+                return ResponseEntity.badRequest().build();
+            }
+
+            CompanyDto savedCompanyDto = companyService.saveCompany(companyDto);
+            return ResponseEntity.status(HttpStatus.CREATED).body(savedCompanyDto);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 }

@@ -27,20 +27,44 @@ public class KpiController {
 
     @PostMapping("/equipment-counts")
     public ResponseEntity<CountingEquipmentKpiDto[]> getCountingEquipmentKpi(@RequestBody FilterDto filter) {
-        CountingEquipmentKpiDto[] countingEquipmentKpiDto = kpiService.computeEquipmentKpi(filter);
-        return new ResponseEntity<>(countingEquipmentKpiDto, HttpStatus.OK);
+        try {
+            if (filter == null) {
+                return ResponseEntity.badRequest().build();
+            }
+
+            CountingEquipmentKpiDto[] countingEquipmentKpiDto = kpiService.computeEquipmentKpi(filter);
+            return ResponseEntity.ok(countingEquipmentKpiDto);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @PostMapping("/equipment-daily-counts")
     public ResponseEntity<CountingEquipmentKpiDto[]> getEquipmentOutputProductionPerDay(@RequestBody FilterDto filter) {
-        CountingEquipmentKpiDto[] countingEquipmentKpiDto = kpiService.getEquipmentOutputProductionPerDay(filter);
-        return new ResponseEntity<>(countingEquipmentKpiDto, HttpStatus.OK);
+        try {
+            if (filter == null) {
+                return ResponseEntity.badRequest().build();
+            }
+
+            CountingEquipmentKpiDto[] countingEquipmentKpiDto = kpiService.getEquipmentOutputProductionPerDay(filter);
+            return ResponseEntity.ok(countingEquipmentKpiDto);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @PostMapping("/{equipmentId}/availability")
     public ResponseEntity<KpiDto> getEquipmentAvailability(@PathVariable long equipmentId, @RequestBody FilterDto filter) {
-        KpiDto kpiAvailabilityDto = kpiService.computeAvailability(equipmentId, filter);
-        return new ResponseEntity<>(kpiAvailabilityDto, HttpStatus.OK);
+        try {
+            if (filter == null) {
+                return ResponseEntity.badRequest().build();
+            }
+
+            KpiDto kpiAvailabilityDto = kpiService.computeAvailability(equipmentId, filter);
+            return ResponseEntity.ok(kpiAvailabilityDto);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @PostMapping("/{equipmentId}/aggregator")
