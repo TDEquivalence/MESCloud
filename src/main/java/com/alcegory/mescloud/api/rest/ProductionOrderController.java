@@ -4,6 +4,7 @@ import com.alcegory.mescloud.exception.ForbiddenAccessException;
 import com.alcegory.mescloud.model.dto.PaginatedProductionOrderDto;
 import com.alcegory.mescloud.model.dto.ProductionOrderDto;
 import com.alcegory.mescloud.model.dto.ProductionOrderSummaryDto;
+import com.alcegory.mescloud.model.entity.ProductionOrderEntity;
 import com.alcegory.mescloud.model.filter.Filter;
 import com.alcegory.mescloud.service.ProductionOrderService;
 import lombok.AllArgsConstructor;
@@ -21,6 +22,18 @@ import java.util.Optional;
 public class ProductionOrderController {
 
     private final ProductionOrderService service;
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ProductionOrderDto> getProductionOrderById(@PathVariable Long id) {
+        try {
+            Optional<ProductionOrderDto> productionOrderOpt = service.getProductionOrderById(id);
+            return productionOrderOpt
+                    .map(productionOrder -> ResponseEntity.ok(productionOrder))
+                    .orElse(ResponseEntity.notFound().build());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 
     @PostMapping
     public ResponseEntity<ProductionOrderDto> create(@RequestBody ProductionOrderDto requestProductionOrder,

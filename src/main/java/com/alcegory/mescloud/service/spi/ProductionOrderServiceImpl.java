@@ -389,4 +389,14 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         productionOrderToUpdate.setWashingProcess(requestProductionOrder.getWashingProcess());
         return productionOrderToUpdate;
     }
+
+    @Override
+    public Optional<ProductionOrderDto> getProductionOrderById(Long id) {
+        Optional<ProductionOrderEntity> productionOrderOpt = repository.findById(id);
+        if (productionOrderOpt.isEmpty()) {
+            return Optional.of(new ProductionOrderDto());
+        }
+        ProductionOrderDto productionOrderDto = converter.toDto(productionOrderOpt.get());
+        return Optional.of(productionOrderDto);
+    }
 }

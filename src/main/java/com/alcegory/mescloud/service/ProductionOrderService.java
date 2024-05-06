@@ -62,4 +62,6 @@ public interface ProductionOrderService {
     List<ProductionOrderEntity> findByComposedProductionOrderId(Long composedOrderId);
 
     Long findComposedProductionOrderIdByCode(String code);
+
+    Optional<ProductionOrderDto> getProductionOrderById(Long id);
 }
