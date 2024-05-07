@@ -17,9 +17,4 @@ public class CounterRecordDto {
     private Date registeredAt;
     private boolean isValidForProduction;
     private String ims;
-    private String inputBatch;
-    private String source;
-    private String gauge;
-    private String category;
-    private String washingProcess;
 }

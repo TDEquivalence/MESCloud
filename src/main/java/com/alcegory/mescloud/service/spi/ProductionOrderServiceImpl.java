@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static com.alcegory.mescloud.model.filter.Filter.Property.END_DATE;
@@ -382,12 +383,17 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     }
 
     private ProductionOrderEntity updateProductionOrder(ProductionOrderDto requestProductionOrder, ProductionOrderEntity productionOrderToUpdate) {
-        productionOrderToUpdate.setTargetAmount(requestProductionOrder.getTargetAmount());
-        productionOrderToUpdate.setInputBatch(requestProductionOrder.getInputBatch());
-        productionOrderToUpdate.setSource(requestProductionOrder.getSource());
-        productionOrderToUpdate.setGauge(requestProductionOrder.getGauge());
-        productionOrderToUpdate.setCategory(requestProductionOrder.getCategory());
-        productionOrderToUpdate.setWashingProcess(requestProductionOrder.getWashingProcess());
+        if (requestProductionOrder == null || productionOrderToUpdate == null) {
+            return null;
+        }
+
+        Map<String, String> instructionsDto = requestProductionOrder.getProductionInstructions();
+        Map<String, String> instructionsToUpdate = productionOrderToUpdate.getProductionInstructionsMap();
+
+        if (instructionsDto != null && instructionsToUpdate != null) {
+            instructionsDto.forEach((key, value) -> instructionsToUpdate.computeIfPresent(key, (k, oldValue) -> value));
+        }
+
         return productionOrderToUpdate;
     }
 

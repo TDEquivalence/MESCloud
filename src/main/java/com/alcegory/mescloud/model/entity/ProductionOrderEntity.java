@@ -34,12 +34,7 @@ public class ProductionOrderEntity implements Serializable {
 
     @OneToMany(mappedBy = "productionOrder", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<ProductionInstructionEntity> productionInstructions;
-
-    private String inputBatch;
-    private String source;
-    private String gauge;
-    private String category;
-    private String washingProcess;
+    
     private Boolean isApproved;
 
     @ManyToOne

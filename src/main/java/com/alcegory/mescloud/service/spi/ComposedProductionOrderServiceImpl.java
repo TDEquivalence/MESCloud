@@ -16,10 +16,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.logging.Logger;
 
 @Service
@@ -129,11 +126,16 @@ public class ComposedProductionOrderServiceImpl implements ComposedProductionOrd
             return false;
         }
 
-        boolean inputBatchEqual = Objects.equals(orderToCompare.getInputBatch(), order.getInputBatch());
-        boolean gaugeEqual = Objects.equals(orderToCompare.getGauge(), order.getGauge());
-        boolean washingProcessEqual = Objects.equals(orderToCompare.getWashingProcess(), order.getWashingProcess());
+        Map<String, String> instructionsToCompare = orderToCompare.getProductionInstructions();
+        Map<String, String> instructions = order.getProductionInstructions();
 
-        return inputBatchEqual && gaugeEqual && washingProcessEqual;
+        if (instructionsToCompare == null && instructions == null) {
+            return true;
+        } else if (instructionsToCompare == null || instructions == null) {
+            return false;
+        }
+
+        return instructionsToCompare.equals(instructions);
     }
 
     private List<ProductionOrderDto> getProductionOrderDtos(List<Long> productionOrderIds) {

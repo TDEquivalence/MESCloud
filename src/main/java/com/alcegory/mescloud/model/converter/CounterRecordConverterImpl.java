@@ -41,26 +41,6 @@ public class CounterRecordConverterImpl implements CounterRecordConverter {
                 .map(ImsEntity::getCode)
                 .orElse(null));
 
-        dto.setInputBatch(Optional.ofNullable(entity.getProductionOrder())
-                .map(ProductionOrderEntity::getInputBatch)
-                .orElse(null));
-
-        dto.setSource(Optional.ofNullable(entity.getProductionOrder())
-                .map(ProductionOrderEntity::getSource)
-                .orElse(null));
-
-        dto.setGauge(Optional.ofNullable(entity.getProductionOrder())
-                .map(ProductionOrderEntity::getGauge)
-                .orElse(null));
-
-        dto.setCategory(Optional.ofNullable(entity.getProductionOrder())
-                .map(ProductionOrderEntity::getCategory)
-                .orElse(null));
-
-        dto.setWashingProcess(Optional.ofNullable(entity.getProductionOrder())
-                .map(ProductionOrderEntity::getWashingProcess)
-                .orElse(null));
-
         return dto;
     }
 }

@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Component
 @Log
@@ -26,11 +25,10 @@ public class ProductionOrderConverterImpl implements ProductionOrderConverter {
         productionOrderEntity.setTargetAmount(productionOrderDto.getTargetAmount());
         productionOrderEntity.setCreatedAt(productionOrderDto.getCreatedAt());
         productionOrderEntity.setCompletedAt(productionOrderDto.getCompletedAt());
-        productionOrderEntity.setInputBatch(productionOrderDto.getInputBatch());
-        productionOrderEntity.setSource(productionOrderDto.getSource());
-        productionOrderEntity.setGauge(productionOrderDto.getGauge());
-        productionOrderEntity.setCategory(productionOrderDto.getCategory());
-        productionOrderEntity.setWashingProcess(productionOrderDto.getWashingProcess());
+
+        List<ProductionInstructionEntity> instructions
+                = fromDtoMap(productionOrderDto.getProductionInstructions(), productionOrderEntity);
+        productionOrderEntity.setProductionInstructions(instructions);
 
         return productionOrderEntity;
     }
@@ -59,11 +57,6 @@ public class ProductionOrderConverterImpl implements ProductionOrderConverter {
         dto.setTargetAmount(entity.getTargetAmount());
         dto.setCreatedAt(entity.getCreatedAt());
         dto.setCompletedAt(entity.getCompletedAt());
-        dto.setGauge(entity.getGauge());
-        dto.setSource(entity.getSource());
-        dto.setCategory(entity.getCategory());
-        dto.setWashingProcess(entity.getWashingProcess());
-        dto.setInputBatch(entity.getInputBatch());
 
         if (entity.getEquipment() != null) {
             dto.setEquipmentId(entity.getEquipment().getId());
