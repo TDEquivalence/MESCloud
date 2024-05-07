@@ -3,9 +3,15 @@ package com.alcegory.mescloud.model.converter;
 import com.alcegory.mescloud.constant.MqttDTOConstants;
 import com.alcegory.mescloud.model.dto.ProductionOrderDto;
 import com.alcegory.mescloud.model.dto.ProductionOrderMqttDto;
+import com.alcegory.mescloud.model.entity.ProductionInstructionEntity;
 import com.alcegory.mescloud.model.entity.ProductionOrderEntity;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Component;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Component
 @Log
@@ -63,6 +69,24 @@ public class ProductionOrderConverterImpl implements ProductionOrderConverter {
             dto.setEquipmentId(entity.getEquipment().getId());
         }
 
+        dto.setProductionInstructions(entity.getProductionInstructionsMap());
+
         return dto;
+    }
+
+    public List<ProductionInstructionEntity> fromDtoMap(Map<String, String> instructionMap, ProductionOrderEntity productionOrder) {
+        if (instructionMap == null || instructionMap.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        return instructionMap.entrySet().stream()
+                .map(entry -> {
+                    ProductionInstructionEntity instruction = new ProductionInstructionEntity();
+                    instruction.setName(entry.getKey());
+                    instruction.setValue(entry.getValue());
+                    instruction.setProductionOrder(productionOrder);
+                    return instruction;
+                })
+                .toList();
     }
 }

@@ -6,7 +6,6 @@ import lombok.Setter;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.Date;
 
 @Getter
 @Setter
@@ -19,9 +18,11 @@ public class ProductionInstructionEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private int instruction;
+
+    private String name;
+    private String value;
+
     @ManyToOne
+    @JoinColumn(name = "production_order_id")
     private ProductionOrderEntity productionOrder;
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date createdAt;
 }

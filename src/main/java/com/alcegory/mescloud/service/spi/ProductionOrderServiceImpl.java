@@ -21,6 +21,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
 import java.util.Date;
@@ -391,12 +392,18 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<ProductionOrderDto> getProductionOrderById(Long id) {
         Optional<ProductionOrderEntity> productionOrderOpt = repository.findById(id);
         if (productionOrderOpt.isEmpty()) {
-            return Optional.of(new ProductionOrderDto());
+            return Optional.empty();
         }
-        ProductionOrderDto productionOrderDto = converter.toDto(productionOrderOpt.get());
+
+        ProductionOrderEntity productionOrderEntity = productionOrderOpt.get();
+        productionOrderEntity.getProductionInstructions().size();
+        productionOrderEntity.getProductionInstructionsMap();
+
+        ProductionOrderDto productionOrderDto = converter.toDto(productionOrderEntity);
         return Optional.of(productionOrderDto);
     }
 }

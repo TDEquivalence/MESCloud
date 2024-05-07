@@ -6,8 +6,8 @@ import lombok.Setter;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -32,8 +32,9 @@ public class ProductionOrderEntity implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date completedAt;
 
-    @OneToMany(mappedBy = "productionOrder")
+    @OneToMany(mappedBy = "productionOrder", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<ProductionInstructionEntity> productionInstructions;
+
     private String inputBatch;
     private String source;
     private String gauge;
@@ -43,6 +44,18 @@ public class ProductionOrderEntity implements Serializable {
 
     @ManyToOne
     private ComposedProductionOrderEntity composedProductionOrder;
+
+    public Map<String, String> getProductionInstructionsMap() {
+        if (productionInstructions == null || productionInstructions.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
+        return productionInstructions.stream()
+                .collect(Collectors.toMap(ProductionInstructionEntity::getName,
+                        ProductionInstructionEntity::getValue,
+                        (existingValue, newValue) -> existingValue,
+                        HashMap::new));
+    }
 }
 
 
