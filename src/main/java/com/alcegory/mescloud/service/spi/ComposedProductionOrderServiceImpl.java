@@ -126,16 +126,19 @@ public class ComposedProductionOrderServiceImpl implements ComposedProductionOrd
             return false;
         }
 
-        Map<String, String> instructionsToCompare = orderToCompare.getProductionInstructions();
-        Map<String, String> instructions = order.getProductionInstructions();
+        List<ProductionInstructionDto> instructionsToCompare = orderToCompare.getInstructions();
+        List<ProductionInstructionDto> instructions = order.getInstructions();
 
-        if (instructionsToCompare == null && instructions == null) {
-            return true;
-        } else if (instructionsToCompare == null || instructions == null) {
-            return false;
+        for (int i = 0; i < instructionsToCompare.size(); i++) {
+            ProductionInstructionDto instructionToCompare = instructionsToCompare.get(i);
+            ProductionInstructionDto instruction = instructions.get(i);
+
+            if (instructionToCompare == null || !instructionToCompare.equals(instruction)) {
+                return false;
+            }
         }
 
-        return instructionsToCompare.equals(instructions);
+        return true;
     }
 
     private List<ProductionOrderDto> getProductionOrderDtos(List<Long> productionOrderIds) {

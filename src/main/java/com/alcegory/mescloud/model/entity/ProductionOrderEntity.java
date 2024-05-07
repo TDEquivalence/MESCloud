@@ -6,8 +6,8 @@ import lombok.Setter;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
@@ -34,23 +34,11 @@ public class ProductionOrderEntity implements Serializable {
 
     @OneToMany(mappedBy = "productionOrder", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<ProductionInstructionEntity> productionInstructions;
-    
+
     private Boolean isApproved;
 
     @ManyToOne
     private ComposedProductionOrderEntity composedProductionOrder;
-
-    public Map<String, String> getProductionInstructionsMap() {
-        if (productionInstructions == null || productionInstructions.isEmpty()) {
-            return Collections.emptyMap();
-        }
-
-        return productionInstructions.stream()
-                .collect(Collectors.toMap(ProductionInstructionEntity::getName,
-                        ProductionInstructionEntity::getValue,
-                        (existingValue, newValue) -> existingValue,
-                        HashMap::new));
-    }
 }
 
 

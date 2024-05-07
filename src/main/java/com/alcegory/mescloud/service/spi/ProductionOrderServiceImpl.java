@@ -7,12 +7,12 @@ import com.alcegory.mescloud.model.converter.GenericConverter;
 import com.alcegory.mescloud.model.converter.ProductionOrderConverter;
 import com.alcegory.mescloud.model.dto.*;
 import com.alcegory.mescloud.model.entity.CountingEquipmentEntity;
+import com.alcegory.mescloud.model.entity.ProductionInstructionEntity;
 import com.alcegory.mescloud.model.entity.ProductionOrderEntity;
 import com.alcegory.mescloud.model.entity.ProductionOrderSummaryEntity;
 import com.alcegory.mescloud.model.filter.Filter;
 import com.alcegory.mescloud.protocol.MesMqttSettings;
 import com.alcegory.mescloud.repository.CountingEquipmentRepository;
-import com.alcegory.mescloud.repository.ProductionInstructionRepository;
 import com.alcegory.mescloud.repository.ProductionOrderRepository;
 import com.alcegory.mescloud.security.service.UserRoleService;
 import com.alcegory.mescloud.service.CountingEquipmentService;
@@ -27,7 +27,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import static com.alcegory.mescloud.model.filter.Filter.Property.END_DATE;
@@ -47,7 +46,6 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
 
     private final ProductionOrderRepository repository;
     private final CountingEquipmentRepository countingEquipmentRepository;
-    private final ProductionInstructionRepository productionInstructionRepository;
 
     private final CountingEquipmentService countingEquipmentService;
     private final MqttClient mqttClient;
@@ -389,11 +387,17 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
             return null;
         }
 
-        Map<String, String> instructionsDto = requestProductionOrder.getProductionInstructions();
-        Map<String, String> instructionsToUpdate = productionOrderToUpdate.getProductionInstructionsMap();
-
-        if (instructionsDto != null && instructionsToUpdate != null) {
-            instructionsDto.forEach((key, value) -> instructionsToUpdate.computeIfPresent(key, (k, oldValue) -> value));
+        List<ProductionInstructionDto> requestInstructions = requestProductionOrder.getInstructions();
+        List<ProductionInstructionEntity> existingInstructions = productionOrderToUpdate.getProductionInstructions();
+        if (requestInstructions != null && existingInstructions != null) {
+            for (ProductionInstructionDto requestInstruction : requestInstructions) {
+                for (ProductionInstructionEntity existingInstruction : existingInstructions) {
+                    if (requestInstruction.getName().equals(existingInstruction.getName())) {
+                        existingInstruction.setValue(requestInstruction.getValue());
+                        break;
+                    }
+                }
+            }
         }
 
         return productionOrderToUpdate;
@@ -409,7 +413,6 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
 
         ProductionOrderEntity productionOrderEntity = productionOrderOpt.get();
         productionOrderEntity.getProductionInstructions().size();
-        productionOrderEntity.getProductionInstructionsMap();
 
         ProductionOrderDto productionOrderDto = converter.toDto(productionOrderEntity);
         return Optional.of(productionOrderDto);

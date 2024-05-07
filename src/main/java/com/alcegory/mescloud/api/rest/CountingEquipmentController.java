@@ -2,6 +2,7 @@ package com.alcegory.mescloud.api.rest;
 
 import com.alcegory.mescloud.exception.*;
 import com.alcegory.mescloud.model.dto.CountingEquipmentDto;
+import com.alcegory.mescloud.model.dto.CountingEquipmentInfoDto;
 import com.alcegory.mescloud.model.request.RequestById;
 import com.alcegory.mescloud.model.request.RequestConfigurationDto;
 import com.alcegory.mescloud.service.CountingEquipmentService;
@@ -42,9 +43,9 @@ public class CountingEquipmentController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CountingEquipmentDto> findById(@PathVariable long id) {
+    public ResponseEntity<CountingEquipmentInfoDto> findById(@PathVariable long id) {
         try {
-            Optional<CountingEquipmentDto> countingEquipmentOpt = service.findEquipmentWithProductionOrderById(id);
+            Optional<CountingEquipmentInfoDto> countingEquipmentOpt = service.findEquipmentWithProductionOrderById(id);
             if (countingEquipmentOpt.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }

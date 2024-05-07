@@ -32,7 +32,5 @@ public class CountingEquipmentDto {
     private int unrecognizedAlarmDuration;
     @Enumerated(EnumType.STRING)
     private CountingEquipmentEntity.OperationStatus operationStatus;
-
-    private ProductionOrderDto productionOrder;
-    List<FeatureDto> features;
+    private List<FeatureDto> features;
 }

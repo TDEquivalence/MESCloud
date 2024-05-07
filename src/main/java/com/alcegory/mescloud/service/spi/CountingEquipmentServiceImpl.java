@@ -6,10 +6,7 @@ import com.alcegory.mescloud.model.converter.CountingEquipmentConverter;
 import com.alcegory.mescloud.model.converter.GenericConverter;
 import com.alcegory.mescloud.model.converter.PlcMqttConverter;
 import com.alcegory.mescloud.model.converter.ProductionOrderConverter;
-import com.alcegory.mescloud.model.dto.CountingEquipmentDto;
-import com.alcegory.mescloud.model.dto.EquipmentConfigMqttDto;
-import com.alcegory.mescloud.model.dto.ImsDto;
-import com.alcegory.mescloud.model.dto.ProductionOrderDto;
+import com.alcegory.mescloud.model.dto.*;
 import com.alcegory.mescloud.model.entity.*;
 import com.alcegory.mescloud.model.request.RequestConfigurationDto;
 import com.alcegory.mescloud.protocol.MesMqttSettings;
@@ -112,7 +109,22 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
     }
 
     @Override
-    public Optional<CountingEquipmentDto> findEquipmentWithProductionOrderById(long id) {
+    public Optional<CountingEquipmentInfoDto> findEquipmentWithProductionOrderById(long id) {
+        Optional<CountingEquipmentDto> countingEquipmentOpt = findEquipmentById(id);
+        Optional<ProductionOrderDto> productionOrderDto = findProductionOrderByEquipmentId(id);
+
+        if (countingEquipmentOpt.isEmpty() || productionOrderDto.isEmpty()) {
+            return Optional.empty();
+        }
+
+        CountingEquipmentInfoDto infoDto = new CountingEquipmentInfoDto();
+        infoDto.setCountingEquipment(countingEquipmentOpt.get());
+        infoDto.setProductionOrder(productionOrderDto.get());
+
+        return Optional.of(infoDto);
+    }
+
+    public Optional<CountingEquipmentDto> findEquipmentById(long id) {
         Optional<CountingEquipmentEntity> countingEquipmentOpt = repository.findByIdWithLastProductionOrder(id);
         if (countingEquipmentOpt.isEmpty()) {
             log.warning(() -> String.format(COUNTING_EQUIPMENT_ID_NOT_FOUND, id));
@@ -125,20 +137,20 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
             return Optional.empty();
         }
 
-        CountingEquipmentDto dto = convertToDtoWithActiveProductionOrder(countingEquipment);
-        Optional<ProductionOrderEntity> productionOrderOpt = productionOrderRepository.findLastByEquipmentId(id);
+        return Optional.of(convertToDtoWithActiveProductionOrder(countingEquipment));
+    }
 
+    public Optional<ProductionOrderDto> findProductionOrderByEquipmentId(long equipmentId) {
+        Optional<ProductionOrderEntity> productionOrderOpt = productionOrderRepository.findLastByEquipmentId(equipmentId);
         if (productionOrderOpt.isEmpty() || productionOrderOpt.get().isCompleted()) {
-            dto.setProductionOrder(null);
-        } else {
-            ProductionOrderEntity productionOrder = productionOrderOpt.get();
-            List<ProductionInstructionEntity> instruction = productionInstructionRepository.findByProductionOrderId(productionOrder.getId());
-            productionOrder.setProductionInstructions(instruction);
-            ProductionOrderDto productionOrderDto = productionOrderConverter.toDto(productionOrder);
-            dto.setProductionOrder(productionOrderDto);
+            return Optional.empty();
         }
 
-        return Optional.of(dto);
+        ProductionOrderEntity productionOrder = productionOrderOpt.get();
+        List<ProductionInstructionEntity> instructions = productionInstructionRepository.findByProductionOrderId(productionOrder.getId());
+        productionOrder.setProductionInstructions(instructions);
+        ProductionOrderDto productionOrderDto = productionOrderConverter.toDto(productionOrder);
+        return Optional.of(productionOrderDto);
     }
 
     @Override

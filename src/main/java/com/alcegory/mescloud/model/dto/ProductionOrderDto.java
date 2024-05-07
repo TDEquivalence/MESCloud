@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 @Getter
@@ -13,10 +14,9 @@ public class ProductionOrderDto {
     private long id;
     private long equipmentId;
     private String code;
-    private String imsCode;
     private int targetAmount;
     private Date createdAt;
     private Date completedAt;
 
-    private Map<String, String> productionInstructions;
+    private List<ProductionInstructionDto> instructions;
 }

@@ -1,6 +1,7 @@
 package com.alcegory.mescloud.model.converter;
 
 import com.alcegory.mescloud.constant.MqttDTOConstants;
+import com.alcegory.mescloud.model.dto.ProductionInstructionDto;
 import com.alcegory.mescloud.model.dto.ProductionOrderDto;
 import com.alcegory.mescloud.model.dto.ProductionOrderMqttDto;
 import com.alcegory.mescloud.model.entity.ProductionInstructionEntity;
@@ -8,9 +9,8 @@ import com.alcegory.mescloud.model.entity.ProductionOrderEntity;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Component;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Component
 @Log
@@ -25,10 +25,7 @@ public class ProductionOrderConverterImpl implements ProductionOrderConverter {
         productionOrderEntity.setTargetAmount(productionOrderDto.getTargetAmount());
         productionOrderEntity.setCreatedAt(productionOrderDto.getCreatedAt());
         productionOrderEntity.setCompletedAt(productionOrderDto.getCompletedAt());
-
-        List<ProductionInstructionEntity> instructions
-                = fromDtoMap(productionOrderDto.getProductionInstructions(), productionOrderEntity);
-        productionOrderEntity.setProductionInstructions(instructions);
+        productionOrderEntity.setProductionInstructions(toEntityList(productionOrderDto.getInstructions()));
 
         return productionOrderEntity;
     }
@@ -62,24 +59,48 @@ public class ProductionOrderConverterImpl implements ProductionOrderConverter {
             dto.setEquipmentId(entity.getEquipment().getId());
         }
 
-        dto.setProductionInstructions(entity.getProductionInstructionsMap());
+        dto.setInstructions(toDtoList(entity.getProductionInstructions()));
 
         return dto;
     }
 
-    public List<ProductionInstructionEntity> fromDtoMap(Map<String, String> instructionMap, ProductionOrderEntity productionOrder) {
-        if (instructionMap == null || instructionMap.isEmpty()) {
-            return Collections.emptyList();
+    public List<ProductionInstructionDto> toDtoList(List<ProductionInstructionEntity> entities) {
+        List<ProductionInstructionDto> dtos = new ArrayList<>();
+        if (entities != null) {
+            for (ProductionInstructionEntity entity : entities) {
+                ProductionInstructionDto dto = toDto(entity);
+                dtos.add(dto);
+            }
         }
+        return dtos;
+    }
 
-        return instructionMap.entrySet().stream()
-                .map(entry -> {
-                    ProductionInstructionEntity instruction = new ProductionInstructionEntity();
-                    instruction.setName(entry.getKey());
-                    instruction.setValue(entry.getValue());
-                    instruction.setProductionOrder(productionOrder);
-                    return instruction;
-                })
-                .toList();
+    public ProductionInstructionDto toDto(ProductionInstructionEntity entity) {
+        ProductionInstructionDto dto = new ProductionInstructionDto();
+        if (entity != null) {
+            dto.setName(entity.getName());
+            dto.setValue(entity.getValue());
+        }
+        return dto;
+    }
+
+    public List<ProductionInstructionEntity> toEntityList(List<ProductionInstructionDto> dtos) {
+        List<ProductionInstructionEntity> entities = new ArrayList<>();
+        if (dtos != null) {
+            for (ProductionInstructionDto dto : dtos) {
+                ProductionInstructionEntity entity = toEntity(dto);
+                entities.add(entity);
+            }
+        }
+        return entities;
+    }
+
+    public ProductionInstructionEntity toEntity(ProductionInstructionDto dto) {
+        ProductionInstructionEntity entity = new ProductionInstructionEntity();
+        if (dto != null) {
+            entity.setName(dto.getName());
+            entity.setValue(dto.getValue());
+        }
+        return entity;
     }
 }
