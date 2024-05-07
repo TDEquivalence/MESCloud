@@ -14,6 +14,7 @@ import com.alcegory.mescloud.model.entity.*;
 import com.alcegory.mescloud.model.request.RequestConfigurationDto;
 import com.alcegory.mescloud.protocol.MesMqttSettings;
 import com.alcegory.mescloud.repository.CountingEquipmentRepository;
+import com.alcegory.mescloud.repository.ProductionInstructionRepository;
 import com.alcegory.mescloud.repository.ProductionOrderRepository;
 import com.alcegory.mescloud.security.model.SectionAuthority;
 import com.alcegory.mescloud.security.service.UserRoleService;
@@ -40,20 +41,22 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
     private static final String COUNTING_EQUIPMENT_CODE_NOT_FOUND = "No Counting Equipment found for code: [%s]";
 
     private final CountingEquipmentRepository repository;
+    private final ProductionOrderRepository productionOrderRepository;
+    private final ProductionInstructionRepository productionInstructionRepository;
+
     private final EquipmentOutputService outputService;
     private final EquipmentOutputAliasService aliasService;
     private final CountingEquipmentConverter converter;
     private final ImsService imsService;
     private final EquipmentStatusRecordService statusRecordService;
+    private final UserRoleService userRoleService;
+
     private final MqttClient mqttClient;
     private final MesMqttSettings mqttSettings;
-    private final ProductionOrderRepository productionOrderRepository;
 
     private final PlcMqttConverter plcConverter;
     private final GenericConverter<ImsEntity, ImsDto> imsConverter;
     private final ProductionOrderConverter productionOrderConverter;
-
-    private final UserRoleService userRoleService;
 
     @Override
     public List<CountingEquipmentDto> findAllWithLastProductionOrder() {
@@ -123,12 +126,15 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
         }
 
         CountingEquipmentDto dto = convertToDtoWithActiveProductionOrder(countingEquipment);
-        Optional<ProductionOrderEntity> productionOrder = productionOrderRepository.findLastByEquipmentId(id);
+        Optional<ProductionOrderEntity> productionOrderOpt = productionOrderRepository.findLastByEquipmentId(id);
 
-        if (productionOrder.isEmpty() || productionOrder.get().isCompleted()) {
+        if (productionOrderOpt.isEmpty() || productionOrderOpt.get().isCompleted()) {
             dto.setProductionOrder(null);
         } else {
-            ProductionOrderDto productionOrderDto = productionOrderConverter.toDto(productionOrder.get());
+            ProductionOrderEntity productionOrder = productionOrderOpt.get();
+            List<ProductionInstructionEntity> instruction = productionInstructionRepository.findByProductionOrderId(productionOrder.getId());
+            productionOrder.setProductionInstructions(instruction);
+            ProductionOrderDto productionOrderDto = productionOrderConverter.toDto(productionOrder);
             dto.setProductionOrder(productionOrderDto);
         }
 

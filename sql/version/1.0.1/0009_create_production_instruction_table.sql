@@ -26,12 +26,11 @@ SELECT 'washing_process', washing_process, id FROM production_order;
 
 -- Step 3: Drop columns from production_order
 ALTER TABLE production_order
-DROP COLUMN inputBatch,
+DROP COLUMN input_batch,
 DROP COLUMN source,
 DROP COLUMN gauge,
 DROP COLUMN category,
-DROP COLUMN washingProcess,
-DROP COLUMN isApproved;
+DROP COLUMN washing_process;
 
 INSERT INTO audit_script (run_date, process, version, schema)
 VALUES
