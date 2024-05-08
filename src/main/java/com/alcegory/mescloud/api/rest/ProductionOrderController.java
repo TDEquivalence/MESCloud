@@ -4,7 +4,6 @@ import com.alcegory.mescloud.exception.ForbiddenAccessException;
 import com.alcegory.mescloud.model.dto.PaginatedProductionOrderDto;
 import com.alcegory.mescloud.model.dto.ProductionOrderDto;
 import com.alcegory.mescloud.model.dto.ProductionOrderSummaryDto;
-import com.alcegory.mescloud.model.entity.ProductionOrderEntity;
 import com.alcegory.mescloud.model.filter.Filter;
 import com.alcegory.mescloud.service.ProductionOrderService;
 import lombok.AllArgsConstructor;
@@ -55,10 +54,10 @@ public class ProductionOrderController {
     public ResponseEntity<ProductionOrderDto> edit(@RequestBody ProductionOrderDto requestProductionOrder,
                                                    Authentication authentication) {
         try {
-            Optional<ProductionOrderDto> editedProductionOrder = service.editProductionOrder(requestProductionOrder, authentication);
+            ProductionOrderDto editedProductionOrder = service.editProductionOrder(requestProductionOrder, authentication);
 
-            if (editedProductionOrder.isPresent()) {
-                return ResponseEntity.ok(editedProductionOrder.get());
+            if (editedProductionOrder != null) {
+                return ResponseEntity.ok(editedProductionOrder);
             } else {
                 return ResponseEntity.badRequest().build();
             }

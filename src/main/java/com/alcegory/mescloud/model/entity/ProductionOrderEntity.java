@@ -3,6 +3,8 @@ package com.alcegory.mescloud.model.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -33,6 +35,7 @@ public class ProductionOrderEntity implements Serializable {
     private Date completedAt;
 
     @OneToMany(mappedBy = "productionOrder", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @Fetch(FetchMode.SUBSELECT)
     private List<ProductionInstructionEntity> productionInstructions;
 
     private Boolean isApproved;

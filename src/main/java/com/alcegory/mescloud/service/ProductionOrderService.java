@@ -57,7 +57,7 @@ public interface ProductionOrderService {
 
     List<ProductionOrderSummaryDto> getProductionOrderByComposedId(Long composedId);
 
-    Optional<ProductionOrderDto> editProductionOrder(ProductionOrderDto requestProductionOrder, Authentication authentication);
+    ProductionOrderDto editProductionOrder(ProductionOrderDto requestProductionOrder, Authentication authentication);
 
     List<ProductionOrderEntity> findByComposedProductionOrderId(Long composedOrderId);
 

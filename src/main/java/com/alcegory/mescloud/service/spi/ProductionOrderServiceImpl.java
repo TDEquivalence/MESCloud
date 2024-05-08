@@ -13,6 +13,7 @@ import com.alcegory.mescloud.model.entity.ProductionOrderSummaryEntity;
 import com.alcegory.mescloud.model.filter.Filter;
 import com.alcegory.mescloud.protocol.MesMqttSettings;
 import com.alcegory.mescloud.repository.CountingEquipmentRepository;
+import com.alcegory.mescloud.repository.ProductionInstructionRepository;
 import com.alcegory.mescloud.repository.ProductionOrderRepository;
 import com.alcegory.mescloud.security.service.UserRoleService;
 import com.alcegory.mescloud.service.CountingEquipmentService;
@@ -46,6 +47,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
 
     private final ProductionOrderRepository repository;
     private final CountingEquipmentRepository countingEquipmentRepository;
+    private final ProductionInstructionRepository productionInstructionRepository;
 
     private final CountingEquipmentService countingEquipmentService;
     private final MqttClient mqttClient;
@@ -360,47 +362,46 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     }
 
     @Override
-    public Optional<ProductionOrderDto> editProductionOrder(ProductionOrderDto requestProductionOrder, Authentication authentication) {
-        //TODO: sectionId
+    @Transactional
+    public ProductionOrderDto editProductionOrder(ProductionOrderDto requestProductionOrder, Authentication authentication) {
+        //TODO: section ID
         userRoleService.checkSectionAuthority(authentication, 1L, OPERATOR_UPDATE);
 
         if (requestProductionOrder == null) {
             log.warning("Null request Production Order received for editing production order.");
-            return Optional.empty();
+            return null;
         }
 
         Optional<ProductionOrderEntity> persistedProductionOrderOpt = repository.findById(requestProductionOrder.getId());
 
         if (persistedProductionOrderOpt.isEmpty()) {
             log.warning("No production order found for ID: " + requestProductionOrder.getId());
-            return Optional.empty();
-        }
-
-        ProductionOrderEntity productionOrderUpdated = updateProductionOrder(requestProductionOrder, persistedProductionOrderOpt.get());
-        ProductionOrderEntity persistedProductionOrder = repository.save(productionOrderUpdated);
-        ProductionOrderDto productionOrderDto = converter.toDto(persistedProductionOrder);
-        return Optional.of(productionOrderDto);
-    }
-
-    private ProductionOrderEntity updateProductionOrder(ProductionOrderDto requestProductionOrder, ProductionOrderEntity productionOrderToUpdate) {
-        if (requestProductionOrder == null || productionOrderToUpdate == null) {
             return null;
         }
 
+        ProductionOrderEntity productionOrderToUpdate = persistedProductionOrderOpt.get();
+
+        updateProductionInstructions(requestProductionOrder, productionOrderToUpdate);
+        ProductionOrderEntity persistedProductionOrder = repository.save(productionOrderToUpdate);
+        return converter.toDto(persistedProductionOrder);
+    }
+
+    private void updateProductionInstructions(ProductionOrderDto requestProductionOrder, ProductionOrderEntity productionOrderToUpdate) {
         List<ProductionInstructionDto> requestInstructions = requestProductionOrder.getInstructions();
         List<ProductionInstructionEntity> existingInstructions = productionOrderToUpdate.getProductionInstructions();
-        if (requestInstructions != null && existingInstructions != null) {
-            for (ProductionInstructionDto requestInstruction : requestInstructions) {
-                for (ProductionInstructionEntity existingInstruction : existingInstructions) {
-                    if (requestInstruction.getName().equals(existingInstruction.getName())) {
-                        existingInstruction.setValue(requestInstruction.getValue());
-                        break;
-                    }
+
+        if (requestInstructions == null || existingInstructions == null) {
+            return;
+        }
+
+        for (ProductionInstructionDto requestInstruction : requestInstructions) {
+            for (ProductionInstructionEntity existingInstruction : existingInstructions) {
+                if (requestInstruction.getName().equals(existingInstruction.getName())) {
+                    existingInstruction.setValue(requestInstruction.getValue());
+                    break;
                 }
             }
         }
-
-        return productionOrderToUpdate;
     }
 
     @Override

@@ -10,19 +10,19 @@ CREATE TABLE production_instruction (
 
 -- Step 2: Copy data from production_order to production_order_instruction
 INSERT INTO production_instruction (name, value, production_order_id)
-SELECT 'input_batch', input_batch, id FROM production_order;
+SELECT 'Lote de entrada', input_batch, id FROM production_order;
 
 INSERT INTO production_instruction (name, value, production_order_id)
-SELECT 'source', source, id FROM production_order;
+SELECT 'Proveniência', source, id FROM production_order;
 
 INSERT INTO production_instruction (name, value, production_order_id)
-SELECT 'gauge', gauge, id FROM production_order;
+SELECT 'Gauge', gauge, id FROM production_order;
 
 INSERT INTO production_instruction (name, value, production_order_id)
-SELECT 'category', category, id FROM production_order;
+SELECT 'Category', category, id FROM production_order;
 
 INSERT INTO production_instruction (name, value, production_order_id)
-SELECT 'washing_process', washing_process, id FROM production_order;
+SELECT 'Lavação', washing_process, id FROM production_order;
 
 -- Step 3: Drop columns from production_order
 ALTER TABLE production_order

@@ -15,11 +15,11 @@ CREATE TABLE template_field_mapping (
 
 INSERT INTO production_order_template (template_name) VALUES ('default');
 
-INSERT INTO template_field_mapping (template_id, field_name) VALUES (1, 'input_batch');
-INSERT INTO template_field_mapping (template_id, field_name) VALUES (1, 'source');
-INSERT INTO template_field_mapping (template_id, field_name) VALUES (1, 'gauge');
-INSERT INTO template_field_mapping (template_id, field_name) VALUES (1, 'category');
-INSERT INTO template_field_mapping (template_id, field_name) VALUES (1, 'washing_process');
+INSERT INTO template_field_mapping (template_id, field_name) VALUES (1, 'Lote de entrada');
+INSERT INTO template_field_mapping (template_id, field_name) VALUES (1, 'Proveniência');
+INSERT INTO template_field_mapping (template_id, field_name) VALUES (1, 'Calibre');
+INSERT INTO template_field_mapping (template_id, field_name) VALUES (1, 'Classe');
+INSERT INTO template_field_mapping (template_id, field_name) VALUES (1, 'Lavação');
 
 INSERT INTO audit_script (run_date, process, version, schema)
 VALUES
