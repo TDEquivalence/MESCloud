@@ -125,7 +125,6 @@ public class PendingContainerServiceImpl implements PendingContainerService {
         }
     }
 
-
     private BlobContainerClient getBlobContainerClient() {
         String containerUriWithSAS = String.format("%s%s?%s", accountUrl, containerName, sasToken);
         return new BlobContainerClientBuilder()

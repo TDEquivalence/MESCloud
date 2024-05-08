@@ -30,18 +30,29 @@ public class CountingEquipmentController {
 
     @GetMapping
     public ResponseEntity<List<CountingEquipmentDto>> findAll() {
-        List<CountingEquipmentDto> countingEquipments = service.findAllWithLastProductionOrder();
-        return new ResponseEntity<>(countingEquipments, HttpStatus.OK);
+        try {
+            List<CountingEquipmentDto> countingEquipments = service.findAllWithLastProductionOrder();
+            if (countingEquipments.isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+            return new ResponseEntity<>(countingEquipments, HttpStatus.OK);
+        } catch (EquipmentNotFoundException e) {
+            return HttpUtil.responseWithHeaders(HttpStatus.NOT_FOUND, EQUIPMENT_ERROR_CAUSE, e);
+        }
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<CountingEquipmentDto> findById(@PathVariable long id) {
-        Optional<CountingEquipmentDto> countingEquipmentOpt = service.findEquipmentWithProductionOrderById(id);
-        if (countingEquipmentOpt.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        try {
+            Optional<CountingEquipmentDto> countingEquipmentOpt = service.findEquipmentWithProductionOrderById(id);
+            if (countingEquipmentOpt.isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
 
-        return new ResponseEntity<>(countingEquipmentOpt.get(), HttpStatus.OK);
+            return new ResponseEntity<>(countingEquipmentOpt.get(), HttpStatus.OK);
+        } catch (EquipmentNotFoundException e) {
+            return HttpUtil.responseWithHeaders(HttpStatus.NOT_FOUND, EQUIPMENT_ERROR_CAUSE, e);
+        }
     }
 
     @PutMapping("/{equipmentId}/ims")

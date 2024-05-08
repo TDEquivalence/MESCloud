@@ -43,8 +43,15 @@ public class BatchController {
 
     @GetMapping
     public ResponseEntity<List<BatchDto>> findAll() {
-        List<BatchDto> batchDtos = batchService.getAll();
-        return new ResponseEntity<>(batchDtos, HttpStatus.OK);
+        try {
+            List<BatchDto> batchDtos = batchService.getAll();
+            if (batchDtos.isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+            return new ResponseEntity<>(batchDtos, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @PostMapping("/reject")

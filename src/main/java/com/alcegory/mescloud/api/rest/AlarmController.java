@@ -23,8 +23,12 @@ public class AlarmController {
 
     @PostMapping
     public ResponseEntity<PaginatedAlarmDto> findByFilter(@RequestBody Filter filter) {
-        PaginatedAlarmDto alarms = service.findByFilter(filter);
-        return new ResponseEntity<>(alarms, HttpStatus.OK);
+        try {
+            PaginatedAlarmDto alarms = service.findByFilter(filter);
+            return new ResponseEntity<>(alarms, HttpStatus.OK);
+        } catch (AlarmNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
     @PutMapping("/{alarmId}/recognize")
@@ -44,7 +48,11 @@ public class AlarmController {
 
     @PostMapping("/counts")
     public ResponseEntity<AlarmCountsDto> getAlarmCounts(@RequestBody Filter filter) {
-        AlarmCountsDto alarmCounts = service.getAlarmCounts(filter);
-        return new ResponseEntity<>(alarmCounts, HttpStatus.OK);
+        try {
+            AlarmCountsDto alarmCounts = service.getAlarmCounts(filter);
+            return new ResponseEntity<>(alarmCounts, HttpStatus.OK);
+        } catch (AlarmNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 }

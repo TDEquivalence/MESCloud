@@ -43,8 +43,12 @@ public class SampleController {
 
     @GetMapping
     public ResponseEntity<List<SampleDto>> findAll() {
-        List<SampleDto> sampleDtos = sampleService.getAll();
-        return new ResponseEntity<>(sampleDtos, HttpStatus.OK);
+        try {
+            List<SampleDto> sampleDtos = sampleService.getAll();
+            return ResponseEntity.ok(sampleDtos);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @PostMapping("/remove")

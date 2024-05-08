@@ -42,8 +42,12 @@ public class HitController {
 
     @GetMapping
     public ResponseEntity<List<HitDto>> findAll() {
-        List<HitDto> hitDtos = hitService.getAll();
-        return new ResponseEntity<>(hitDtos, HttpStatus.OK);
+        try {
+            List<HitDto> hitDtos = hitService.getAll();
+            return ResponseEntity.ok(hitDtos);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @PostMapping("/remove")
