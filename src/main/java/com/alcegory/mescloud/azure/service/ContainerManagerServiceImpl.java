@@ -14,6 +14,8 @@ import java.util.List;
 @Slf4j
 public class ContainerManagerServiceImpl implements ContainerManagerService {
 
+    public static final int MAX_OCCURRENCES = 3;
+
     private final PublicContainerService publicContainerService;
     private final PendingContainerService pendingContainerService;
     private final ApprovedContainerService approvedContainerService;
@@ -111,8 +113,8 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
 
         ImageAnnotationDto uploadedImageAnnotationDto = approvedContainerService.saveToApprovedContainer(containerInfoDto.getImageAnnotationDto());
 
-        handleImageOccurrences(uploadedImageAnnotationDto, image, imageOccurrencesNotInitial);
         saveApprovedImageAnnotation(uploadedImageAnnotationDto, containerInfoDto.getImageAnnotationDto().isUserApproval(), authentication);
+        handleImageOccurrences(uploadedImageAnnotationDto, image, imageOccurrencesNotInitial);
         return uploadedImageAnnotationDto;
     }
 
@@ -124,7 +126,7 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
     }
 
     private void handleImageOccurrences(ImageAnnotationDto uploadedImageAnnotationDto, String image, int imageOccurrencesNotInitial) {
-        if (uploadedImageAnnotationDto != null && imageOccurrencesNotInitial >= 3) {
+        if (uploadedImageAnnotationDto != null && imageOccurrencesNotInitial >= MAX_OCCURRENCES) {
             deleteBlobsForImage(image);
         }
     }
