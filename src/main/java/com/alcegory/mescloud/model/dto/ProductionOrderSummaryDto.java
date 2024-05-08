@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
@@ -16,11 +17,7 @@ public class ProductionOrderSummaryDto {
     private int targetAmount;
     private Date createdAt;
     private Date completedAt;
-
-    private String inputBatch;
-    private String source;
-    private String gauge;
-    private String category;
-    private String washingProcess;
     private long validAmount;
+
+    private List<ProductionInstructionDto> instructions;
 }

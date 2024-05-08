@@ -34,7 +34,7 @@ public class ProductionOrderEntity implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date completedAt;
 
-    @OneToMany(mappedBy = "productionOrder", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "productionOrder", fetch = FetchType.LAZY, cascade = {CascadeType.ALL, CascadeType.PERSIST})
     @Fetch(FetchMode.SUBSELECT)
     private List<ProductionInstructionEntity> productionInstructions;
 

@@ -19,9 +19,9 @@ public class TemplateServiceImpl implements TemplateService {
     private final TemplateFieldMappingRepository templateFieldMappingRepository;
 
     @Override
-    public ProductionOrderTemplateEntity getTemplateWithFields(Long templateId) {
+    public ProductionOrderTemplateEntity getTemplateWithFields() {
         // Retrieve the ProductionOrderTemplateEntity by its ID
-        Optional<ProductionOrderTemplateEntity> optionalTemplate = templateRepository.findById(templateId);
+        Optional<ProductionOrderTemplateEntity> optionalTemplate = templateRepository.findById(1L);
 
         // If the template is found, fetch its fields
         if (optionalTemplate.isPresent()) {

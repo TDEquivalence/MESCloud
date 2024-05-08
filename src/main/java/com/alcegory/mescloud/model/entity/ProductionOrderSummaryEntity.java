@@ -33,11 +33,5 @@ public class ProductionOrderSummaryEntity implements Serializable {
     private Boolean isCompleted;
     private Date createdAt;
     private Date completedAt;
-    private String inputBatch;
-    private String source;
-    private String gauge;
-    private String category;
-    private String washingProcess;
-
     private Long validAmount;
 }

@@ -18,10 +18,10 @@ public class TemplateController {
 
     private final TemplateService templateService;
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ProductionOrderTemplateEntity> getTemplate(@PathVariable Long id) {
+    @GetMapping
+    public ResponseEntity<ProductionOrderTemplateEntity> getTemplate() {
         try {
-            ProductionOrderTemplateEntity template = templateService.getTemplateWithFields(id);
+            ProductionOrderTemplateEntity template = templateService.getTemplateWithFields();
             if (template != null) {
                 return ResponseEntity.ok(template);
             } else {

@@ -25,11 +25,6 @@ public class ComposedSummaryEntity implements Serializable {
     private Timestamp hitInsertedAt;
     private Integer sampleAmount;
     private Double reliability;
-    private String inputBatch;
-    private String source;
-    private String gauge;
-    private String category;
-    private String washingProcess;
     private Boolean isBatchApproved;
     private String batchCode;
     private Integer amountOfHits;

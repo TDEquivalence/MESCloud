@@ -28,7 +28,7 @@ public class ExcelExportImpl extends AbstractExcelExport {
 
         XSSFSheet composedSheet = createSheet(SHEET_NAME_COMPOSED);
         createHeaderRow(composedSheet, getComposedHeaders());
-        
+
         if (!composedList.isEmpty()) {
             writeDataToComposed(composedSheet, composedList);
             createTable(composedSheet, TABLE_NAME_COMPOSED, getComposedHeaders().length - 1);
@@ -70,11 +70,11 @@ public class ExcelExportImpl extends AbstractExcelExport {
 
             createCell(row, columnCount++, composed.getBatchCode(), style);
             createCell(row, columnCount++, composed.getCode(), style);
-            createCell(row, columnCount++, composed.getInputBatch(), style);
+            /*createCell(row, columnCount++, composed.getInputBatch(), style);
             createCell(row, columnCount++, composed.getSource(), style);
             createCell(row, columnCount++, composed.getGauge(), style);
             createCell(row, columnCount++, composed.getCategory(), style);
-            createCell(row, columnCount++, composed.getWashingProcess(), style);
+            createCell(row, columnCount++, composed.getWashingProcess(), style);*/
             createCell(row, columnCount++, composed.getValidAmount(), style);
             createCell(row, columnCount++, composed.getSampleAmount(), style);
             createCell(row, columnCount++, composed.getCreatedAt(), style);
@@ -101,11 +101,11 @@ public class ExcelExportImpl extends AbstractExcelExport {
                     .getCode() : null, style);
             createCell(row, columnCount++, po.getCode(), style);
             createCell(row, columnCount++, po.getIms() != null ? po.getIms().getCode() : null, style);
-            createCell(row, columnCount++, po.getInputBatch(), style);
+            /*createCell(row, columnCount++, po.getInputBatch(), style);
             createCell(row, columnCount++, po.getSource(), style);
             createCell(row, columnCount++, po.getGauge(), style);
             createCell(row, columnCount++, po.getCategory(), style);
-            createCell(row, columnCount++, po.getWashingProcess(), style);
+            createCell(row, columnCount++, po.getWashingProcess(), style);*/
             createCell(row, columnCount++, po.getValidAmount(), style);
             createCell(row, columnCount++, po.getCreatedAt(), style);
             createCell(row, columnCount++, po.getCompletedAt(), style);

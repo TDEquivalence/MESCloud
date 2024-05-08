@@ -20,7 +20,7 @@ public class ProductionOrderTemplateEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "template_name")
+    @Column(name = "name")
     private String templateName;
 
     @OneToMany(mappedBy = "template", fetch = FetchType.LAZY, cascade = CascadeType.ALL)

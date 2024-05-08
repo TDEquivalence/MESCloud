@@ -2,7 +2,7 @@ BEGIN;
 
 CREATE TABLE production_order_template (
     id SERIAL PRIMARY KEY,
-    template_name TEXT
+    name TEXT
 );
 
 CREATE TABLE template_field_mapping (
@@ -13,7 +13,7 @@ CREATE TABLE template_field_mapping (
 );
 
 
-INSERT INTO production_order_template (template_name) VALUES ('default');
+INSERT INTO production_order_template (name) VALUES ('default');
 
 INSERT INTO template_field_mapping (template_id, field_name) VALUES (1, 'Lote de entrada');
 INSERT INTO template_field_mapping (template_id, field_name) VALUES (1, 'Proveniência');

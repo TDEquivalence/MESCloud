@@ -60,6 +60,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     private final UserRoleService userRoleService;
 
     @Override
+    @Transactional
     public Optional<ProductionOrderDto> complete(long equipmentId, Authentication authentication) {
         //TODO: sectionId
         userRoleService.checkSectionAuthority(authentication, 1L, OPERATOR_UPDATE);
@@ -259,7 +260,21 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     @Override
     public List<ProductionOrderSummaryDto> getCompletedWithoutComposedFiltered() {
         List<ProductionOrderSummaryEntity> persistedProductionOrders = repository.findCompleted(true, null, null, null);
-        return summaryConverter.toDto(persistedProductionOrders, ProductionOrderSummaryDto.class);
+        List<ProductionOrderSummaryDto> productionOrderSummaryDtos = summaryConverter.toDto(persistedProductionOrders, ProductionOrderSummaryDto.class);
+
+        for (ProductionOrderSummaryDto summaryDto : productionOrderSummaryDtos) {
+            setInstructions(summaryDto);
+        }
+
+        return productionOrderSummaryDtos;
+    }
+
+    private void setInstructions(ProductionOrderSummaryDto summaryDto) {
+        List<ProductionInstructionEntity> instructions = productionInstructionRepository.findByProductionOrderId(summaryDto.getId());
+        if (!instructions.isEmpty()) {
+            List<ProductionInstructionDto> instructionDto = converter.toDtoList(instructions);
+            summaryDto.setInstructions(instructionDto);
+        }
     }
 
     @Override
@@ -279,6 +294,10 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         paginatedProductionOrderDto.setHasNextPage(hasNextPage);
 
         List<ProductionOrderSummaryDto> summaryDtos = summaryConverter.toDto(persistedProductionOrders, ProductionOrderSummaryDto.class);
+        for (ProductionOrderSummaryDto summaryDto : summaryDtos) {
+            setInstructions(summaryDto);
+        }
+
         paginatedProductionOrderDto.setProductionOrders(summaryDtos);
         return paginatedProductionOrderDto;
     }
@@ -358,7 +377,13 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
             throw new IllegalArgumentException("Composed ID cannot be null");
         }
         List<ProductionOrderSummaryEntity> productionOrderSummaryEntities = repository.findProductionOrderSummaryByComposedId(composedId);
-        return summaryConverter.toDto(productionOrderSummaryEntities, ProductionOrderSummaryDto.class);
+        List<ProductionOrderSummaryDto> productionOrderSummaryDtos = summaryConverter.toDto(productionOrderSummaryEntities, ProductionOrderSummaryDto.class);
+
+        for (ProductionOrderSummaryDto summaryDto : productionOrderSummaryDtos) {
+            setInstructions(summaryDto);
+        }
+
+        return productionOrderSummaryDtos;
     }
 
     @Override
@@ -380,7 +405,6 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         }
 
         ProductionOrderEntity productionOrderToUpdate = persistedProductionOrderOpt.get();
-
         updateProductionInstructions(requestProductionOrder, productionOrderToUpdate);
         ProductionOrderEntity persistedProductionOrder = repository.save(productionOrderToUpdate);
         return converter.toDto(persistedProductionOrder);
