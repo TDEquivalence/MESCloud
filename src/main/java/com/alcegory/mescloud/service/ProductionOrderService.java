@@ -66,4 +66,6 @@ public interface ProductionOrderService {
     Optional<ProductionOrderDto> getProductionOrderById(Long id);
 
     void completeProductionOrder(ProductionOrderEntity productionOrder);
+
+    ProductionOrderEntity getProductionOrderByCode(String code);
 }

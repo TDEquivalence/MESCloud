@@ -6,7 +6,6 @@ import com.alcegory.mescloud.model.dto.PlcMqttDto;
 import com.alcegory.mescloud.model.dto.ProductionOrderMqttDto;
 import com.alcegory.mescloud.model.entity.CountingEquipmentEntity;
 import com.alcegory.mescloud.model.entity.ProductionOrderEntity;
-import com.alcegory.mescloud.repository.ProductionOrderRepository;
 import com.alcegory.mescloud.service.AlarmService;
 import com.alcegory.mescloud.service.CounterRecordService;
 import com.alcegory.mescloud.service.CountingEquipmentService;
@@ -14,8 +13,6 @@ import com.alcegory.mescloud.service.ProductionOrderService;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 @Log
@@ -29,7 +26,6 @@ public class ProductionOrderConclusionProcess extends AbstractMesProtocolProcess
     private final ProductionOrderService productionOrderService;
     private final AlarmService alarmService;
     private final MqttClient mqttClient;
-    private final ProductionOrderRepository repository;
     private final MesMqttSettings mqttSettings;
 
     @Override
@@ -98,13 +94,7 @@ public class ProductionOrderConclusionProcess extends AbstractMesProtocolProcess
     }
 
     private ProductionOrderEntity getProductionOrderByCode(String code) {
-        Optional<ProductionOrderEntity> productionOrderEntityOpt = repository.findByCode(code);
-        if (productionOrderEntityOpt.isEmpty()) {
-            log.warning(() -> String.format("No Production Order found for an Equipment with code [%s]", code));
-            return null;
-        }
-
-        return productionOrderEntityOpt.get();
+        return productionOrderService.getProductionOrderByCode(code);
     }
 
     private void setOperationStatus(String equipmentCode) {

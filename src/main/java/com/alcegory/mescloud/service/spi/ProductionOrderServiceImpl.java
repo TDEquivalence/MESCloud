@@ -434,4 +434,15 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
 
         repository.save(productionOrder);
     }
+
+    @Override
+    public ProductionOrderEntity getProductionOrderByCode(String code) {
+        Optional<ProductionOrderEntity> productionOrderEntityOpt = repository.findByCode(code);
+        if (productionOrderEntityOpt.isEmpty()) {
+            log.warning(() -> String.format("No Production Order found for an Equipment with code [%s]", code));
+            return null;
+        }
+
+        return productionOrderEntityOpt.get();
+    }
 }
