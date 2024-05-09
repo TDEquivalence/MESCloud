@@ -29,7 +29,7 @@ env:
   PENDING_SAS_TOKEN: ${{ secrets.PENDING_SAS_TOKEN }}
   APPROVED_CONTAINER_NAME: ${{ secrets.APPROVED_CONTAINER_NAME }}
   APPROVED_SAS_TOKEN: ${{ secrets.APPROVED_SAS_TOKEN }}
-
+  
 
 jobs:
   codeql-analysis:
