@@ -5,6 +5,7 @@ import com.alcegory.mescloud.model.dto.CountingEquipmentDto;
 import com.alcegory.mescloud.model.dto.CountingEquipmentInfoDto;
 import com.alcegory.mescloud.model.request.RequestById;
 import com.alcegory.mescloud.model.request.RequestConfigurationDto;
+import com.alcegory.mescloud.service.CountingEquipmentManagementService;
 import com.alcegory.mescloud.service.CountingEquipmentService;
 import com.alcegory.mescloud.utility.HttpUtil;
 import lombok.AllArgsConstructor;
@@ -27,7 +28,8 @@ public class CountingEquipmentController {
     private static final String CONFIG_ERROR_CAUSE = "CONFIG";
     private static final String PLC_ERROR_CAUSE = "PLC";
 
-    private CountingEquipmentService service;
+    private final CountingEquipmentService service;
+    private final CountingEquipmentManagementService countingEquipmentManagementService;
 
     @GetMapping
     public ResponseEntity<List<CountingEquipmentDto>> findAll() {
@@ -60,7 +62,7 @@ public class CountingEquipmentController {
     public ResponseEntity<CountingEquipmentDto> updateIms(@PathVariable long equipmentId, @RequestBody RequestById request,
                                                           Authentication authentication) {
         try {
-            CountingEquipmentDto updatedIms = service.updateIms(equipmentId, request.getId(), authentication);
+            CountingEquipmentDto updatedIms = countingEquipmentManagementService.updateIms(equipmentId, request.getId(), authentication);
             return new ResponseEntity<>(updatedIms, HttpStatus.OK);
         } catch (EquipmentNotFoundException e) {
             return HttpUtil.responseWithHeaders(HttpStatus.NOT_FOUND, IMS_ERROR_CAUSE, e);
@@ -78,7 +80,7 @@ public class CountingEquipmentController {
                                                                     @RequestBody RequestConfigurationDto request,
                                                                     Authentication authentication) {
         try {
-            CountingEquipmentDto countingEquipment = service.updateConfiguration(equipmentId, request, authentication);
+            CountingEquipmentDto countingEquipment = countingEquipmentManagementService.updateConfiguration(equipmentId, request, authentication);
             return new ResponseEntity<>(countingEquipment, HttpStatus.OK);
         } catch (IncompleteConfigurationException e) {
             return HttpUtil.responseWithHeaders(HttpStatus.BAD_REQUEST, CONFIG_ERROR_CAUSE, e);

@@ -13,7 +13,7 @@ public class RequestProductionOrderDto {
 
     private long id;
     private long equipmentId;
-    private String code;
+    private String imsCode;
     private int targetAmount;
     private Date createdAt;
     private Date completedAt;

@@ -1,27 +1,17 @@
 package com.alcegory.mescloud.service.spi;
 
-import com.alcegory.mescloud.api.mqtt.MqttClient;
-import com.alcegory.mescloud.constant.MqttDTOConstants;
-import com.alcegory.mescloud.exception.MesMqttException;
-import com.alcegory.mescloud.model.converter.GenericConverter;
 import com.alcegory.mescloud.model.converter.ProductionOrderConverter;
-import com.alcegory.mescloud.model.dto.*;
-import com.alcegory.mescloud.model.entity.CountingEquipmentEntity;
-import com.alcegory.mescloud.model.entity.ProductionInstructionEntity;
+import com.alcegory.mescloud.model.dto.PaginatedProductionOrderDto;
+import com.alcegory.mescloud.model.dto.ProductionOrderDto;
 import com.alcegory.mescloud.model.entity.ProductionOrderEntity;
 import com.alcegory.mescloud.model.filter.Filter;
-import com.alcegory.mescloud.model.request.RequestProductionOrderDto;
-import com.alcegory.mescloud.protocol.MesMqttSettings;
 import com.alcegory.mescloud.repository.CounterRecordRepository;
-import com.alcegory.mescloud.repository.CountingEquipmentRepository;
 import com.alcegory.mescloud.repository.ProductionOrderRepository;
 import com.alcegory.mescloud.security.service.UserRoleService;
-import com.alcegory.mescloud.service.CountingEquipmentService;
 import com.alcegory.mescloud.service.ProductionOrderService;
 import com.alcegory.mescloud.utility.DateUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,8 +22,6 @@ import java.util.Optional;
 
 import static com.alcegory.mescloud.model.filter.Filter.Property.END_DATE;
 import static com.alcegory.mescloud.model.filter.Filter.Property.START_DATE;
-import static com.alcegory.mescloud.security.model.SectionAuthority.OPERATOR_CREATE;
-import static com.alcegory.mescloud.security.model.SectionAuthority.OPERATOR_UPDATE;
 
 @Service
 @AllArgsConstructor
@@ -46,118 +34,9 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     private static final int FIRST_CODE_VALUE = 1;
 
     private final ProductionOrderRepository repository;
-    private final CountingEquipmentRepository countingEquipmentRepository;
-    private final CounterRecordRepository counterRecordRepository;
-
-    private final CountingEquipmentService countingEquipmentService;
-    private final MqttClient mqttClient;
-    private final MesMqttSettings mqttSettings;
-
     private final ProductionOrderConverter converter;
-    private final GenericConverter<CountingEquipmentEntity, CountingEquipmentDto> equipmentConverter;
 
-    private final UserRoleService userRoleService;
-
-    @Override
-    @Transactional
-    public Optional<ProductionOrderDto> complete(long equipmentId, Authentication authentication) {
-        //TODO: sectionId
-        userRoleService.checkSectionAuthority(authentication, 1L, OPERATOR_UPDATE);
-        log.info(() -> String.format("Complete process Production Order started for equipmentId [%s]:", equipmentId));
-
-        Optional<CountingEquipmentEntity> countingEquipmentOpt = countingEquipmentRepository.findById(equipmentId);
-        if (countingEquipmentOpt.isEmpty()) {
-            log.warning(() -> String.format("Unable to find Equipment with id [%s]", equipmentId));
-            return Optional.empty();
-        }
-
-        CountingEquipmentDto countingEquipmentDto = setOperationStatus(countingEquipmentOpt.get(),
-                CountingEquipmentEntity.OperationStatus.PENDING);
-        log.info(() -> String.format("Change status to PENDING for Equipment with code [%s]", countingEquipmentDto.getCode()));
-
-        Optional<ProductionOrderEntity> productionOrderEntityOpt = repository.findActiveByEquipmentId(equipmentId);
-        if (productionOrderEntityOpt.isEmpty()) {
-            log.warning(() -> String.format("No active Production Order found for Equipment with id [%s]", equipmentId));
-            return Optional.empty();
-        }
-
-        publishProductionOrderCompletion(countingEquipmentOpt.get(), productionOrderEntityOpt.get());
-        log.info(() -> String.format("Production Order Conclusion already publish for equipmentId [%s]:", equipmentId));
-
-        ProductionOrderEntity productionOrder = productionOrderEntityOpt.get();
-        ProductionOrderDto productionOrderDto = converter.toDto(productionOrder);
-        return Optional.of(productionOrderDto);
-    }
-
-    public void publishProductionOrderCompletion(CountingEquipmentEntity countingEquipment, ProductionOrderEntity productionOrder) {
-        try {
-            publishProductionOrderCompletionToPLC(countingEquipment, productionOrder);
-        } catch (MesMqttException e) {
-            log.severe(() -> String.format("Unable to publish Order Completion to PLC for equipment [%s]",
-                    countingEquipment.getCode()));
-        }
-    }
-
-    private void publishProductionOrderCompletionToPLC(CountingEquipmentEntity countingEquipment, ProductionOrderEntity productionOrder)
-            throws MesMqttException {
-
-        ProductionOrderMqttDto productionOrderMqttDto = new ProductionOrderMqttDto();
-        productionOrderMqttDto.setJsonType(MqttDTOConstants.PRODUCTION_ORDER_CONCLUSION_DTO_NAME);
-        productionOrderMqttDto.setEquipmentEnabled(false);
-        productionOrderMqttDto.setProductionOrderCode(productionOrder.getCode());
-        productionOrderMqttDto.setTargetAmount(0);
-        productionOrderMqttDto.setEquipmentCode(countingEquipment.getCode());
-        mqttClient.publish(mqttSettings.getProtCountPlcTopic(), productionOrderMqttDto);
-    }
-
-    @Override
-    public Optional<ProductionOrderDto> create(RequestProductionOrderDto productionOrder, Authentication authentication) {
-        //TODO: sectionId
-        userRoleService.checkSectionAuthority(authentication, 1L, OPERATOR_CREATE);
-        return create(productionOrder);
-    }
-
-    private Optional<ProductionOrderDto> create(RequestProductionOrderDto productionOrder) {
-
-        Optional<CountingEquipmentEntity> countingEquipmentEntityOpt =
-                countingEquipmentRepository.findById(productionOrder.getEquipmentId());
-        if (countingEquipmentEntityOpt.isEmpty()) {
-            log.warning(() -> String.format("Unable to create Production Order - no Equipment found with id [%s]",
-                    productionOrder.getEquipmentId()));
-            return Optional.empty();
-        }
-
-        if (repository.hasEquipmentActiveProductionOrder(productionOrder.getEquipmentId())) {
-            log.warning(() -> String.format("Unable to create Production Order - Equipment with id [%s] still has an " +
-                    "uncompleted production order", productionOrder.getEquipmentId()));
-            return Optional.empty();
-        }
-
-        ProductionOrderEntity productionOrderEntity = converter.toEntity(productionOrder);
-        productionOrderEntity.setCreatedAt(new Date());
-        productionOrderEntity.setCompleted(false);
-        productionOrderEntity.setCode(generateCode());
-
-        CountingEquipmentEntity countingEquipmentEntity = countingEquipmentEntityOpt.get();
-        countingEquipmentEntity.setId(productionOrder.getEquipmentId());
-        productionOrderEntity.setEquipment(countingEquipmentEntity);
-        productionOrderEntity.setIms(countingEquipmentEntity.getIms());
-
-        ProductionOrderEntity persistedProductionOrder = repository.save(productionOrderEntity);
-
-        log.info(() -> String.format("Change status to IN PROGRESS for Equipment with code [%s]", countingEquipmentEntity.getCode()));
-        setOperationStatus(countingEquipmentEntity, CountingEquipmentEntity.OperationStatus.IN_PROGRESS);
-
-        try {
-            publishToPlc(persistedProductionOrder);
-        } catch (MesMqttException e) {
-            log.severe("Unable to publish Production Order over MQTT.");
-            return Optional.empty();
-        }
-
-        ProductionOrderDto persistedProductionOrderDto = converter.toDto(persistedProductionOrder);
-        return Optional.of(persistedProductionOrderDto);
-    }
+    private final CounterRecordRepository counterRecordRepository;
 
     @Override
     public String generateCode() {
@@ -190,11 +69,6 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     private boolean hasYearChanged(String productionOrderCode, int yearDigits, String codePrefix) {
         String numericCode = productionOrderCode.substring(codePrefix.length());
         return !numericCode.startsWith(String.valueOf(yearDigits));
-    }
-
-    private void publishToPlc(ProductionOrderEntity productionOrderEntity) throws MesMqttException {
-        ProductionOrderMqttDto productionOrderMqttDto = converter.toMqttDto(productionOrderEntity, true);
-        mqttClient.publish(mqttSettings.getProtCountPlcTopic(), productionOrderMqttDto);
     }
 
     @Override
@@ -343,12 +217,6 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         repository.delete(productionOrder);
     }
 
-    private CountingEquipmentDto setOperationStatus(CountingEquipmentEntity countingEquipment,
-                                                    CountingEquipmentEntity.OperationStatus status) {
-        countingEquipmentService.setOperationStatus(countingEquipment, status);
-        return equipmentConverter.toDto(countingEquipment, CountingEquipmentDto.class);
-    }
-
     @Override
     public List<ProductionOrderEntity> findByEquipmentAndPeriod(Long equipmentId, String productionOrderCode,
                                                                 Timestamp startDate, Timestamp endDate) {
@@ -363,48 +231,6 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         }
         List<ProductionOrderEntity> productionOrder = repository.findProductionOrderSummaryByComposedId(composedId);
         return converter.toDto(productionOrder);
-    }
-
-    @Override
-    @Transactional
-    public ProductionOrderDto editProductionOrder(ProductionOrderDto requestProductionOrder, Authentication authentication) {
-        //TODO: section ID
-        userRoleService.checkSectionAuthority(authentication, 1L, OPERATOR_UPDATE);
-
-        if (requestProductionOrder == null) {
-            log.warning("Null request Production Order received for editing production order.");
-            return null;
-        }
-
-        Optional<ProductionOrderEntity> persistedProductionOrderOpt = repository.findById(requestProductionOrder.getId());
-
-        if (persistedProductionOrderOpt.isEmpty()) {
-            log.warning("No production order found for ID: " + requestProductionOrder.getId());
-            return null;
-        }
-
-        ProductionOrderEntity productionOrderToUpdate = persistedProductionOrderOpt.get();
-        updateProductionInstructions(requestProductionOrder, productionOrderToUpdate);
-        ProductionOrderEntity persistedProductionOrder = repository.save(productionOrderToUpdate);
-        return converter.toDto(persistedProductionOrder);
-    }
-
-    private void updateProductionInstructions(ProductionOrderDto requestProductionOrder, ProductionOrderEntity productionOrderToUpdate) {
-        List<ProductionInstructionDto> requestInstructions = requestProductionOrder.getInstructions();
-        List<ProductionInstructionEntity> existingInstructions = productionOrderToUpdate.getProductionInstructions();
-
-        if (requestInstructions == null || existingInstructions == null) {
-            return;
-        }
-
-        for (ProductionInstructionDto requestInstruction : requestInstructions) {
-            for (ProductionInstructionEntity existingInstruction : existingInstructions) {
-                if (requestInstruction.getName().equals(existingInstruction.getName())) {
-                    existingInstruction.setValue(requestInstruction.getValue());
-                    break;
-                }
-            }
-        }
     }
 
     @Override
@@ -442,5 +268,30 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         }
 
         return productionOrderEntityOpt.get();
+    }
+
+    @Override
+    public Optional<ProductionOrderEntity> findActiveByEquipmentId(long equipmentId) {
+        if (equipmentId <= 0) {
+            throw new IllegalArgumentException("Equipment ID must be positive");
+        }
+        return repository.findActiveByEquipmentId(equipmentId);
+    }
+
+    @Override
+    public boolean hasEquipmentActiveProductionOrder(Long equipmentId) {
+        if (equipmentId == null || equipmentId <= 0) {
+            throw new IllegalArgumentException("Invalid equipment ID: " + equipmentId);
+        }
+        return repository.hasEquipmentActiveProductionOrder(equipmentId);
+    }
+
+    @Override
+    public ProductionOrderEntity save(ProductionOrderEntity productionOrder) {
+        if (productionOrder == null) {
+            throw new IllegalArgumentException("Production order cannot be null");
+        }
+
+        return repository.save(productionOrder);
     }
 }

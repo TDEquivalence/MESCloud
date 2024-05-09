@@ -8,7 +8,7 @@ import com.alcegory.mescloud.model.entity.CountingEquipmentEntity;
 import com.alcegory.mescloud.model.entity.ProductionOrderEntity;
 import com.alcegory.mescloud.service.AlarmService;
 import com.alcegory.mescloud.service.CounterRecordService;
-import com.alcegory.mescloud.service.CountingEquipmentService;
+import com.alcegory.mescloud.service.CountingEquipmentManagementService;
 import com.alcegory.mescloud.service.ProductionOrderService;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
@@ -22,7 +22,7 @@ public class ProductionOrderConclusionProcess extends AbstractMesProtocolProcess
     private static final int THREAD_SLEEP_DURATION = 500;
 
     private final CounterRecordService counterRecordService;
-    private final CountingEquipmentService equipmentService;
+    private final CountingEquipmentManagementService countingEquipmentManagementService;
     private final ProductionOrderService productionOrderService;
     private final AlarmService alarmService;
     private final MqttClient mqttClient;
@@ -37,7 +37,7 @@ public class ProductionOrderConclusionProcess extends AbstractMesProtocolProcess
             return;
         }
 
-        equipmentService.updateEquipmentStatus(equipmentCounts.getEquipmentCode(), equipmentCounts.getEquipmentStatus());
+        countingEquipmentManagementService.updateEquipmentStatus(equipmentCounts.getEquipmentCode(), equipmentCounts.getEquipmentStatus());
         alarmService.processAlarms(equipmentCounts);
 
         counterRecordService.processCounterRecord(equipmentCounts);
@@ -76,7 +76,7 @@ public class ProductionOrderConclusionProcess extends AbstractMesProtocolProcess
         }
 
         completeProductionOrder(productionOrder);
-        setOperationStatus(equipmentCode);
+        countingEquipmentManagementService.setOperationStatusByCode(equipmentCode, CountingEquipmentEntity.OperationStatus.IDLE);
     }
 
     private void completeProductionOrder(ProductionOrderEntity productionOrder) {
@@ -95,10 +95,5 @@ public class ProductionOrderConclusionProcess extends AbstractMesProtocolProcess
 
     private ProductionOrderEntity getProductionOrderByCode(String code) {
         return productionOrderService.getProductionOrderByCode(code);
-    }
-
-    private void setOperationStatus(String equipmentCode) {
-        log.info(() -> String.format("Change status to IDLE for Equipment with code [%s]", equipmentCode));
-        equipmentService.setOperationStatusByCode(equipmentCode, CountingEquipmentEntity.OperationStatus.IDLE);
     }
 }

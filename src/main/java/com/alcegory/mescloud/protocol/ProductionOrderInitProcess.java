@@ -4,7 +4,7 @@ import com.alcegory.mescloud.constant.MqttDTOConstants;
 import com.alcegory.mescloud.model.dto.PlcMqttDto;
 import com.alcegory.mescloud.service.AlarmService;
 import com.alcegory.mescloud.service.CounterRecordService;
-import com.alcegory.mescloud.service.CountingEquipmentService;
+import com.alcegory.mescloud.service.CountingEquipmentManagementService;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 public class ProductionOrderInitProcess extends AbstractMesProtocolProcess<PlcMqttDto> {
 
     private final CounterRecordService counterRecordService;
-    private final CountingEquipmentService equipmentService;
+    private final CountingEquipmentManagementService countingEquipmentManagementService;
     private final AlarmService alarmService;
 
 
@@ -25,7 +25,7 @@ public class ProductionOrderInitProcess extends AbstractMesProtocolProcess<PlcMq
         String equipmentCode = equipmentCounts.getEquipmentCode();
 
         log.info("Executing Production Order response process");
-        equipmentService.updateEquipmentStatus(equipmentCode, equipmentCounts.getEquipmentStatus());
+        countingEquipmentManagementService.updateEquipmentStatus(equipmentCode, equipmentCounts.getEquipmentStatus());
         alarmService.processAlarms(equipmentCounts);
 
         if (areInvalidInitialCounts(equipmentCounts)) {

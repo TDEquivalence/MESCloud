@@ -5,6 +5,7 @@ import com.alcegory.mescloud.model.dto.PaginatedProductionOrderDto;
 import com.alcegory.mescloud.model.dto.ProductionOrderDto;
 import com.alcegory.mescloud.model.filter.Filter;
 import com.alcegory.mescloud.model.request.RequestProductionOrderDto;
+import com.alcegory.mescloud.service.ProductionOrderManagementService;
 import com.alcegory.mescloud.service.ProductionOrderService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,6 +22,7 @@ import java.util.Optional;
 public class ProductionOrderController {
 
     private final ProductionOrderService service;
+    private final ProductionOrderManagementService productionOrderManagementService;
 
     @GetMapping("/{id}")
     public ResponseEntity<ProductionOrderDto> getProductionOrderById(@PathVariable Long id) {
@@ -39,7 +41,7 @@ public class ProductionOrderController {
                                                      Authentication authentication) {
 
         try {
-            Optional<ProductionOrderDto> productionOrderOpt = service.create(requestProductionOrder, authentication);
+            Optional<ProductionOrderDto> productionOrderOpt = productionOrderManagementService.create(requestProductionOrder, authentication);
             if (productionOrderOpt.isPresent()) {
                 return new ResponseEntity<>(productionOrderOpt.get(), HttpStatus.OK);
             } else {
@@ -54,7 +56,7 @@ public class ProductionOrderController {
     public ResponseEntity<ProductionOrderDto> edit(@RequestBody ProductionOrderDto requestProductionOrder,
                                                    Authentication authentication) {
         try {
-            ProductionOrderDto editedProductionOrder = service.editProductionOrder(requestProductionOrder, authentication);
+            ProductionOrderDto editedProductionOrder = productionOrderManagementService.editProductionOrder(requestProductionOrder, authentication);
 
             if (editedProductionOrder != null) {
                 return ResponseEntity.ok(editedProductionOrder);
@@ -69,7 +71,8 @@ public class ProductionOrderController {
     @PutMapping("{countingEquipmentId}/complete")
     public ResponseEntity<ProductionOrderDto> complete(@PathVariable long countingEquipmentId, Authentication authentication) {
         try {
-            Optional<ProductionOrderDto> productionOrderOpt = service.complete(countingEquipmentId, authentication);
+            Optional<ProductionOrderDto> productionOrderOpt
+                    = productionOrderManagementService.complete(countingEquipmentId, authentication);
             if (productionOrderOpt.isPresent()) {
                 return ResponseEntity.ok(productionOrderOpt.get());
             } else {

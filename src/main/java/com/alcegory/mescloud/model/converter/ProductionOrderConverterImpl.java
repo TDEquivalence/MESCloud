@@ -39,7 +39,7 @@ public class ProductionOrderConverterImpl implements ProductionOrderConverter {
     @Override
     public ProductionOrderEntity toEntity(RequestProductionOrderDto requestProductionOrderDto) {
         return toEntityInternal(requestProductionOrderDto.getId(),
-                requestProductionOrderDto.getCode(),
+                requestProductionOrderDto.getImsCode(),
                 requestProductionOrderDto.getTargetAmount(),
                 requestProductionOrderDto.getCreatedAt(),
                 requestProductionOrderDto.getCompletedAt(),
