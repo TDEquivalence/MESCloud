@@ -416,8 +416,6 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         }
 
         ProductionOrderEntity productionOrderEntity = productionOrderOpt.get();
-        productionOrderEntity.getProductionInstructions().size();
-
         ProductionOrderDto productionOrderDto = converter.toDto(productionOrderEntity);
         return Optional.of(productionOrderDto);
     }

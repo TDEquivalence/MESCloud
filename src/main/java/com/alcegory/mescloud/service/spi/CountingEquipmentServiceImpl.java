@@ -11,7 +11,6 @@ import com.alcegory.mescloud.model.entity.*;
 import com.alcegory.mescloud.model.request.RequestConfigurationDto;
 import com.alcegory.mescloud.protocol.MesMqttSettings;
 import com.alcegory.mescloud.repository.CountingEquipmentRepository;
-import com.alcegory.mescloud.repository.ProductionInstructionRepository;
 import com.alcegory.mescloud.repository.ProductionOrderRepository;
 import com.alcegory.mescloud.security.model.SectionAuthority;
 import com.alcegory.mescloud.security.service.UserRoleService;
@@ -21,6 +20,7 @@ import lombok.extern.java.Log;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -39,7 +39,6 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
 
     private final CountingEquipmentRepository repository;
     private final ProductionOrderRepository productionOrderRepository;
-    private final ProductionInstructionRepository productionInstructionRepository;
 
     private final EquipmentOutputService outputService;
     private final EquipmentOutputAliasService aliasService;
@@ -140,6 +139,7 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
         return Optional.of(convertToDtoWithActiveProductionOrder(countingEquipment));
     }
 
+    @Transactional
     public Optional<ProductionOrderDto> findProductionOrderByEquipmentId(long equipmentId) {
         Optional<ProductionOrderEntity> productionOrderOpt = productionOrderRepository.findLastByEquipmentId(equipmentId);
         if (productionOrderOpt.isEmpty() || productionOrderOpt.get().isCompleted()) {
@@ -147,8 +147,6 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
         }
 
         ProductionOrderEntity productionOrder = productionOrderOpt.get();
-        List<ProductionInstructionEntity> instructions = productionInstructionRepository.findByProductionOrderId(productionOrder.getId());
-        productionOrder.setProductionInstructions(instructions);
         ProductionOrderDto productionOrderDto = productionOrderConverter.toDto(productionOrder);
         return Optional.of(productionOrderDto);
     }

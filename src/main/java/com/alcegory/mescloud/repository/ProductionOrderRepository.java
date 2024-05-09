@@ -25,8 +25,6 @@ public interface ProductionOrderRepository extends JpaRepository<ProductionOrder
             "ORDER BY id DESC LIMIT 1", nativeQuery = true)
     Optional<ProductionOrderEntity> findActiveByEquipmentId(long equipmentId);
 
-    @Query(value = "SELECT * FROM production_order po WHERE po.equipment_id = :equipmentId " +
-            "ORDER BY id DESC LIMIT 1", nativeQuery = true)
     Optional<ProductionOrderEntity> findLastByEquipmentId(long equipmentId);
 
     @Query(value = "SELECT po.* FROM production_order po " +

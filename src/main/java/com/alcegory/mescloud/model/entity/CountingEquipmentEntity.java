@@ -1,5 +1,6 @@
 package com.alcegory.mescloud.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,13 +17,18 @@ public class CountingEquipmentEntity implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @OneToMany(mappedBy = "equipment", fetch = FetchType.LAZY)
-    private List<ProductionOrderEntity> productionOrders;
-    @OneToMany(mappedBy = "countingEquipment", fetch = FetchType.LAZY)
-    private List<EquipmentStatusRecordEntity> equipmentStatusRecords;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "equipment", fetch = FetchType.LAZY)
+    private List<ProductionOrderEntity> productionOrders;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "countingEquipment", fetch = FetchType.LAZY)
+    private List<EquipmentStatusRecordEntity> equipmentStatusRecords;
+
     private String code;
     private String alias;
     @ManyToOne
@@ -34,14 +40,17 @@ public class CountingEquipmentEntity implements Serializable {
             cascade = {CascadeType.PERSIST},
             orphanRemoval = false
     )
+
     @JoinColumn(name = "ims_id", referencedColumnName = "id")
     private ImsEntity ims;
+
     @OneToMany(
             mappedBy = "countingEquipment",
             fetch = FetchType.EAGER,
             cascade = {CascadeType.PERSIST},
             orphanRemoval = false
     )
+
     private List<EquipmentOutputEntity> outputs;
     private Double theoreticalProduction;
 

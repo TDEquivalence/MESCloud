@@ -1,6 +1,7 @@
 package com.alcegory.mescloud.repository;
 
 import com.alcegory.mescloud.model.entity.ComposedProductionOrderEntity;
+import com.alcegory.mescloud.model.entity.CountingEquipmentEntity;
 import com.alcegory.mescloud.model.entity.ProductionOrderEntity;
 import com.alcegory.mescloud.model.filter.Filter;
 import jakarta.persistence.EntityManager;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Repository;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @AllArgsConstructor
 @Repository
@@ -22,6 +24,8 @@ public class ProductionOrderRepositoryImpl {
     private static final String COMPOSED_PRODUCTION_ORDER = "composedProductionOrder";
     private static final String IS_COMPLETED = "isCompleted";
     private static final String PROP_ID = "id";
+
+    private static final String EQUIPMENT = "equipment";
 
     private final EntityManager entityManager;
 
@@ -70,8 +74,27 @@ public class ProductionOrderRepositoryImpl {
                 JoinType.LEFT);
 
         query.select(root)
-                .where(cb.equal(joinComposedProductionOrder.get("id"), composedProductionOrderId));
+                .where(cb.equal(joinComposedProductionOrder.get(PROP_ID), composedProductionOrderId));
 
         return entityManager.createQuery(query).getResultList();
+    }
+
+    public Optional<ProductionOrderEntity> findLastByEquipmentId(long equipmentId) {
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<ProductionOrderEntity> query = criteriaBuilder.createQuery(ProductionOrderEntity.class);
+        Root<ProductionOrderEntity> root = query.from(ProductionOrderEntity.class);
+
+        // Joining the equipment association
+        Join<ProductionOrderEntity, CountingEquipmentEntity> equipmentJoin = root.join(EQUIPMENT);
+
+        query.select(root)
+                .where(criteriaBuilder.equal(equipmentJoin.get(PROP_ID), equipmentId))
+                .orderBy(criteriaBuilder.desc(root.get(PROP_ID)));
+
+        return entityManager.createQuery(query)
+                .setMaxResults(1)
+                .getResultList()
+                .stream()
+                .findFirst();
     }
 }

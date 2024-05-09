@@ -23,7 +23,7 @@ public class ProductionOrderEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String code;
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     private CountingEquipmentEntity equipment;
     @ManyToOne(fetch = FetchType.EAGER)
     private ImsEntity ims;
@@ -34,7 +34,7 @@ public class ProductionOrderEntity implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date completedAt;
 
-    @OneToMany(mappedBy = "productionOrder", fetch = FetchType.LAZY, cascade = {CascadeType.ALL, CascadeType.PERSIST})
+    @OneToMany(mappedBy = "productionOrder", fetch = FetchType.EAGER, cascade = {CascadeType.ALL, CascadeType.PERSIST})
     @Fetch(FetchMode.SUBSELECT)
     private List<ProductionInstructionEntity> productionInstructions;
 

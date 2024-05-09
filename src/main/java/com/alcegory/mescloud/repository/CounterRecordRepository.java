@@ -26,7 +26,6 @@ public interface CounterRecordRepository extends CrudRepository<CounterRecordEnt
 
     List<CounterRecordConclusionEntity> findLastPerProductionOrder(FilterDto filterDto);
 
-
     List<CounterRecordEntity> findLastPerProductionOrderAndEquipmentOutputPerDay(FilterDto filterDto);
 
     List<CounterRecordEntity> getFilteredAndPaginated(Filter filterDto);
@@ -37,7 +36,7 @@ public interface CounterRecordRepository extends CrudRepository<CounterRecordEnt
             "WHERE cr.isValidForProduction = true " +
             "AND cr.productionOrder.id = :productionOrderId")
     Long sumValidCounterIncrementByProductionOrderId(@Param("productionOrderId") Long productionOrderId);
-    
+
     Integer sumValidCounterIncrementForApprovedPO(Long countingEquipmentId, Timestamp startDateFilter, Timestamp endDateFilter);
 
     Integer sumCounterIncrement(Long countingEquipmentId, FilterDto filter);
