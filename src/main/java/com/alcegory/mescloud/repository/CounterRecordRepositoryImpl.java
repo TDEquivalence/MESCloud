@@ -212,7 +212,6 @@ public class CounterRecordRepositoryImpl extends AbstractFilterRepository<Filter
         return Objects.requireNonNullElse(resultSumIncrement, 0);
     }
 
-
     public Integer sumValidCounterIncrementByPO(Long countingEquipmentId, FilterDto filter) {
 
         Timestamp startDateFilter = filter.getSearch().getTimestampValue(START_DATE);

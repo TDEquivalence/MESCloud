@@ -9,11 +9,11 @@ import com.alcegory.mescloud.model.dto.*;
 import com.alcegory.mescloud.model.entity.CountingEquipmentEntity;
 import com.alcegory.mescloud.model.entity.ProductionInstructionEntity;
 import com.alcegory.mescloud.model.entity.ProductionOrderEntity;
-import com.alcegory.mescloud.model.entity.ProductionOrderSummaryEntity;
 import com.alcegory.mescloud.model.filter.Filter;
+import com.alcegory.mescloud.model.request.RequestProductionOrderDto;
 import com.alcegory.mescloud.protocol.MesMqttSettings;
+import com.alcegory.mescloud.repository.CounterRecordRepository;
 import com.alcegory.mescloud.repository.CountingEquipmentRepository;
-import com.alcegory.mescloud.repository.ProductionInstructionRepository;
 import com.alcegory.mescloud.repository.ProductionOrderRepository;
 import com.alcegory.mescloud.security.service.UserRoleService;
 import com.alcegory.mescloud.service.CountingEquipmentService;
@@ -47,14 +47,13 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
 
     private final ProductionOrderRepository repository;
     private final CountingEquipmentRepository countingEquipmentRepository;
-    private final ProductionInstructionRepository productionInstructionRepository;
+    private final CounterRecordRepository counterRecordRepository;
 
     private final CountingEquipmentService countingEquipmentService;
     private final MqttClient mqttClient;
     private final MesMqttSettings mqttSettings;
 
     private final ProductionOrderConverter converter;
-    private final GenericConverter<ProductionOrderSummaryEntity, ProductionOrderSummaryDto> summaryConverter;
     private final GenericConverter<CountingEquipmentEntity, CountingEquipmentDto> equipmentConverter;
 
     private final UserRoleService userRoleService;
@@ -112,13 +111,13 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     }
 
     @Override
-    public Optional<ProductionOrderDto> create(ProductionOrderDto productionOrder, Authentication authentication) {
+    public Optional<ProductionOrderDto> create(RequestProductionOrderDto productionOrder, Authentication authentication) {
         //TODO: sectionId
         userRoleService.checkSectionAuthority(authentication, 1L, OPERATOR_CREATE);
         return create(productionOrder);
     }
 
-    private Optional<ProductionOrderDto> create(ProductionOrderDto productionOrder) {
+    private Optional<ProductionOrderDto> create(RequestProductionOrderDto productionOrder) {
 
         Optional<CountingEquipmentEntity> countingEquipmentEntityOpt =
                 countingEquipmentRepository.findById(productionOrder.getEquipmentId());
@@ -258,31 +257,19 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     }
 
     @Override
-    public List<ProductionOrderSummaryDto> getCompletedWithoutComposedFiltered() {
-        List<ProductionOrderSummaryEntity> persistedProductionOrders = repository.findCompleted(true, null, null, null);
-        List<ProductionOrderSummaryDto> productionOrderSummaryDtos = summaryConverter.toDto(persistedProductionOrders, ProductionOrderSummaryDto.class);
-
-        for (ProductionOrderSummaryDto summaryDto : productionOrderSummaryDtos) {
-            setInstructions(summaryDto);
-        }
-
-        return productionOrderSummaryDtos;
-    }
-
-    private void setInstructions(ProductionOrderSummaryDto summaryDto) {
-        List<ProductionInstructionEntity> instructions = productionInstructionRepository.findByProductionOrderId(summaryDto.getId());
-        if (!instructions.isEmpty()) {
-            List<ProductionInstructionDto> instructionDto = converter.toDtoList(instructions);
-            summaryDto.setInstructions(instructionDto);
-        }
+    @Transactional
+    public List<ProductionOrderDto> getCompletedWithoutComposedFiltered() {
+        List<ProductionOrderEntity> persistedProductionOrders = repository.findCompleted(true, null, null, null);
+        return converter.toDto(persistedProductionOrders);
     }
 
     @Override
+    @Transactional
     public PaginatedProductionOrderDto getCompletedWithoutComposedFiltered(Filter filter) {
         int requestedProductionOrders = filter.getTake();
         filter.setTake(filter.getTake() + 1);
 
-        List<ProductionOrderSummaryEntity> persistedProductionOrders = repository.findCompleted(true, filter,
+        List<ProductionOrderEntity> persistedProductionOrders = repository.findCompleted(true, filter,
                 filter.getSearch().getTimestampValue(START_DATE), filter.getSearch().getTimestampValue(END_DATE));
         boolean hasNextPage = persistedProductionOrders.size() > requestedProductionOrders;
 
@@ -293,10 +280,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         PaginatedProductionOrderDto paginatedProductionOrderDto = new PaginatedProductionOrderDto();
         paginatedProductionOrderDto.setHasNextPage(hasNextPage);
 
-        List<ProductionOrderSummaryDto> summaryDtos = summaryConverter.toDto(persistedProductionOrders, ProductionOrderSummaryDto.class);
-        for (ProductionOrderSummaryDto summaryDto : summaryDtos) {
-            setInstructions(summaryDto);
-        }
+        List<ProductionOrderDto> summaryDtos = converter.toDto(persistedProductionOrders);
 
         paginatedProductionOrderDto.setProductionOrders(summaryDtos);
         return paginatedProductionOrderDto;
@@ -372,18 +356,13 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     }
 
     @Override
-    public List<ProductionOrderSummaryDto> getProductionOrderByComposedId(Long composedId) {
+    @Transactional
+    public List<ProductionOrderDto> getProductionOrderByComposedId(Long composedId) {
         if (composedId == null) {
             throw new IllegalArgumentException("Composed ID cannot be null");
         }
-        List<ProductionOrderSummaryEntity> productionOrderSummaryEntities = repository.findProductionOrderSummaryByComposedId(composedId);
-        List<ProductionOrderSummaryDto> productionOrderSummaryDtos = summaryConverter.toDto(productionOrderSummaryEntities, ProductionOrderSummaryDto.class);
-
-        for (ProductionOrderSummaryDto summaryDto : productionOrderSummaryDtos) {
-            setInstructions(summaryDto);
-        }
-
-        return productionOrderSummaryDtos;
+        List<ProductionOrderEntity> productionOrder = repository.findProductionOrderSummaryByComposedId(composedId);
+        return converter.toDto(productionOrder);
     }
 
     @Override
@@ -441,5 +420,18 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
 
         ProductionOrderDto productionOrderDto = converter.toDto(productionOrderEntity);
         return Optional.of(productionOrderDto);
+    }
+
+    public void completeProductionOrder(ProductionOrderEntity productionOrder) {
+        String productionOrderCode = productionOrder.getCode();
+        log.info(() -> String.format("Setting and saving production order [%s] as completed.", productionOrderCode));
+
+        productionOrder.setCompletedAt(new Date());
+        productionOrder.setCompleted(true);
+
+        Long validAmount = counterRecordRepository.sumValidCounterIncrementByProductionOrderId(productionOrder.getId());
+        productionOrder.setValidAmount(validAmount);
+
+        repository.save(productionOrder);
     }
 }

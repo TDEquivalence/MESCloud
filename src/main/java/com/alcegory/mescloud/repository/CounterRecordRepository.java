@@ -33,6 +33,11 @@ public interface CounterRecordRepository extends CrudRepository<CounterRecordEnt
 
     Integer sumValidCounterIncrement(Long countingEquipmentId, FilterDto filter);
 
+    @Query("SELECT SUM(cr.increment) FROM CounterRecordEntity cr " +
+            "WHERE cr.isValidForProduction = true " +
+            "AND cr.productionOrder.id = :productionOrderId")
+    Long sumValidCounterIncrementByProductionOrderId(@Param("productionOrderId") Long productionOrderId);
+    
     Integer sumValidCounterIncrementForApprovedPO(Long countingEquipmentId, Timestamp startDateFilter, Timestamp endDateFilter);
 
     Integer sumCounterIncrement(Long countingEquipmentId, FilterDto filter);

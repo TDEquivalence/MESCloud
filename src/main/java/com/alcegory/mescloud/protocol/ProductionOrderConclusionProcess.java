@@ -10,13 +10,11 @@ import com.alcegory.mescloud.repository.ProductionOrderRepository;
 import com.alcegory.mescloud.service.AlarmService;
 import com.alcegory.mescloud.service.CounterRecordService;
 import com.alcegory.mescloud.service.CountingEquipmentService;
+import com.alcegory.mescloud.service.ProductionOrderService;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
 import java.util.Optional;
 
 @Service
@@ -24,12 +22,11 @@ import java.util.Optional;
 @AllArgsConstructor
 public class ProductionOrderConclusionProcess extends AbstractMesProtocolProcess<PlcMqttDto> {
 
-    private static final Logger logger = LoggerFactory.getLogger(ProductionOrderConclusionProcess.class);
-
     private static final int THREAD_SLEEP_DURATION = 500;
 
     private final CounterRecordService counterRecordService;
     private final CountingEquipmentService equipmentService;
+    private final ProductionOrderService productionOrderService;
     private final AlarmService alarmService;
     private final MqttClient mqttClient;
     private final ProductionOrderRepository repository;
@@ -87,10 +84,7 @@ public class ProductionOrderConclusionProcess extends AbstractMesProtocolProcess
     }
 
     private void completeProductionOrder(ProductionOrderEntity productionOrder) {
-        log.info(() -> String.format("Set and save production order as completed, with code [%s]", productionOrder.getCode()));
-        productionOrder.setCompletedAt(new Date());
-        productionOrder.setCompleted(true);
-        repository.save(productionOrder);
+        productionOrderService.completeProductionOrder(productionOrder);
     }
 
     private ProductionOrderMqttDto createProductionOrderMqttDto(String equipmentCode) {

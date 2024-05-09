@@ -42,6 +42,8 @@ public class ProductionOrderEntity implements Serializable {
 
     @ManyToOne
     private ComposedProductionOrderEntity composedProductionOrder;
+
+    private Long validAmount;
 }
 
 

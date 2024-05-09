@@ -1,5 +1,6 @@
-package com.alcegory.mescloud.model.dto;
+package com.alcegory.mescloud.model.request;
 
+import com.alcegory.mescloud.model.dto.ProductionInstructionDto;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,16 +9,14 @@ import java.util.List;
 
 @Getter
 @Setter
-public class ProductionOrderSummaryDto {
+public class RequestProductionOrderDto {
 
     private long id;
-    private CountingEquipmentDto equipment;
+    private long equipmentId;
     private String code;
-    private ImsDto ims;
     private int targetAmount;
     private Date createdAt;
     private Date completedAt;
-    private long validAmount;
 
     private List<ProductionInstructionDto> instructions;
 }

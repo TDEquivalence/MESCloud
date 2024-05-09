@@ -1,7 +1,7 @@
 package com.alcegory.mescloud.utility.export;
 
 import com.alcegory.mescloud.model.entity.ComposedSummaryEntity;
-import com.alcegory.mescloud.model.entity.ProductionOrderSummaryEntity;
+import com.alcegory.mescloud.model.entity.ProductionOrderEntity;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
@@ -24,7 +24,7 @@ public class ExcelExportImpl extends AbstractExcelExport {
     }
 
     public void exportDataToExcel(HttpServletResponse response, List<ComposedSummaryEntity> composedList,
-                                  List<ProductionOrderSummaryEntity> productionOrders) {
+                                  List<ProductionOrderEntity> productionOrders) {
 
         XSSFSheet composedSheet = createSheet(SHEET_NAME_COMPOSED);
         createHeaderRow(composedSheet, getComposedHeaders());
@@ -86,14 +86,14 @@ public class ExcelExportImpl extends AbstractExcelExport {
         }
     }
 
-    protected void writeDataToProduction(XSSFSheet sheet, List<ProductionOrderSummaryEntity> productionOrders) {
+    protected void writeDataToProduction(XSSFSheet sheet, List<ProductionOrderEntity> productionOrders) {
         int rowCount = 1; // Start from row 1 (row 0 is header)
         CellStyle style = workbook.createCellStyle();
         XSSFFont font = workbook.createFont();
         font.setFontHeight(14);
         style.setFont(font);
 
-        for (ProductionOrderSummaryEntity po : productionOrders) {
+        for (ProductionOrderEntity po : productionOrders) {
             Row row = sheet.createRow(rowCount++);
             int columnCount = 0;
             createCell(row, columnCount++, po.getEquipment() != null ? po.getEquipment().getAlias() : null, style);

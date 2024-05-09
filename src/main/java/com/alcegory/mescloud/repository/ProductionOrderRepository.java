@@ -1,7 +1,6 @@
 package com.alcegory.mescloud.repository;
 
 import com.alcegory.mescloud.model.entity.ProductionOrderEntity;
-import com.alcegory.mescloud.model.entity.ProductionOrderSummaryEntity;
 import com.alcegory.mescloud.model.filter.Filter;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -38,7 +37,7 @@ public interface ProductionOrderRepository extends JpaRepository<ProductionOrder
 
     List<ProductionOrderEntity> findByIdIn(List<Long> ids);
 
-    List<ProductionOrderSummaryEntity> findCompleted(boolean withoutComposed, Filter filter, Timestamp startDate, Timestamp endDate);
+    List<ProductionOrderEntity> findCompleted(boolean withoutComposed, Filter filter, Timestamp startDate, Timestamp endDate);
 
     List<ProductionOrderEntity> findByComposedProductionOrderId(Long composedProductionOrderId);
 
@@ -73,7 +72,7 @@ public interface ProductionOrderRepository extends JpaRepository<ProductionOrder
             "AND po.is_completed = false", nativeQuery = true)
     boolean hasEquipmentActiveProductionOrder(@Param("countingEquipmentCode") String countingEquipmentCode);
 
-    List<ProductionOrderSummaryEntity> findProductionOrderSummaryByComposedId(Long composedProductionOrderId);
+    List<ProductionOrderEntity> findProductionOrderSummaryByComposedId(Long composedProductionOrderId);
 
     @Transactional
     @Modifying

@@ -2,7 +2,7 @@ package com.alcegory.mescloud.service.spi;
 
 import com.alcegory.mescloud.exception.ExcelExportException;
 import com.alcegory.mescloud.model.entity.ComposedSummaryEntity;
-import com.alcegory.mescloud.model.entity.ProductionOrderSummaryEntity;
+import com.alcegory.mescloud.model.entity.ProductionOrderEntity;
 import com.alcegory.mescloud.repository.ComposedProductionOrderRepository;
 import com.alcegory.mescloud.repository.ProductionOrderRepository;
 import com.alcegory.mescloud.service.ExportExcelService;
@@ -47,7 +47,7 @@ public class ExportExcelServiceImpl implements ExportExcelService {
 
         setExcelResponseHeaders(response, COMPOSED_PRODUCTION_ORDERS_COMPLETED);
 
-        List<ProductionOrderSummaryEntity> productionOrderViews = productionOrderRepository.findCompleted(false, null, startDate, endDate);
+        List<ProductionOrderEntity> productionOrderViews = productionOrderRepository.findCompleted(false, null, startDate, endDate);
         List<ComposedSummaryEntity> composedList = composedRepository.findAllComposed(startDate, endDate);
 
         try {

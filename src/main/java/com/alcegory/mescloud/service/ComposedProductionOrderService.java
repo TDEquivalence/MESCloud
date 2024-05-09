@@ -1,9 +1,6 @@
 package com.alcegory.mescloud.service;
 
-import com.alcegory.mescloud.model.dto.ComposedProductionOrderDto;
-import com.alcegory.mescloud.model.dto.ComposedSummaryDto;
-import com.alcegory.mescloud.model.dto.PaginatedComposedDto;
-import com.alcegory.mescloud.model.dto.ProductionOrderSummaryDto;
+import com.alcegory.mescloud.model.dto.*;
 import com.alcegory.mescloud.model.entity.ComposedProductionOrderEntity;
 import com.alcegory.mescloud.model.filter.Filter;
 import com.alcegory.mescloud.model.request.RequestComposedDto;
@@ -53,7 +50,7 @@ public interface ComposedProductionOrderService {
 
     void setHitInsertAtInComposed(ComposedProductionOrderEntity composed);
 
-    List<ProductionOrderSummaryDto> getProductionOrderSummaryByComposedId(Long composedId);
+    List<ProductionOrderDto> getProductionOrderSummaryByComposedId(Long composedId);
 
     void deleteComposed(ComposedProductionOrderEntity composedProductionOrder);
 }

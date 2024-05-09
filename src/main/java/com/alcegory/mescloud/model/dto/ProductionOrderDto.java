@@ -5,18 +5,20 @@ import lombok.Setter;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 @Getter
 @Setter
 public class ProductionOrderDto {
 
     private long id;
-    private long equipmentId;
     private String code;
     private int targetAmount;
+    private Long validAmount;
+    private Boolean isCompleted;
     private Date createdAt;
     private Date completedAt;
 
+    private ImsDto ims;
+    private CountingEquipmentDto equipment;
     private List<ProductionInstructionDto> instructions;
 }

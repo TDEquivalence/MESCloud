@@ -1,7 +1,7 @@
 package com.alcegory.mescloud.repository;
 
 import com.alcegory.mescloud.model.entity.ComposedProductionOrderEntity;
-import com.alcegory.mescloud.model.entity.ProductionOrderSummaryEntity;
+import com.alcegory.mescloud.model.entity.ProductionOrderEntity;
 import com.alcegory.mescloud.model.filter.Filter;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
@@ -25,62 +25,36 @@ public class ProductionOrderRepositoryImpl {
 
     private final EntityManager entityManager;
 
-    public List<ProductionOrderSummaryEntity> findCompleted(boolean withoutComposed, Filter filter, Timestamp startDate, Timestamp endDate) {
-        String productionOrderCode = null;
-        Integer skip = null;
-        Integer take = null;
-
-        if (filter != null) {
-            productionOrderCode = filter.getSearch().getValue(Filter.Property.PRODUCTION_ORDER_CODE);
-            skip = filter.getSkip();
-            take = filter.getTake();
-        }
-
-        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<ProductionOrderSummaryEntity> query = criteriaBuilder.createQuery(ProductionOrderSummaryEntity.class);
-        Root<ProductionOrderSummaryEntity> root = query.from(ProductionOrderSummaryEntity.class);
-        query.select(root);
+    public List<ProductionOrderEntity> findCompleted(boolean withoutComposed, Filter filter, Timestamp startDate, Timestamp endDate) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<ProductionOrderEntity> query = cb.createQuery(ProductionOrderEntity.class);
+        Root<ProductionOrderEntity> root = query.from(ProductionOrderEntity.class);
 
         List<Predicate> predicates = new ArrayList<>();
-
         if (withoutComposed) {
-            // Add predicate to filter by composedProductionOrder == null
-            Predicate composedProductionOrderIsNull = criteriaBuilder.isNull(root.get(COMPOSED_PRODUCTION_ORDER));
-            predicates.add(composedProductionOrderIsNull);
+            predicates.add(cb.isNull(root.get(COMPOSED_PRODUCTION_ORDER)));
         }
-
         if (startDate != null) {
-            Predicate startDatePredicate = criteriaBuilder.greaterThanOrEqualTo(root.get(COMPLETED_AT), startDate);
-            predicates.add(startDatePredicate);
+            predicates.add(cb.greaterThanOrEqualTo(root.get(COMPLETED_AT), startDate));
         }
-
         if (endDate != null) {
-            Predicate endDatePredicate = criteriaBuilder.lessThanOrEqualTo(root.get(COMPLETED_AT), endDate);
-            predicates.add(endDatePredicate);
+            predicates.add(cb.lessThanOrEqualTo(root.get(COMPLETED_AT), endDate));
         }
+        predicates.add(cb.isTrue(root.get(IS_COMPLETED)));
 
-        Predicate isCompletedPredicate = criteriaBuilder.isTrue(root.get(IS_COMPLETED));
-        predicates.add(isCompletedPredicate);
-
+        String productionOrderCode = (filter != null) ? filter.getSearch().getValue(Filter.Property.PRODUCTION_ORDER_CODE) : null;
         if (productionOrderCode != null && !productionOrderCode.isEmpty()) {
-            Predicate productionOrderCodePredicate = criteriaBuilder.like(root.get(PRODUCTION_ORDER_CODE), "%" + productionOrderCode + "%");
-            predicates.add(productionOrderCodePredicate);
+            predicates.add(cb.like(root.get(PRODUCTION_ORDER_CODE), "%" + productionOrderCode + "%"));
         }
-        query.where(predicates.toArray(new Predicate[0]));
+        query.where(predicates.toArray(new Predicate[0]))
+                .orderBy(cb.desc(root.get(PROP_ID)));
 
-        List<Order> orders = new ArrayList<>();
-        Order newestOrder = criteriaBuilder.desc(root.get(PROP_ID));
-        orders.add(newestOrder);
+        TypedQuery<ProductionOrderEntity> typedQuery = entityManager.createQuery(query);
 
-        query.orderBy(orders);
-
-        TypedQuery<ProductionOrderSummaryEntity> typedQuery = entityManager.createQuery(query);
-
-        if (skip != null) {
+        if (filter != null) {
+            int skip = filter.getSkip();
+            int take = filter.getTake();
             typedQuery.setFirstResult(skip);
-        }
-
-        if (take != null) {
             typedQuery.setMaxResults(take);
         }
 
@@ -88,15 +62,15 @@ public class ProductionOrderRepositoryImpl {
     }
 
 
-    public List<ProductionOrderSummaryEntity> findProductionOrderSummaryByComposedId(Long composedProductionOrderId) {
-        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<ProductionOrderSummaryEntity> query = criteriaBuilder.createQuery(ProductionOrderSummaryEntity.class);
-        Root<ProductionOrderSummaryEntity> root = query.from(ProductionOrderSummaryEntity.class);
-        Join<ProductionOrderSummaryEntity, ComposedProductionOrderEntity> joinComposedProductionOrder = root.join(COMPOSED_PRODUCTION_ORDER,
+    public List<ProductionOrderEntity> findProductionOrderSummaryByComposedId(Long composedProductionOrderId) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<ProductionOrderEntity> query = cb.createQuery(ProductionOrderEntity.class);
+        Root<ProductionOrderEntity> root = query.from(ProductionOrderEntity.class);
+        Join<ProductionOrderEntity, ComposedProductionOrderEntity> joinComposedProductionOrder = root.join(COMPOSED_PRODUCTION_ORDER,
                 JoinType.LEFT);
 
         query.select(root)
-                .where(criteriaBuilder.equal(joinComposedProductionOrder.get("id"), composedProductionOrderId));
+                .where(cb.equal(joinComposedProductionOrder.get("id"), composedProductionOrderId));
 
         return entityManager.createQuery(query).getResultList();
     }

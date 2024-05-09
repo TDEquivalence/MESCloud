@@ -8,6 +8,6 @@ import java.util.List;
 @Getter
 @Setter
 public class PaginatedProductionOrderDto {
-    private List<ProductionOrderSummaryDto> productionOrders;
+    private List<ProductionOrderDto> productionOrders;
     private boolean hasNextPage;
 }

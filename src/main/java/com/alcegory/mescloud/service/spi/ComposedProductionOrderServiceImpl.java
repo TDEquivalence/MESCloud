@@ -270,7 +270,7 @@ public class ComposedProductionOrderServiceImpl implements ComposedProductionOrd
     }
 
     @Override
-    public List<ProductionOrderSummaryDto> getProductionOrderSummaryByComposedId(Long composedId) {
+    public List<ProductionOrderDto> getProductionOrderSummaryByComposedId(Long composedId) {
         if (composedId == null) {
             throw new IllegalArgumentException("Cannot get PO's, because composed id is null");
         }

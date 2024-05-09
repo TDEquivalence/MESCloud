@@ -3,8 +3,8 @@ package com.alcegory.mescloud.api.rest;
 import com.alcegory.mescloud.exception.ForbiddenAccessException;
 import com.alcegory.mescloud.model.dto.PaginatedProductionOrderDto;
 import com.alcegory.mescloud.model.dto.ProductionOrderDto;
-import com.alcegory.mescloud.model.dto.ProductionOrderSummaryDto;
 import com.alcegory.mescloud.model.filter.Filter;
+import com.alcegory.mescloud.model.request.RequestProductionOrderDto;
 import com.alcegory.mescloud.service.ProductionOrderService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -35,7 +35,7 @@ public class ProductionOrderController {
     }
 
     @PostMapping
-    public ResponseEntity<ProductionOrderDto> create(@RequestBody ProductionOrderDto requestProductionOrder,
+    public ResponseEntity<ProductionOrderDto> create(@RequestBody RequestProductionOrderDto requestProductionOrder,
                                                      Authentication authentication) {
 
         try {
@@ -81,9 +81,9 @@ public class ProductionOrderController {
     }
 
     @GetMapping("/completed")
-    public ResponseEntity<List<ProductionOrderSummaryDto>> getAllCompleted() {
+    public ResponseEntity<List<ProductionOrderDto>> getAllCompleted() {
         try {
-            List<ProductionOrderSummaryDto> completedOrders = service.getCompletedWithoutComposedFiltered();
+            List<ProductionOrderDto> completedOrders = service.getCompletedWithoutComposedFiltered();
             return ResponseEntity.ok(completedOrders);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();

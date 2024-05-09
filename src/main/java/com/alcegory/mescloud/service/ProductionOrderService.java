@@ -2,9 +2,9 @@ package com.alcegory.mescloud.service;
 
 import com.alcegory.mescloud.model.dto.PaginatedProductionOrderDto;
 import com.alcegory.mescloud.model.dto.ProductionOrderDto;
-import com.alcegory.mescloud.model.dto.ProductionOrderSummaryDto;
 import com.alcegory.mescloud.model.entity.ProductionOrderEntity;
 import com.alcegory.mescloud.model.filter.Filter;
+import com.alcegory.mescloud.model.request.RequestProductionOrderDto;
 import org.springframework.security.core.Authentication;
 
 import java.sql.Timestamp;
@@ -20,7 +20,7 @@ public interface ProductionOrderService {
 
     String generateCode();
 
-    Optional<ProductionOrderDto> create(ProductionOrderDto productionOrderDto, Authentication authentication);
+    Optional<ProductionOrderDto> create(RequestProductionOrderDto productionOrderDto, Authentication authentication);
 
     boolean hasActiveProductionOrderByEquipmentId(long countingEquipmentId);
 
@@ -42,7 +42,7 @@ public interface ProductionOrderService {
 
     List<Long> findExistingIds(List<Long> ids);
 
-    List<ProductionOrderSummaryDto> getCompletedWithoutComposedFiltered();
+    List<ProductionOrderDto> getCompletedWithoutComposedFiltered();
 
     PaginatedProductionOrderDto getCompletedWithoutComposedFiltered(Filter filter);
 
@@ -55,7 +55,7 @@ public interface ProductionOrderService {
     List<ProductionOrderEntity> findByEquipmentAndPeriod(Long equipmentId, String productionOrderCode, Timestamp startDate,
                                                          Timestamp endDate);
 
-    List<ProductionOrderSummaryDto> getProductionOrderByComposedId(Long composedId);
+    List<ProductionOrderDto> getProductionOrderByComposedId(Long composedId);
 
     ProductionOrderDto editProductionOrder(ProductionOrderDto requestProductionOrder, Authentication authentication);
 
@@ -64,4 +64,6 @@ public interface ProductionOrderService {
     Long findComposedProductionOrderIdByCode(String code);
 
     Optional<ProductionOrderDto> getProductionOrderById(Long id);
+
+    void completeProductionOrder(ProductionOrderEntity productionOrder);
 }
