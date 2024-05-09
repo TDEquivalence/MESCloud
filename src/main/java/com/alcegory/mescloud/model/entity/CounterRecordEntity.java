@@ -22,21 +22,32 @@ public class CounterRecordEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "equipment_output_id")
     private EquipmentOutputEntity equipmentOutput;
+
     private String equipmentOutputAlias;
+
     private int realValue;
+
     private int computedValue;
+
     private Integer increment;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "production_order_id")
     private ProductionOrderEntity productionOrder;
+
     @Temporal(TemporalType.TIMESTAMP)
     private Date registeredAt;
+
     private Boolean isValidForProduction;
+
     private int activeTime;
+
     private int computedActiveTime;
+
     private Integer incrementActiveTime;
 
     public CounterRecordEntity(Long id,

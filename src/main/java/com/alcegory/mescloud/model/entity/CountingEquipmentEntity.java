@@ -31,27 +31,28 @@ public class CountingEquipmentEntity implements Serializable {
 
     private String code;
     private String alias;
+
     @ManyToOne
     private SectionEntity section;
+
     private int equipmentStatus;
+
     private int pTimerCommunicationCycle;
+
     @OneToOne(
             fetch = FetchType.EAGER,
-            cascade = {CascadeType.PERSIST},
-            orphanRemoval = false
+            cascade = {CascadeType.PERSIST}
     )
-
     @JoinColumn(name = "ims_id", referencedColumnName = "id")
     private ImsEntity ims;
 
     @OneToMany(
             mappedBy = "countingEquipment",
             fetch = FetchType.EAGER,
-            cascade = {CascadeType.PERSIST},
-            orphanRemoval = false
+            cascade = CascadeType.ALL
     )
-
     private List<EquipmentOutputEntity> outputs;
+
     private Double theoreticalProduction;
 
     private Double qualityTarget;
@@ -62,6 +63,7 @@ public class CountingEquipmentEntity implements Serializable {
 
     @Enumerated(EnumType.STRING)
     private OperationStatus operationStatus;
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "counting_equipment_feature",
             joinColumns = @JoinColumn(name = "counting_equipment_id"),

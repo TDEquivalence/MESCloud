@@ -18,8 +18,11 @@ public class EquipmentOutputEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "counting_equipment_id")
     private CountingEquipmentEntity countingEquipment;
+
     private String code;
 
     @ManyToOne(cascade = CascadeType.ALL)

@@ -3,6 +3,7 @@ package com.alcegory.mescloud.repository;
 import com.alcegory.mescloud.model.dto.FilterDto;
 import com.alcegory.mescloud.model.entity.CounterRecordConclusionEntity;
 import com.alcegory.mescloud.model.entity.CounterRecordEntity;
+import com.alcegory.mescloud.model.entity.CounterRecordSummaryEntity;
 import com.alcegory.mescloud.model.filter.Filter;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.Modifying;
@@ -26,7 +27,7 @@ public interface CounterRecordRepository extends CrudRepository<CounterRecordEnt
 
     List<CounterRecordConclusionEntity> findLastPerProductionOrder(FilterDto filterDto);
 
-    List<CounterRecordEntity> findLastPerProductionOrderAndEquipmentOutputPerDay(FilterDto filterDto);
+    List<CounterRecordSummaryEntity> findLastPerProductionOrderAndEquipmentOutputPerDay(FilterDto filterDto);
 
     List<CounterRecordEntity> getFilteredAndPaginated(Filter filterDto);
 

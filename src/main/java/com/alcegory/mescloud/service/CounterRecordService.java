@@ -4,6 +4,7 @@ import com.alcegory.mescloud.model.dto.CounterRecordDto;
 import com.alcegory.mescloud.model.dto.FilterDto;
 import com.alcegory.mescloud.model.dto.PaginatedCounterRecordsDto;
 import com.alcegory.mescloud.model.dto.PlcMqttDto;
+import com.alcegory.mescloud.model.entity.CounterRecordSummaryEntity;
 import com.alcegory.mescloud.model.filter.Filter;
 
 import java.sql.Timestamp;
@@ -11,7 +12,7 @@ import java.util.List;
 
 public interface CounterRecordService {
 
-    List<CounterRecordDto> getEquipmentOutputProductionPerDay(FilterDto filter);
+    List<CounterRecordSummaryEntity> getEquipmentOutputProductionPerDay(FilterDto filter);
 
     List<CounterRecordDto> filterConclusionRecordsKpi(FilterDto filterDto);
 

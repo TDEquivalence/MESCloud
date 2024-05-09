@@ -1,5 +1,6 @@
 package com.alcegory.mescloud.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -24,5 +25,6 @@ public class ProductionInstructionEntity implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "production_order_id")
+    @JsonIgnore
     private ProductionOrderEntity productionOrder;
 }

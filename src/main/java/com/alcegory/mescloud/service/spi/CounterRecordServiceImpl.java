@@ -2,10 +2,7 @@ package com.alcegory.mescloud.service.spi;
 
 import com.alcegory.mescloud.model.converter.CounterRecordConverter;
 import com.alcegory.mescloud.model.dto.*;
-import com.alcegory.mescloud.model.entity.CounterRecordConclusionEntity;
-import com.alcegory.mescloud.model.entity.CounterRecordEntity;
-import com.alcegory.mescloud.model.entity.EquipmentOutputEntity;
-import com.alcegory.mescloud.model.entity.ProductionOrderEntity;
+import com.alcegory.mescloud.model.entity.*;
 import com.alcegory.mescloud.model.filter.Filter;
 import com.alcegory.mescloud.repository.CounterRecordRepository;
 import com.alcegory.mescloud.repository.ProductionOrderRepository;
@@ -39,9 +36,8 @@ public class CounterRecordServiceImpl implements CounterRecordService {
 
 
     @Override
-    public List<CounterRecordDto> getEquipmentOutputProductionPerDay(FilterDto filter) {
-        List<CounterRecordEntity> equipmentOutputProductionPerDay = repository.findLastPerProductionOrderAndEquipmentOutputPerDay(filter);
-        return converter.toDto(equipmentOutputProductionPerDay);
+    public List<CounterRecordSummaryEntity> getEquipmentOutputProductionPerDay(FilterDto filter) {
+        return repository.findLastPerProductionOrderAndEquipmentOutputPerDay(filter);
     }
 
     @Override

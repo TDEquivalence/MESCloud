@@ -1,15 +1,14 @@
 package com.alcegory.mescloud.model.converter;
 
 import com.alcegory.mescloud.model.dto.CounterRecordDto;
-import com.alcegory.mescloud.model.entity.CounterRecordConclusionEntity;
-import com.alcegory.mescloud.model.entity.CounterRecordEntity;
-import com.alcegory.mescloud.model.entity.ImsEntity;
-import com.alcegory.mescloud.model.entity.ProductionOrderEntity;
+import com.alcegory.mescloud.model.entity.*;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -26,6 +25,20 @@ public class CounterRecordConverterImpl implements CounterRecordConverter {
             counterRecordDto.setEquipmentAlias(entity.getEquipmentOutput().getCountingEquipment().getAlias());
         }
         return counterRecordDto;
+    }
+
+    @Override
+    public CounterRecordDto toDto(CounterRecordSummaryEntity entity) {
+        return mapper.map(entity, CounterRecordDto.class);
+    }
+
+    @Override
+    public List<CounterRecordDto> toDtoList(List<CounterRecordSummaryEntity> entityList) {
+        List<CounterRecordDto> dtoList = new ArrayList<>();
+        for (CounterRecordSummaryEntity entity : entityList) {
+            dtoList.add(toDto(entity));
+        }
+        return dtoList;
     }
 
     @Override

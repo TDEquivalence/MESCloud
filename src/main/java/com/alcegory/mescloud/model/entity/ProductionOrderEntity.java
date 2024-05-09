@@ -22,15 +22,22 @@ public class ProductionOrderEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String code;
+
     @ManyToOne(fetch = FetchType.LAZY)
     private CountingEquipmentEntity equipment;
+
     @ManyToOne(fetch = FetchType.EAGER)
     private ImsEntity ims;
+
     private int targetAmount;
+
     private boolean isCompleted;
+
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
+
     @Temporal(TemporalType.TIMESTAMP)
     private Date completedAt;
 

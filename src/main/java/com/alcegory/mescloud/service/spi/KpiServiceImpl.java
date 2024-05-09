@@ -1,7 +1,9 @@
 package com.alcegory.mescloud.service.spi;
 
 import com.alcegory.mescloud.exception.IncompleteConfigurationException;
+import com.alcegory.mescloud.model.converter.CounterRecordConverter;
 import com.alcegory.mescloud.model.dto.*;
+import com.alcegory.mescloud.model.entity.CounterRecordSummaryEntity;
 import com.alcegory.mescloud.model.entity.ProductionOrderEntity;
 import com.alcegory.mescloud.model.filter.Filter;
 import com.alcegory.mescloud.service.*;
@@ -29,12 +31,14 @@ public class KpiServiceImpl implements KpiService {
     private final ProductionOrderService productionOrderService;
     private final CountingEquipmentService countingEquipmentService;
     private final EquipmentOutputService equipmentOutputService;
+    private final CounterRecordConverter counterRecordConverter;
 
 
     @Override
     public CountingEquipmentKpiDto[] getEquipmentOutputProductionPerDay(FilterDto filter) {
-        List<CounterRecordDto> equipmentCounts = counterRecordService.getEquipmentOutputProductionPerDay(filter);
-        return sortPerDay(filter, equipmentCounts);
+        List<CounterRecordSummaryEntity> equipmentCounts = counterRecordService.getEquipmentOutputProductionPerDay(filter);
+        List<CounterRecordDto> counterRecordDto = counterRecordConverter.toDtoList(equipmentCounts);
+        return sortPerDay(filter, counterRecordDto);
     }
 
     @Override

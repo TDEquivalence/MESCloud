@@ -29,45 +29,23 @@ public class CounterRecordRepositoryImpl extends AbstractFilterRepository<Filter
     private static final String REGISTERED_AT_PROP = "registeredAt";
     private static final String IS_VALID_FOR_PRODUCTION_PROP = "isValidForProduction";
     private static final String INCREMENT_PROP = "increment";
-    private static final String COMPUTED_VALUE_PROP = "computedValue";
-    private static final String DATE_FUNCION = "DATE";
 
 
-    public List<CounterRecordEntity> findLastPerProductionOrderAndEquipmentOutputPerDay(FilterDto filter) {
+    public List<CounterRecordSummaryEntity> findLastPerProductionOrderAndEquipmentOutputPerDay(FilterDto filter) {
         String startDateStr = filter.getSearch().getValue(START_DATE);
         Date startDate = Date.from(DateUtil.convertToInstant(startDateStr));
         String endDateStr = filter.getSearch().getValue(END_DATE);
         Date endDate = Date.from(DateUtil.convertToInstant(endDateStr));
 
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<CounterRecordEntity> criteriaQuery = criteriaBuilder.createQuery(CounterRecordEntity.class);
-        Root<CounterRecordEntity> root = criteriaQuery.from(CounterRecordEntity.class);
-
-        criteriaQuery.multiselect(
-                criteriaBuilder.max(root.get(ID_PROP)),
-                root.get(EQUIPMENT_OUTPUT_PROP),
-                root.get(EQUIPMENT_OUTPUT_ALIAS_PROP),
-                criteriaBuilder.sum(root.get(INCREMENT_PROP)).alias(COMPUTED_VALUE_PROP),
-                root.get(PRODUCTION_ORDER_PROP),
-                criteriaBuilder.function(DATE_FUNCION, Date.class, root.get(REGISTERED_AT_PROP)),
-                root.get(IS_VALID_FOR_PRODUCTION_PROP)
-        );
+        CriteriaQuery<CounterRecordSummaryEntity> criteriaQuery = criteriaBuilder.createQuery(CounterRecordSummaryEntity.class);
+        Root<CounterRecordSummaryEntity> root = criteriaQuery.from(CounterRecordSummaryEntity.class);
 
         List<Predicate> predicates = new ArrayList<>();
         Predicate dateRangePredicate = criteriaBuilder.between(root.get(REGISTERED_AT_PROP), startDate, endDate);
         predicates.add(dateRangePredicate);
-        addPredicates(filter, predicates, criteriaBuilder, root);
 
         criteriaQuery.where(criteriaBuilder.and(predicates.toArray(new Predicate[0])));
-
-        criteriaQuery.groupBy(
-                root.get(EQUIPMENT_OUTPUT_PROP),
-                root.get(EQUIPMENT_OUTPUT_ALIAS_PROP),
-                root.get(PRODUCTION_ORDER_PROP),
-                criteriaBuilder.function(DATE_FUNCION, Date.class, root.get(REGISTERED_AT_PROP)),
-                root.get(IS_VALID_FOR_PRODUCTION_PROP),
-                root.get(ID_PROP)
-        );
 
         return entityManager.createQuery(criteriaQuery).getResultList();
     }
