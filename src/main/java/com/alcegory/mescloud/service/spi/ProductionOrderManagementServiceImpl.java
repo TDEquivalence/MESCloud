@@ -163,7 +163,7 @@ public class ProductionOrderManagementServiceImpl implements ProductionOrderMana
             return null;
         }
 
-        Optional<ProductionOrderEntity> persistedProductionOrderOpt = repository.findById(requestProductionOrder.getId());
+        Optional<ProductionOrderEntity> persistedProductionOrderOpt = productionOrderService.findById(requestProductionOrder.getId());
 
         if (persistedProductionOrderOpt.isEmpty()) {
             log.warning("No production order found for ID: " + requestProductionOrder.getId());
