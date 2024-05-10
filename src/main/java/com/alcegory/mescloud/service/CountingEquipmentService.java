@@ -1,7 +1,6 @@
 package com.alcegory.mescloud.service;
 
 import com.alcegory.mescloud.model.dto.CountingEquipmentDto;
-import com.alcegory.mescloud.model.dto.CountingEquipmentInfoDto;
 import com.alcegory.mescloud.model.entity.CountingEquipmentEntity;
 import org.springframework.data.repository.query.Param;
 
@@ -27,8 +26,6 @@ public interface CountingEquipmentService {
     List<Long> findAllIds();
 
     Long findIdByAlias(String alias);
-
-    Optional<CountingEquipmentInfoDto> findEquipmentWithProductionOrderById(long id);
 
     Optional<CountingEquipmentEntity> findEntityById(Long equipmentId);
 

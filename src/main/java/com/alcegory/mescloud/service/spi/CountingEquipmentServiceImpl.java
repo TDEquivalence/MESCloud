@@ -1,19 +1,13 @@
 package com.alcegory.mescloud.service.spi;
 
 import com.alcegory.mescloud.model.converter.CountingEquipmentConverter;
-import com.alcegory.mescloud.model.converter.ProductionOrderConverter;
 import com.alcegory.mescloud.model.dto.CountingEquipmentDto;
-import com.alcegory.mescloud.model.dto.CountingEquipmentInfoDto;
-import com.alcegory.mescloud.model.dto.ProductionOrderDto;
 import com.alcegory.mescloud.model.entity.CountingEquipmentEntity;
-import com.alcegory.mescloud.model.entity.ProductionOrderEntity;
 import com.alcegory.mescloud.repository.CountingEquipmentRepository;
-import com.alcegory.mescloud.repository.ProductionOrderRepository;
 import com.alcegory.mescloud.service.CountingEquipmentService;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,10 +22,7 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
     private static final String COUNTING_EQUIPMENT_CODE_NOT_FOUND = "No Counting Equipment found for code: [%s]";
 
     private final CountingEquipmentRepository repository;
-    private final ProductionOrderRepository productionOrderRepository;
-
     private final CountingEquipmentConverter converter;
-    private final ProductionOrderConverter productionOrderConverter;
 
     @Override
     public List<CountingEquipmentDto> findAllWithLastProductionOrder() {
@@ -86,48 +77,6 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
         return Optional.of(dto);
     }
 
-    @Override
-    public Optional<CountingEquipmentInfoDto> findEquipmentWithProductionOrderById(long id) {
-        Optional<CountingEquipmentDto> countingEquipmentOpt = findEquipmentById(id);
-        Optional<ProductionOrderDto> productionOrderDto = findProductionOrderByEquipmentId(id);
-
-        if (countingEquipmentOpt.isEmpty() || productionOrderDto.isEmpty()) {
-            return Optional.empty();
-        }
-
-        CountingEquipmentInfoDto infoDto = new CountingEquipmentInfoDto();
-        infoDto.setCountingEquipment(countingEquipmentOpt.get());
-        infoDto.setProductionOrder(productionOrderDto.get());
-
-        return Optional.of(infoDto);
-    }
-
-    public Optional<CountingEquipmentDto> findEquipmentById(long id) {
-        Optional<CountingEquipmentEntity> countingEquipmentOpt = repository.findByIdWithLastProductionOrder(id);
-        if (countingEquipmentOpt.isEmpty()) {
-            log.warning(() -> String.format(COUNTING_EQUIPMENT_ID_NOT_FOUND, id));
-            return Optional.empty();
-        }
-
-        CountingEquipmentEntity countingEquipment = countingEquipmentOpt.get();
-        if (countingEquipment.getOutputs().isEmpty()) {
-            log.warning(() -> String.format(COUNTING_EQUIPMENT_ID_NOT_FOUND, id));
-            return Optional.empty();
-        }
-
-        return Optional.of(convertToDtoWithActiveProductionOrder(countingEquipment));
-    }
-
-    public Optional<ProductionOrderDto> findProductionOrderByEquipmentId(long equipmentId) {
-        Optional<ProductionOrderEntity> productionOrderOpt = productionOrderRepository.findLastByEquipmentId(equipmentId);
-        if (productionOrderOpt.isEmpty() || productionOrderOpt.get().isCompleted()) {
-            return Optional.empty();
-        }
-
-        ProductionOrderEntity productionOrder = productionOrderOpt.get();
-        ProductionOrderDto productionOrderDto = productionOrderConverter.toDto(productionOrder);
-        return Optional.of(productionOrderDto);
-    }
 
     @Override
     public Optional<CountingEquipmentDto> findByCode(String code) {

@@ -5,6 +5,7 @@ import com.alcegory.mescloud.exception.*;
 import com.alcegory.mescloud.model.converter.CountingEquipmentConverter;
 import com.alcegory.mescloud.model.converter.GenericConverter;
 import com.alcegory.mescloud.model.converter.PlcMqttConverter;
+import com.alcegory.mescloud.model.converter.ProductionOrderConverter;
 import com.alcegory.mescloud.model.dto.CountingEquipmentDto;
 import com.alcegory.mescloud.model.dto.EquipmentConfigMqttDto;
 import com.alcegory.mescloud.model.dto.ImsDto;
@@ -14,6 +15,7 @@ import com.alcegory.mescloud.model.entity.EquipmentOutputEntity;
 import com.alcegory.mescloud.model.entity.ImsEntity;
 import com.alcegory.mescloud.model.request.RequestConfigurationDto;
 import com.alcegory.mescloud.protocol.MesMqttSettings;
+import com.alcegory.mescloud.repository.ProductionOrderRepository;
 import com.alcegory.mescloud.security.model.SectionAuthority;
 import com.alcegory.mescloud.security.service.UserRoleService;
 import com.alcegory.mescloud.service.*;
@@ -55,6 +57,10 @@ public class CountingEquipmentManagementServiceImpl implements CountingEquipment
     private final CountingEquipmentConverter converter;
     private final PlcMqttConverter plcConverter;
     private final GenericConverter<ImsEntity, ImsDto> imsConverter;
+
+    private final ProductionOrderRepository productionOrderRepository;
+
+    private final ProductionOrderConverter productionOrderConverter;
 
 
     @Override
