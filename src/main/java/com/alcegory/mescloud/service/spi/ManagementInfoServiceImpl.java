@@ -2,10 +2,7 @@ package com.alcegory.mescloud.service.spi;
 
 import com.alcegory.mescloud.model.converter.CountingEquipmentConverter;
 import com.alcegory.mescloud.model.converter.ProductionOrderConverter;
-import com.alcegory.mescloud.model.dto.CountingEquipmentDto;
-import com.alcegory.mescloud.model.dto.CountingEquipmentInfoDto;
-import com.alcegory.mescloud.model.dto.PaginatedProductionOrderDto;
-import com.alcegory.mescloud.model.dto.ProductionOrderDto;
+import com.alcegory.mescloud.model.dto.*;
 import com.alcegory.mescloud.model.entity.CountingEquipmentEntity;
 import com.alcegory.mescloud.model.entity.ProductionOrderEntity;
 import com.alcegory.mescloud.model.filter.Filter;
@@ -36,7 +33,7 @@ public class ManagementInfoServiceImpl implements ManagementInfoService {
 
     public Optional<CountingEquipmentInfoDto> findEquipmentWithProductionOrderById(long id) {
         CountingEquipmentDto countingEquipmentOpt = findEquipmentById(id);
-        ProductionOrderDto productionOrderDto = findProductionOrderByEquipmentId(id);
+        ProductionOrderInfoDto productionOrderDto = findProductionOrderByEquipmentId(id);
         CountingEquipmentInfoDto infoDto = new CountingEquipmentInfoDto();
         infoDto.setCountingEquipment(countingEquipmentOpt);
         infoDto.setProductionOrder(productionOrderDto);
@@ -78,14 +75,14 @@ public class ManagementInfoServiceImpl implements ManagementInfoService {
                 !entity.getProductionOrders().get(0).isCompleted();
     }
 
-    public ProductionOrderDto findProductionOrderByEquipmentId(long equipmentId) {
+    public ProductionOrderInfoDto findProductionOrderByEquipmentId(long equipmentId) {
         Optional<ProductionOrderEntity> productionOrderOpt = productionOrderService.findLastByEquipmentId(equipmentId);
         if (productionOrderOpt.isEmpty() || productionOrderOpt.get().isCompleted()) {
             return null;
         }
 
         ProductionOrderEntity productionOrder = productionOrderOpt.get();
-        return productionOrderConverter.toDto(productionOrder);
+        return productionOrderConverter.toInfoDto(productionOrder);
     }
 
     @Override
@@ -108,5 +105,10 @@ public class ManagementInfoServiceImpl implements ManagementInfoService {
 
         paginatedProductionOrderDto.setProductionOrders(summaryDtos);
         return paginatedProductionOrderDto;
+    }
+
+    @Override
+    public List<ComposedSummaryDto> findAllCompleted() {
+        return null;
     }
 }

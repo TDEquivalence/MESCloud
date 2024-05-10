@@ -30,9 +30,11 @@ public class ProductionOrderController {
     public ResponseEntity<ProductionOrderDto> getProductionOrderById(@PathVariable Long id) {
         try {
             Optional<ProductionOrderDto> productionOrderOpt = service.getProductionOrderById(id);
-            return productionOrderOpt
-                    .map(productionOrder -> ResponseEntity.ok(productionOrder))
-                    .orElse(ResponseEntity.notFound().build());
+            if (productionOrderOpt.isPresent()) {
+                return ResponseEntity.ok(productionOrderOpt.get());
+            } else {
+                return ResponseEntity.notFound().build();
+            }
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }

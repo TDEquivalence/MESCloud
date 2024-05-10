@@ -1,10 +1,7 @@
 package com.alcegory.mescloud.model.converter;
 
 import com.alcegory.mescloud.constant.MqttDTOConstants;
-import com.alcegory.mescloud.model.dto.ImsDto;
-import com.alcegory.mescloud.model.dto.ProductionInstructionDto;
-import com.alcegory.mescloud.model.dto.ProductionOrderDto;
-import com.alcegory.mescloud.model.dto.ProductionOrderMqttDto;
+import com.alcegory.mescloud.model.dto.*;
 import com.alcegory.mescloud.model.entity.ImsEntity;
 import com.alcegory.mescloud.model.entity.ProductionInstructionEntity;
 import com.alcegory.mescloud.model.entity.ProductionOrderEntity;
@@ -95,6 +92,20 @@ public class ProductionOrderConverterImpl implements ProductionOrderConverter {
 
         dto.setInstructions(toDtoList(entity.getProductionInstructions()));
         return dto;
+    }
+
+    @Override
+    public ProductionOrderInfoDto toInfoDto(ProductionOrderEntity entity) {
+        ProductionOrderInfoDto infoDto = new ProductionOrderInfoDto();
+        infoDto.setId(entity.getId());
+        infoDto.setCode(entity.getCode());
+        infoDto.setValidAmount(entity.getValidAmount());
+        infoDto.setIsCompleted(entity.isCompleted());
+        infoDto.setCreatedAt(entity.getCreatedAt());
+        infoDto.setCompletedAt(entity.getCompletedAt());
+
+        infoDto.setInstructions(toDtoList(entity.getProductionInstructions()));
+        return infoDto;
     }
 
     @Override

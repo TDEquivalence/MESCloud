@@ -10,6 +10,6 @@ import java.util.List;
 public class CountingEquipmentInfoDto {
 
     private CountingEquipmentDto countingEquipment;
-    private ProductionOrderDto productionOrder;
+    private ProductionOrderInfoDto productionOrder;
     private List<FeatureDto> features;
 }
