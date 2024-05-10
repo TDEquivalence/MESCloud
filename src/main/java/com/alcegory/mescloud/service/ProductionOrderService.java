@@ -67,4 +67,6 @@ public interface ProductionOrderService {
     boolean hasEquipmentActiveProductionOrder(@Param("equipmentId") Long equipmentId);
 
     ProductionOrderEntity save(ProductionOrderEntity productionOrder);
+
+    Optional<ProductionOrderEntity> findLastByEquipmentId(long equipmentId);
 }

@@ -294,4 +294,9 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
 
         return repository.save(productionOrder);
     }
+
+    @Override
+    public Optional<ProductionOrderEntity> findLastByEquipmentId(long equipmentId) {
+        return repository.findLastByEquipmentId(equipmentId);
+    }
 }

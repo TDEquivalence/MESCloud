@@ -7,9 +7,9 @@ import com.alcegory.mescloud.model.dto.CountingEquipmentInfoDto;
 import com.alcegory.mescloud.model.dto.ProductionOrderDto;
 import com.alcegory.mescloud.model.entity.CountingEquipmentEntity;
 import com.alcegory.mescloud.model.entity.ProductionOrderEntity;
-import com.alcegory.mescloud.repository.ProductionOrderRepository;
 import com.alcegory.mescloud.service.CountingEquipmentInfoService;
 import com.alcegory.mescloud.service.CountingEquipmentService;
+import com.alcegory.mescloud.service.ProductionOrderService;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
@@ -22,10 +22,9 @@ import java.util.Optional;
 @Log
 @AllArgsConstructor
 public class CountingEquipmentInfoServiceImpl implements CountingEquipmentInfoService {
-    
-    private final CountingEquipmentService countingEquipmentService;
-    private final ProductionOrderRepository productionOrderRepository;
 
+    private final CountingEquipmentService countingEquipmentService;
+    private final ProductionOrderService productionOrderService;
     private final CountingEquipmentConverter converter;
     private final ProductionOrderConverter productionOrderConverter;
 
@@ -74,7 +73,7 @@ public class CountingEquipmentInfoServiceImpl implements CountingEquipmentInfoSe
     }
 
     public ProductionOrderDto findProductionOrderByEquipmentId(long equipmentId) {
-        Optional<ProductionOrderEntity> productionOrderOpt = productionOrderRepository.findLastByEquipmentId(equipmentId);
+        Optional<ProductionOrderEntity> productionOrderOpt = productionOrderService.findLastByEquipmentId(equipmentId);
         if (productionOrderOpt.isEmpty() || productionOrderOpt.get().isCompleted()) {
             return null;
         }

@@ -84,7 +84,6 @@ public class ProductionOrderRepositoryImpl {
         CriteriaQuery<ProductionOrderEntity> query = criteriaBuilder.createQuery(ProductionOrderEntity.class);
         Root<ProductionOrderEntity> root = query.from(ProductionOrderEntity.class);
 
-        // Joining the equipment association
         Join<ProductionOrderEntity, CountingEquipmentEntity> equipmentJoin = root.join(EQUIPMENT);
 
         query.select(root)
