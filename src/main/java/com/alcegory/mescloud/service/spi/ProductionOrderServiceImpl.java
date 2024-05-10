@@ -1,13 +1,11 @@
 package com.alcegory.mescloud.service.spi;
 
 import com.alcegory.mescloud.model.converter.ProductionOrderConverter;
-import com.alcegory.mescloud.model.dto.PaginatedProductionOrderDto;
 import com.alcegory.mescloud.model.dto.ProductionOrderDto;
 import com.alcegory.mescloud.model.entity.ProductionOrderEntity;
 import com.alcegory.mescloud.model.filter.Filter;
 import com.alcegory.mescloud.repository.CounterRecordRepository;
 import com.alcegory.mescloud.repository.ProductionOrderRepository;
-import com.alcegory.mescloud.security.service.UserRoleService;
 import com.alcegory.mescloud.service.ProductionOrderService;
 import com.alcegory.mescloud.utility.DateUtil;
 import lombok.AllArgsConstructor;
@@ -19,9 +17,6 @@ import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-
-import static com.alcegory.mescloud.model.filter.Filter.Property.END_DATE;
-import static com.alcegory.mescloud.model.filter.Filter.Property.START_DATE;
 
 @Service
 @AllArgsConstructor
@@ -136,30 +131,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         List<ProductionOrderEntity> persistedProductionOrders = repository.findCompleted(true, null, null, null);
         return converter.toDto(persistedProductionOrders);
     }
-
-    @Override
-    @Transactional
-    public PaginatedProductionOrderDto getCompletedWithoutComposedFiltered(Filter filter) {
-        int requestedProductionOrders = filter.getTake();
-        filter.setTake(filter.getTake() + 1);
-
-        List<ProductionOrderEntity> persistedProductionOrders = repository.findCompleted(true, filter,
-                filter.getSearch().getTimestampValue(START_DATE), filter.getSearch().getTimestampValue(END_DATE));
-        boolean hasNextPage = persistedProductionOrders.size() > requestedProductionOrders;
-
-        if (hasNextPage) {
-            persistedProductionOrders.remove(persistedProductionOrders.size() - 1);
-        }
-
-        PaginatedProductionOrderDto paginatedProductionOrderDto = new PaginatedProductionOrderDto();
-        paginatedProductionOrderDto.setHasNextPage(hasNextPage);
-
-        List<ProductionOrderDto> summaryDtos = converter.toDto(persistedProductionOrders);
-
-        paginatedProductionOrderDto.setProductionOrders(summaryDtos);
-        return paginatedProductionOrderDto;
-    }
-
+    
     @Override
     public void setProductionOrderApproval(Long composedOrderId, boolean isApproved) {
         try {
@@ -298,5 +270,11 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     @Override
     public Optional<ProductionOrderEntity> findLastByEquipmentId(long equipmentId) {
         return repository.findLastByEquipmentId(equipmentId);
+    }
+
+    @Override
+    public List<ProductionOrderEntity> findCompleted(boolean withoutComposed, Filter filter, Timestamp startDate,
+                                                     Timestamp endDate) {
+        return repository.findCompleted(withoutComposed, filter, startDate, endDate);
     }
 }

@@ -5,7 +5,7 @@ import com.alcegory.mescloud.model.dto.CountingEquipmentDto;
 import com.alcegory.mescloud.model.dto.CountingEquipmentInfoDto;
 import com.alcegory.mescloud.model.request.RequestById;
 import com.alcegory.mescloud.model.request.RequestConfigurationDto;
-import com.alcegory.mescloud.service.CountingEquipmentInfoService;
+import com.alcegory.mescloud.service.ManagementInfoService;
 import com.alcegory.mescloud.service.CountingEquipmentManagementService;
 import com.alcegory.mescloud.service.CountingEquipmentService;
 import com.alcegory.mescloud.utility.HttpUtil;
@@ -31,7 +31,7 @@ public class CountingEquipmentController {
 
     private final CountingEquipmentService service;
     private final CountingEquipmentManagementService countingEquipmentManagementService;
-    private final CountingEquipmentInfoService countingEquipmentInfoService;
+    private final ManagementInfoService managementInfoService;
 
     @GetMapping
     public ResponseEntity<List<CountingEquipmentDto>> findAll() {
@@ -49,7 +49,7 @@ public class CountingEquipmentController {
     @GetMapping("/{id}")
     public ResponseEntity<CountingEquipmentInfoDto> findById(@PathVariable long id) {
         try {
-            Optional<CountingEquipmentInfoDto> countingEquipmentOpt = countingEquipmentInfoService.findEquipmentWithProductionOrderById(id);
+            Optional<CountingEquipmentInfoDto> countingEquipmentOpt = managementInfoService.findEquipmentWithProductionOrderById(id);
             if (countingEquipmentOpt.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }

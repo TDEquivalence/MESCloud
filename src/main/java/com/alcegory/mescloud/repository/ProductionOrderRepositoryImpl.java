@@ -26,6 +26,7 @@ public class ProductionOrderRepositoryImpl {
     private static final String PROP_ID = "id";
 
     private static final String EQUIPMENT = "equipment";
+    private static final String PRODUCTION_INSTRUCTIONS = "productionInstructions";
 
     private final EntityManager entityManager;
 
@@ -33,6 +34,7 @@ public class ProductionOrderRepositoryImpl {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<ProductionOrderEntity> query = cb.createQuery(ProductionOrderEntity.class);
         Root<ProductionOrderEntity> root = query.from(ProductionOrderEntity.class);
+        root.fetch(PRODUCTION_INSTRUCTIONS, JoinType.LEFT);
 
         List<Predicate> predicates = new ArrayList<>();
         if (withoutComposed) {

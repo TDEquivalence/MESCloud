@@ -5,6 +5,7 @@ import com.alcegory.mescloud.model.dto.PaginatedProductionOrderDto;
 import com.alcegory.mescloud.model.dto.ProductionOrderDto;
 import com.alcegory.mescloud.model.filter.Filter;
 import com.alcegory.mescloud.model.request.RequestProductionOrderDto;
+import com.alcegory.mescloud.service.ManagementInfoService;
 import com.alcegory.mescloud.service.ProductionOrderManagementService;
 import com.alcegory.mescloud.service.ProductionOrderService;
 import lombok.AllArgsConstructor;
@@ -23,6 +24,7 @@ public class ProductionOrderController {
 
     private final ProductionOrderService service;
     private final ProductionOrderManagementService productionOrderManagementService;
+    private final ManagementInfoService managementInfoService;
 
     @GetMapping("/{id}")
     public ResponseEntity<ProductionOrderDto> getProductionOrderById(@PathVariable Long id) {
@@ -100,7 +102,7 @@ public class ProductionOrderController {
                 return ResponseEntity.badRequest().build();
             }
 
-            PaginatedProductionOrderDto completedOrders = service.getCompletedWithoutComposedFiltered(filter);
+            PaginatedProductionOrderDto completedOrders = managementInfoService.getCompletedWithoutComposedFiltered(filter);
             return ResponseEntity.ok(completedOrders);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
