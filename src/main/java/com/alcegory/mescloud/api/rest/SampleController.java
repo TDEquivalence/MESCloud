@@ -7,7 +7,7 @@ import com.alcegory.mescloud.model.dto.ProductionOrderDto;
 import com.alcegory.mescloud.model.dto.SampleDto;
 import com.alcegory.mescloud.model.request.RequestById;
 import com.alcegory.mescloud.model.request.RequestSampleDto;
-import com.alcegory.mescloud.service.SampleService;
+import com.alcegory.mescloud.service.composed.SampleService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;

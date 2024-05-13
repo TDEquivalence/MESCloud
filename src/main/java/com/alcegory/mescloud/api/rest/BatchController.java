@@ -6,7 +6,7 @@ import com.alcegory.mescloud.model.dto.ProductionOrderDto;
 import com.alcegory.mescloud.model.request.RequestBatchDto;
 import com.alcegory.mescloud.model.request.RequestById;
 import com.alcegory.mescloud.model.request.RequestToRejectBatchDto;
-import com.alcegory.mescloud.service.BatchService;
+import com.alcegory.mescloud.service.composed.BatchService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;

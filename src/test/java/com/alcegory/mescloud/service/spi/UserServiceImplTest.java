@@ -2,7 +2,7 @@ package com.alcegory.mescloud.service.spi;
 
 import com.alcegory.mescloud.model.dto.UserDto;
 import com.alcegory.mescloud.model.entity.UserEntity;
-import com.alcegory.mescloud.repository.UserRepository;
+import com.alcegory.mescloud.repository.user.UserRepository;
 import com.alcegory.mescloud.security.mapper.EntityDtoMapper;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;

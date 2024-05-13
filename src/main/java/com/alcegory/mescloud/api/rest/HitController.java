@@ -5,7 +5,7 @@ import com.alcegory.mescloud.model.dto.HitDto;
 import com.alcegory.mescloud.model.dto.ProductionOrderDto;
 import com.alcegory.mescloud.model.request.RequestById;
 import com.alcegory.mescloud.model.request.RequestHitDto;
-import com.alcegory.mescloud.service.HitService;
+import com.alcegory.mescloud.service.composed.HitService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;

@@ -1,7 +1,7 @@
 package com.alcegory.mescloud.service.spi;
 
 import com.alcegory.mescloud.constant.EquipmentStatus;
-import com.alcegory.mescloud.repository.EquipmentStatusRecordRepository;
+import com.alcegory.mescloud.repository.equipment.EquipmentStatusRecordRepository;
 import com.alcegory.mescloud.model.entity.EquipmentStatusRecordEntity;
 import com.alcegory.mescloud.service.spi.EquipmentStatusRecordServiceImpl;
 import org.junit.Test;

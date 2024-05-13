@@ -7,7 +7,7 @@ import com.alcegory.mescloud.model.dto.ProductionOrderDto;
 import com.alcegory.mescloud.model.filter.Filter;
 import com.alcegory.mescloud.model.request.RequestById;
 import com.alcegory.mescloud.model.request.RequestComposedDto;
-import com.alcegory.mescloud.service.ComposedProductionOrderService;
+import com.alcegory.mescloud.service.composed.ComposedProductionOrderService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

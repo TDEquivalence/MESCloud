@@ -11,7 +11,7 @@ import com.alcegory.mescloud.security.model.SectionRoleEntity;
 import com.alcegory.mescloud.security.model.UserRoleEntity;
 import com.alcegory.mescloud.security.model.auth.AuthenticationResponse;
 import com.alcegory.mescloud.security.repository.UserRoleRepository;
-import com.alcegory.mescloud.service.UserService;
+import com.alcegory.mescloud.service.user.UserService;
 import com.alcegory.mescloud.utility.SectionConfigUtil;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;

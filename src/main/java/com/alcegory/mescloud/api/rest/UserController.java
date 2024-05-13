@@ -9,7 +9,7 @@ import com.alcegory.mescloud.model.dto.UserDto;
 import com.alcegory.mescloud.model.filter.Filter;
 import com.alcegory.mescloud.security.exception.UserNotFoundException;
 import com.alcegory.mescloud.security.service.UserRoleService;
-import com.alcegory.mescloud.service.UserService;
+import com.alcegory.mescloud.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

@@ -7,7 +7,7 @@ import com.alcegory.mescloud.model.dto.AlarmDto;
 import com.alcegory.mescloud.model.dto.PaginatedAlarmDto;
 import com.alcegory.mescloud.model.filter.Filter;
 import com.alcegory.mescloud.model.request.RequestAlarmRecognitionDto;
-import com.alcegory.mescloud.service.AlarmService;
+import com.alcegory.mescloud.service.alarm.AlarmService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

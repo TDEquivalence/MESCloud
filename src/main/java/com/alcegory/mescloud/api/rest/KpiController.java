@@ -5,7 +5,7 @@ import com.alcegory.mescloud.model.dto.CountingEquipmentKpiDto;
 import com.alcegory.mescloud.model.dto.EquipmentKpiAggregatorDto;
 import com.alcegory.mescloud.model.dto.FilterDto;
 import com.alcegory.mescloud.model.dto.KpiDto;
-import com.alcegory.mescloud.service.KpiService;
+import com.alcegory.mescloud.service.kpi.KpiService;
 import com.alcegory.mescloud.utility.HttpUtil;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;

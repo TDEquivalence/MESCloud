@@ -1,9 +1,9 @@
 package com.alcegory.mescloud.service.spi;
 
 import com.alcegory.mescloud.model.dto.*;
-import com.alcegory.mescloud.repository.CounterRecordRepository;
-import com.alcegory.mescloud.service.CountingEquipmentService;
-import com.alcegory.mescloud.service.EquipmentOutputService;
+import com.alcegory.mescloud.repository.record.CounterRecordRepository;
+import com.alcegory.mescloud.service.equipment.CountingEquipmentService;
+import com.alcegory.mescloud.service.equipment.EquipmentOutputService;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentMatchers;
