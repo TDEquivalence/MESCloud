@@ -8,7 +8,7 @@ SELECT
     eo.id AS equipment_output_id,
     eo_alias.alias AS equipment_output_alias,
     SUM(cr.increment) AS computed_value,
-    DATE_TRUNC('day', cr.registered_at) AS registered_at,
+    cr.registered_at,
     cr.is_valid_for_production,
     ims.code AS ims
 FROM
@@ -28,9 +28,10 @@ GROUP BY
     po.code,
     eo.id,
     eo_alias.alias,
-    DATE_TRUNC('day', cr.registered_at),
+    cr.registered_at,
     cr.is_valid_for_production,
     ims.code;
+
 
 INSERT INTO audit_script (run_date, process, version, schema)
 VALUES

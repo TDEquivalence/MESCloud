@@ -4,9 +4,18 @@ ALTER TABLE production_order
 ADD COLUMN valid_amount bigint;
 
 UPDATE production_order po
-SET valid_amount = ps.valid_amount::bigint
-FROM production_order_summary ps
-WHERE po.id = ps.id;
+SET valid_amount = (
+    SELECT SUM(cr.increment)
+    FROM counter_record cr
+    WHERE cr.production_order_id = po.id
+    AND cr.is_valid_for_production = true
+)
+WHERE EXISTS (
+    SELECT 1
+    FROM counter_record cr
+    WHERE cr.production_order_id = po.id
+    AND cr.is_valid_for_production = true
+);
 
 DROP VIEW IF EXISTS production_order_summary;
 
