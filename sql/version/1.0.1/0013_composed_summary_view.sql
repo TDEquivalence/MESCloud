@@ -9,8 +9,7 @@ SELECT DISTINCT ON (cpo.id)
     s.amount AS sample_amount,
     b.is_approved AS is_batch_approved,
     subquery.amount_of_hits,
-    po.valid_amount AS valid_amount,
-    pi.id AS production_instruction_id
+    po.valid_amount AS valid_amount
 FROM composed_production_order cpo
 LEFT JOIN sample s ON cpo.id = s.composed_production_order_id
 LEFT JOIN production_order po ON cpo.id = po.composed_production_order_id
@@ -22,15 +21,13 @@ LEFT JOIN (
     JOIN hit h ON s.id = h.sample_id
     GROUP BY s.composed_production_order_id
 ) AS subquery ON cpo.id = subquery.composed_production_order_id
-LEFT JOIN production_instruction pi ON po.id = pi.production_order_id
 WHERE crpc.is_valid_for_production = true
 GROUP BY
     cpo.id, cpo.created_at, cpo.code,
     s.amount, s.reliability,
     b.id, b.code, b.is_approved,
     subquery.amount_of_hits,
-    po.valid_amount,
-    pi.id;
+    po.valid_amount;
 
 INSERT INTO audit_script (run_date, process, version, schema)
 VALUES

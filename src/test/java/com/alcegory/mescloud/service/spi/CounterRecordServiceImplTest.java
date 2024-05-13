@@ -4,6 +4,7 @@ import com.alcegory.mescloud.model.dto.*;
 import com.alcegory.mescloud.repository.record.CounterRecordRepository;
 import com.alcegory.mescloud.service.equipment.CountingEquipmentService;
 import com.alcegory.mescloud.service.equipment.EquipmentOutputService;
+import com.alcegory.mescloud.service.record.CounterRecordServiceImpl;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentMatchers;
