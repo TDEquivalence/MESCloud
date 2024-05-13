@@ -1,7 +1,7 @@
 package com.alcegory.mescloud.api.rest;
 
 import com.alcegory.mescloud.model.dto.ImsDto;
-import com.alcegory.mescloud.service.spi.ImsServiceImpl;
+import com.alcegory.mescloud.service.equipment.ImsService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +15,7 @@ import java.util.List;
 @AllArgsConstructor
 public class ImsController {
 
-    private ImsServiceImpl imsService;
+    private ImsService imsService;
 
     @PostMapping()
     public ResponseEntity<ImsDto> create(@RequestBody ImsDto imsDto) {
