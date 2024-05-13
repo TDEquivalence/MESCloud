@@ -2,7 +2,7 @@ package com.alcegory.mescloud.service.spi;
 
 import com.alcegory.mescloud.model.entity.ProductionOrderEntity;
 import com.alcegory.mescloud.repository.production.ProductionOrderRepository;
-import com.alcegory.mescloud.service.production.ProductionOrderService;
+import com.alcegory.mescloud.service.production.ProductionOrderServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -25,7 +25,7 @@ class ProductionOrderServiceTest {
     @Mock
     private ProductionOrderRepository productionOrderRepository;
     @InjectMocks
-    private ProductionOrderService productionOrderService;
+    private ProductionOrderServiceImpl productionOrderService;
 
     @Test
     void testFindExistingIds() {

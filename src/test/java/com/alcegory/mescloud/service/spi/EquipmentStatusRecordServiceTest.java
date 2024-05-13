@@ -3,7 +3,7 @@ package com.alcegory.mescloud.service.spi;
 import com.alcegory.mescloud.constant.EquipmentStatus;
 import com.alcegory.mescloud.model.entity.EquipmentStatusRecordEntity;
 import com.alcegory.mescloud.repository.equipment.EquipmentStatusRecordRepository;
-import com.alcegory.mescloud.service.equipment.EquipmentStatusRecordService;
+import com.alcegory.mescloud.service.equipment.EquipmentStatusRecordServiceImpl;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
@@ -25,7 +25,7 @@ public class EquipmentStatusRecordServiceTest {
     @Mock
     private EquipmentStatusRecordRepository equipmentStatusRecordRepository;
     @InjectMocks
-    private EquipmentStatusRecordService equipmentStatusRecordService;
+    private EquipmentStatusRecordServiceImpl equipmentStatusRecordService;
 
     private EquipmentStatusRecordEntity createEquipmentStatusRecord(EquipmentStatus status, String createdAt) {
         EquipmentStatusRecordEntity record = new EquipmentStatusRecordEntity();

@@ -2,8 +2,8 @@ package com.alcegory.mescloud.service.spi;
 
 import com.alcegory.mescloud.model.dto.*;
 import com.alcegory.mescloud.repository.record.CounterRecordRepository;
-import com.alcegory.mescloud.service.equipment.CountingEquipmentService;
-import com.alcegory.mescloud.service.equipment.EquipmentOutputService;
+import com.alcegory.mescloud.service.equipment.CountingEquipmentServiceImpl;
+import com.alcegory.mescloud.service.equipment.EquipmentOutputServiceImpl;
 import com.alcegory.mescloud.service.record.CounterRecordServiceImpl;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,10 +23,10 @@ public class CounterRecordServiceImplTest {
     private CounterRecordRepository repository;
 
     @Mock
-    private CountingEquipmentService countingEquipmentService;
+    private CountingEquipmentServiceImpl countingEquipmentService;
 
     @Mock
-    private EquipmentOutputService equipmentOutputService;
+    private EquipmentOutputServiceImpl equipmentOutputService;
 
     @InjectMocks
     private CounterRecordServiceImpl service;
