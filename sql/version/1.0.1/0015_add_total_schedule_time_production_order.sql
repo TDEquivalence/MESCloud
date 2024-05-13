@@ -3,11 +3,6 @@ BEGIN;
 ALTER TABLE production_order
 ADD COLUMN scheduled_time TIMESTAMP;
 
-UPDATE production_order
-SET scheduled_time = CASE
-                        WHEN completed_at IS NULL THEN CURRENT_TIMESTAMP
-                        ELSE completed_at
-                    END;
 
 INSERT INTO audit_script (run_date, process, version, schema)
 VALUES
