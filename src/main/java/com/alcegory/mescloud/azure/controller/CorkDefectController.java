@@ -37,8 +37,8 @@ public class CorkDefectController {
             ContainerInfoSummary imageAnnotation = containerManagerService.getRandomData(authentication);
             return new ResponseEntity<>(imageAnnotation, HttpStatus.OK);
         } catch (ImageAnnotationException ex) {
-            ErrorResponse errorResponse = new ErrorResponse("Internal server error occurred while saving image annotation");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+            ErrorResponse errorResponse = new ErrorResponse("Image not found: " + ex.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
         } catch (AuthenticationException ex) {
             ErrorResponse errorResponse = new ErrorResponse("Authentication failed: " + ex.getMessage());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);

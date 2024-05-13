@@ -14,6 +14,7 @@ import java.util.List;
 @Slf4j
 public class ContainerManagerServiceImpl implements ContainerManagerService {
 
+    public static final int MAX_ITERATIONS = 5;
     public static final int MAX_OCCURRENCES = 3;
 
     private final PublicContainerService publicContainerService;
@@ -36,10 +37,20 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
     public ContainerInfoSummary getRandomData(Authentication authentication) {
         ImageAnnotationDto imageAnnotationDto;
         ImageInfoDto imageInfoDto;
+        int iterationCount = 0;
+
         do {
+            if (iterationCount >= MAX_ITERATIONS) {
+                log.info("Maximum number of iterations reached.");
+                throw new ImageAnnotationException("There are no more images. Maximum number of iterations reached.");
+            }
+
             imageInfoDto = publicContainerService.getRandomImageReference();
+            iterationCount++;
+
             if (imageInfoDto == null) {
-                return new ContainerInfoSummary();
+                log.error("Image reference is null.");
+                throw new ImageAnnotationException("Image reference is null.");
             }
 
             imageAnnotationDto = pendingContainerService.getImageAnnotationFromContainer(imageInfoDto.getPath());
@@ -47,8 +58,8 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
             if (imageAnnotationDto == null) {
                 log.info("The image at path '{}' was not found in the pending container.",
                         imageInfoDto.getPath());
-                return new ContainerInfoSummary();
             }
+
         } while (hasUserDecisionOnImage(imageAnnotationDto, authentication));
 
         return convertToSummary(imageAnnotationDto, imageInfoDto);
