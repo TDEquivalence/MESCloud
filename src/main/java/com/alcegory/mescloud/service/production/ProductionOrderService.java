@@ -1,7 +1,7 @@
 package com.alcegory.mescloud.service.production;
 
-import com.alcegory.mescloud.model.dto.ProductionOrderDto;
-import com.alcegory.mescloud.model.entity.ProductionOrderEntity;
+import com.alcegory.mescloud.model.dto.production.ProductionOrderDto;
+import com.alcegory.mescloud.model.entity.production.ProductionOrderEntity;
 import com.alcegory.mescloud.model.filter.Filter;
 import org.springframework.data.repository.query.Param;
 

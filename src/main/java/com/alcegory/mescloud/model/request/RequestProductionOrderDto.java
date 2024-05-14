@@ -1,6 +1,6 @@
 package com.alcegory.mescloud.model.request;
 
-import com.alcegory.mescloud.model.dto.ProductionInstructionDto;
+import com.alcegory.mescloud.model.dto.production.ProductionInstructionDto;
 import lombok.Getter;
 import lombok.Setter;
 

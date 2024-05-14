@@ -1,6 +1,6 @@
 package com.alcegory.mescloud.repository.equipment;
 
-import com.alcegory.mescloud.model.entity.EquipmentOutputAliasEntity;
+import com.alcegory.mescloud.model.entity.equipment.EquipmentOutputAliasEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

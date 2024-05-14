@@ -1,6 +1,6 @@
 package com.alcegory.mescloud.repository.alarm;
 
-import com.alcegory.mescloud.model.entity.AlarmConfigurationEntity;
+import com.alcegory.mescloud.model.entity.alarm.AlarmConfigurationEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

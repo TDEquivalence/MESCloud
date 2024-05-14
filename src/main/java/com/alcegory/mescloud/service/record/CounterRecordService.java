@@ -1,10 +1,10 @@
 package com.alcegory.mescloud.service.record;
 
 import com.alcegory.mescloud.model.dto.CounterRecordDto;
-import com.alcegory.mescloud.model.dto.FilterDto;
-import com.alcegory.mescloud.model.dto.PaginatedCounterRecordsDto;
-import com.alcegory.mescloud.model.dto.PlcMqttDto;
-import com.alcegory.mescloud.model.entity.CounterRecordSummaryEntity;
+import com.alcegory.mescloud.model.filter.FilterDto;
+import com.alcegory.mescloud.model.dto.pagination.PaginatedCounterRecordsDto;
+import com.alcegory.mescloud.model.dto.mqqt.PlcMqttDto;
+import com.alcegory.mescloud.model.entity.records.CounterRecordSummaryEntity;
 import com.alcegory.mescloud.model.filter.Filter;
 
 import java.sql.Timestamp;

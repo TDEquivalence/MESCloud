@@ -1,8 +1,8 @@
 package com.alcegory.mescloud.repository.production;
 
-import com.alcegory.mescloud.model.entity.ComposedProductionOrderEntity;
-import com.alcegory.mescloud.model.entity.CountingEquipmentEntity;
-import com.alcegory.mescloud.model.entity.ProductionOrderEntity;
+import com.alcegory.mescloud.model.entity.production.ComposedProductionOrderEntity;
+import com.alcegory.mescloud.model.entity.equipment.CountingEquipmentEntity;
+import com.alcegory.mescloud.model.entity.production.ProductionOrderEntity;
 import com.alcegory.mescloud.model.filter.Filter;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
@@ -32,23 +32,31 @@ public class ProductionOrderRepositoryImpl {
 
     public List<ProductionOrderEntity> findCompleted(boolean withoutComposed, Filter filter, Timestamp startDate, Timestamp endDate) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-        CriteriaQuery<ProductionOrderEntity> query = cb.createQuery(ProductionOrderEntity.class);
-        Root<ProductionOrderEntity> root = query.from(ProductionOrderEntity.class);
-        root.fetch(PRODUCTION_INSTRUCTIONS, JoinType.LEFT);
+        CriteriaQuery<Long> idQuery = cb.createQuery(Long.class);
+        Root<ProductionOrderEntity> root = idQuery.from(ProductionOrderEntity.class);
 
         Predicate[] predicates = buildPredicates(cb, root, withoutComposed, startDate, endDate, filter);
+        idQuery.where(predicates);
 
-        query.where(predicates)
-                .orderBy(cb.desc(root.get(PROP_ID)));
 
-        TypedQuery<ProductionOrderEntity> typedQuery = entityManager.createQuery(query);
+        idQuery.select(root.get(PROP_ID));
+        TypedQuery<Long> idTypedQuery = entityManager.createQuery(idQuery);
 
         if (filter != null) {
             int skip = filter.getSkip();
             int take = filter.getTake();
-            typedQuery.setFirstResult(skip);
-            typedQuery.setMaxResults(take);
+            idTypedQuery.setFirstResult(skip);
+            idTypedQuery.setMaxResults(take);
         }
+
+        List<Long> ids = idTypedQuery.getResultList();
+        
+        CriteriaQuery<ProductionOrderEntity> mainQuery = cb.createQuery(ProductionOrderEntity.class);
+        Root<ProductionOrderEntity> mainRoot = mainQuery.from(ProductionOrderEntity.class);
+        mainQuery.where(mainRoot.get(PROP_ID).in(ids));
+        mainQuery.orderBy(cb.desc(mainRoot.get(PROP_ID)));
+
+        TypedQuery<ProductionOrderEntity> typedQuery = entityManager.createQuery(mainQuery);
 
         return typedQuery.getResultList();
     }

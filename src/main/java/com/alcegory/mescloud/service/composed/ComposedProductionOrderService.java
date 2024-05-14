@@ -1,7 +1,10 @@
 package com.alcegory.mescloud.service.composed;
 
-import com.alcegory.mescloud.model.dto.*;
-import com.alcegory.mescloud.model.entity.ComposedProductionOrderEntity;
+import com.alcegory.mescloud.model.dto.pagination.PaginatedComposedDto;
+import com.alcegory.mescloud.model.dto.production.ComposedProductionOrderDto;
+import com.alcegory.mescloud.model.dto.production.ComposedSummaryDto;
+import com.alcegory.mescloud.model.dto.production.ProductionOrderDto;
+import com.alcegory.mescloud.model.entity.production.ComposedProductionOrderEntity;
 import com.alcegory.mescloud.model.filter.Filter;
 import com.alcegory.mescloud.model.request.RequestComposedDto;
 

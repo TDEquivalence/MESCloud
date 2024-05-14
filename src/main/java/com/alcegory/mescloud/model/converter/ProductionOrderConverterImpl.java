@@ -1,10 +1,11 @@
 package com.alcegory.mescloud.model.converter;
 
 import com.alcegory.mescloud.constant.MqttDTOConstants;
-import com.alcegory.mescloud.model.dto.*;
+import com.alcegory.mescloud.model.dto.ImsDto;
+import com.alcegory.mescloud.model.dto.production.*;
 import com.alcegory.mescloud.model.entity.ImsEntity;
-import com.alcegory.mescloud.model.entity.ProductionInstructionEntity;
-import com.alcegory.mescloud.model.entity.ProductionOrderEntity;
+import com.alcegory.mescloud.model.entity.production.ProductionInstructionEntity;
+import com.alcegory.mescloud.model.entity.production.ProductionOrderEntity;
 import com.alcegory.mescloud.model.request.RequestProductionOrderDto;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
@@ -81,6 +82,8 @@ public class ProductionOrderConverterImpl implements ProductionOrderConverter {
         dto.setIsCompleted(entity.isCompleted());
         dto.setCreatedAt(entity.getCreatedAt());
         dto.setCompletedAt(entity.getCompletedAt());
+        dto.setComposedCode(entity.getComposedProductionOrder() != null ?
+                entity.getComposedProductionOrder().getCode() : null);
 
         Optional<ImsDto> imsDtoOptional = Optional.ofNullable(entity.getIms())
                 .map(ims -> imsConverter.toDto(ims, ImsDto.class));
@@ -94,7 +97,6 @@ public class ProductionOrderConverterImpl implements ProductionOrderConverter {
         return dto;
     }
 
-    @Override
     public ProductionOrderInfoDto toInfoDto(ProductionOrderEntity entity) {
         ProductionOrderInfoDto infoDto = new ProductionOrderInfoDto();
         infoDto.setId(entity.getId());
@@ -118,6 +120,32 @@ public class ProductionOrderConverterImpl implements ProductionOrderConverter {
             }
         }
         return dtos;
+    }
+
+    @Override
+    public List<ExportProductionOrderDto> toExportDtoList(List<ProductionOrderEntity> entities) {
+        List<ExportProductionOrderDto> exportDtoList = new ArrayList<>();
+
+        for (ProductionOrderEntity entity : entities) {
+            ExportProductionOrderDto exportDto = toExportDtoList(entity);
+            exportDtoList.add(exportDto);
+        }
+
+        return exportDtoList;
+    }
+
+    public ExportProductionOrderDto toExportDtoList(ProductionOrderEntity entity) {
+        ExportProductionOrderDto exportDto = new ExportProductionOrderDto();
+
+        exportDto.setEquipment(entity.getEquipment().getCode());
+        exportDto.setComposedCode(entity.getComposedProductionOrder().getCode());
+        exportDto.setCode(entity.getCode());
+        exportDto.setIms(entity.getIms().getCode());
+        exportDto.setInstructionDtos(toDtoList(entity.getProductionInstructions()));
+        exportDto.setValidAmount(entity.getValidAmount());
+        exportDto.setCreatedAt(entity.getCreatedAt());
+        exportDto.setCompletedAt(entity.getCompletedAt());
+        return exportDto;
     }
 
     public ProductionInstructionDto toDto(ProductionInstructionEntity entity) {

@@ -1,7 +1,7 @@
 package com.alcegory.mescloud.model.converter;
 
 import com.alcegory.mescloud.model.dto.ImsDto;
-import com.alcegory.mescloud.model.entity.CountingEquipmentEntity;
+import com.alcegory.mescloud.model.entity.equipment.CountingEquipmentEntity;
 import com.alcegory.mescloud.model.entity.ImsEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

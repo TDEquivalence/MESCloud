@@ -1,6 +1,6 @@
 package com.alcegory.mescloud.repository.company;
 
-import com.alcegory.mescloud.model.entity.FactoryEntity;
+import com.alcegory.mescloud.model.entity.company.FactoryEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

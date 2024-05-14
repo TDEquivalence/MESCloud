@@ -1,8 +1,8 @@
 package com.alcegory.mescloud.model.converter;
 
-import com.alcegory.mescloud.model.dto.CountingEquipmentDto;
-import com.alcegory.mescloud.model.dto.CountingEquipmentSummaryDto;
-import com.alcegory.mescloud.model.entity.CountingEquipmentEntity;
+import com.alcegory.mescloud.model.dto.equipment.CountingEquipmentDto;
+import com.alcegory.mescloud.model.dto.equipment.CountingEquipmentSummaryDto;
+import com.alcegory.mescloud.model.entity.equipment.CountingEquipmentEntity;
 import com.alcegory.mescloud.model.request.RequestConfigurationDto;
 
 import java.util.List;

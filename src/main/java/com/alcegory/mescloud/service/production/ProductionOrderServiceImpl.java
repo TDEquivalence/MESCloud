@@ -1,8 +1,8 @@
 package com.alcegory.mescloud.service.production;
 
 import com.alcegory.mescloud.model.converter.ProductionOrderConverter;
-import com.alcegory.mescloud.model.dto.ProductionOrderDto;
-import com.alcegory.mescloud.model.entity.ProductionOrderEntity;
+import com.alcegory.mescloud.model.dto.production.ProductionOrderDto;
+import com.alcegory.mescloud.model.entity.production.ProductionOrderEntity;
 import com.alcegory.mescloud.model.filter.Filter;
 import com.alcegory.mescloud.repository.record.CounterRecordRepository;
 import com.alcegory.mescloud.repository.production.ProductionOrderRepository;

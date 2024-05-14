@@ -1,6 +1,6 @@
 package com.alcegory.mescloud.service.spi;
 
-import com.alcegory.mescloud.model.entity.ProductionOrderEntity;
+import com.alcegory.mescloud.model.entity.production.ProductionOrderEntity;
 import com.alcegory.mescloud.repository.production.ProductionOrderRepository;
 import com.alcegory.mescloud.service.production.ProductionOrderServiceImpl;
 import org.junit.jupiter.api.Test;

@@ -1,9 +1,9 @@
 package com.alcegory.mescloud.model.converter;
 
 import com.alcegory.mescloud.model.dto.CounterRecordDto;
-import com.alcegory.mescloud.model.entity.CounterRecordConclusionEntity;
-import com.alcegory.mescloud.model.entity.CounterRecordEntity;
-import com.alcegory.mescloud.model.entity.CounterRecordSummaryEntity;
+import com.alcegory.mescloud.model.entity.records.CounterRecordConclusionEntity;
+import com.alcegory.mescloud.model.entity.records.CounterRecordEntity;
+import com.alcegory.mescloud.model.entity.records.CounterRecordSummaryEntity;
 
 import java.util.ArrayList;
 import java.util.List;

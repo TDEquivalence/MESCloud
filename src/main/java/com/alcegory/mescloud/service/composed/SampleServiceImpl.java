@@ -2,11 +2,11 @@ package com.alcegory.mescloud.service.composed;
 
 import com.alcegory.mescloud.model.converter.GenericConverter;
 import com.alcegory.mescloud.model.converter.ProductionOrderConverter;
-import com.alcegory.mescloud.model.dto.ComposedProductionOrderDto;
-import com.alcegory.mescloud.model.dto.ProductionOrderDto;
+import com.alcegory.mescloud.model.dto.production.ComposedProductionOrderDto;
+import com.alcegory.mescloud.model.dto.production.ProductionOrderDto;
 import com.alcegory.mescloud.model.dto.SampleDto;
-import com.alcegory.mescloud.model.entity.ComposedProductionOrderEntity;
-import com.alcegory.mescloud.model.entity.ProductionOrderEntity;
+import com.alcegory.mescloud.model.entity.production.ComposedProductionOrderEntity;
+import com.alcegory.mescloud.model.entity.production.ProductionOrderEntity;
 import com.alcegory.mescloud.model.entity.SampleEntity;
 import com.alcegory.mescloud.model.request.RequestById;
 import com.alcegory.mescloud.model.request.RequestSampleDto;

@@ -1,6 +1,6 @@
 package com.alcegory.mescloud.protocol;
 
-import com.alcegory.mescloud.model.dto.MqttDto;
+import com.alcegory.mescloud.model.dto.mqqt.MqttDto;
 import lombok.extern.java.Log;
 
 import java.util.HashMap;

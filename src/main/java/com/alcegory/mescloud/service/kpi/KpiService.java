@@ -1,8 +1,8 @@
 package com.alcegory.mescloud.service.kpi;
 
-import com.alcegory.mescloud.model.dto.CountingEquipmentKpiDto;
-import com.alcegory.mescloud.model.dto.EquipmentKpiAggregatorDto;
-import com.alcegory.mescloud.model.dto.FilterDto;
+import com.alcegory.mescloud.model.dto.equipment.CountingEquipmentKpiDto;
+import com.alcegory.mescloud.model.dto.equipment.EquipmentKpiAggregatorDto;
+import com.alcegory.mescloud.model.filter.FilterDto;
 import com.alcegory.mescloud.model.dto.KpiDto;
 
 import java.util.List;

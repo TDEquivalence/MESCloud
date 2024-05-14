@@ -1,8 +1,8 @@
 package com.alcegory.mescloud.service.equipment;
 
 import com.alcegory.mescloud.model.converter.CountingEquipmentConverter;
-import com.alcegory.mescloud.model.dto.CountingEquipmentDto;
-import com.alcegory.mescloud.model.entity.CountingEquipmentEntity;
+import com.alcegory.mescloud.model.dto.equipment.CountingEquipmentDto;
+import com.alcegory.mescloud.model.entity.equipment.CountingEquipmentEntity;
 import com.alcegory.mescloud.repository.equipment.CountingEquipmentRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;

@@ -1,6 +1,6 @@
 package com.alcegory.mescloud.api.rest;
 
-import com.alcegory.mescloud.model.entity.ProductionOrderTemplateEntity;
+import com.alcegory.mescloud.model.entity.production.ProductionOrderTemplateEntity;
 import com.alcegory.mescloud.service.production.TemplateService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;

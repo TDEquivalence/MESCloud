@@ -1,9 +1,9 @@
 package com.alcegory.mescloud.security.service;
 
 import com.alcegory.mescloud.exception.RegistrationException;
-import com.alcegory.mescloud.model.dto.SectionRoleMapping;
-import com.alcegory.mescloud.model.dto.UserConfigDto;
-import com.alcegory.mescloud.model.entity.CompanyEntity;
+import com.alcegory.mescloud.model.dto.company.SectionRoleMapping;
+import com.alcegory.mescloud.model.dto.user.UserConfigDto;
+import com.alcegory.mescloud.model.entity.company.CompanyEntity;
 import com.alcegory.mescloud.model.entity.UserEntity;
 import com.alcegory.mescloud.repository.user.UserRepository;
 import com.alcegory.mescloud.security.constant.UserServiceImpConstant;

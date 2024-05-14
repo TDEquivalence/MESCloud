@@ -1,6 +1,6 @@
 package com.alcegory.mescloud.service.management;
 
-import com.alcegory.mescloud.model.dto.ProductionOrderDto;
+import com.alcegory.mescloud.model.dto.production.ProductionOrderDto;
 import com.alcegory.mescloud.model.request.RequestProductionOrderDto;
 import org.springframework.security.core.Authentication;
 

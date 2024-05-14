@@ -1,6 +1,6 @@
 package com.alcegory.mescloud.repository.equipment;
 
-import com.alcegory.mescloud.model.entity.CountingEquipmentEntity;
+import com.alcegory.mescloud.model.entity.equipment.CountingEquipmentEntity;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;

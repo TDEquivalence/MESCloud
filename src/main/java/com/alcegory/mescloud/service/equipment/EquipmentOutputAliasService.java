@@ -1,6 +1,6 @@
 package com.alcegory.mescloud.service.equipment;
 
-import com.alcegory.mescloud.model.entity.EquipmentOutputAliasEntity;
+import com.alcegory.mescloud.model.entity.equipment.EquipmentOutputAliasEntity;
 
 import java.util.List;
 

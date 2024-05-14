@@ -1,5 +1,7 @@
 package com.alcegory.mescloud.model.entity;
 
+import com.alcegory.mescloud.model.entity.equipment.CountingEquipmentEntity;
+import com.alcegory.mescloud.model.entity.production.ProductionOrderEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;

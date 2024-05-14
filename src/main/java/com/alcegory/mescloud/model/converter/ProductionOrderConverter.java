@@ -1,12 +1,9 @@
 package com.alcegory.mescloud.model.converter;
 
 
-import com.alcegory.mescloud.model.dto.ProductionInstructionDto;
-import com.alcegory.mescloud.model.dto.ProductionOrderDto;
-import com.alcegory.mescloud.model.dto.ProductionOrderInfoDto;
-import com.alcegory.mescloud.model.dto.ProductionOrderMqttDto;
-import com.alcegory.mescloud.model.entity.ProductionInstructionEntity;
-import com.alcegory.mescloud.model.entity.ProductionOrderEntity;
+import com.alcegory.mescloud.model.dto.production.*;
+import com.alcegory.mescloud.model.entity.production.ProductionInstructionEntity;
+import com.alcegory.mescloud.model.entity.production.ProductionOrderEntity;
 import com.alcegory.mescloud.model.request.RequestProductionOrderDto;
 
 import java.util.List;
@@ -24,6 +21,8 @@ public interface ProductionOrderConverter {
     ProductionOrderInfoDto toInfoDto(ProductionOrderEntity entity);
 
     List<ProductionInstructionDto> toDtoList(List<ProductionInstructionEntity> entities);
+
+    List<ExportProductionOrderDto> toExportDtoList(List<ProductionOrderEntity> entities);
 
     default List<ProductionOrderDto> toDto(List<ProductionOrderEntity> entityList) {
         return entityList.stream()

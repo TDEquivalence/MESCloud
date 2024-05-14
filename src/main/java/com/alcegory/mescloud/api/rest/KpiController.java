@@ -1,9 +1,9 @@
 package com.alcegory.mescloud.api.rest;
 
 import com.alcegory.mescloud.exception.IncompleteConfigurationException;
-import com.alcegory.mescloud.model.dto.CountingEquipmentKpiDto;
-import com.alcegory.mescloud.model.dto.EquipmentKpiAggregatorDto;
-import com.alcegory.mescloud.model.dto.FilterDto;
+import com.alcegory.mescloud.model.dto.equipment.CountingEquipmentKpiDto;
+import com.alcegory.mescloud.model.dto.equipment.EquipmentKpiAggregatorDto;
+import com.alcegory.mescloud.model.filter.FilterDto;
 import com.alcegory.mescloud.model.dto.KpiDto;
 import com.alcegory.mescloud.service.kpi.KpiService;
 import com.alcegory.mescloud.utility.HttpUtil;

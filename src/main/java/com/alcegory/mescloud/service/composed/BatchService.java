@@ -1,7 +1,7 @@
 package com.alcegory.mescloud.service.composed;
 
 import com.alcegory.mescloud.model.dto.BatchDto;
-import com.alcegory.mescloud.model.dto.ProductionOrderDto;
+import com.alcegory.mescloud.model.dto.production.ProductionOrderDto;
 import com.alcegory.mescloud.model.entity.BatchEntity;
 import com.alcegory.mescloud.model.request.RequestBatchDto;
 import com.alcegory.mescloud.model.request.RequestById;

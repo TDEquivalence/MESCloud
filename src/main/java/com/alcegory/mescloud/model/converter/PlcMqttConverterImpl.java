@@ -1,9 +1,9 @@
 package com.alcegory.mescloud.model.converter;
 
 import com.alcegory.mescloud.constant.MqttDTOConstants;
-import com.alcegory.mescloud.model.dto.EquipmentConfigMqttDto;
-import com.alcegory.mescloud.model.entity.CountingEquipmentEntity;
-import com.alcegory.mescloud.model.entity.EquipmentOutputEntity;
+import com.alcegory.mescloud.model.dto.equipment.EquipmentConfigMqttDto;
+import com.alcegory.mescloud.model.entity.equipment.CountingEquipmentEntity;
+import com.alcegory.mescloud.model.entity.equipment.EquipmentOutputEntity;
 import org.springframework.stereotype.Component;
 
 import java.util.List;

@@ -1,7 +1,7 @@
 package com.alcegory.mescloud.protocol;
 
 import com.alcegory.mescloud.constant.MqttDTOConstants;
-import com.alcegory.mescloud.model.dto.PlcMqttDto;
+import com.alcegory.mescloud.model.dto.mqqt.PlcMqttDto;
 import com.alcegory.mescloud.service.alarm.AlarmService;
 import com.alcegory.mescloud.service.record.CounterRecordService;
 import com.alcegory.mescloud.service.management.CountingEquipmentManagementService;

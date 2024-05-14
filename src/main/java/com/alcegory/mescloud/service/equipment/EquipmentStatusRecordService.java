@@ -1,6 +1,6 @@
 package com.alcegory.mescloud.service.equipment;
 
-import com.alcegory.mescloud.model.dto.EquipmentStatusRecordDto;
+import com.alcegory.mescloud.model.dto.equipment.EquipmentStatusRecordDto;
 
 import java.sql.Timestamp;
 

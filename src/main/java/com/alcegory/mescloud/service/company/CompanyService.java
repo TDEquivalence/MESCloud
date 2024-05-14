@@ -1,7 +1,7 @@
 package com.alcegory.mescloud.service.company;
 
-import com.alcegory.mescloud.model.dto.CompanyDto;
-import com.alcegory.mescloud.model.entity.CompanyEntity;
+import com.alcegory.mescloud.model.dto.company.CompanyDto;
+import com.alcegory.mescloud.model.entity.company.CompanyEntity;
 
 import java.util.List;
 

@@ -1,6 +1,6 @@
 package com.alcegory.mescloud.repository.production;
 
-import com.alcegory.mescloud.model.entity.ProductionOrderTemplateEntity;
+import com.alcegory.mescloud.model.entity.production.ProductionOrderTemplateEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

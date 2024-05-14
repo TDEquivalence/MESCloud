@@ -2,6 +2,10 @@ package com.alcegory.mescloud.model.converter;
 
 import com.alcegory.mescloud.model.dto.CounterRecordDto;
 import com.alcegory.mescloud.model.entity.*;
+import com.alcegory.mescloud.model.entity.production.ProductionOrderEntity;
+import com.alcegory.mescloud.model.entity.records.CounterRecordConclusionEntity;
+import com.alcegory.mescloud.model.entity.records.CounterRecordEntity;
+import com.alcegory.mescloud.model.entity.records.CounterRecordSummaryEntity;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.modelmapper.ModelMapper;

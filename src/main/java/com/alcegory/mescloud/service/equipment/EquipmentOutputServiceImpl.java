@@ -2,8 +2,8 @@ package com.alcegory.mescloud.service.equipment;
 
 import com.alcegory.mescloud.repository.equipment.EquipmentOutputRepository;
 import com.alcegory.mescloud.model.converter.GenericConverter;
-import com.alcegory.mescloud.model.dto.EquipmentOutputDto;
-import com.alcegory.mescloud.model.entity.EquipmentOutputEntity;
+import com.alcegory.mescloud.model.dto.equipment.EquipmentOutputDto;
+import com.alcegory.mescloud.model.entity.equipment.EquipmentOutputEntity;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;

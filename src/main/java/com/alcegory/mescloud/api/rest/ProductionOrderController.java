@@ -1,8 +1,8 @@
 package com.alcegory.mescloud.api.rest;
 
 import com.alcegory.mescloud.exception.ForbiddenAccessException;
-import com.alcegory.mescloud.model.dto.PaginatedProductionOrderDto;
-import com.alcegory.mescloud.model.dto.ProductionOrderDto;
+import com.alcegory.mescloud.model.dto.pagination.PaginatedProductionOrderDto;
+import com.alcegory.mescloud.model.dto.production.ProductionOrderDto;
 import com.alcegory.mescloud.model.filter.Filter;
 import com.alcegory.mescloud.model.request.RequestProductionOrderDto;
 import com.alcegory.mescloud.service.management.ManagementInfoService;

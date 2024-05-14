@@ -1,7 +1,7 @@
 package com.alcegory.mescloud.service.user;
 
-import com.alcegory.mescloud.model.dto.UserConfigDto;
-import com.alcegory.mescloud.model.dto.UserDto;
+import com.alcegory.mescloud.model.dto.user.UserConfigDto;
+import com.alcegory.mescloud.model.dto.user.UserDto;
 import com.alcegory.mescloud.model.entity.UserEntity;
 import com.alcegory.mescloud.model.filter.Filter;
 import com.alcegory.mescloud.security.exception.UserNotFoundException;

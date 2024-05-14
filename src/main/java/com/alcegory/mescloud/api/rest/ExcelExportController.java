@@ -1,6 +1,6 @@
 package com.alcegory.mescloud.api.rest;
 
-import com.alcegory.mescloud.service.export.ExportExcelService;
+import com.alcegory.mescloud.service.export.ManageExportExcelService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -17,7 +17,7 @@ import java.util.Map;
 @AllArgsConstructor
 public class ExcelExportController {
 
-    private final ExportExcelService exportExcelService;
+    private final ManageExportExcelService exportExcelService;
 
     @PostMapping("composed-and-production-orders/completed")
     public ResponseEntity<Void> exportCompletedComposedAndProductionToExcel(HttpServletResponse response,

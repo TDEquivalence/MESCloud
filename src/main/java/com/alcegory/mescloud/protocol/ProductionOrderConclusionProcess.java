@@ -2,10 +2,10 @@ package com.alcegory.mescloud.protocol;
 
 import com.alcegory.mescloud.api.mqtt.MqttClient;
 import com.alcegory.mescloud.constant.MqttDTOConstants;
-import com.alcegory.mescloud.model.dto.PlcMqttDto;
-import com.alcegory.mescloud.model.dto.ProductionOrderMqttDto;
-import com.alcegory.mescloud.model.entity.CountingEquipmentEntity;
-import com.alcegory.mescloud.model.entity.ProductionOrderEntity;
+import com.alcegory.mescloud.model.dto.mqqt.PlcMqttDto;
+import com.alcegory.mescloud.model.dto.production.ProductionOrderMqttDto;
+import com.alcegory.mescloud.model.entity.equipment.CountingEquipmentEntity;
+import com.alcegory.mescloud.model.entity.production.ProductionOrderEntity;
 import com.alcegory.mescloud.service.alarm.AlarmService;
 import com.alcegory.mescloud.service.record.CounterRecordService;
 import com.alcegory.mescloud.service.management.CountingEquipmentManagementService;

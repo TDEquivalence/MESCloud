@@ -1,9 +1,9 @@
 package com.alcegory.mescloud.repository.alarm;
 
 import com.alcegory.mescloud.constant.AlarmStatus;
-import com.alcegory.mescloud.model.dto.AlarmCountsDto;
-import com.alcegory.mescloud.model.entity.AlarmEntity;
-import com.alcegory.mescloud.model.entity.AlarmSummaryEntity;
+import com.alcegory.mescloud.model.dto.alarm.AlarmCountsDto;
+import com.alcegory.mescloud.model.entity.alarm.AlarmEntity;
+import com.alcegory.mescloud.model.entity.alarm.AlarmSummaryEntity;
 import com.alcegory.mescloud.model.filter.Filter;
 import com.alcegory.mescloud.repository.AbstractFilterRepository;
 import jakarta.persistence.criteria.*;

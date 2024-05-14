@@ -1,9 +1,9 @@
 package com.alcegory.mescloud.repository.record;
 
-import com.alcegory.mescloud.model.dto.FilterDto;
-import com.alcegory.mescloud.model.entity.CounterRecordConclusionEntity;
-import com.alcegory.mescloud.model.entity.CounterRecordEntity;
-import com.alcegory.mescloud.model.entity.CounterRecordSummaryEntity;
+import com.alcegory.mescloud.model.filter.FilterDto;
+import com.alcegory.mescloud.model.entity.records.CounterRecordConclusionEntity;
+import com.alcegory.mescloud.model.entity.records.CounterRecordEntity;
+import com.alcegory.mescloud.model.entity.records.CounterRecordSummaryEntity;
 import com.alcegory.mescloud.model.filter.Filter;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.Modifying;

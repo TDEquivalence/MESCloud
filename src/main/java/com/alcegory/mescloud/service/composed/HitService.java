@@ -1,7 +1,7 @@
 package com.alcegory.mescloud.service.composed;
 
 import com.alcegory.mescloud.model.dto.HitDto;
-import com.alcegory.mescloud.model.dto.ProductionOrderDto;
+import com.alcegory.mescloud.model.dto.production.ProductionOrderDto;
 import com.alcegory.mescloud.model.entity.HitEntity;
 import com.alcegory.mescloud.model.request.RequestById;
 import com.alcegory.mescloud.model.request.RequestHitDto;

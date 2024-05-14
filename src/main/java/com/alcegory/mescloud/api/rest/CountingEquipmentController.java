@@ -1,8 +1,8 @@
 package com.alcegory.mescloud.api.rest;
 
 import com.alcegory.mescloud.exception.*;
-import com.alcegory.mescloud.model.dto.CountingEquipmentDto;
-import com.alcegory.mescloud.model.dto.CountingEquipmentInfoDto;
+import com.alcegory.mescloud.model.dto.equipment.CountingEquipmentDto;
+import com.alcegory.mescloud.model.dto.equipment.CountingEquipmentInfoDto;
 import com.alcegory.mescloud.model.request.RequestById;
 import com.alcegory.mescloud.model.request.RequestConfigurationDto;
 import com.alcegory.mescloud.service.management.ManagementInfoService;
