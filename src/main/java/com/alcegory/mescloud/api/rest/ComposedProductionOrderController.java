@@ -53,7 +53,7 @@ public class ComposedProductionOrderController {
     public ResponseEntity<PaginatedComposedDto> findAllToInsertHits() {
         try {
             PaginatedComposedDto composedWithoutHits = composedService.findAllSummarizedWithoutHits();
-            if (composedWithoutHits == null || composedWithoutHits.getComposedProductionOrders().isEmpty()) {
+            if (composedWithoutHits == null) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
             return new ResponseEntity<>(composedWithoutHits, HttpStatus.OK);
@@ -66,7 +66,7 @@ public class ComposedProductionOrderController {
     public ResponseEntity<PaginatedComposedDto> findToInsertHitsFiltered(@RequestBody Filter filter) {
         try {
             PaginatedComposedDto composedWithoutHits = composedService.findSummarizedWithoutHitsFiltered(filter);
-            if (composedWithoutHits == null || composedWithoutHits.getComposedProductionOrders().isEmpty()) {
+            if (composedWithoutHits == null) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
             return new ResponseEntity<>(composedWithoutHits, HttpStatus.OK);
@@ -79,7 +79,7 @@ public class ComposedProductionOrderController {
     public ResponseEntity<PaginatedComposedDto> findAllForApproval() {
         try {
             PaginatedComposedDto composedWithHits = composedService.findAllSummarizedWithHits();
-            if (composedWithHits == null || composedWithHits.getComposedProductionOrders().isEmpty()) {
+            if (composedWithHits == null) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
             return new ResponseEntity<>(composedWithHits, HttpStatus.OK);
@@ -92,7 +92,7 @@ public class ComposedProductionOrderController {
     public ResponseEntity<PaginatedComposedDto> findForApprovalFiltered(@RequestBody Filter filter) {
         try {
             PaginatedComposedDto composedWithHits = composedService.findSummarizedWithHitsFiltered(filter);
-            if (composedWithHits == null || composedWithHits.getComposedProductionOrders().isEmpty()) {
+            if (composedWithHits == null) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
             return new ResponseEntity<>(composedWithHits, HttpStatus.OK);
@@ -118,7 +118,7 @@ public class ComposedProductionOrderController {
     public ResponseEntity<PaginatedComposedDto> findCompletedFiltered(@RequestBody Filter filter) {
         try {
             PaginatedComposedDto composedCompleted = composedService.findCompletedFiltered(filter);
-            if (composedCompleted == null || composedCompleted.getComposedProductionOrders().isEmpty()) {
+            if (composedCompleted == null) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
             return new ResponseEntity<>(composedCompleted, HttpStatus.OK);

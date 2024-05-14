@@ -36,23 +36,9 @@ public class ProductionOrderRepositoryImpl {
         Root<ProductionOrderEntity> root = query.from(ProductionOrderEntity.class);
         root.fetch(PRODUCTION_INSTRUCTIONS, JoinType.LEFT);
 
-        List<Predicate> predicates = new ArrayList<>();
-        if (withoutComposed) {
-            predicates.add(cb.isNull(root.get(COMPOSED_PRODUCTION_ORDER)));
-        }
-        if (startDate != null) {
-            predicates.add(cb.greaterThanOrEqualTo(root.get(COMPLETED_AT), startDate));
-        }
-        if (endDate != null) {
-            predicates.add(cb.lessThanOrEqualTo(root.get(COMPLETED_AT), endDate));
-        }
-        predicates.add(cb.isTrue(root.get(IS_COMPLETED)));
+        Predicate[] predicates = buildPredicates(cb, root, withoutComposed, startDate, endDate, filter);
 
-        String productionOrderCode = (filter != null) ? filter.getSearch().getValue(Filter.Property.PRODUCTION_ORDER_CODE) : null;
-        if (productionOrderCode != null && !productionOrderCode.isEmpty()) {
-            predicates.add(cb.like(root.get(PRODUCTION_ORDER_CODE), "%" + productionOrderCode + "%"));
-        }
-        query.where(predicates.toArray(new Predicate[0]))
+        query.where(predicates)
                 .orderBy(cb.desc(root.get(PROP_ID)));
 
         TypedQuery<ProductionOrderEntity> typedQuery = entityManager.createQuery(query);
@@ -65,6 +51,30 @@ public class ProductionOrderRepositoryImpl {
         }
 
         return typedQuery.getResultList();
+    }
+
+    private Predicate[] buildPredicates(CriteriaBuilder cb, Root<ProductionOrderEntity> root, boolean withoutComposed, Timestamp startDate, Timestamp endDate, Filter filter) {
+        List<Predicate> predicates = new ArrayList<>();
+
+        if (withoutComposed) {
+            predicates.add(cb.isNull(root.get(COMPOSED_PRODUCTION_ORDER)));
+        }
+        if (startDate != null) {
+            predicates.add(cb.greaterThanOrEqualTo(root.get(COMPLETED_AT), startDate));
+        }
+        if (endDate != null) {
+            predicates.add(cb.lessThanOrEqualTo(root.get(COMPLETED_AT), endDate));
+        }
+        predicates.add(cb.isTrue(root.get(IS_COMPLETED)));
+
+        if (filter != null) {
+            String productionOrderCode = filter.getSearch().getValue(Filter.Property.PRODUCTION_ORDER_CODE);
+            if (productionOrderCode != null && !productionOrderCode.isEmpty()) {
+                predicates.add(cb.like(root.get(PRODUCTION_ORDER_CODE), "%" + productionOrderCode + "%"));
+            }
+        }
+
+        return predicates.toArray(new Predicate[0]);
     }
 
 
