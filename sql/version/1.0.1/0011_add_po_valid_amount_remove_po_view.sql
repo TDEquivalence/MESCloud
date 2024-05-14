@@ -21,6 +21,6 @@ DROP VIEW IF EXISTS production_order_summary;
 
 INSERT INTO audit_script (run_date, process, version, schema)
 VALUES
-    (CURRENT_DATE, '0011_add_po_valid_amount_remove_po_view', '1.0.1', '1.0.1_0011');
+    (CURRENT_DATE, '0011_add_po_valid_amount_remove_po_view.sql', '1.0.1', '1.0.1_0011');
 
 COMMIT;

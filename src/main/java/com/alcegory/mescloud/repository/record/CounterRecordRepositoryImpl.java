@@ -1,6 +1,5 @@
 package com.alcegory.mescloud.repository.record;
 
-import com.alcegory.mescloud.model.filter.FilterDto;
 import com.alcegory.mescloud.model.entity.equipment.CountingEquipmentEntity;
 import com.alcegory.mescloud.model.entity.equipment.EquipmentOutputEntity;
 import com.alcegory.mescloud.model.entity.production.ProductionOrderEntity;
@@ -8,6 +7,7 @@ import com.alcegory.mescloud.model.entity.records.CounterRecordConclusionEntity;
 import com.alcegory.mescloud.model.entity.records.CounterRecordEntity;
 import com.alcegory.mescloud.model.entity.records.CounterRecordSummaryEntity;
 import com.alcegory.mescloud.model.filter.Filter;
+import com.alcegory.mescloud.model.filter.FilterDto;
 import com.alcegory.mescloud.repository.AbstractFilterRepository;
 import com.alcegory.mescloud.utility.DateUtil;
 import jakarta.persistence.EntityGraph;

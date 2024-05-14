@@ -1,5 +1,6 @@
 package com.alcegory.mescloud.model.entity.records;
 
+import com.alcegory.mescloud.model.converter.InstructionsConverter;
 import com.alcegory.mescloud.model.entity.equipment.EquipmentOutputEntity;
 import com.alcegory.mescloud.model.entity.production.ProductionOrderEntity;
 import jakarta.persistence.*;
@@ -9,6 +10,8 @@ import lombok.Setter;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 @Entity
 @Table(name = "counter_record_production_conclusion")
@@ -33,4 +36,7 @@ public class CounterRecordConclusionEntity implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date registeredAt;
     private Boolean isValidForProduction;
+
+    @Convert(converter = InstructionsConverter.class)
+    private List<Map<String, Object>> instructions;
 }
