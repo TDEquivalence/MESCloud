@@ -1,6 +1,6 @@
 package com.alcegory.mescloud.repository.production;
 
-import com.alcegory.mescloud.model.entity.production.ComposedProductionOrderEntity;
+import com.alcegory.mescloud.model.entity.composed.ComposedProductionOrderEntity;
 import com.alcegory.mescloud.model.entity.equipment.CountingEquipmentEntity;
 import com.alcegory.mescloud.model.entity.production.ProductionOrderEntity;
 import com.alcegory.mescloud.model.filter.Filter;
@@ -50,7 +50,7 @@ public class ProductionOrderRepositoryImpl {
         }
 
         List<Long> ids = idTypedQuery.getResultList();
-        
+
         CriteriaQuery<ProductionOrderEntity> mainQuery = cb.createQuery(ProductionOrderEntity.class);
         Root<ProductionOrderEntity> mainRoot = mainQuery.from(ProductionOrderEntity.class);
         mainQuery.where(mainRoot.get(PROP_ID).in(ids));

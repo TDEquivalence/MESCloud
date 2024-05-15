@@ -5,7 +5,6 @@ import com.alcegory.mescloud.model.converter.ProductionOrderConverter;
 import com.alcegory.mescloud.model.dto.equipment.CountingEquipmentDto;
 import com.alcegory.mescloud.model.dto.equipment.CountingEquipmentInfoDto;
 import com.alcegory.mescloud.model.dto.pagination.PaginatedProductionOrderDto;
-import com.alcegory.mescloud.model.dto.production.ComposedSummaryDto;
 import com.alcegory.mescloud.model.dto.production.ProductionOrderDto;
 import com.alcegory.mescloud.model.dto.production.ProductionOrderInfoDto;
 import com.alcegory.mescloud.model.entity.equipment.CountingEquipmentEntity;

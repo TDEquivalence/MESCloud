@@ -1,7 +1,7 @@
 package com.alcegory.mescloud.repository.composed;
 
-import com.alcegory.mescloud.model.entity.production.ComposedProductionOrderEntity;
-import com.alcegory.mescloud.model.entity.production.ComposedSummaryEntity;
+import com.alcegory.mescloud.model.entity.composed.ComposedProductionOrderEntity;
+import com.alcegory.mescloud.model.entity.composed.ComposedSummaryEntity;
 import com.alcegory.mescloud.model.filter.Filter;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

@@ -1,5 +1,6 @@
-package com.alcegory.mescloud.model.dto.production;
+package com.alcegory.mescloud.model.dto.composed;
 
+import com.alcegory.mescloud.model.dto.production.ProductionInstructionDto;
 import lombok.Getter;
 import lombok.Setter;
 

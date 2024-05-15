@@ -1,9 +1,9 @@
 package com.alcegory.mescloud.model.converter;
 
-import com.alcegory.mescloud.model.dto.production.ComposedInfoDto;
-import com.alcegory.mescloud.model.dto.production.ExportComposedDto;
+import com.alcegory.mescloud.model.dto.composed.ComposedInfoDto;
+import com.alcegory.mescloud.model.dto.composed.ExportComposedDto;
 import com.alcegory.mescloud.model.dto.production.ProductionInstructionDto;
-import com.alcegory.mescloud.model.entity.production.ComposedSummaryEntity;
+import com.alcegory.mescloud.model.entity.composed.ComposedSummaryEntity;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Component;
 

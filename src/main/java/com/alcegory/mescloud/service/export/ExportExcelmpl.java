@@ -1,6 +1,6 @@
 package com.alcegory.mescloud.service.export;
 
-import com.alcegory.mescloud.model.dto.production.ComposedInfoDto;
+import com.alcegory.mescloud.model.dto.composed.ComposedInfoDto;
 import com.alcegory.mescloud.model.dto.production.ProductionInstructionDto;
 import com.alcegory.mescloud.model.dto.production.ProductionOrderDto;
 import jakarta.servlet.http.HttpServletResponse;
@@ -117,7 +117,7 @@ public class ExportExcelmpl extends AbstractExcelExport {
         for (ProductionOrderDto po : productionOrders) {
             Row row = sheet.createRow(rowCount++);
             int columnCount = 0;
-            
+
             createCell(row, columnCount++, po.getEquipment() != null ? po.getEquipment().getAlias() : null, style);
             createCell(row, columnCount++, po.getComposedCode(), style);
             createCell(row, columnCount++, po.getCode(), style);

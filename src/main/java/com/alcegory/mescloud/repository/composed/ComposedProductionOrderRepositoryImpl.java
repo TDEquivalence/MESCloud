@@ -1,8 +1,8 @@
 package com.alcegory.mescloud.repository.composed;
 
-import com.alcegory.mescloud.model.entity.BatchEntity;
-import com.alcegory.mescloud.model.entity.production.ComposedSummaryEntity;
-import com.alcegory.mescloud.model.entity.HitEntity;
+import com.alcegory.mescloud.model.entity.composed.BatchEntity;
+import com.alcegory.mescloud.model.entity.composed.ComposedSummaryEntity;
+import com.alcegory.mescloud.model.entity.composed.HitEntity;
 import com.alcegory.mescloud.model.filter.Filter;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;

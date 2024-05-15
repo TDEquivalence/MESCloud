@@ -1,5 +1,6 @@
 package com.alcegory.mescloud.model.entity.production;
 
+import com.alcegory.mescloud.model.entity.composed.ComposedProductionOrderEntity;
 import com.alcegory.mescloud.model.entity.equipment.CountingEquipmentEntity;
 import com.alcegory.mescloud.model.entity.ImsEntity;
 import jakarta.persistence.*;

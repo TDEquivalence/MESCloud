@@ -1,4 +1,4 @@
-package com.alcegory.mescloud.model.entity.production;
+package com.alcegory.mescloud.model.entity.composed;
 
 import com.alcegory.mescloud.model.converter.InstructionsConverter;
 import jakarta.persistence.Convert;

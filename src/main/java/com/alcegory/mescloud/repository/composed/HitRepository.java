@@ -1,6 +1,6 @@
 package com.alcegory.mescloud.repository.composed;
 
-import com.alcegory.mescloud.model.entity.HitEntity;
+import com.alcegory.mescloud.model.entity.composed.HitEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

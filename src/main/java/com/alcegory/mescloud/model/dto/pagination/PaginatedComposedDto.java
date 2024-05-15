@@ -1,6 +1,6 @@
 package com.alcegory.mescloud.model.dto.pagination;
 
-import com.alcegory.mescloud.model.dto.production.ComposedSummaryDto;
+import com.alcegory.mescloud.model.dto.composed.ComposedSummaryDto;
 import lombok.Getter;
 import lombok.Setter;
 

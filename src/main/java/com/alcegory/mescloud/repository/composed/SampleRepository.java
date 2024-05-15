@@ -1,6 +1,6 @@
 package com.alcegory.mescloud.repository.composed;
 
-import com.alcegory.mescloud.model.entity.SampleEntity;
+import com.alcegory.mescloud.model.entity.composed.SampleEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

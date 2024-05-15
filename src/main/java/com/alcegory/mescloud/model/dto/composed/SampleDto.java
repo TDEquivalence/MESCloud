@@ -1,4 +1,4 @@
-package com.alcegory.mescloud.model.dto;
+package com.alcegory.mescloud.model.dto.composed;
 
 import lombok.Getter;
 import lombok.Setter;

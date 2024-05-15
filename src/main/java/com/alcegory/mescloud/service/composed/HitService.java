@@ -1,8 +1,8 @@
 package com.alcegory.mescloud.service.composed;
 
-import com.alcegory.mescloud.model.dto.HitDto;
+import com.alcegory.mescloud.model.dto.composed.HitDto;
 import com.alcegory.mescloud.model.dto.production.ProductionOrderDto;
-import com.alcegory.mescloud.model.entity.HitEntity;
+import com.alcegory.mescloud.model.entity.composed.HitEntity;
 import com.alcegory.mescloud.model.request.RequestById;
 import com.alcegory.mescloud.model.request.RequestHitDto;
 import org.springframework.security.core.Authentication;

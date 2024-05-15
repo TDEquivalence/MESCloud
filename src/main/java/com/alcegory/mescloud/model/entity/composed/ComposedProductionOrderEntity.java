@@ -1,5 +1,6 @@
-package com.alcegory.mescloud.model.entity.production;
+package com.alcegory.mescloud.model.entity.composed;
 
+import com.alcegory.mescloud.model.entity.production.ProductionOrderEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
