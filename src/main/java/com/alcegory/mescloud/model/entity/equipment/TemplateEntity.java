@@ -1,5 +1,6 @@
-package com.alcegory.mescloud.model.entity.production;
+package com.alcegory.mescloud.model.entity.equipment;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,7 +12,7 @@ import java.util.List;
 @Getter
 @Setter
 @Entity(name = "production_order_template")
-public class ProductionOrderTemplateEntity implements Serializable {
+public class TemplateEntity implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -25,5 +26,9 @@ public class ProductionOrderTemplateEntity implements Serializable {
 
     @OneToMany(mappedBy = "template", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<TemplateFieldMappingEntity> fields;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "template", fetch = FetchType.LAZY) // Relationship with CountingEquipmentEntity
+    private List<CountingEquipmentEntity> countingEquipment;
 }
 

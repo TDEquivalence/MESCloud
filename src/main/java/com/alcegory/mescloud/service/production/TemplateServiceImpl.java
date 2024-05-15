@@ -1,6 +1,6 @@
 package com.alcegory.mescloud.service.production;
 
-import com.alcegory.mescloud.model.entity.production.ProductionOrderTemplateEntity;
+import com.alcegory.mescloud.model.entity.equipment.TemplateEntity;
 import com.alcegory.mescloud.repository.production.ProductionOrderTemplateRepository;
 import com.alcegory.mescloud.repository.production.TemplateFieldMappingRepository;
 import lombok.AllArgsConstructor;
@@ -18,18 +18,18 @@ public class TemplateServiceImpl implements TemplateService {
     private final TemplateFieldMappingRepository templateFieldMappingRepository;
 
     @Override
-    public ProductionOrderTemplateEntity getTemplateWithFields() {
+    public TemplateEntity getTemplateWithFields() {
         // Retrieve the ProductionOrderTemplateEntity by its ID
-        Optional<ProductionOrderTemplateEntity> optionalTemplate = templateRepository.findById(1L);
+        Optional<TemplateEntity> optionalTemplate = templateRepository.findById(1L);
 
         // If the template is found, fetch its fields
         if (optionalTemplate.isPresent()) {
-            ProductionOrderTemplateEntity template = optionalTemplate.get();
+            TemplateEntity template = optionalTemplate.get();
             template.getFields().size(); // Force eager fetching of fields
             return template;
         }
 
-        return new ProductionOrderTemplateEntity();
+        return new TemplateEntity();
     }
 
 }

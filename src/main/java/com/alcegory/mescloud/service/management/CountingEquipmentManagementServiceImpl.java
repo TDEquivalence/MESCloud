@@ -5,17 +5,17 @@ import com.alcegory.mescloud.exception.*;
 import com.alcegory.mescloud.model.converter.CountingEquipmentConverter;
 import com.alcegory.mescloud.model.converter.GenericConverter;
 import com.alcegory.mescloud.model.converter.PlcMqttConverter;
-import com.alcegory.mescloud.model.converter.ProductionOrderConverter;
+import com.alcegory.mescloud.model.dto.ImsDto;
 import com.alcegory.mescloud.model.dto.equipment.CountingEquipmentDto;
 import com.alcegory.mescloud.model.dto.equipment.EquipmentConfigMqttDto;
-import com.alcegory.mescloud.model.dto.ImsDto;
+import com.alcegory.mescloud.model.dto.equipment.TemplateDto;
+import com.alcegory.mescloud.model.entity.ImsEntity;
 import com.alcegory.mescloud.model.entity.equipment.CountingEquipmentEntity;
 import com.alcegory.mescloud.model.entity.equipment.EquipmentOutputAliasEntity;
 import com.alcegory.mescloud.model.entity.equipment.EquipmentOutputEntity;
-import com.alcegory.mescloud.model.entity.ImsEntity;
+import com.alcegory.mescloud.model.entity.equipment.TemplateEntity;
 import com.alcegory.mescloud.model.request.RequestConfigurationDto;
 import com.alcegory.mescloud.protocol.MesMqttSettings;
-import com.alcegory.mescloud.repository.production.ProductionOrderRepository;
 import com.alcegory.mescloud.security.model.SectionAuthority;
 import com.alcegory.mescloud.security.service.UserRoleService;
 import com.alcegory.mescloud.service.equipment.*;
@@ -57,11 +57,7 @@ public class CountingEquipmentManagementServiceImpl implements CountingEquipment
     private final CountingEquipmentConverter converter;
     private final PlcMqttConverter plcConverter;
     private final GenericConverter<ImsEntity, ImsDto> imsConverter;
-
-    private final ProductionOrderRepository productionOrderRepository;
-
-    private final ProductionOrderConverter productionOrderConverter;
-
+    private final GenericConverter<TemplateEntity, TemplateDto> templateConverter;
 
     @Override
     public Optional<CountingEquipmentDto> updateEquipmentStatus(String equipmentCode, int equipmentStatus) {
@@ -254,5 +250,15 @@ public class CountingEquipmentManagementServiceImpl implements CountingEquipment
     private void ensureMinimumPTimer(CountingEquipmentEntity countingEquipmentEntity) {
         int currentPTimer = countingEquipmentEntity.getPTimerCommunicationCycle();
         countingEquipmentEntity.setPTimerCommunicationCycle(Math.max(MIN_P_TIMER_IN_MINUTES, currentPTimer));
+    }
+
+    @Override
+    public TemplateDto findEquipmentTemplate(long id) {
+        CountingEquipmentEntity countingEquipment = countingEquipmentService.findEquipmentTemplate(id)
+                .orElseThrow(() -> new CountingEquipmentException("Error getting counting equipment with id " + id));
+
+        TemplateEntity template = countingEquipment.getTemplate();
+
+        return templateConverter.toDto(template, TemplateDto.class);
     }
 }

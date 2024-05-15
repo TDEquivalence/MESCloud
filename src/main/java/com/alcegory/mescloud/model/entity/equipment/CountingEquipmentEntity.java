@@ -3,8 +3,6 @@ package com.alcegory.mescloud.model.entity.equipment;
 import com.alcegory.mescloud.model.entity.FeatureEntity;
 import com.alcegory.mescloud.model.entity.ImsEntity;
 import com.alcegory.mescloud.model.entity.company.SectionEntity;
-import com.alcegory.mescloud.model.entity.equipment.EquipmentOutputEntity;
-import com.alcegory.mescloud.model.entity.equipment.EquipmentStatusRecordEntity;
 import com.alcegory.mescloud.model.entity.production.ProductionOrderEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -27,6 +25,10 @@ public class CountingEquipmentEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String code;
+
+    private String alias;
+
     @JsonIgnore
     @OneToMany(mappedBy = "equipment", fetch = FetchType.LAZY)
     private List<ProductionOrderEntity> productionOrders;
@@ -35,8 +37,10 @@ public class CountingEquipmentEntity implements Serializable {
     @OneToMany(mappedBy = "countingEquipment", fetch = FetchType.LAZY)
     private List<EquipmentStatusRecordEntity> equipmentStatusRecords;
 
-    private String code;
-    private String alias;
+    @ManyToOne
+    @JoinColumn(name = "template_id") // This column refers to the template
+    private TemplateEntity template;
+
 
     @ManyToOne
     private SectionEntity section;

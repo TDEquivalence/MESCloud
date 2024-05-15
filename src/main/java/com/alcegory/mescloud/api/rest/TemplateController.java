@@ -1,6 +1,6 @@
 package com.alcegory.mescloud.api.rest;
 
-import com.alcegory.mescloud.model.entity.production.ProductionOrderTemplateEntity;
+import com.alcegory.mescloud.model.entity.equipment.TemplateEntity;
 import com.alcegory.mescloud.service.production.TemplateService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -17,9 +17,9 @@ public class TemplateController {
     private final TemplateService templateService;
 
     @GetMapping
-    public ResponseEntity<ProductionOrderTemplateEntity> getTemplate() {
+    public ResponseEntity<TemplateEntity> getTemplate() {
         try {
-            ProductionOrderTemplateEntity template = templateService.getTemplateWithFields();
+            TemplateEntity template = templateService.getTemplateWithFields();
             if (template != null) {
                 return ResponseEntity.ok(template);
             } else {

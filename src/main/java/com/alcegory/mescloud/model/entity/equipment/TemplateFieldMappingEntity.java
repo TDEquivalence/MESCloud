@@ -1,4 +1,4 @@
-package com.alcegory.mescloud.model.entity.production;
+package com.alcegory.mescloud.model.entity.equipment;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -24,7 +24,7 @@ public class TemplateFieldMappingEntity implements Serializable {
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "template_id")
-    private ProductionOrderTemplateEntity template;
+    private TemplateEntity template;
 
     @Column(name = "field_name")
     private String fieldName;

@@ -2,6 +2,7 @@ package com.alcegory.mescloud.service.equipment;
 
 import com.alcegory.mescloud.model.converter.CountingEquipmentConverter;
 import com.alcegory.mescloud.model.dto.equipment.CountingEquipmentDto;
+import com.alcegory.mescloud.model.dto.equipment.CountingEquipmentInfoDto;
 import com.alcegory.mescloud.model.entity.equipment.CountingEquipmentEntity;
 import com.alcegory.mescloud.repository.equipment.CountingEquipmentRepository;
 import lombok.AllArgsConstructor;
@@ -169,5 +170,10 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
     @Override
     public Optional<CountingEquipmentEntity> findByIdWithLastProductionOrder(Long id) {
         return repository.findByIdWithLastProductionOrder(id);
+    }
+
+    @Override
+    public Optional<CountingEquipmentEntity> findEquipmentTemplate(long id) {
+        return repository.findEquipmentWithTemplateById(id);
     }
 }

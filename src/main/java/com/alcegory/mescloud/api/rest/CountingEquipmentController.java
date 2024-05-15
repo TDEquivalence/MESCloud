@@ -3,11 +3,12 @@ package com.alcegory.mescloud.api.rest;
 import com.alcegory.mescloud.exception.*;
 import com.alcegory.mescloud.model.dto.equipment.CountingEquipmentDto;
 import com.alcegory.mescloud.model.dto.equipment.CountingEquipmentInfoDto;
+import com.alcegory.mescloud.model.dto.equipment.TemplateDto;
 import com.alcegory.mescloud.model.request.RequestById;
 import com.alcegory.mescloud.model.request.RequestConfigurationDto;
-import com.alcegory.mescloud.service.management.ManagementInfoService;
-import com.alcegory.mescloud.service.management.CountingEquipmentManagementService;
 import com.alcegory.mescloud.service.equipment.CountingEquipmentService;
+import com.alcegory.mescloud.service.management.CountingEquipmentManagementService;
+import com.alcegory.mescloud.service.management.ManagementInfoService;
 import com.alcegory.mescloud.utility.HttpUtil;
 import lombok.AllArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -55,6 +56,20 @@ public class CountingEquipmentController {
             }
 
             return new ResponseEntity<>(countingEquipmentOpt.get(), HttpStatus.OK);
+        } catch (EquipmentNotFoundException e) {
+            return HttpUtil.responseWithHeaders(HttpStatus.NOT_FOUND, EQUIPMENT_ERROR_CAUSE, e);
+        }
+    }
+
+    @GetMapping("/{id}/template")
+    public ResponseEntity<TemplateDto> findTemplateById(@PathVariable long id) {
+        try {
+            TemplateDto templateDto = countingEquipmentManagementService.findEquipmentTemplate(id);
+            if (templateDto == null) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+
+            return new ResponseEntity<>(templateDto, HttpStatus.OK);
         } catch (EquipmentNotFoundException e) {
             return HttpUtil.responseWithHeaders(HttpStatus.NOT_FOUND, EQUIPMENT_ERROR_CAUSE, e);
         }
