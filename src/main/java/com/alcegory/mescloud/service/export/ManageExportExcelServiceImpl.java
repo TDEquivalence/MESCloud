@@ -15,6 +15,7 @@ import lombok.extern.java.Log;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -27,6 +28,7 @@ import java.util.Map;
 @Service
 @AllArgsConstructor
 @Log
+@Transactional
 public class ManageExportExcelServiceImpl implements ManageExportExcelService {
 
     private static final String START_DATE = "startDate";

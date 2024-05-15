@@ -10,8 +10,7 @@ import java.util.List;
 @Getter
 @Setter
 public class ComposedInfoDto {
-
-    private Integer id;
+    
     private String code;
     private Timestamp createdAt;
     private Timestamp approvedAt;

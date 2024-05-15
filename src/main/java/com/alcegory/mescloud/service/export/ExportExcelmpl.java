@@ -14,11 +14,13 @@ import org.apache.poi.xssf.usermodel.XSSFTable;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.lang.reflect.Field;
-import java.util.List;
+import java.util.*;
 
 import static com.alcegory.mescloud.service.export.ExcelConstants.*;
 
 public class ExportExcelmpl extends AbstractExcelExport {
+
+    private static final String INSTRUCTIONS = "instructions";
 
     public ExportExcelmpl() {
         super(null, null, null, null);
@@ -29,11 +31,11 @@ public class ExportExcelmpl extends AbstractExcelExport {
                                   List<ProductionOrderDto> productionOrders) {
 
         XSSFSheet composedSheet = createSheet(SHEET_NAME_COMPOSED);
-        createComposedHeaderRow(composedSheet);
+        Set<String> composedHeaders = createComposedHeaderRow(composedSheet, composedList);
 
         if (!composedList.isEmpty()) {
             createTable(composedSheet, TABLE_NAME_COMPOSED, getComposedHeaders().length - 1);
-            writeDataToComposed(composedSheet, composedList);
+            writeDataToComposed(composedSheet, composedList, composedHeaders);
         }
 
         XSSFSheet productionSheet = createSheet(SHEET_NAME_PRODUCTION_ORDERS);
@@ -51,17 +53,54 @@ public class ExportExcelmpl extends AbstractExcelExport {
         return workbook.createSheet(sheetName);
     }
 
-    private void createComposedHeaderRow(XSSFSheet sheet) {
-        Row headerRow = sheet.createRow(0);
-        CellStyle headerStyle = createHeaderStyle();
+    private Set<String> createComposedHeaderRow(XSSFSheet sheet, List<ComposedInfoDto> composedList) {
+        Set<String> fieldSet = new LinkedHashSet<>();
+
+        Map<String, String> portugueseFieldNames = createPortugueseFieldNamesMapping();
 
         Class<?> composedClass = ComposedInfoDto.class;
         Field[] fields = composedClass.getDeclaredFields();
-
-        for (int i = 0; i < fields.length; i++) {
-            String fieldName = fields[i].getName();
-            createCell(headerRow, i, fieldName, headerStyle);
+        for (Field field : fields) {
+            if (!field.getName().equals(INSTRUCTIONS)) {
+                String portugueseFieldName = portugueseFieldNames.get(field.getName());
+                if (portugueseFieldName != null) {
+                    fieldSet.add(portugueseFieldName);
+                } else {
+                    fieldSet.add(field.getName());
+                }
+            }
         }
+
+        for (ComposedInfoDto composedInfoDto : composedList) {
+            for (ProductionInstructionDto productionInstructionDto : composedInfoDto.getInstructions()) {
+                fieldSet.add(productionInstructionDto.getName());
+            }
+        }
+
+        Row headerRow = sheet.createRow(0);
+        CellStyle headerStyle = createHeaderStyle();
+
+        int columnIndex = 0;
+        for (String fieldName : fieldSet) {
+            createCell(headerRow, columnIndex++, fieldName, headerStyle);
+        }
+
+        return fieldSet;
+    }
+
+    private Map<String, String> createPortugueseFieldNamesMapping() {
+        Map<String, String> mapping = new HashMap<>();
+        mapping.put("batchCode", "Lote Final");
+        mapping.put("code", "Produção Composta");
+        mapping.put("createdAt", "Criação da Composta");
+        mapping.put("validAmount", "Quantidade");
+        mapping.put("isBatchApproved", "Aprovado");
+        mapping.put("approvedAt", "Aprovado em");
+        mapping.put("amountOfHits", "Hits");
+        mapping.put("hitInsertedAt", "Hits inseridos em");
+        mapping.put("sampleAmount", "Amostra");
+        mapping.put("reliability", "Fiabilidade");
+        return mapping;
     }
 
     private void createProductionHeaderRow(XSSFSheet sheet) {
@@ -77,7 +116,7 @@ public class ExportExcelmpl extends AbstractExcelExport {
         }
     }
 
-    protected void writeDataToComposed(XSSFSheet sheet, List<ComposedInfoDto> composedList) {
+    protected void writeDataToComposed(XSSFSheet sheet, List<ComposedInfoDto> composedList, Set<String> composedHeaders) {
         int rowCount = 1;
         CellStyle style = workbook.createCellStyle();
         XSSFFont font = workbook.createFont();
@@ -88,7 +127,6 @@ public class ExportExcelmpl extends AbstractExcelExport {
             Row row = sheet.createRow(rowCount++);
             int columnCount = 0;
 
-            createCell(row, columnCount++, composed.getId(), style);
             createCell(row, columnCount++, composed.getBatchCode(), style);
             createCell(row, columnCount++, composed.getCode(), style);
 

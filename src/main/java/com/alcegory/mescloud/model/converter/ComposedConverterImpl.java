@@ -29,8 +29,7 @@ public class ComposedConverterImpl implements ComposedConverter {
 
     public ComposedInfoDto convertToDto(ComposedSummaryEntity entity) {
         ComposedInfoDto dto = new ComposedInfoDto();
-
-        dto.setId(entity.getId());
+        
         dto.setCode(entity.getCode());
         dto.setCreatedAt(entity.getCreatedAt());
         dto.setApprovedAt(entity.getApprovedAt());
