@@ -91,15 +91,6 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
         return saveToApprovedContainer(updatedContainerInfoDto, originalImageContainerInfoDto, authentication);
     }
 
-    private ContainerInfoDto getOriginalImageContainerInfoDto(ImageAnnotationDto imageAnnotationDtoFromContainer) {
-        ContainerInfoDto containerInfoDto = new ContainerInfoDto();
-        containerInfoDto.setImageAnnotationDto(imageAnnotationDtoFromContainer);
-        ImageInfoDto imageInfoDto = new ImageInfoDto();
-        imageInfoDto.setPath(imageAnnotationDtoFromContainer.getData().getImage());
-        containerInfoDto.setJpg(imageInfoDto);
-        return containerInfoDto;
-    }
-
     private void validateContainerInfoUpdate(ContainerInfoUpdate containerInfoUpdate) {
         if (containerInfoUpdate == null || containerInfoUpdate.getFileName() == null) {
             throw new IllegalArgumentException("ContainerInfoUpdate or FileName cannot be null");
