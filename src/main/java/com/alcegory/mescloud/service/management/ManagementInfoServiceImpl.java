@@ -110,9 +110,4 @@ public class ManagementInfoServiceImpl implements ManagementInfoService {
         paginatedProductionOrderDto.setProductionOrders(summaryDtos);
         return paginatedProductionOrderDto;
     }
-
-    @Override
-    public List<ComposedSummaryDto> findAllCompleted() {
-        return null;
-    }
 }

@@ -13,6 +13,4 @@ public interface ManagementInfoService {
     Optional<CountingEquipmentInfoDto> findEquipmentWithProductionOrderById(long id);
 
     PaginatedProductionOrderDto getCompletedWithoutComposedFiltered(Filter filter);
-
-    List<ComposedSummaryDto> findAllCompleted();
 }
