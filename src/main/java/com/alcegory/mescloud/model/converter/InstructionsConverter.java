@@ -1,6 +1,7 @@
 package com.alcegory.mescloud.model.converter;
 
 
+import com.alcegory.mescloud.exception.ConverterException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.MapType;
@@ -21,7 +22,7 @@ public class InstructionsConverter implements AttributeConverter<List<Map<String
         try {
             return objectMapper.writeValueAsString(attribute);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException("Error converting instructions to JSON", e);
+            throw new ConverterException("Error converting instructions to JSON", e);
         }
     }
 
@@ -31,7 +32,7 @@ public class InstructionsConverter implements AttributeConverter<List<Map<String
             MapType type = objectMapper.getTypeFactory().constructMapType(Map.class, String.class, Object.class);
             return objectMapper.readValue(dbData, objectMapper.getTypeFactory().constructCollectionType(List.class, type));
         } catch (IOException e) {
-            throw new RuntimeException("Error converting JSON to instructions", e);
+            throw new ConverterException("Error converting JSON to instructions", e);
         }
     }
 }

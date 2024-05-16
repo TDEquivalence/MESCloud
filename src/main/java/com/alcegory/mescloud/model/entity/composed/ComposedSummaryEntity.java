@@ -4,7 +4,6 @@ import com.alcegory.mescloud.model.converter.InstructionsConverter;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.Transient;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -34,7 +33,7 @@ public class ComposedSummaryEntity implements Serializable {
     private String batchCode;
     private Integer amountOfHits;
     private Integer validAmount;
-    
+
     @Convert(converter = InstructionsConverter.class)
     private List<Map<String, Object>> instructions;
 }

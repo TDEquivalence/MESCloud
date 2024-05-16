@@ -4,7 +4,7 @@ import com.alcegory.mescloud.model.dto.composed.ComposedExportInfoDto;
 import com.alcegory.mescloud.model.dto.composed.ExportComposedDto;
 import com.alcegory.mescloud.model.dto.production.ProductionInstructionDto;
 import com.alcegory.mescloud.model.entity.composed.ComposedSummaryEntity;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Field;
@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 @Component
-@Log
+@Slf4j
 public class ComposedConverterImpl implements ComposedConverter {
 
     public List<ComposedExportInfoDto> convertToDtoList(List<ComposedSummaryEntity> entities) {
@@ -72,13 +72,16 @@ public class ComposedConverterImpl implements ComposedConverter {
 
         Field[] fields = ComposedSummaryEntity.class.getDeclaredFields();
         for (Field field : fields) {
-            field.setAccessible(true);
+            boolean originalAccessibility = field.canAccess(entity);
 
             try {
+                field.setAccessible(true);
                 Object value = field.get(entity);
                 addInstruction(instructionDtos, field.getName(), value);
             } catch (IllegalAccessException e) {
-                e.printStackTrace();
+                log.error("Error accessing field: {}", e.getMessage());
+            } finally {
+                field.setAccessible(originalAccessibility);
             }
         }
 

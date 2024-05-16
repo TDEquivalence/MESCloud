@@ -38,7 +38,7 @@ public class ExportExcelmpl extends AbstractExcelExport {
 
         if (!composedList.isEmpty()) {
             createTable(composedSheet, TABLE_NAME_COMPOSED, composedHeaders.size());
-            writeDataToComposed(composedSheet, composedList, composedHeaders);
+            writeDataToComposed(composedSheet, composedList);
         }
 
         XSSFSheet productionSheet = createSheet(SHEET_NAME_PRODUCTION_ORDERS);
@@ -46,7 +46,7 @@ public class ExportExcelmpl extends AbstractExcelExport {
 
         if (!productionOrders.isEmpty()) {
             createTable(productionSheet, TABLE_NAME_PRODUCTION, composedHeaders.size());
-            writeDataToProduction(productionSheet, productionOrders, productionHeaders);
+            writeDataToProduction(productionSheet, productionOrders);
         }
 
         writeWorkbookToResponse(response);
@@ -124,7 +124,7 @@ public class ExportExcelmpl extends AbstractExcelExport {
         return fieldSet;
     }
 
-    protected void writeDataToComposed(XSSFSheet sheet, List<ComposedExportInfoDto> composedList, Set<String> composedHeaders) {
+    protected void writeDataToComposed(XSSFSheet sheet, List<ComposedExportInfoDto> composedList) {
         int rowCount = 1;
         CellStyle style = workbook.createCellStyle();
         XSSFFont font = workbook.createFont();
@@ -152,7 +152,7 @@ public class ExportExcelmpl extends AbstractExcelExport {
         }
     }
 
-    protected void writeDataToProduction(XSSFSheet sheet, List<ProductionOrderExportInfoDto> productionOrders, Set<String> productionHeaders) {
+    protected void writeDataToProduction(XSSFSheet sheet, List<ProductionOrderExportInfoDto> productionOrders) {
         int rowCount = 1;
         CellStyle style = workbook.createCellStyle();
         XSSFFont font = workbook.createFont();

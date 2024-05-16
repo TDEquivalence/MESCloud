@@ -1,6 +1,5 @@
 package com.alcegory.mescloud.model.dto.company;
 
-import com.alcegory.mescloud.model.dto.company.FactoryDto;
 import lombok.Getter;
 import lombok.Setter;
 

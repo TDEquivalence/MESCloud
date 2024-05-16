@@ -12,7 +12,7 @@ import com.alcegory.mescloud.model.dto.equipment.CountingEquipmentDto;
 import com.alcegory.mescloud.model.dto.mqqt.PlcMqttDto;
 import com.alcegory.mescloud.model.dto.pagination.PaginatedAlarmDto;
 import com.alcegory.mescloud.model.dto.production.ProductionOrderDto;
-import com.alcegory.mescloud.model.entity.*;
+import com.alcegory.mescloud.model.entity.UserEntity;
 import com.alcegory.mescloud.model.entity.alarm.AlarmConfigurationEntity;
 import com.alcegory.mescloud.model.entity.alarm.AlarmEntity;
 import com.alcegory.mescloud.model.entity.alarm.AlarmSummaryEntity;
@@ -216,12 +216,6 @@ public class AlarmServiceImpl implements AlarmService {
 
     private Map<Long, AlarmEntity> findActiveAlarmsMap(Long equipmentId) {
         List<AlarmEntity> activeAlarms = repository.findByEquipmentIdAndStatus(equipmentId, AlarmStatus.ACTIVE);
-        return activeAlarms.stream()
-                .collect(Collectors.toMap(alarm -> alarm.getAlarmConfiguration().getId(), alarm -> alarm));
-    }
-
-    private Map<Long, AlarmEntity> findInactiveAlarmsMap(Long equipmentId) {
-        List<AlarmEntity> activeAlarms = repository.findByEquipmentIdAndStatus(equipmentId, AlarmStatus.INACTIVE);
         return activeAlarms.stream()
                 .collect(Collectors.toMap(alarm -> alarm.getAlarmConfiguration().getId(), alarm -> alarm));
     }

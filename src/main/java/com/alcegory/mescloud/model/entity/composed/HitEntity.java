@@ -1,6 +1,5 @@
 package com.alcegory.mescloud.model.entity.composed;
 
-import com.alcegory.mescloud.model.entity.composed.SampleEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
