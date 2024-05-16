@@ -22,11 +22,7 @@ public class ExcelExportController {
     @PostMapping("composed-and-production-orders/completed")
     public ResponseEntity<Void> exportCompletedComposedAndProductionToExcel(HttpServletResponse response,
                                                                             @RequestBody Map<String, String> requestPayload) {
-        try {
-            exportExcelService.exportProductionAndComposedToExcelFiltered(response, requestPayload);
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+        exportExcelService.exportProductionAndComposedToExcelFiltered(response, requestPayload);
+        return ResponseEntity.ok().build();
     }
 }

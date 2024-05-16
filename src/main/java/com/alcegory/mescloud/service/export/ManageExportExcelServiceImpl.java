@@ -3,8 +3,8 @@ package com.alcegory.mescloud.service.export;
 import com.alcegory.mescloud.exception.ExcelExportException;
 import com.alcegory.mescloud.model.converter.ComposedConverter;
 import com.alcegory.mescloud.model.converter.ProductionOrderConverter;
-import com.alcegory.mescloud.model.dto.composed.ComposedInfoDto;
-import com.alcegory.mescloud.model.dto.production.ProductionOrderDto;
+import com.alcegory.mescloud.model.dto.composed.ComposedExportInfoDto;
+import com.alcegory.mescloud.model.dto.production.ProductionOrderExportInfoDto;
 import com.alcegory.mescloud.model.entity.composed.ComposedSummaryEntity;
 import com.alcegory.mescloud.model.entity.production.ProductionOrderEntity;
 import com.alcegory.mescloud.repository.composed.ComposedProductionOrderRepository;
@@ -56,15 +56,15 @@ public class ManageExportExcelServiceImpl implements ManageExportExcelService {
         List<ProductionOrderEntity> productionOrders = productionOrderRepository.findCompleted(false, null, startDate, endDate);
         List<ComposedSummaryEntity> composedList = composedRepository.findAllComposed(startDate, endDate);
 
-        List<ProductionOrderDto> productionOrderDtos = productionOrderConverter.toDto(productionOrders);
-        List<ComposedInfoDto> composedInfoDtos = composedConverter.convertToDtoList(composedList);
+        List<ProductionOrderExportInfoDto> productionOrderDtos = productionOrderConverter.toExportDtoList(productionOrders);
+        List<ComposedExportInfoDto> composedExportInfoDtos = composedConverter.convertToDtoList(composedList);
 
         try {
-            if (productionOrderDtos.isEmpty() && composedInfoDtos.isEmpty()) {
+            if (productionOrderDtos.isEmpty() && composedExportInfoDtos.isEmpty()) {
                 handleEmptyLists(response);
             } else {
                 ExportExcelmpl excelExportImpl = new ExportExcelmpl();
-                excelExportImpl.exportDataToExcel(response, composedInfoDtos, productionOrderDtos);
+                excelExportImpl.exportDataToExcel(response, composedExportInfoDtos, productionOrderDtos);
             }
         } catch (IOException e) {
             throw new ExcelExportException(ERROR_MESSAGE, e);

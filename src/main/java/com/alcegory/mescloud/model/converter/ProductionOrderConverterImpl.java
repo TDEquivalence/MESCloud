@@ -123,28 +123,30 @@ public class ProductionOrderConverterImpl implements ProductionOrderConverter {
     }
 
     @Override
-    public List<ExportProductionOrderDto> toExportDtoList(List<ProductionOrderEntity> entities) {
-        List<ExportProductionOrderDto> exportDtoList = new ArrayList<>();
+    public List<ProductionOrderExportInfoDto> toExportDtoList(List<ProductionOrderEntity> entities) {
+        List<ProductionOrderExportInfoDto> exportDtoList = new ArrayList<>();
 
         for (ProductionOrderEntity entity : entities) {
-            ExportProductionOrderDto exportDto = toExportDtoList(entity);
+            ProductionOrderExportInfoDto exportDto = toExportDto(entity);
             exportDtoList.add(exportDto);
         }
 
         return exportDtoList;
     }
 
-    public ExportProductionOrderDto toExportDtoList(ProductionOrderEntity entity) {
-        ExportProductionOrderDto exportDto = new ExportProductionOrderDto();
+    public ProductionOrderExportInfoDto toExportDto(ProductionOrderEntity entity) {
+        ProductionOrderExportInfoDto exportDto = new ProductionOrderExportInfoDto();
 
-        exportDto.setEquipment(entity.getEquipment().getCode());
-        exportDto.setComposedCode(entity.getComposedProductionOrder().getCode());
-        exportDto.setCode(entity.getCode());
-        exportDto.setIms(entity.getIms().getCode());
-        exportDto.setInstructionDtos(toDtoList(entity.getProductionInstructions()));
+        exportDto.setEquipment(entity.getEquipment() != null ? entity.getEquipment().getCode() : "");
+        exportDto.setComposedCode(entity.getComposedProductionOrder() != null ?
+                entity.getComposedProductionOrder().getCode() : "");
+        exportDto.setProductionCode(entity.getCode() != null ? entity.getCode() : "");
+        exportDto.setIms(entity.getIms() != null ? entity.getIms().getCode() : "");
         exportDto.setValidAmount(entity.getValidAmount());
-        exportDto.setCreatedAt(entity.getCreatedAt());
-        exportDto.setCompletedAt(entity.getCompletedAt());
+        exportDto.setProductionCreatedAt(entity.getCreatedAt());
+        exportDto.setProductionCompletedAt(entity.getCompletedAt());
+        exportDto.setInstructions(toDtoList(entity.getProductionInstructions()));
+
         return exportDto;
     }
 

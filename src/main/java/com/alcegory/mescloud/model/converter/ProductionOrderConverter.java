@@ -22,7 +22,7 @@ public interface ProductionOrderConverter {
 
     List<ProductionInstructionDto> toDtoList(List<ProductionInstructionEntity> entities);
 
-    List<ExportProductionOrderDto> toExportDtoList(List<ProductionOrderEntity> entities);
+    List<ProductionOrderExportInfoDto> toExportDtoList(List<ProductionOrderEntity> entities);
 
     default List<ProductionOrderDto> toDto(List<ProductionOrderEntity> entityList) {
         return entityList.stream()

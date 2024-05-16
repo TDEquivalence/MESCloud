@@ -8,16 +8,15 @@ import java.util.List;
 
 @Getter
 @Setter
-public class ExportProductionOrderDto {
+public class ProductionOrderExportInfoDto {
 
     private String equipment;
     private String composedCode;
-    private String code;
+    private String productionCode;
     private String ims;
-
-    private List<ProductionInstructionDto> instructionDtos;
-
     private Long validAmount;
-    private Date createdAt;
-    private Date completedAt;
+    private Date productionCreatedAt;
+    private Date productionCompletedAt;
+
+    private List<ProductionInstructionDto> instructions;
 }

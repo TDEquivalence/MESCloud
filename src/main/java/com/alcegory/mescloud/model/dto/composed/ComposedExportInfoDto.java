@@ -9,11 +9,11 @@ import java.util.List;
 
 @Getter
 @Setter
-public class ComposedInfoDto {
+public class ComposedExportInfoDto {
 
     private String batchCode;
-    private Timestamp createdAt;
-    private String code;
+    private Timestamp composedCreatedAt;
+    private String composedCode;
     private Integer validAmount;
     private Integer sampleAmount;
     private Integer amountOfHits;

@@ -1,8 +1,7 @@
 package com.alcegory.mescloud.service.export;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 public abstract class ExcelConstants {
 
@@ -15,71 +14,23 @@ public abstract class ExcelConstants {
     private ExcelConstants() {
     }
 
-    public static String[] getHeaders(boolean withHits, boolean isCompleted) {
-        List<String> headersList = new ArrayList<>();
-
-        if (isCompleted) {
-            headersList.add("Lote Final");
-        }
-
-        String[] commonHeaders = {
-                "Produção Composta",
-                "Lote de Entrada",
-                "Proveniência",
-                "Calibre",
-                "Classe",
-                "Lavação",
-                "Quantidade",
-                "Amostra",
-                "Criação da composta"
-        };
-
-        headersList.addAll(Arrays.asList(commonHeaders));
-
-        if (withHits) {
-            headersList.addAll(Arrays.asList("Hits", "Fiabilidade", "Hits inseridos em"));
-        }
-
-        if (isCompleted) {
-            headersList.add("Status");
-            headersList.add("Resolvido em");
-        }
-
-        return headersList.toArray(new String[0]);
-    }
-
-    public static String[] getHeaders(boolean isCompleted) {
-        List<String> headersList = new ArrayList<>();
-
-        String[] commonHeaders = {
-                "Equipamento",
-                "Ordem de Produção",
-                "IMS",
-                "Lote de Entrada",
-                "Proveniência",
-                "Calibre",
-                "Classe",
-                "Lavação",
-                "Quantidade",
-                "Início de Produção",
-                "Conclusão de Produção"
-        };
-
-        // Add common headers
-        headersList.addAll(Arrays.asList(commonHeaders));
-
-        if (isCompleted) {
-            headersList.add(1, "Produção Composta");
-        }
-
-        return headersList.toArray(new String[0]);
-    }
-
-    public static String[] getComposedHeaders() {
-        return getHeaders(true, true);
-    }
-
-    public static String[] getProductionOrderHeaders() {
-        return getHeaders(true);
+    public static Map<String, String> translateFieldNamesMapping() {
+        Map<String, String> mapping = new HashMap<>();
+        mapping.put("batchCode", "Lote Final");
+        mapping.put("composedCode", "Produção Composta");
+        mapping.put("composedCreatedAt", "Criação da Composta");
+        mapping.put("validAmount", "Quantidade");
+        mapping.put("isBatchApproved", "Aprovado");
+        mapping.put("approvedAt", "Aprovado em");
+        mapping.put("amountOfHits", "Hits");
+        mapping.put("hitInsertedAt", "Hits inseridos em");
+        mapping.put("sampleAmount", "Amostra");
+        mapping.put("reliability", "Fiabilidade");
+        mapping.put("equipment", "Equipamento");
+        mapping.put("productionCode", "Ordem de Produção");
+        mapping.put("ims", "IMS");
+        mapping.put("productionCreatedAt", "Início de Produção");
+        mapping.put("productionCompletedAt", "Conclusão de Produção");
+        return mapping;
     }
 }

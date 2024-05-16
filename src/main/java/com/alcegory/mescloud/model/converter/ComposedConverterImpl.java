@@ -1,6 +1,6 @@
 package com.alcegory.mescloud.model.converter;
 
-import com.alcegory.mescloud.model.dto.composed.ComposedInfoDto;
+import com.alcegory.mescloud.model.dto.composed.ComposedExportInfoDto;
 import com.alcegory.mescloud.model.dto.composed.ExportComposedDto;
 import com.alcegory.mescloud.model.dto.production.ProductionInstructionDto;
 import com.alcegory.mescloud.model.entity.composed.ComposedSummaryEntity;
@@ -16,22 +16,22 @@ import java.util.Map;
 @Log
 public class ComposedConverterImpl implements ComposedConverter {
 
-    public List<ComposedInfoDto> convertToDtoList(List<ComposedSummaryEntity> entities) {
-        List<ComposedInfoDto> dtoList = new ArrayList<>();
+    public List<ComposedExportInfoDto> convertToDtoList(List<ComposedSummaryEntity> entities) {
+        List<ComposedExportInfoDto> dtoList = new ArrayList<>();
 
         for (ComposedSummaryEntity entity : entities) {
-            ComposedInfoDto dto = convertToDto(entity);
+            ComposedExportInfoDto dto = convertToDto(entity);
             dtoList.add(dto);
         }
 
         return dtoList;
     }
 
-    public ComposedInfoDto convertToDto(ComposedSummaryEntity entity) {
-        ComposedInfoDto dto = new ComposedInfoDto();
-        
-        dto.setCode(entity.getCode());
-        dto.setCreatedAt(entity.getCreatedAt());
+    public ComposedExportInfoDto convertToDto(ComposedSummaryEntity entity) {
+        ComposedExportInfoDto dto = new ComposedExportInfoDto();
+
+        dto.setComposedCode(entity.getCode());
+        dto.setComposedCreatedAt(entity.getCreatedAt());
         dto.setApprovedAt(entity.getApprovedAt());
         dto.setHitInsertedAt(entity.getHitInsertedAt());
         dto.setSampleAmount(entity.getSampleAmount());
