@@ -11,6 +11,7 @@ import com.alcegory.mescloud.model.filter.FilterDto;
 import com.alcegory.mescloud.repository.AbstractFilterRepository;
 import com.alcegory.mescloud.utility.DateUtil;
 import jakarta.persistence.EntityGraph;
+import jakarta.persistence.EntityManager;
 import jakarta.persistence.Tuple;
 import jakarta.persistence.criteria.*;
 import lombok.extern.java.Log;
@@ -35,6 +36,10 @@ public class CounterRecordRepositoryImpl extends AbstractFilterRepository<Filter
     private static final String REGISTERED_AT_PROP = "registeredAt";
     private static final String IS_VALID_FOR_PRODUCTION_PROP = "isValidForProduction";
     private static final String INCREMENT_PROP = "increment";
+
+    protected CounterRecordRepositoryImpl(EntityManager entityManager) {
+        super(entityManager);
+    }
 
 
     public List<CounterRecordSummaryEntity> findLastPerProductionOrderAndEquipmentOutputPerDay(FilterDto filter) {

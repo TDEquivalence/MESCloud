@@ -6,6 +6,7 @@ import com.alcegory.mescloud.model.entity.alarm.AlarmEntity;
 import com.alcegory.mescloud.model.entity.alarm.AlarmSummaryEntity;
 import com.alcegory.mescloud.model.filter.Filter;
 import com.alcegory.mescloud.repository.AbstractFilterRepository;
+import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
@@ -21,6 +22,10 @@ public class AlarmRepositoryImpl extends AbstractFilterRepository<Filter.Propert
     private static final String ID_PROP = "id";
     private static final String CREATED_AT_PROP = "createdAt";
     private static final String STATUS_PROP = "status";
+
+    protected AlarmRepositoryImpl(EntityManager entityManager) {
+        super(entityManager);
+    }
 
     public List<AlarmSummaryEntity> findByFilter(Filter filter) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
