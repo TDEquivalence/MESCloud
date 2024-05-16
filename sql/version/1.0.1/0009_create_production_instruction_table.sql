@@ -16,10 +16,10 @@ INSERT INTO production_instruction (name, value, production_order_id)
 SELECT 'Proveniência', source, id FROM production_order;
 
 INSERT INTO production_instruction (name, value, production_order_id)
-SELECT 'Gauge', gauge, id FROM production_order;
+SELECT 'Calibre', gauge, id FROM production_order;
 
 INSERT INTO production_instruction (name, value, production_order_id)
-SELECT 'Category', category, id FROM production_order;
+SELECT 'Categoria', category, id FROM production_order;
 
 INSERT INTO production_instruction (name, value, production_order_id)
 SELECT 'Lavação', washing_process, id FROM production_order;

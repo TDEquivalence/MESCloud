@@ -56,7 +56,7 @@ public class ExportExcelmpl extends AbstractExcelExport {
     private Set<String> createComposedHeaderRow(XSSFSheet sheet, List<ComposedInfoDto> composedList) {
         Set<String> fieldSet = new LinkedHashSet<>();
 
-        Map<String, String> portugueseFieldNames = createPortugueseFieldNamesMapping();
+        Map<String, String> portugueseFieldNames = translateFieldNamesMapping();
 
         Class<?> composedClass = ComposedInfoDto.class;
         Field[] fields = composedClass.getDeclaredFields();
@@ -88,7 +88,7 @@ public class ExportExcelmpl extends AbstractExcelExport {
         return fieldSet;
     }
 
-    private Map<String, String> createPortugueseFieldNamesMapping() {
+    private Map<String, String> translateFieldNamesMapping() {
         Map<String, String> mapping = new HashMap<>();
         mapping.put("batchCode", "Lote Final");
         mapping.put("code", "Produção Composta");
@@ -128,20 +128,19 @@ public class ExportExcelmpl extends AbstractExcelExport {
             int columnCount = 0;
 
             createCell(row, columnCount++, composed.getBatchCode(), style);
+            createCell(row, columnCount++, composed.getCreatedAt(), style);
             createCell(row, columnCount++, composed.getCode(), style);
+            createCell(row, columnCount++, composed.getValidAmount(), style);
+            createCell(row, columnCount++, composed.getSampleAmount(), style);
+            createCell(row, columnCount++, composed.getAmountOfHits(), style);
+            createCell(row, columnCount++, composed.getHitInsertedAt(), style);
+            createCell(row, columnCount++, composed.getReliability(), style);
+            createCell(row, columnCount++, composed.getIsBatchApproved(), style);
+            createCell(row, columnCount++, composed.getApprovedAt(), style);
 
             for (ProductionInstructionDto instruction : composed.getInstructions()) {
                 createCell(row, columnCount++, instruction.getValue(), style);
             }
-
-            createCell(row, columnCount++, composed.getValidAmount(), style);
-            createCell(row, columnCount++, composed.getSampleAmount(), style);
-            createCell(row, columnCount++, composed.getCreatedAt(), style);
-            createCell(row, columnCount++, composed.getAmountOfHits(), style);
-            createCell(row, columnCount++, composed.getReliability(), style);
-            createCell(row, columnCount++, composed.getHitInsertedAt(), style);
-            createCell(row, columnCount++, composed.getIsBatchApproved(), style);
-            createCell(row, columnCount++, composed.getApprovedAt(), style);
         }
     }
 

@@ -10,16 +10,16 @@ import java.util.List;
 @Getter
 @Setter
 public class ComposedInfoDto {
-    
-    private String code;
+
+    private String batchCode;
     private Timestamp createdAt;
-    private Timestamp approvedAt;
-    private Timestamp hitInsertedAt;
+    private String code;
+    private Integer validAmount;
     private Integer sampleAmount;
+    private Integer amountOfHits;
+    private Timestamp hitInsertedAt;
     private Double reliability;
     private Boolean isBatchApproved;
-    private String batchCode;
-    private Integer amountOfHits;
-    private Integer validAmount;
+    private Timestamp approvedAt;
     private List<ProductionInstructionDto> instructions;
 }
