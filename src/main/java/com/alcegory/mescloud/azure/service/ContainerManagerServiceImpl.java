@@ -1,14 +1,14 @@
 package com.alcegory.mescloud.azure.service;
 
-import com.alcegory.mescloud.azure.model.dto.*;
+import com.alcegory.mescloud.azure.model.dto.ContainerInfoSummary;
+import com.alcegory.mescloud.azure.model.dto.ContainerInfoUpdate;
+import com.alcegory.mescloud.azure.model.dto.ImageAnnotationDto;
+import com.alcegory.mescloud.azure.model.dto.ImageInfoDto;
 import com.alcegory.mescloud.exception.ImageAnnotationException;
 import com.alcegory.mescloud.model.entity.UserEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 @Slf4j
@@ -186,26 +186,5 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
         summary.setPath(imageInfoDto.getPath());
 
         return summary;
-    }
-
-    private List<String> getRectangleLabels(List<AnnotationDto> annotations) {
-        List<String> rectangleLabels = new ArrayList<>();
-        if (annotations != null) {
-            for (AnnotationDto annotation : annotations) {
-                addRectangleLabels(annotation.getResult(), rectangleLabels);
-            }
-        }
-        return rectangleLabels;
-    }
-
-    private void addRectangleLabels(List<ResultDto> results, List<String> rectangleLabels) {
-        if (results != null) {
-            for (ResultDto result : results) {
-                ValueDto value = result.getValue();
-                if (value != null && value.getRectangleLabels() != null) {
-                    rectangleLabels.addAll(value.getRectangleLabels());
-                }
-            }
-        }
     }
 }
