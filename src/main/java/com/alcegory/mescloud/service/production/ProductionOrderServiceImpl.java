@@ -2,10 +2,11 @@ package com.alcegory.mescloud.service.production;
 
 import com.alcegory.mescloud.model.converter.ProductionOrderConverter;
 import com.alcegory.mescloud.model.dto.production.ProductionOrderDto;
+import com.alcegory.mescloud.model.entity.production.ProductionInstructionEntity;
 import com.alcegory.mescloud.model.entity.production.ProductionOrderEntity;
 import com.alcegory.mescloud.model.filter.Filter;
-import com.alcegory.mescloud.repository.record.CounterRecordRepository;
 import com.alcegory.mescloud.repository.production.ProductionOrderRepository;
+import com.alcegory.mescloud.repository.record.CounterRecordRepository;
 import com.alcegory.mescloud.utility.DateUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
@@ -261,6 +262,11 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     public ProductionOrderEntity save(ProductionOrderEntity productionOrder) {
         if (productionOrder == null) {
             throw new IllegalArgumentException("Production order cannot be null");
+        }
+
+        List<ProductionInstructionEntity> productionInstruction = productionOrder.getProductionInstructions();
+        for (ProductionInstructionEntity pi : productionInstruction) {
+            pi.setProductionOrder(productionOrder);
         }
 
         return repository.save(productionOrder);
