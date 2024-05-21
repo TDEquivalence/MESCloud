@@ -22,6 +22,8 @@ public interface ProductionOrderConverter {
 
     List<ProductionInstructionDto> toDtoList(List<ProductionInstructionEntity> entities);
 
+    List<ProductionInstructionEntity> toEntityList(List<ProductionInstructionDto> dtos);
+
     List<ProductionOrderExportInfoDto> toExportDtoList(List<ProductionOrderEntity> entities);
 
     default List<ProductionOrderDto> toDto(List<ProductionOrderEntity> entityList) {
