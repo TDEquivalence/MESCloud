@@ -26,7 +26,6 @@ public class ProductionOrderRepositoryImpl {
     private static final String PROP_ID = "id";
 
     private static final String EQUIPMENT = "equipment";
-    private static final String PRODUCTION_INSTRUCTIONS = "productionInstructions";
 
     private final EntityManager entityManager;
 

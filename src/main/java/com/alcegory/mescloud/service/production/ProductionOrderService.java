@@ -6,7 +6,6 @@ import com.alcegory.mescloud.model.filter.Filter;
 import org.springframework.data.repository.query.Param;
 
 import java.sql.Timestamp;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,12 +39,7 @@ public interface ProductionOrderService {
 
     void setProductionOrderApproval(Long composedOrderId, boolean isApproved);
 
-    List<ProductionOrderDto> findByEquipmentAndPeriod(Long equipmentId, Date startDate, Date endDate);
-
     boolean isCompleted(String productionOrderCode);
-
-    List<ProductionOrderEntity> findByEquipmentAndPeriod(Long equipmentId, String productionOrderCode, Timestamp startDate,
-                                                         Timestamp endDate);
 
     List<ProductionOrderDto> getProductionOrderByComposedId(Long composedId);
 

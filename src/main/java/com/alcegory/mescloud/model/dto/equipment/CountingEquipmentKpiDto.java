@@ -20,9 +20,9 @@ public class CountingEquipmentKpiDto {
 
     public void updateCounts(int timeUnitAsIndex, CounterRecordDto equipmentCount) {
         if (equipmentCount.isValidForProduction()) {
-            validCounts[timeUnitAsIndex] += equipmentCount.getComputedValue();
+            validCounts[timeUnitAsIndex] += equipmentCount.getIncrementDay();
         } else {
-            invalidCounts[timeUnitAsIndex] += equipmentCount.getComputedValue();
+            invalidCounts[timeUnitAsIndex] += equipmentCount.getIncrementDay();
         }
     }
 }

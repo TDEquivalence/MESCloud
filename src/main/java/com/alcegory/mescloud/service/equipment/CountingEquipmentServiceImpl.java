@@ -175,4 +175,28 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
     public Optional<CountingEquipmentEntity> findEquipmentTemplate(long id) {
         return repository.findEquipmentWithTemplateById(id);
     }
+
+    @Override
+    public Double getAverageQualityTargetDividedByTotalCount() {
+        return repository.findAverageQualityTargetDividedByTotalCount();
+    }
+
+    @Override
+    public Double getAverageAvailabilityTargetDividedByTotalCount() {
+        return repository.findAverageAvailabilityTargetDividedByTotalCount();
+    }
+
+    @Override
+    public Double getAveragePerformanceTargetDividedByTotalCount() {
+        return repository.findAveragePerformanceTargetDividedByTotalCount();
+    }
+
+    @Override
+    public Double getAverageOverallEquipmentEffectivenessTargetDividedByTotalCount() {
+        return repository.findAverageOverallEquipmentEffectivenessTargetDividedByTotalCount();
+    }
+
+    public Double getAverageTheoreticalProduction() {
+        return repository.findAverageTheoreticalProduction();
+    }
 }

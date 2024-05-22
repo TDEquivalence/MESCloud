@@ -1,7 +1,7 @@
 package com.alcegory.mescloud.service.record;
 
 import com.alcegory.mescloud.model.converter.CounterRecordConverter;
-import com.alcegory.mescloud.model.dto.*;
+import com.alcegory.mescloud.model.dto.CounterRecordDto;
 import com.alcegory.mescloud.model.dto.equipment.CountingEquipmentDto;
 import com.alcegory.mescloud.model.dto.equipment.EquipmentOutputDto;
 import com.alcegory.mescloud.model.dto.mqqt.CounterMqttDto;
@@ -15,8 +15,8 @@ import com.alcegory.mescloud.model.entity.records.CounterRecordEntity;
 import com.alcegory.mescloud.model.entity.records.CounterRecordSummaryEntity;
 import com.alcegory.mescloud.model.filter.Filter;
 import com.alcegory.mescloud.model.filter.FilterDto;
-import com.alcegory.mescloud.repository.record.CounterRecordRepository;
 import com.alcegory.mescloud.repository.production.ProductionOrderRepository;
+import com.alcegory.mescloud.repository.record.CounterRecordRepository;
 import com.alcegory.mescloud.service.company.CompanyService;
 import com.alcegory.mescloud.service.equipment.CountingEquipmentService;
 import com.alcegory.mescloud.service.equipment.EquipmentOutputService;
@@ -282,25 +282,12 @@ public class CounterRecordServiceImpl implements CounterRecordService {
 
     @Override
     public Integer sumValidCounterIncrement(Long countingEquipmentId, FilterDto filter) {
-        return repository.sumValidCounterIncrement(countingEquipmentId, filter);
+        return repository.sumIncrementDay(countingEquipmentId, filter, true);
     }
 
     @Override
-    public Integer sumCounterIncrement(Long countingEquipmentId, FilterDto filter) {
-        return repository.sumCounterIncrement(countingEquipmentId, filter);
-    }
-
-    @Override
-    public Integer sumIncrementActiveTimeByProductionOrderId(Long productionOrderId, Long equipmentOutputId, Timestamp startDate,
-                                                             Timestamp endDate) {
-
-        if (productionOrderId == null) {
-            throw new IllegalArgumentException("Production order cannot be null");
-        }
-
-        Integer activeTime = repository.sumIncrementActiveTimeByProductionOrderId(productionOrderId, equipmentOutputId,
-                startDate, endDate);
-        return Optional.ofNullable(activeTime).orElse(0);
+    public Integer sumTotalCounterIncrement(Long countingEquipmentId, FilterDto filter) {
+        return repository.sumIncrementDay(countingEquipmentId, filter, false);
     }
 
     @Override
@@ -334,5 +321,14 @@ public class CounterRecordServiceImpl implements CounterRecordService {
                 }
             });
         }
+    }
+
+    public Long sumActiveTimeDayByProductionOrderId(Long productionOrderId, Long equipmentId, Timestamp startDate, Timestamp endDate) {
+        return repository.sumActiveTimeDayByProductionOrderId(productionOrderId, equipmentId, startDate, endDate);
+    }
+
+    public List<CounterRecordSummaryEntity> findByEquipmentAndPeriod(
+            Long equipmentId, String productionOrderCode, Timestamp startDate, Timestamp endDate) {
+        return repository.findByEquipmentAndPeriod(equipmentId, productionOrderCode, startDate, endDate);
     }
 }

@@ -10,6 +10,21 @@ import java.util.Optional;
 
 public interface CountingEquipmentRepository extends CrudRepository<CountingEquipmentEntity, Long> {
 
+    @Query(value = "SELECT AVG(ce.quality_target) / COUNT(ce) FROM counting_equipment ce", nativeQuery = true)
+    Double findAverageQualityTargetDividedByTotalCount();
+
+    @Query(value = "SELECT AVG(ce.availability_target) / COUNT(ce) FROM counting_equipment ce", nativeQuery = true)
+    Double findAverageAvailabilityTargetDividedByTotalCount();
+
+    @Query(value = "SELECT AVG(ce.performance_target) / COUNT(ce) FROM counting_equipment ce", nativeQuery = true)
+    Double findAveragePerformanceTargetDividedByTotalCount();
+
+    @Query(value = "SELECT AVG(ce.overall_equipment_effectiveness_target) / COUNT(ce) FROM counting_equipment ce", nativeQuery = true)
+    Double findAverageOverallEquipmentEffectivenessTargetDividedByTotalCount();
+
+    @Query(value = "SELECT AVG(ce.theoretical_production) FROM counting_equipment ce", nativeQuery = true)
+    Double findAverageTheoreticalProduction();
+
     Optional<CountingEquipmentEntity> findByCode(String code);
 
     @Query("SELECT ce FROM counting_equipment ce LEFT JOIN FETCH ce.equipmentStatusRecords esr " +

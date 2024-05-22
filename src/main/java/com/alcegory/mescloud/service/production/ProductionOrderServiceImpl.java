@@ -163,13 +163,6 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     }
 
     @Override
-    public List<ProductionOrderDto> findByEquipmentAndPeriod(Long equipmentId, Date startDate, Date endDate) {
-        List<ProductionOrderEntity> productionOrders = repository.findByEquipmentAndPeriod(equipmentId, null,
-                startDate, endDate);
-        return converter.toDto(productionOrders);
-    }
-
-    @Override
     public boolean isCompleted(String productionOrderCode) {
         return repository.isCompleted(productionOrderCode);
     }
@@ -187,12 +180,6 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     @Override
     public void delete(ProductionOrderEntity productionOrder) {
         repository.delete(productionOrder);
-    }
-
-    @Override
-    public List<ProductionOrderEntity> findByEquipmentAndPeriod(Long equipmentId, String productionOrderCode,
-                                                                Timestamp startDate, Timestamp endDate) {
-        return repository.findByEquipmentAndPeriod(equipmentId, productionOrderCode, startDate, endDate);
     }
 
     @Override

@@ -1,7 +1,7 @@
 package com.alcegory.mescloud.model.converter;
 
 import com.alcegory.mescloud.model.dto.CounterRecordDto;
-import com.alcegory.mescloud.model.entity.*;
+import com.alcegory.mescloud.model.entity.ImsEntity;
 import com.alcegory.mescloud.model.entity.production.ProductionOrderEntity;
 import com.alcegory.mescloud.model.entity.records.CounterRecordConclusionEntity;
 import com.alcegory.mescloud.model.entity.records.CounterRecordEntity;
@@ -26,7 +26,7 @@ public class CounterRecordConverterImpl implements CounterRecordConverter {
     public CounterRecordDto toDto(CounterRecordEntity entity) {
         CounterRecordDto counterRecordDto = mapper.map(entity, CounterRecordDto.class);
         if (entity.getEquipmentOutput() != null && entity.getEquipmentOutput().getCountingEquipment() != null) {
-            counterRecordDto.setEquipmentAlias(entity.getEquipmentOutput().getCountingEquipment().getAlias());
+            counterRecordDto.setEquipmentOutputAlias(entity.getEquipmentOutput().getCountingEquipment().getAlias());
         }
         return counterRecordDto;
     }

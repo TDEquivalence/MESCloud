@@ -3,7 +3,7 @@ package com.alcegory.mescloud.model.dto;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Date;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 
@@ -15,8 +15,8 @@ public class CounterRecordDto {
     private String productionOrderCode;
     private int equipmentOutputId;
     private String equipmentOutputAlias;
-    private int computedValue;
-    private Date registeredAt;
+    private int incrementDay;
+    private Timestamp registeredAt;
     private boolean isValidForProduction;
     private String ims;
 

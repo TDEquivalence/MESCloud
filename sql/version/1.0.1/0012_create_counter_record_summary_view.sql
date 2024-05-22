@@ -1,16 +1,21 @@
 BEGIN;
 
-CREATE VIEW counter_record_view AS
+CREATE VIEW counter_record_summary AS
 SELECT
     MAX(cr.id) AS id,
-    e.alias AS equipment_alias,
+    e.id AS counting_equipment_id,
+    e.alias AS counting_equipment_alias,
+    po.id AS production_order_id,
     po.code AS production_order_code,
     eo.id AS equipment_output_id,
     eo_alias.alias AS equipment_output_alias,
-    SUM(cr.increment) AS computed_value,
-    cr.registered_at,
+    SUM(cr.increment) AS increment_day,
+    SUM(cr.increment_active_time) AS active_time_day,
+    DATE(cr.registered_at) AS registered_at,
     cr.is_valid_for_production,
-    ims.code AS ims
+    ims.code AS ims,
+    po.created_at,
+    po.completed_at
 FROM
     counter_record cr
 JOIN
@@ -24,17 +29,21 @@ JOIN
 JOIN
     equipment_output_alias eo_alias ON eo.equipment_output_alias_id = eo_alias.id
 GROUP BY
+    e.id,
     e.alias,
+    po.id,
     po.code,
     eo.id,
     eo_alias.alias,
-    cr.registered_at,
+    DATE(cr.registered_at),
     cr.is_valid_for_production,
-    ims.code;
+    ims.code,
+    po.created_at,
+    po.completed_at;
 
 
 INSERT INTO audit_script (run_date, process, version, schema)
 VALUES
-    (CURRENT_DATE, '0012_create_counter_record_view.sql', '1.0.1', '1.0.1_0012');
+    (CURRENT_DATE, '0012_create_counter_record_summary_view.sql', '1.0.1', '1.0.1_0012');
 
 COMMIT;

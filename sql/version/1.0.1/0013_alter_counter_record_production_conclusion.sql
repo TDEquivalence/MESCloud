@@ -52,6 +52,6 @@ GROUP BY
 
 INSERT INTO audit_script (run_date, process, version, schema)
 VALUES
-    (CURRENT_DATE, '0016_counter_record_production_conclusion.sql', '1.0.1', '1.0.1_0016');
+    (CURRENT_DATE, '0014_counter_record_production_conclusion.sql', '1.0.1', '1.0.1_0014');
 
 COMMIT;

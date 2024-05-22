@@ -1,7 +1,6 @@
 package com.alcegory.mescloud.service.equipment;
 
 import com.alcegory.mescloud.model.dto.equipment.CountingEquipmentDto;
-import com.alcegory.mescloud.model.dto.equipment.CountingEquipmentInfoDto;
 import com.alcegory.mescloud.model.entity.equipment.CountingEquipmentEntity;
 import org.springframework.data.repository.query.Param;
 
@@ -41,4 +40,14 @@ public interface CountingEquipmentService {
     CountingEquipmentDto saveAndGetDto(CountingEquipmentEntity countingEquipment);
 
     Optional<CountingEquipmentEntity> findEquipmentTemplate(long id);
+
+    Double getAverageQualityTargetDividedByTotalCount();
+
+    Double getAverageAvailabilityTargetDividedByTotalCount();
+
+    Double getAveragePerformanceTargetDividedByTotalCount();
+
+    Double getAverageOverallEquipmentEffectivenessTargetDividedByTotalCount();
+
+    Double getAverageTheoreticalProduction();
 }

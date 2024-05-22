@@ -1,10 +1,10 @@
 package com.alcegory.mescloud.repository.record;
 
-import com.alcegory.mescloud.model.filter.FilterDto;
 import com.alcegory.mescloud.model.entity.records.CounterRecordConclusionEntity;
 import com.alcegory.mescloud.model.entity.records.CounterRecordEntity;
 import com.alcegory.mescloud.model.entity.records.CounterRecordSummaryEntity;
 import com.alcegory.mescloud.model.filter.Filter;
+import com.alcegory.mescloud.model.filter.FilterDto;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -31,16 +31,10 @@ public interface CounterRecordRepository extends CrudRepository<CounterRecordEnt
 
     List<CounterRecordEntity> getFilteredAndPaginated(Filter filterDto);
 
-    Integer sumValidCounterIncrement(Long countingEquipmentId, FilterDto filter);
-
     @Query("SELECT SUM(cr.increment) FROM CounterRecordEntity cr " +
             "WHERE cr.isValidForProduction = true " +
             "AND cr.productionOrder.id = :productionOrderId")
     Long sumValidCounterIncrementByProductionOrderId(@Param("productionOrderId") Long productionOrderId);
-
-    Integer sumValidCounterIncrementForApprovedPO(Long countingEquipmentId, Timestamp startDateFilter, Timestamp endDateFilter);
-
-    Integer sumCounterIncrement(Long countingEquipmentId, FilterDto filter);
 
     @Query(value = "SELECT " +
             "SUM(cr.increment_active_time) - COALESCE((" +
@@ -87,4 +81,19 @@ public interface CounterRecordRepository extends CrudRepository<CounterRecordEnt
             "WHERE po.code = :productionOrderCode " +
             "AND (cr.increment IS NOT NULL AND cr.increment > 0)", nativeQuery = true)
     boolean hasIncrementByProductionOrderCode(String productionOrderCode);
+
+    Integer sumIncrementDay(Long countingEquipmentId, FilterDto filter, boolean filterByValidProduction);
+
+    @Query(value = "SELECT SUM(DISTINCT cr.active_time_day) " +
+            "FROM counter_record_summary cr " +
+            "WHERE cr.production_order_id = :productionOrderId " +
+            "AND cr.counting_equipment_id = :equipmentId " +
+            "AND cr.registered_at BETWEEN :startDate AND :endDate", nativeQuery = true)
+    Long sumActiveTimeDayByProductionOrderId(
+            @Param("productionOrderId") Long productionOrderId,
+            @Param("equipmentId") Long equipmentId,
+            @Param("startDate") Timestamp startDate,
+            @Param("endDate") Timestamp endDate);
+
+    List<CounterRecordSummaryEntity> findByEquipmentAndPeriod(Long equipmentId, String productionOrderCode, Timestamp startDate, Timestamp endDate);
 }

@@ -10,7 +10,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,18 +37,6 @@ public interface ProductionOrderRepository extends JpaRepository<ProductionOrder
     List<ProductionOrderEntity> findCompleted(boolean withoutComposed, Filter filter, Timestamp startDate, Timestamp endDate);
 
     List<ProductionOrderEntity> findByComposedProductionOrderId(Long composedProductionOrderId);
-
-    @Query(value = "SELECT * FROM production_order p " +
-            "WHERE (p.completed_at > :startDate OR p.completed_at IS NULL) " +
-            "AND p.created_at < :endDate " +
-            "AND (p.equipment_id = :equipmentId) " +
-            "AND (:productionOrderCode IS NULL OR p.code = :productionOrderCode)", nativeQuery = true)
-    List<ProductionOrderEntity> findByEquipmentAndPeriod(
-            @Param("equipmentId") Long equipmentId,
-            @Param("productionOrderCode") String productionOrderCode,
-            @Param("startDate") Date startDate,
-            @Param("endDate") Date endDate
-    );
 
     @Query("SELECT po.isCompleted FROM production_order po WHERE po.code = :productionOrderCode")
     boolean isCompleted(String productionOrderCode);

@@ -33,8 +33,15 @@ GROUP BY
     b.id, b.code, b.is_approved,
     subquery.amount_of_hits;
 
+    ALTER TABLE production_order
+    DROP COLUMN input_batch,
+    DROP COLUMN source,
+    DROP COLUMN gauge,
+    DROP COLUMN category,
+    DROP COLUMN washing_process;
+
 INSERT INTO audit_script (run_date, process, version, schema)
 VALUES
-    (CURRENT_DATE, '0015_composed_summary_view.sql', '1.0.1', '1.0.1_0015');
+    (CURRENT_DATE, '0013_composed_summary_view.sql', '1.0.1', '1.0.1_0013');
 
 COMMIT;
