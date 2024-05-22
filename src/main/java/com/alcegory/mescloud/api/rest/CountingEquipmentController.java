@@ -47,10 +47,24 @@ public class CountingEquipmentController {
         }
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<CountingEquipmentInfoDto> findById(@PathVariable long id) {
+    @GetMapping("/{id}/info")
+    public ResponseEntity<CountingEquipmentInfoDto> findCountingInfoById(@PathVariable long id) {
         try {
             Optional<CountingEquipmentInfoDto> countingEquipmentOpt = managementInfoService.findEquipmentWithProductionOrderById(id);
+            if (countingEquipmentOpt.isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+
+            return new ResponseEntity<>(countingEquipmentOpt.get(), HttpStatus.OK);
+        } catch (EquipmentNotFoundException e) {
+            return HttpUtil.responseWithHeaders(HttpStatus.NOT_FOUND, EQUIPMENT_ERROR_CAUSE, e);
+        }
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<CountingEquipmentDto> findById(@PathVariable long id) {
+        try {
+            Optional<CountingEquipmentDto> countingEquipmentOpt = managementInfoService.findEquipmentById(id);
             if (countingEquipmentOpt.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
