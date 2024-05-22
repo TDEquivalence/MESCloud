@@ -64,12 +64,12 @@ public class CountingEquipmentController {
     @GetMapping("/{id}")
     public ResponseEntity<CountingEquipmentDto> findById(@PathVariable long id) {
         try {
-            Optional<CountingEquipmentDto> countingEquipmentOpt = managementInfoService.findEquipmentById(id);
-            if (countingEquipmentOpt.isEmpty()) {
+            CountingEquipmentDto countingEquipmentOpt = managementInfoService.findEquipmentById(id);
+            if (countingEquipmentOpt == null) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
 
-            return new ResponseEntity<>(countingEquipmentOpt.get(), HttpStatus.OK);
+            return new ResponseEntity<>(countingEquipmentOpt, HttpStatus.OK);
         } catch (EquipmentNotFoundException e) {
             return HttpUtil.responseWithHeaders(HttpStatus.NOT_FOUND, EQUIPMENT_ERROR_CAUSE, e);
         }
