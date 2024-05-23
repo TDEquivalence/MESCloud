@@ -37,16 +37,9 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
     public ContainerInfoSummary getRandomData(Authentication authentication) {
         ImageAnnotationDto imageAnnotationDto;
         ImageInfoDto imageInfoDto;
-        int iterationCount = 0;
 
         do {
-            if (iterationCount >= MAX_ITERATIONS) {
-                log.info("Maximum number of iterations reached.");
-                throw new ImageAnnotationException("There are no more images. Maximum number of iterations reached.");
-            }
-
             imageInfoDto = publicContainerService.getRandomImageReference();
-            iterationCount++;
 
             if (imageInfoDto == null) {
                 log.error("Image reference is null.");
@@ -120,22 +113,15 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
         int imageOccurrencesNotInitial = imageAnnotationService.countByImageAndStatusNotInitial(image);
 
         saveInitialApprovedImageAnnotation(containerInfoDto, authentication, imageOccurrencesNotInitial);
-        updateImageName(containerInfoDto.getImageAnnotationDto(), image, imageOccurrencesNotInitial);
 
-        ImageAnnotationDto uploadedImageAnnotationDto = approvedContainerService.saveToApprovedContainer(containerInfoDto.getImageAnnotationDto());
+        ImageAnnotationDto uploadedImageAnnotationDto = approvedContainerService.saveToApprovedContainer(containerInfoDto.getImageAnnotationDto(),
+                imageOccurrencesNotInitial);
 
         saveApprovedImageAnnotation(uploadedImageAnnotationDto, containerInfoDto.getImageAnnotationDto().isUserApproval(), authentication);
         handleImageOccurrences(uploadedImageAnnotationDto, image, imageOccurrencesNotInitial);
         return uploadedImageAnnotationDto;
     }
-
-    private void updateImageName(ImageAnnotationDto uploadedImageAnnotationDto, String image, int imageOccurrencesNotInitial) {
-        if (uploadedImageAnnotationDto != null && imageOccurrencesNotInitial != 0) {
-            String imageDataOccurrence = image + "(" + imageOccurrencesNotInitial + ")";
-            uploadedImageAnnotationDto.getData().setImage(imageDataOccurrence);
-        }
-    }
-
+    
     private void handleImageOccurrences(ImageAnnotationDto uploadedImageAnnotationDto, String image, int imageOccurrencesNotInitial) {
         if (uploadedImageAnnotationDto != null && imageOccurrencesNotInitial >= MAX_OCCURRENCES) {
             deleteBlobsForImage(image);

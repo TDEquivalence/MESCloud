@@ -58,11 +58,11 @@ public class ApprovedContainerServiceImpl implements ApprovedContainerService {
     }
 
     @Override
-    public ImageAnnotationDto saveToApprovedContainer(ImageAnnotationDto imageAnnotationDto) {
+    public ImageAnnotationDto saveToApprovedContainer(ImageAnnotationDto imageAnnotationDto, int imageOccurrencesNotInitial) {
         try {
             BlobContainerClient blobContainerClient = getBlobContainerClient();
 
-            String uploadedData = saveJsonAnnotation(blobContainerClient, imageAnnotationDto);
+            String uploadedData = saveJsonAnnotation(blobContainerClient, imageAnnotationDto, imageOccurrencesNotInitial);
             return convertJsonToImageAnnotation(uploadedData);
         } catch (IOException e) {
             log.error("Error saving to approved container", e);
@@ -75,7 +75,8 @@ public class ApprovedContainerServiceImpl implements ApprovedContainerService {
         return objectMapper.readValue(json, ImageAnnotationDto.class);
     }
 
-    private String saveJsonAnnotation(BlobContainerClient blobContainerClient, ImageAnnotationDto imageAnnotationDto)
+    private String saveJsonAnnotation(BlobContainerClient blobContainerClient, ImageAnnotationDto imageAnnotationDto,
+                                      int imageOccurrencesNotInitial)
             throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         String json = objectMapper.writeValueAsString(imageAnnotationDto);
@@ -83,6 +84,11 @@ public class ApprovedContainerServiceImpl implements ApprovedContainerService {
         String imageName = imageAnnotationDto.getData().getImage();
         String imageNameWithExtension = imageName.substring(imageName.lastIndexOf('/') + 1);
         String imageNameWithoutExtension = imageNameWithExtension.substring(0, imageNameWithExtension.lastIndexOf('.'));
+
+        if (imageOccurrencesNotInitial != 0) {
+            imageNameWithoutExtension = imageNameWithoutExtension + "(" + imageOccurrencesNotInitial + ")";
+        }
+
         BlobClient jsonBlobClient = blobContainerClient.getBlobClient(imageNameWithoutExtension + ".json");
         try (InputStream dataStream = new ByteArrayInputStream(json.getBytes(StandardCharsets.UTF_8))) {
             int dataSize = json.getBytes(StandardCharsets.UTF_8).length;
