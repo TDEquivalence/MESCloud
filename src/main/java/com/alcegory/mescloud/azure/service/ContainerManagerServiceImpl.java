@@ -149,7 +149,6 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
         }
 
         ImageAnnotationDto imageAnnotation = new ImageAnnotationDto();
-
         imageAnnotation.setClassification(containerInfoUpdate.getClassification());
         imageAnnotation.setRejection(containerInfoUpdate.getRejection());
         imageAnnotation.setComments(containerInfoUpdate.getComments());
@@ -157,6 +156,13 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
         imageAnnotation.setMesUserDecision(containerInfoUpdate.getMesUserDecision());
         imageAnnotation.setAnnotations(containerInfoUpdate.getAnnotations());
         imageAnnotation.setData(imageAnnotationDto.getData());
+        imageAnnotation.setModelDecision(imageAnnotationDto.getModelDecision());
+
+        if (containerInfoUpdate.isUserApproval()) {
+            imageAnnotation.setMesUserDecision(imageAnnotationDto.getModelDecision());
+        } else {
+            imageAnnotation.setMesUserDecision(imageAnnotationDto.getMesUserDecision());
+        }
 
         return imageAnnotation;
     }
