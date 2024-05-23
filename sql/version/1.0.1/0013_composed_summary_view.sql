@@ -1,7 +1,5 @@
 BEGIN;
 
-DROP VIEW composed_summary;
-
 CREATE OR REPLACE VIEW composed_summary AS
 SELECT DISTINCT ON (cpo.id)
     cpo.id, cpo.created_at, cpo.code, cpo.approved_at, cpo.hit_inserted_at,
@@ -42,6 +40,6 @@ GROUP BY
 
 INSERT INTO audit_script (run_date, process, version, schema)
 VALUES
-    (CURRENT_DATE, '0013_composed_summary_view.sql', '1.0.1', '1.0.1_0013');
+    (CURRENT_DATE, '0014_composed_summary_view.sql', '1.0.1', '1.0.1_0014');
 
 COMMIT;

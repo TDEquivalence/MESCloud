@@ -1,5 +1,6 @@
 BEGIN;
 
+DROP VIEW composed_summary;
 DROP VIEW counter_record_production_conclusion;
 
 CREATE OR REPLACE VIEW counter_record_production_conclusion AS
@@ -52,6 +53,6 @@ GROUP BY
 
 INSERT INTO audit_script (run_date, process, version, schema)
 VALUES
-    (CURRENT_DATE, '0014_counter_record_production_conclusion.sql', '1.0.1', '1.0.1_0014');
+    (CURRENT_DATE, '0013_counter_record_production_conclusion.sql', '1.0.1', '1.0.1_0013');
 
 COMMIT;

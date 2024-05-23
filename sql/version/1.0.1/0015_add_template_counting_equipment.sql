@@ -13,6 +13,6 @@ SET template_id = 1;
 
 INSERT INTO audit_script (run_date, process, version, schema)
 VALUES
-    (CURRENT_DATE, '0014_add_template_counting_equipment.sql', '1.0.1', '1.0.1_0014');
+    (CURRENT_DATE, '0015_add_template_counting_equipment.sql', '1.0.1', '1.0.1_0015');
 
 COMMIT;
