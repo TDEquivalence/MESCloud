@@ -10,20 +10,20 @@ import java.util.Optional;
 
 public interface CountingEquipmentRepository extends CrudRepository<CountingEquipmentEntity, Long> {
 
-    @Query(value = "SELECT AVG(ce.quality_target) / COUNT(ce) FROM counting_equipment ce", nativeQuery = true)
-    Double findAverageQualityTargetDividedByTotalCount();
+    @Query(value = "SELECT SUM(ce.quality_target) / COUNT(ce) FROM counting_equipment ce", nativeQuery = true)
+    Double findSumQualityTargetDividedByTotalCount();
 
-    @Query(value = "SELECT AVG(ce.availability_target) / COUNT(ce) FROM counting_equipment ce", nativeQuery = true)
-    Double findAverageAvailabilityTargetDividedByTotalCount();
+    @Query(value = "SELECT SUM(ce.availability_target) / COUNT(ce) FROM counting_equipment ce", nativeQuery = true)
+    Double findSumAvailabilityTargetDividedByTotalCount();
 
-    @Query(value = "SELECT AVG(ce.performance_target) / COUNT(ce) FROM counting_equipment ce", nativeQuery = true)
-    Double findAveragePerformanceTargetDividedByTotalCount();
+    @Query(value = "SELECT SUM(ce.performance_target) / COUNT(ce) FROM counting_equipment ce", nativeQuery = true)
+    Double findSumPerformanceTargetDividedByTotalCount();
 
-    @Query(value = "SELECT AVG(ce.overall_equipment_effectiveness_target) / COUNT(ce) FROM counting_equipment ce", nativeQuery = true)
-    Double findAverageOverallEquipmentEffectivenessTargetDividedByTotalCount();
+    @Query(value = "SELECT SUM(ce.overall_equipment_effectiveness_target) / COUNT(ce) FROM counting_equipment ce", nativeQuery = true)
+    Double findSumOverallEquipmentEffectivenessTargetDividedByTotalCount();
 
-    @Query(value = "SELECT AVG(ce.theoretical_production) FROM counting_equipment ce", nativeQuery = true)
-    Double findAverageTheoreticalProduction();
+    @Query(value = "SELECT SUM(ce.theoretical_production) / COUNT(ce) FROM counting_equipment ce", nativeQuery = true)
+    Double findSumTheoreticalProductionDividedByTotalCount();
 
     Optional<CountingEquipmentEntity> findByCode(String code);
 

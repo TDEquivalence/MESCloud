@@ -29,7 +29,7 @@ public interface CounterRecordService {
     Integer sumValidCounterIncrement(Long countingEquipmentId, FilterDto filter);
 
     Integer sumTotalCounterIncrement(Long countingEquipmentId, FilterDto filter);
-    
+
     Timestamp getLastRegisteredAtByProductionOrderId(Long productionOrderId);
 
     void validateProductionOrder(String equipmentCode, String productionOrderCode);
@@ -37,5 +37,5 @@ public interface CounterRecordService {
     Long sumActiveTimeDayByProductionOrderId(Long productionOrderId, Long equipmentId, Timestamp startDate, Timestamp endDate);
 
     List<CounterRecordSummaryEntity> findByEquipmentAndPeriod(
-            Long equipmentId, String productionOrderCode, Timestamp startDate, Timestamp endDate);
+            Long equipmentId, FilterDto filter);
 }

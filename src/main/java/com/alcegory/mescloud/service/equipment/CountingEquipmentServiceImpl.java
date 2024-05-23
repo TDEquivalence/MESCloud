@@ -178,25 +178,25 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
 
     @Override
     public Double getAverageQualityTargetDividedByTotalCount() {
-        return repository.findAverageQualityTargetDividedByTotalCount();
+        return repository.findSumQualityTargetDividedByTotalCount();
     }
 
     @Override
     public Double getAverageAvailabilityTargetDividedByTotalCount() {
-        return repository.findAverageAvailabilityTargetDividedByTotalCount();
+        return repository.findSumAvailabilityTargetDividedByTotalCount();
     }
 
     @Override
     public Double getAveragePerformanceTargetDividedByTotalCount() {
-        return repository.findAveragePerformanceTargetDividedByTotalCount();
+        return repository.findSumPerformanceTargetDividedByTotalCount();
     }
 
     @Override
     public Double getAverageOverallEquipmentEffectivenessTargetDividedByTotalCount() {
-        return repository.findAverageOverallEquipmentEffectivenessTargetDividedByTotalCount();
+        return repository.findSumOverallEquipmentEffectivenessTargetDividedByTotalCount();
     }
 
     public Double getAverageTheoreticalProduction() {
-        return repository.findAverageTheoreticalProduction();
+        return repository.findSumTheoreticalProductionDividedByTotalCount();
     }
 }

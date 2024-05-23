@@ -328,7 +328,7 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     }
 
     public List<CounterRecordSummaryEntity> findByEquipmentAndPeriod(
-            Long equipmentId, String productionOrderCode, Timestamp startDate, Timestamp endDate) {
-        return repository.findByEquipmentAndPeriod(equipmentId, productionOrderCode, startDate, endDate);
+            Long equipmentId, FilterDto filter) {
+        return repository.findByEquipmentAndPeriod(equipmentId, filter);
     }
 }

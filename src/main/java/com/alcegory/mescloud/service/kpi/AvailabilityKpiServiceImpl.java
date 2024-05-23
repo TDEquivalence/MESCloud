@@ -15,7 +15,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.alcegory.mescloud.model.filter.Filter.Property.*;
+import static com.alcegory.mescloud.model.filter.Filter.Property.END_DATE;
+import static com.alcegory.mescloud.model.filter.Filter.Property.START_DATE;
 
 @Service
 @AllArgsConstructor
@@ -28,10 +29,8 @@ public class AvailabilityKpiServiceImpl implements AvailabilityKpiService {
     public KpiDto computeAvailability(Long equipmentId, FilterDto filter) {
         Timestamp startDate = filter.getSearch().getTimestampValue(START_DATE);
         Timestamp endDate = filter.getSearch().getTimestampValue(END_DATE);
-        String productionOrderCode = filter.getSearch().getValue(PRODUCTION_ORDER_CODE);
-
-        List<CounterRecordSummaryEntity> counterRecords = counterRecordService.findByEquipmentAndPeriod(
-                equipmentId, productionOrderCode, startDate, endDate);
+        
+        List<CounterRecordSummaryEntity> counterRecords = counterRecordService.findByEquipmentAndPeriod(equipmentId, filter);
 
         long totalScheduledTime = 0L;
         long totalActiveTime = 0L;
@@ -41,7 +40,7 @@ public class AvailabilityKpiServiceImpl implements AvailabilityKpiService {
 
         for (Map.Entry<String, List<CounterRecordSummaryEntity>> entry : recordsByProductionOrder.entrySet()) {
             List<CounterRecordSummaryEntity> records = entry.getValue();
-            
+
             for (CounterRecordSummaryEntity counterRecord : records) {
                 totalActiveTime += counterRecord.getActiveTimeDay();
             }

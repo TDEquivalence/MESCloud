@@ -95,5 +95,5 @@ public interface CounterRecordRepository extends CrudRepository<CounterRecordEnt
             @Param("startDate") Timestamp startDate,
             @Param("endDate") Timestamp endDate);
 
-    List<CounterRecordSummaryEntity> findByEquipmentAndPeriod(Long equipmentId, String productionOrderCode, Timestamp startDate, Timestamp endDate);
+    List<CounterRecordSummaryEntity> findByEquipmentAndPeriod(Long equipmentId, FilterDto filter);
 }

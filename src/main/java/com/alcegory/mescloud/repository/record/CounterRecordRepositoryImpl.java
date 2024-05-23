@@ -167,6 +167,7 @@ public class CounterRecordRepositoryImpl extends AbstractFilterRepository<Filter
         Timestamp startDateFilter = filter.getSearch().getTimestampValue(START_DATE);
         Timestamp endDateFilter = filter.getSearch().getTimestampValue(END_DATE);
         String productionOrderCode = filter.getSearch().getValue(PRODUCTION_ORDER_CODE);
+        String equipmentAlias = filter.getSearch().getValue(EQUIPMENT_ALIAS);
 
         StringBuilder nativeQuery = new StringBuilder("SELECT SUM(increment_day) FROM counter_record_summary c WHERE ");
 
@@ -182,6 +183,10 @@ public class CounterRecordRepositoryImpl extends AbstractFilterRepository<Filter
 
         if (productionOrderCode != null) {
             conditions.add("c.production_order_code = :productionOrderCode");
+        }
+
+        if (equipmentAlias != null) {
+            conditions.add("c.equipment_alias = :equipmentAlias");
         }
 
         conditions.add("c.registered_at BETWEEN :startDate AND :endDate");
@@ -200,12 +205,21 @@ public class CounterRecordRepositoryImpl extends AbstractFilterRepository<Filter
             query.setParameter(PRODUCTION_ORDER_CODE_PROP, productionOrderCode);
         }
 
+        if (equipmentAlias != null) {
+            query.setParameter(EQUIPMENT_ALIAS_PROP, equipmentAlias);
+        }
+
         Object result = query.getSingleResult();
         return result != null ? ((Number) result).intValue() : 0;
     }
 
     //KPI AVAILABILITY WITH COUNTER_RECORD_SUMMARY_VIEW//
-    public List<CounterRecordSummaryEntity> findByEquipmentAndPeriod(Long equipmentId, String productionOrderCode, Timestamp startDate, Timestamp endDate) {
+    public List<CounterRecordSummaryEntity> findByEquipmentAndPeriod(Long equipmentId, FilterDto filter) {
+        Timestamp startDate = filter.getSearch().getTimestampValue(START_DATE);
+        Timestamp endDate = filter.getSearch().getTimestampValue(END_DATE);
+        String productionOrderCode = filter.getSearch().getValue(PRODUCTION_ORDER_CODE);
+        String equipmentAlias = filter.getSearch().getValue(EQUIPMENT_ALIAS);
+
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<CounterRecordSummaryEntity> criteriaQuery = criteriaBuilder.createQuery(CounterRecordSummaryEntity.class);
         Root<CounterRecordSummaryEntity> root = criteriaQuery.from(CounterRecordSummaryEntity.class);
@@ -217,8 +231,11 @@ public class CounterRecordRepositoryImpl extends AbstractFilterRepository<Filter
         if (productionOrderCode != null) {
             predicates.add(criteriaBuilder.equal(root.get(PRODUCTION_ORDER_CODE_PROP), productionOrderCode));
         }
+        if (equipmentAlias != null) {
+            predicates.add(criteriaBuilder.equal(root.get(EQUIPMENT_ALIAS_PROP), equipmentAlias));
+        }
         predicates.add(criteriaBuilder.between(root.get(REGISTERED_AT_PROP), startDate, endDate));
-        predicates.add(criteriaBuilder.isTrue(root.get(IS_VALID_FOR_PRODUCTION_PROP))); // Add predicate for is_valid_for_production = true
+        predicates.add(criteriaBuilder.isTrue(root.get(IS_VALID_FOR_PRODUCTION_PROP)));
 
         criteriaQuery.select(root)
                 .distinct(true)
