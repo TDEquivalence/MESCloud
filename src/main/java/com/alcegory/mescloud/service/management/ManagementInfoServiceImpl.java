@@ -79,7 +79,7 @@ public class ManagementInfoServiceImpl implements ManagementInfoService {
     }
 
     public ProductionOrderInfoDto findProductionOrderByEquipmentId(long equipmentId) {
-        Optional<ProductionOrderEntity> productionOrderOpt = productionOrderService.findLastByEquipmentId(equipmentId);
+        Optional<ProductionOrderEntity> productionOrderOpt = productionOrderService.findActiveByEquipmentId(equipmentId);
         if (productionOrderOpt.isEmpty() || productionOrderOpt.get().isCompleted()) {
             return null;
         }
