@@ -3,8 +3,8 @@ BEGIN;
 CREATE VIEW counter_record_summary AS
 SELECT
     MAX(cr.id) AS id,
-    e.id AS counting_equipment_id,
-    e.alias AS counting_equipment_alias,
+    e.id AS equipment_id,
+    e.alias AS equipment_alias,
     po.id AS production_order_id,
     po.code AS production_order_code,
     eo.id AS equipment_output_id,
