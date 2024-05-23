@@ -1,14 +1,14 @@
 package com.alcegory.mescloud.azure.service;
 
-import com.alcegory.mescloud.azure.model.dto.*;
+import com.alcegory.mescloud.azure.model.dto.ContainerInfoSummary;
+import com.alcegory.mescloud.azure.model.dto.ContainerInfoUpdate;
+import com.alcegory.mescloud.azure.model.dto.ImageAnnotationDto;
+import com.alcegory.mescloud.azure.model.dto.ImageInfoDto;
 import com.alcegory.mescloud.exception.ImageAnnotationException;
 import com.alcegory.mescloud.model.entity.UserEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 @Slf4j
@@ -37,7 +37,6 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
     public ContainerInfoSummary getRandomData(Authentication authentication) {
         ImageAnnotationDto imageAnnotationDto;
         ImageInfoDto imageInfoDto;
-        int iterationCount = 0;
 
         do {
             if (iterationCount >= MAX_ITERATIONS) {
@@ -46,7 +45,6 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
             }
 
             imageInfoDto = publicContainerService.getRandomImageReference();
-            iterationCount++;
 
             if (imageInfoDto == null) {
                 log.error("Image reference is null.");
@@ -117,20 +115,13 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
         int imageOccurrencesNotInitial = imageAnnotationService.countByImageAndStatusNotInitial(image);
 
         saveInitialApprovedImageAnnotation(originalContainerInfo, authentication, imageOccurrencesNotInitial);
-        updateImageName(updatedContainerInfoDto, image, imageOccurrencesNotInitial);
 
-        ImageAnnotationDto uploadedImageAnnotationDto = approvedContainerService.saveToApprovedContainer(updatedContainerInfoDto);
+        ImageAnnotationDto uploadedImageAnnotationDto =
+                approvedContainerService.saveToApprovedContainer(updatedContainerInfoDto, imageOccurrencesNotInitial);
 
         saveApprovedImageAnnotation(uploadedImageAnnotationDto, updatedContainerInfoDto.isUserApproval(), authentication);
         handleImageOccurrences(uploadedImageAnnotationDto, image, imageOccurrencesNotInitial);
         return uploadedImageAnnotationDto;
-    }
-
-    private void updateImageName(ImageAnnotationDto uploadedImageAnnotationDto, String image, int imageOccurrencesNotInitial) {
-        if (uploadedImageAnnotationDto != null && imageOccurrencesNotInitial != 0) {
-            String imageDataOccurrence = image + "(" + imageOccurrencesNotInitial + ")";
-            uploadedImageAnnotationDto.getData().setImage(imageDataOccurrence);
-        }
     }
 
     private void handleImageOccurrences(ImageAnnotationDto uploadedImageAnnotationDto, String image, int imageOccurrencesNotInitial) {
@@ -186,26 +177,5 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
         summary.setPath(imageInfoDto.getPath());
 
         return summary;
-    }
-
-    private List<String> getRectangleLabels(List<AnnotationDto> annotations) {
-        List<String> rectangleLabels = new ArrayList<>();
-        if (annotations != null) {
-            for (AnnotationDto annotation : annotations) {
-                addRectangleLabels(annotation.getResult(), rectangleLabels);
-            }
-        }
-        return rectangleLabels;
-    }
-
-    private void addRectangleLabels(List<ResultDto> results, List<String> rectangleLabels) {
-        if (results != null) {
-            for (ResultDto result : results) {
-                ValueDto value = result.getValue();
-                if (value != null && value.getRectangleLabels() != null) {
-                    rectangleLabels.addAll(value.getRectangleLabels());
-                }
-            }
-        }
     }
 }
