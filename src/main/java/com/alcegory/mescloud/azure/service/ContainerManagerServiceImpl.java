@@ -110,9 +110,9 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
         int imageOccurrencesNotInitial = imageAnnotationService.countByImageAndStatusNotInitial(image);
 
         saveInitialApprovedImageAnnotation(originalContainerInfo, authentication, imageOccurrencesNotInitial);
-        updateImageName(updatedContainerInfoDto, image, imageOccurrencesNotInitial);
 
-        ImageAnnotationDto uploadedImageAnnotationDto = approvedContainerService.saveToApprovedContainer(updatedContainerInfoDto);
+        ImageAnnotationDto uploadedImageAnnotationDto =
+                approvedContainerService.saveToApprovedContainer(updatedContainerInfoDto, imageOccurrencesNotInitial);
 
         saveApprovedImageAnnotation(uploadedImageAnnotationDto, updatedContainerInfoDto.isUserApproval(), authentication);
         handleImageOccurrences(uploadedImageAnnotationDto, image, imageOccurrencesNotInitial);
