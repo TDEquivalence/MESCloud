@@ -72,16 +72,16 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
                                                              Authentication authentication) {
         validateContainerInfoUpdate(containerInfoUpdate);
 
-        ImageAnnotationDto originalImageContainerInfoDto = getImageAnnotationFromContainer(containerInfoUpdate);
-        ImageAnnotationDto updatedContainerInfoDto = convertToContainerInfo(originalImageContainerInfoDto, containerInfoUpdate);
+        ImageAnnotationDto imageAnnotationDto = updateImageAnnotation(containerInfoUpdate);
+        ContainerInfoDto containerInfoDto = convertToContainerInfo(imageAnnotationDto, containerInfoUpdate);
 
-        if (updatedContainerInfoDto == null) {
+        if (containerInfoDto == null) {
             throw new IllegalArgumentException("ContainerInfoUpdate or FileName cannot be null");
         }
 
-        updatedContainerInfoDto.setUsername(authentication.getName());
+        containerInfoDto.getImageAnnotationDto().setUsername(authentication.getName());
 
-        return saveToApprovedContainer(updatedContainerInfoDto, originalImageContainerInfoDto, authentication);
+        return saveToApprovedContainer(containerInfoDto, authentication);
     }
 
     private void validateContainerInfoUpdate(ContainerInfoUpdate containerInfoUpdate) {
@@ -90,40 +90,36 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
         }
     }
 
-    public ImageAnnotationDto getImageAnnotationFromContainer(ContainerInfoUpdate containerInfoUpdate) {
+    public ImageAnnotationDto updateImageAnnotation(ContainerInfoUpdate containerInfoUpdate) {
         ImageAnnotationDto imageAnnotationDto = pendingContainerService.getImageAnnotationFromContainer(containerInfoUpdate.getFileName());
 
         if (imageAnnotationDto == null) {
             throw new ImageAnnotationException("ImageAnnotationDto is null. The image might have been deleted from the pending container.");
         }
 
+        if (containerInfoUpdate.getAnnotations() != null) {
+            imageAnnotationDto.setAnnotations(containerInfoUpdate.getAnnotations());
+        }
+
         return imageAnnotationDto;
     }
 
-    private ImageAnnotationDto saveToApprovedContainer(ImageAnnotationDto updatedContainerInfoDto, ImageAnnotationDto originalContainerInfo,
-                                                       Authentication authentication) {
-        if (updatedContainerInfoDto == null) {
+    private ImageAnnotationDto saveToApprovedContainer(ContainerInfoDto containerInfoDto, Authentication authentication) {
+        if (containerInfoDto == null || containerInfoDto.getImageAnnotationDto() == null) {
             return null;
         }
 
-        String image = updatedContainerInfoDto.getData().getImage();
+        String image = containerInfoDto.getImageAnnotationDto().getData().getImage();
         int imageOccurrencesNotInitial = imageAnnotationService.countByImageAndStatusNotInitial(image);
 
-        saveInitialApprovedImageAnnotation(originalContainerInfo, authentication, imageOccurrencesNotInitial);
-        updateImageName(updatedContainerInfoDto, image, imageOccurrencesNotInitial);
+        saveInitialApprovedImageAnnotation(containerInfoDto, authentication, imageOccurrencesNotInitial);
 
-        ImageAnnotationDto uploadedImageAnnotationDto = approvedContainerService.saveToApprovedContainer(updatedContainerInfoDto);
+        ImageAnnotationDto uploadedImageAnnotationDto = approvedContainerService.saveToApprovedContainer(containerInfoDto.getImageAnnotationDto(),
+                imageOccurrencesNotInitial);
 
-        saveApprovedImageAnnotation(uploadedImageAnnotationDto, updatedContainerInfoDto.isUserApproval(), authentication);
+        saveApprovedImageAnnotation(uploadedImageAnnotationDto, containerInfoDto.getImageAnnotationDto().isUserApproval(), authentication);
         handleImageOccurrences(uploadedImageAnnotationDto, image, imageOccurrencesNotInitial);
         return uploadedImageAnnotationDto;
-    }
-
-    private void updateImageName(ImageAnnotationDto uploadedImageAnnotationDto, String image, int imageOccurrencesNotInitial) {
-        if (uploadedImageAnnotationDto != null && imageOccurrencesNotInitial != 0) {
-            String imageDataOccurrence = image + "(" + imageOccurrencesNotInitial + ")";
-            uploadedImageAnnotationDto.getData().setImage(imageDataOccurrence);
-        }
     }
 
     private void handleImageOccurrences(ImageAnnotationDto uploadedImageAnnotationDto, String image, int imageOccurrencesNotInitial) {
@@ -132,9 +128,9 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
         }
     }
 
-    private void saveInitialApprovedImageAnnotation(ImageAnnotationDto containerInfoDto, Authentication authentication, int imageOccurrencesNotInitial) {
+    private void saveInitialApprovedImageAnnotation(ContainerInfoDto containerInfoDto, Authentication authentication, int imageOccurrencesNotInitial) {
         if (imageOccurrencesNotInitial == 0) {
-            imageAnnotationService.saveImageAnnotation(containerInfoDto, authentication);
+            imageAnnotationService.saveImageAnnotation(containerInfoDto.getImageAnnotationDto(), authentication);
         }
     }
 
@@ -149,23 +145,21 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
         pendingContainerService.deleteJpgAndJsonBlobs(image);
     }
 
-    private ImageAnnotationDto convertToContainerInfo(ImageAnnotationDto imageAnnotationDto,
-                                                      ContainerInfoUpdate containerInfoUpdate) {
+    private ContainerInfoDto convertToContainerInfo(ImageAnnotationDto imageAnnotationDto,
+                                                    ContainerInfoUpdate containerInfoUpdate) {
         if (imageAnnotationDto == null || containerInfoUpdate == null) {
             return null;
         }
 
-        ImageAnnotationDto imageAnnotation = new ImageAnnotationDto();
+        imageAnnotationDto.setClassification(containerInfoUpdate.getClassification());
+        imageAnnotationDto.setRejection(containerInfoUpdate.getRejection());
+        imageAnnotationDto.setComments(containerInfoUpdate.getComments());
+        imageAnnotationDto.setUserApproval(containerInfoUpdate.isUserApproval());
+        imageAnnotationDto.setMesUserDecision(containerInfoUpdate.getMesUserDecision());
 
-        imageAnnotation.setClassification(containerInfoUpdate.getClassification());
-        imageAnnotation.setRejection(containerInfoUpdate.getRejection());
-        imageAnnotation.setComments(containerInfoUpdate.getComments());
-        imageAnnotation.setUserApproval(containerInfoUpdate.isUserApproval());
-        imageAnnotation.setMesUserDecision(containerInfoUpdate.getMesUserDecision());
-        imageAnnotation.setAnnotations(containerInfoUpdate.getAnnotations());
-        imageAnnotation.setData(imageAnnotationDto.getData());
-
-        return imageAnnotation;
+        ContainerInfoDto containerInfoDto = new ContainerInfoDto();
+        containerInfoDto.setImageAnnotationDto(imageAnnotationDto);
+        return containerInfoDto;
     }
 
     private ContainerInfoSummary convertToSummary(ImageAnnotationDto imageAnnotationDto, ImageInfoDto imageInfoDto) {
