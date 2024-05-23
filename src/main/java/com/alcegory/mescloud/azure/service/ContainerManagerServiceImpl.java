@@ -37,16 +37,9 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
     public ContainerInfoSummary getRandomData(Authentication authentication) {
         ImageAnnotationDto imageAnnotationDto;
         ImageInfoDto imageInfoDto;
-        int iterationCount = 0;
 
         do {
-            if (iterationCount >= MAX_ITERATIONS) {
-                log.info("Maximum number of iterations reached.");
-                throw new ImageAnnotationException("There are no more images. Maximum number of iterations reached.");
-            }
-
             imageInfoDto = publicContainerService.getRandomImageReference();
-            iterationCount++;
 
             if (imageInfoDto == null) {
                 log.error("Image reference is null.");

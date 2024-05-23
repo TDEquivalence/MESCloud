@@ -12,5 +12,5 @@ public interface ApprovedContainerService {
 
     List<ImageInfoDto> getAllImageReference();
 
-    ImageAnnotationDto saveToApprovedContainer(ImageAnnotationDto imageAnnotationDto);
+    ImageAnnotationDto saveToApprovedContainer(ImageAnnotationDto imageAnnotationDto, int imageOccurrencesNotInitial);
 }
