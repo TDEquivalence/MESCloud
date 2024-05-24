@@ -1,4 +1,4 @@
-package com.alcegory.mescloud.model.dto;
+package com.alcegory.mescloud.model.dto.kpi;
 
 import com.alcegory.mescloud.utility.DoubleUtil;
 import lombok.Getter;

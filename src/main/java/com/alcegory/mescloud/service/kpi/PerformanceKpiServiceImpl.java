@@ -1,6 +1,6 @@
 package com.alcegory.mescloud.service.kpi;
 
-import com.alcegory.mescloud.model.dto.KpiDto;
+import com.alcegory.mescloud.model.dto.kpi.KpiDto;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

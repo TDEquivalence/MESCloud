@@ -1,6 +1,6 @@
 package com.alcegory.mescloud.service.kpi;
 
-import com.alcegory.mescloud.model.dto.KpiDto;
+import com.alcegory.mescloud.model.dto.kpi.KpiDto;
 import com.alcegory.mescloud.model.entity.records.CounterRecordSummaryEntity;
 import com.alcegory.mescloud.model.filter.FilterDto;
 import com.alcegory.mescloud.service.record.CounterRecordService;
@@ -29,7 +29,7 @@ public class AvailabilityKpiServiceImpl implements AvailabilityKpiService {
     public KpiDto computeAvailability(Long equipmentId, FilterDto filter) {
         Timestamp startDate = filter.getSearch().getTimestampValue(START_DATE);
         Timestamp endDate = filter.getSearch().getTimestampValue(END_DATE);
-        
+
         List<CounterRecordSummaryEntity> counterRecords = counterRecordService.findByEquipmentAndPeriod(equipmentId, filter);
 
         long totalScheduledTime = 0L;

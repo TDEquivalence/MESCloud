@@ -1,6 +1,6 @@
 package com.alcegory.mescloud.model.dto.equipment;
 
-import com.alcegory.mescloud.model.dto.KpiDto;
+import com.alcegory.mescloud.model.dto.kpi.KpiDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
