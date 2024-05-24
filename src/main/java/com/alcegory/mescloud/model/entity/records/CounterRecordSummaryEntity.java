@@ -40,7 +40,7 @@ public class CounterRecordSummaryEntity implements Serializable {
     private String equipmentOutputAlias;
 
     @Column(name = "increment_day")
-    private Long incrementDay;
+    private Long computedValue;
 
     @Column(name = "active_time_day")
     private Long activeTimeDay;

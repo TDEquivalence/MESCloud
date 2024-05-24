@@ -15,7 +15,7 @@ public class CounterRecordDto {
     private String productionOrderCode;
     private int equipmentOutputId;
     private String equipmentOutputAlias;
-    private int incrementDay;
+    private int computedValue;
     private Timestamp registeredAt;
     private boolean isValidForProduction;
     private String ims;
