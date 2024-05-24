@@ -21,11 +21,11 @@ import java.util.Set;
 
 import static com.alcegory.mescloud.service.export.ExcelConstants.*;
 
-public class ExportExcelmpl extends AbstractExcelExport {
+public class ExportExcelImpl extends AbstractExcelExport {
 
     private static final String INSTRUCTIONS = "instructions";
 
-    public ExportExcelmpl() {
+    public ExportExcelImpl() {
         super(null, null, null, null);
         this.workbook = new XSSFWorkbook();
     }
@@ -42,7 +42,6 @@ public class ExportExcelmpl extends AbstractExcelExport {
         }
 
         XSSFSheet productionSheet = createSheet(SHEET_NAME_PRODUCTION_ORDERS);
-        Set<String> productionHeaders = createProductionHeaderRow(productionSheet, productionOrders);
 
         if (!productionOrders.isEmpty()) {
             createTable(productionSheet, TABLE_NAME_PRODUCTION, composedHeaders.size());
@@ -75,40 +74,6 @@ public class ExportExcelmpl extends AbstractExcelExport {
 
         for (ComposedExportInfoDto composedExportInfoDto : composedList) {
             for (ProductionInstructionDto productionInstructionDto : composedExportInfoDto.getInstructions()) {
-                fieldSet.add(productionInstructionDto.getName());
-            }
-        }
-
-        Row headerRow = sheet.createRow(0);
-        CellStyle headerStyle = createHeaderStyle();
-
-        int columnIndex = 0;
-        for (String fieldName : fieldSet) {
-            createCell(headerRow, columnIndex++, fieldName, headerStyle);
-        }
-
-        return fieldSet;
-    }
-
-    private Set<String> createProductionHeaderRow(XSSFSheet sheet, List<ProductionOrderExportInfoDto> productionOrder) {
-        Set<String> fieldSet = new LinkedHashSet<>();
-        Map<String, String> portugueseFieldNames = translateFieldNamesMapping();
-
-        Class<?> productionClass = ProductionOrderExportInfoDto.class;
-        Field[] fields = productionClass.getDeclaredFields();
-        for (Field field : fields) {
-            if (!field.getName().equals(INSTRUCTIONS)) {
-                String portugueseFieldName = portugueseFieldNames.get(field.getName());
-                if (portugueseFieldName != null) {
-                    fieldSet.add(portugueseFieldName);
-                } else {
-                    fieldSet.add(field.getName());
-                }
-            }
-        }
-
-        for (ProductionOrderExportInfoDto productionExportInfoDto : productionOrder) {
-            for (ProductionInstructionDto productionInstructionDto : productionExportInfoDto.getInstructions()) {
                 fieldSet.add(productionInstructionDto.getName());
             }
         }

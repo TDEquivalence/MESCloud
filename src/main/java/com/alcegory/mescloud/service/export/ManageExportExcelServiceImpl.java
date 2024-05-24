@@ -63,7 +63,7 @@ public class ManageExportExcelServiceImpl implements ManageExportExcelService {
             if (productionOrderDtos.isEmpty() && composedExportInfoDtos.isEmpty()) {
                 handleEmptyLists(response);
             } else {
-                ExportExcelmpl excelExportImpl = new ExportExcelmpl();
+                ExportExcelImpl excelExportImpl = new ExportExcelImpl();
                 excelExportImpl.exportDataToExcel(response, composedExportInfoDtos, productionOrderDtos);
             }
         } catch (IOException e) {

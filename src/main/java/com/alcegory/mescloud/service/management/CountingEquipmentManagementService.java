@@ -2,7 +2,6 @@ package com.alcegory.mescloud.service.management;
 
 import com.alcegory.mescloud.exception.MesMqttException;
 import com.alcegory.mescloud.model.dto.equipment.CountingEquipmentDto;
-import com.alcegory.mescloud.model.dto.equipment.CountingEquipmentInfoDto;
 import com.alcegory.mescloud.model.dto.equipment.TemplateDto;
 import com.alcegory.mescloud.model.entity.equipment.CountingEquipmentEntity;
 import com.alcegory.mescloud.model.request.RequestConfigurationDto;

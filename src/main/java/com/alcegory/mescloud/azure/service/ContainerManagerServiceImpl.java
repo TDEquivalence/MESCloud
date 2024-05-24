@@ -119,13 +119,6 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
         return uploadedImageAnnotationDto;
     }
 
-    private void updateImageName(ImageAnnotationDto uploadedImageAnnotationDto, String image, int imageOccurrencesNotInitial) {
-        if (uploadedImageAnnotationDto != null && imageOccurrencesNotInitial != 0) {
-            String imageDataOccurrence = image + "(" + imageOccurrencesNotInitial + ")";
-            uploadedImageAnnotationDto.getData().setImage(imageDataOccurrence);
-        }
-    }
-
     private void handleImageOccurrences(ImageAnnotationDto uploadedImageAnnotationDto, String image, int imageOccurrencesNotInitial) {
         if (uploadedImageAnnotationDto != null && imageOccurrencesNotInitial >= MAX_OCCURRENCES) {
             deleteBlobsForImage(image);

@@ -75,7 +75,6 @@ public class ComposedConverterImpl implements ComposedConverter {
             boolean originalAccessibility = field.canAccess(entity);
 
             try {
-                field.setAccessible(true);
                 Object value = field.get(entity);
                 addInstruction(instructionDtos, field.getName(), value);
             } catch (IllegalAccessException e) {
