@@ -21,6 +21,7 @@ import java.util.Optional;
 @Service
 @AllArgsConstructor
 @Log
+@Transactional
 public class ProductionOrderServiceImpl implements ProductionOrderService {
 
     private static final String OBO_SECTION_PREFIX = "OBO";
@@ -68,6 +69,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
 
     @Override
     public Optional<ProductionOrderDto> findDtoByCode(String code) {
+        log.info(() -> "findDtoByCode: PO DTO");
         Optional<ProductionOrderEntity> persistedProductionOrderOpt = repository.findByCode(code);
         if (persistedProductionOrderOpt.isEmpty()) {
             return Optional.empty();
