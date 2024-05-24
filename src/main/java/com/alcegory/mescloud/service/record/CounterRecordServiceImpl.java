@@ -132,17 +132,13 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     }
 
     private CounterRecordEntity extractCounterRecordEntity(CounterMqttDto counterDto, PlcMqttDto equipmentCountsDto) {
-        log.info(() -> "extractCounterRecordEntity: start");
         CounterRecordEntity counterRecord = new CounterRecordEntity();
         counterRecord.setRegisteredAt(new Date());
         counterRecord.setRealValue(counterDto.getValue());
         counterRecord.setActiveTime(equipmentCountsDto.getActiveTime());
 
-        log.info(() -> "extractCounterRecordEntity: setEquipment");
         setEquipmentOutput(counterRecord, counterDto.getOutputCode());
-        log.info(() -> "extractCounterRecordEntity: setProductionOrder");
         setProductionOrder(counterRecord, equipmentCountsDto.getProductionOrderCode());
-        log.info(() -> "extractCounterRecordEntity: setComputedValue");
         setComputedValue(counterRecord);
 
         return counterRecord;
@@ -165,7 +161,6 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     }
 
     private void setProductionOrder(CounterRecordEntity counterRecord, String productionOrderCode) {
-        log.info(() -> String.format("setProductionOrder: ARE we here [%s]", productionOrderCode));
         Optional<ProductionOrderDto> productionOrderOpt = productionOrderService.findDtoByCode(productionOrderCode);
         if (productionOrderOpt.isEmpty()) {
             log.warning(() -> String.format("No Production Order found with the code [%s]", productionOrderCode));
