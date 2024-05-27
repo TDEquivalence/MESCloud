@@ -42,7 +42,7 @@ public class AvailabilityKpiServiceImpl implements AvailabilityKpiService {
             List<CounterRecordSummaryEntity> records = entry.getValue();
 
             for (CounterRecordSummaryEntity counterRecord : records) {
-                totalActiveTime += counterRecord.getActiveTimeDay();
+                totalActiveTime += counterRecord.getActiveTimeDay() - ACTIVE_TIME_THRESHOLD_SECONDS;
             }
 
             Timestamp adjustedStartDate = calculateAdjustedStartDate(records.get(0), startDate);
@@ -50,8 +50,7 @@ public class AvailabilityKpiServiceImpl implements AvailabilityKpiService {
 
             totalScheduledTime += DateUtil.calculateScheduledTimeInSeconds(adjustedStartDate, adjustedEndDate);
         }
-
-        totalActiveTime -= ACTIVE_TIME_THRESHOLD_SECONDS;
+        
         KpiDto kpi = new KpiDto(DoubleUtil.safeDoubleValue(totalActiveTime), DoubleUtil.safeDoubleValue(totalScheduledTime));
         kpi.setValueAsDivision();
         return kpi;
