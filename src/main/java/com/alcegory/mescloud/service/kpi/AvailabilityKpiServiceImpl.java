@@ -41,6 +41,10 @@ public class AvailabilityKpiServiceImpl implements AvailabilityKpiService {
         for (Map.Entry<String, List<CounterRecordSummaryEntity>> entry : recordsByProductionOrder.entrySet()) {
             List<CounterRecordSummaryEntity> records = entry.getValue();
 
+            if (records.isEmpty()) {
+                continue;
+            }
+
             for (CounterRecordSummaryEntity counterRecord : records) {
                 totalActiveTime += counterRecord.getActiveTimeDay() - ACTIVE_TIME_THRESHOLD_SECONDS;
             }
@@ -50,7 +54,7 @@ public class AvailabilityKpiServiceImpl implements AvailabilityKpiService {
 
             totalScheduledTime += DateUtil.calculateScheduledTimeInSeconds(adjustedStartDate, adjustedEndDate);
         }
-        
+
         KpiDto kpi = new KpiDto(DoubleUtil.safeDoubleValue(totalActiveTime), DoubleUtil.safeDoubleValue(totalScheduledTime));
         kpi.setValueAsDivision();
         return kpi;
