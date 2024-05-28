@@ -7,9 +7,9 @@ import com.alcegory.mescloud.model.dto.production.ProductionOrderMqttDto;
 import com.alcegory.mescloud.model.entity.equipment.CountingEquipmentEntity;
 import com.alcegory.mescloud.model.entity.production.ProductionOrderEntity;
 import com.alcegory.mescloud.service.alarm.AlarmService;
-import com.alcegory.mescloud.service.record.CounterRecordService;
 import com.alcegory.mescloud.service.management.CountingEquipmentManagementService;
 import com.alcegory.mescloud.service.production.ProductionOrderService;
+import com.alcegory.mescloud.service.record.CounterRecordService;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
@@ -59,7 +59,7 @@ public class ProductionOrderConclusionProcess extends AbstractMesProtocolProcess
 
         if (productionOrder == null) {
             log.warning(() -> String.format("No Production Order found for Equipment with code [%s]", equipmentCode));
-            return; // No need to continue if no production order is found.
+            return;
         }
 
         if (!productionOrder.isCompleted()) {
