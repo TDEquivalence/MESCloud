@@ -8,13 +8,13 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@JsonPropertyOrder({"jsonType", "equipmentCode", "pTimerCommunicationCycle", "totalOuput", "outputCodes"})
+@JsonPropertyOrder({"jsonType", "equipmentCode", "pTimerCommunicationCycle", "totalOutput", "outputCodes"})
 public class EquipmentConfigMqttDto extends AbstractMqttDto {
 
     private String equipmentCode;
     @JsonProperty("pTimerCommunicationCycle")
     private int pTimerCommunicationCycle;
-    private int totalOuput;
+    private int totalOutput;
     private String[] outputCodes;
 }
 

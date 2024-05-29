@@ -21,7 +21,7 @@ public class PlcMqttConverterImpl implements PlcMqttConverter {
         if (countingEquipment.getOutputs() != null) {
             List<String> equipmentOutputCodes = getSortedEquipmentOutputCodes(countingEquipment);
 
-            equipmentConfig.setTotalOuput(equipmentOutputCodes.size());
+            equipmentConfig.setTotalOutput(equipmentOutputCodes.size());
             equipmentConfig.setOutputCodes(equipmentOutputCodes.toArray(new String[0]));
         }
 
