@@ -1,6 +1,6 @@
 package com.alcegory.mescloud.security.service;
 
-import com.alcegory.mescloud.model.dto.UserConfigDto;
+import com.alcegory.mescloud.model.dto.user.UserConfigDto;
 import com.alcegory.mescloud.security.exception.UserNotFoundException;
 import com.alcegory.mescloud.security.model.SectionAuthority;
 import com.alcegory.mescloud.security.model.UserRoleEntity;

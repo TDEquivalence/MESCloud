@@ -1,11 +1,13 @@
 package com.alcegory.mescloud.api.rest;
 
 import com.alcegory.mescloud.exception.ForbiddenAccessException;
-import com.alcegory.mescloud.model.dto.PaginatedProductionOrderDto;
-import com.alcegory.mescloud.model.dto.ProductionOrderDto;
-import com.alcegory.mescloud.model.dto.ProductionOrderSummaryDto;
+import com.alcegory.mescloud.model.dto.pagination.PaginatedProductionOrderDto;
+import com.alcegory.mescloud.model.dto.production.ProductionOrderDto;
 import com.alcegory.mescloud.model.filter.Filter;
-import com.alcegory.mescloud.service.ProductionOrderService;
+import com.alcegory.mescloud.model.request.RequestProductionOrderDto;
+import com.alcegory.mescloud.service.management.ManagementInfoService;
+import com.alcegory.mescloud.service.management.ProductionOrderManagementService;
+import com.alcegory.mescloud.service.production.ProductionOrderService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,13 +23,29 @@ import java.util.Optional;
 public class ProductionOrderController {
 
     private final ProductionOrderService service;
+    private final ProductionOrderManagementService productionOrderManagementService;
+    private final ManagementInfoService managementInfoService;
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ProductionOrderDto> getProductionOrderById(@PathVariable Long id) {
+        try {
+            Optional<ProductionOrderDto> productionOrderOpt = service.getProductionOrderById(id);
+            if (productionOrderOpt.isPresent()) {
+                return ResponseEntity.ok(productionOrderOpt.get());
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 
     @PostMapping
-    public ResponseEntity<ProductionOrderDto> create(@RequestBody ProductionOrderDto requestProductionOrder,
+    public ResponseEntity<ProductionOrderDto> create(@RequestBody RequestProductionOrderDto requestProductionOrder,
                                                      Authentication authentication) {
 
         try {
-            Optional<ProductionOrderDto> productionOrderOpt = service.create(requestProductionOrder, authentication);
+            Optional<ProductionOrderDto> productionOrderOpt = productionOrderManagementService.create(requestProductionOrder, authentication);
             if (productionOrderOpt.isPresent()) {
                 return new ResponseEntity<>(productionOrderOpt.get(), HttpStatus.OK);
             } else {
@@ -42,10 +60,10 @@ public class ProductionOrderController {
     public ResponseEntity<ProductionOrderDto> edit(@RequestBody ProductionOrderDto requestProductionOrder,
                                                    Authentication authentication) {
         try {
-            Optional<ProductionOrderDto> editedProductionOrder = service.editProductionOrder(requestProductionOrder, authentication);
+            ProductionOrderDto editedProductionOrder = productionOrderManagementService.editProductionOrder(requestProductionOrder, authentication);
 
-            if (editedProductionOrder.isPresent()) {
-                return ResponseEntity.ok(editedProductionOrder.get());
+            if (editedProductionOrder != null) {
+                return ResponseEntity.ok(editedProductionOrder);
             } else {
                 return ResponseEntity.badRequest().build();
             }
@@ -57,7 +75,8 @@ public class ProductionOrderController {
     @PutMapping("{countingEquipmentId}/complete")
     public ResponseEntity<ProductionOrderDto> complete(@PathVariable long countingEquipmentId, Authentication authentication) {
         try {
-            Optional<ProductionOrderDto> productionOrderOpt = service.complete(countingEquipmentId, authentication);
+            Optional<ProductionOrderDto> productionOrderOpt
+                    = productionOrderManagementService.complete(countingEquipmentId, authentication);
             if (productionOrderOpt.isPresent()) {
                 return ResponseEntity.ok(productionOrderOpt.get());
             } else {
@@ -69,9 +88,9 @@ public class ProductionOrderController {
     }
 
     @GetMapping("/completed")
-    public ResponseEntity<List<ProductionOrderSummaryDto>> getAllCompleted() {
+    public ResponseEntity<List<ProductionOrderDto>> getAllCompleted() {
         try {
-            List<ProductionOrderSummaryDto> completedOrders = service.getCompletedWithoutComposedFiltered();
+            List<ProductionOrderDto> completedOrders = service.getCompletedWithoutComposedFiltered();
             return ResponseEntity.ok(completedOrders);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -85,7 +104,7 @@ public class ProductionOrderController {
                 return ResponseEntity.badRequest().build();
             }
 
-            PaginatedProductionOrderDto completedOrders = service.getCompletedWithoutComposedFiltered(filter);
+            PaginatedProductionOrderDto completedOrders = managementInfoService.getCompletedWithoutComposedFiltered(filter);
             return ResponseEntity.ok(completedOrders);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();

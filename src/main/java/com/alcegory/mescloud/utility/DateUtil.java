@@ -3,10 +3,7 @@ package com.alcegory.mescloud.utility;
 import lombok.extern.java.Log;
 
 import java.sql.Timestamp;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.*;
 import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
 import java.util.Date;
@@ -15,20 +12,22 @@ import java.util.concurrent.TimeUnit;
 @Log
 public class DateUtil {
 
+    private static final int INCLUDE_LAST_DAY = 1;
+    private static final int MILLISECONDS_PER_MINUTE = 60 * 1000;
+
     private DateUtil() {
         //Utility class, not meant for instantiation
     }
 
-    private static final int INCLUDE_LAST_DAY = 1;
-    private static final int MILLISECONDS_PER_MINUTE = 60 * 1000;
-
-    public static int spanInDays(Instant startDate, Instant endDate) {
-        long differenceInDays = ChronoUnit.DAYS.between(startDate.truncatedTo(ChronoUnit.DAYS), endDate.truncatedTo(ChronoUnit.DAYS));
+    public static int spanInDays(Timestamp startDate, Timestamp endDate) {
+        LocalDate startLocalDate = startDate.toLocalDateTime().toLocalDate();
+        LocalDate endLocalDate = endDate.toLocalDateTime().toLocalDate();
+        long differenceInDays = ChronoUnit.DAYS.between(startLocalDate, endLocalDate);
         return (int) differenceInDays + INCLUDE_LAST_DAY;
     }
 
-    public static int differenceInDays(Instant startDate, Date endDate) {
-        long differenceInMillis = endDate.getTime() - startDate.toEpochMilli();
+    public static int differenceInDays(Timestamp startDate, Timestamp endDate) {
+        long differenceInMillis = endDate.getTime() - startDate.getTime();
         return (int) TimeUnit.MILLISECONDS.toDays(differenceInMillis);
     }
 

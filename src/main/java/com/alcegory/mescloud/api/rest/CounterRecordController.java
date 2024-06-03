@@ -1,8 +1,8 @@
 package com.alcegory.mescloud.api.rest;
 
-import com.alcegory.mescloud.model.dto.PaginatedCounterRecordsDto;
+import com.alcegory.mescloud.model.dto.pagination.PaginatedCounterRecordsDto;
 import com.alcegory.mescloud.model.filter.Filter;
-import com.alcegory.mescloud.service.CounterRecordService;
+import com.alcegory.mescloud.service.record.CounterRecordService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

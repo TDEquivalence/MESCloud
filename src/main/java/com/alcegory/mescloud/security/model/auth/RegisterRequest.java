@@ -1,6 +1,6 @@
 package com.alcegory.mescloud.security.model.auth;
 
-import com.alcegory.mescloud.model.dto.SectionRoleMapping;
+import com.alcegory.mescloud.model.dto.company.SectionRoleMapping;
 import com.alcegory.mescloud.security.model.Role;
 import lombok.*;
 

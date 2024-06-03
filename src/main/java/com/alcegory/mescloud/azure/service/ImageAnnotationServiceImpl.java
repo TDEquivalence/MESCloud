@@ -9,7 +9,7 @@ import com.alcegory.mescloud.azure.repository.AnnotationRepository;
 import com.alcegory.mescloud.azure.repository.ImageAnnotationRepository;
 import com.alcegory.mescloud.exception.ImageAnnotationException;
 import com.alcegory.mescloud.model.entity.UserEntity;
-import com.alcegory.mescloud.repository.UserRepository;
+import com.alcegory.mescloud.repository.user.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.security.core.Authentication;

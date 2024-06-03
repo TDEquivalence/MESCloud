@@ -2,12 +2,12 @@ package com.alcegory.mescloud.api.rest;
 
 import com.alcegory.mescloud.exception.AlarmNotFoundException;
 import com.alcegory.mescloud.exception.IllegalAlarmStatusException;
-import com.alcegory.mescloud.model.dto.AlarmCountsDto;
-import com.alcegory.mescloud.model.dto.AlarmDto;
-import com.alcegory.mescloud.model.dto.PaginatedAlarmDto;
+import com.alcegory.mescloud.model.dto.alarm.AlarmCountsDto;
+import com.alcegory.mescloud.model.dto.alarm.AlarmDto;
+import com.alcegory.mescloud.model.dto.pagination.PaginatedAlarmDto;
 import com.alcegory.mescloud.model.filter.Filter;
 import com.alcegory.mescloud.model.request.RequestAlarmRecognitionDto;
-import com.alcegory.mescloud.service.AlarmService;
+import com.alcegory.mescloud.service.alarm.AlarmService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

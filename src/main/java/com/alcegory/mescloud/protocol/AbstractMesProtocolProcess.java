@@ -1,6 +1,6 @@
 package com.alcegory.mescloud.protocol;
 
-import com.alcegory.mescloud.model.dto.MqttDto;
+import com.alcegory.mescloud.model.dto.mqqt.MqttDto;
 import jakarta.annotation.PostConstruct;
 
 public abstract class AbstractMesProtocolProcess<T extends MqttDto> implements MesProtocolProcess<T>{

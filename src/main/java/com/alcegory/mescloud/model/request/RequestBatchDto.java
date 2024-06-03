@@ -1,6 +1,6 @@
 package com.alcegory.mescloud.model.request;
 
-import com.alcegory.mescloud.model.dto.BatchDto;
+import com.alcegory.mescloud.model.dto.composed.BatchDto;
 import lombok.Getter;
 import lombok.Setter;
 

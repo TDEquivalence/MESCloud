@@ -1,6 +1,6 @@
 package com.alcegory.mescloud.model.request;
 
-import com.alcegory.mescloud.model.dto.EquipmentOutputDto;
+import com.alcegory.mescloud.model.dto.equipment.EquipmentOutputDto;
 import com.alcegory.mescloud.model.dto.ImsDto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;

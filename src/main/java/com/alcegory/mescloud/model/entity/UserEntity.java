@@ -1,5 +1,6 @@
 package com.alcegory.mescloud.model.entity;
 
+import com.alcegory.mescloud.model.entity.company.CompanyEntity;
 import com.alcegory.mescloud.security.model.Role;
 import jakarta.persistence.*;
 import lombok.*;
