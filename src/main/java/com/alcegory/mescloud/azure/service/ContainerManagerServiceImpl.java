@@ -39,11 +39,6 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
         ImageInfoDto imageInfoDto;
 
         do {
-            if (iterationCount >= MAX_ITERATIONS) {
-                log.info("Maximum number of iterations reached.");
-                throw new ImageAnnotationException("There are no more images. Maximum number of iterations reached.");
-            }
-
             imageInfoDto = publicContainerService.getRandomImageReference();
 
             if (imageInfoDto == null) {
