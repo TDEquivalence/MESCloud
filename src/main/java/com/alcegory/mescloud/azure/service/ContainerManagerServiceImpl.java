@@ -157,6 +157,10 @@ public class ContainerManagerServiceImpl implements ContainerManagerService {
         imageAnnotation.setMesUserDecision(containerInfoUpdate.getMesUserDecision());
         imageAnnotation.setAnnotations(containerInfoUpdate.getAnnotations());
         imageAnnotation.setData(imageAnnotationDto.getData());
+        imageAnnotation.setModelDecision(imageAnnotationDto.getModelDecision());
+        imageAnnotation.setMesUserDecision(imageAnnotationDto.getMesUserDecision());
+        imageAnnotation.setLimits(imageAnnotationDto.getLimits());
+        imageAnnotation.setLogDecision(imageAnnotationDto.getLogDecision());
 
         return imageAnnotation;
     }
