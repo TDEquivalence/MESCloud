@@ -20,6 +20,7 @@ public class CompanyEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
+    private String prefix;
     @OneToMany(mappedBy = "company", fetch = FetchType.EAGER)
     private List<FactoryEntity> factoryList;
 }

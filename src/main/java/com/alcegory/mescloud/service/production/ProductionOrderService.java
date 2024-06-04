@@ -35,7 +35,7 @@ public interface ProductionOrderService {
 
     List<Long> findExistingIds(List<Long> ids);
 
-    List<ProductionOrderDto> getCompletedWithoutComposedFiltered();
+    List<ProductionOrderDto> getCompletedWithoutComposedFiltered(long sectionId);
 
     void setProductionOrderApproval(Long composedOrderId, boolean isApproved);
 
@@ -61,5 +61,6 @@ public interface ProductionOrderService {
 
     Optional<ProductionOrderEntity> findLastByEquipmentId(long equipmentId);
 
-    List<ProductionOrderEntity> findCompleted(boolean withoutComposed, Filter filter, Timestamp startDate, Timestamp endDate);
+    List<ProductionOrderEntity> findCompleted(long sectionId, boolean withoutComposed, Filter filter,
+                                              Timestamp startDate, Timestamp endDate);
 }

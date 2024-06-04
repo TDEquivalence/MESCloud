@@ -128,8 +128,9 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
 
     @Override
     @Transactional
-    public List<ProductionOrderDto> getCompletedWithoutComposedFiltered() {
-        List<ProductionOrderEntity> persistedProductionOrders = repository.findCompleted(true, null, null, null);
+    public List<ProductionOrderDto> getCompletedWithoutComposedFiltered(long sectionId) {
+        List<ProductionOrderEntity> persistedProductionOrders = repository.findCompleted(sectionId, true,
+                null, null, null);
         return converter.toDto(persistedProductionOrders);
     }
 
@@ -266,8 +267,8 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     }
 
     @Override
-    public List<ProductionOrderEntity> findCompleted(boolean withoutComposed, Filter filter, Timestamp startDate,
+    public List<ProductionOrderEntity> findCompleted(long sectionId, boolean withoutComposed, Filter filter, Timestamp startDate,
                                                      Timestamp endDate) {
-        return repository.findCompleted(withoutComposed, filter, startDate, endDate);
+        return repository.findCompleted(sectionId, withoutComposed, filter, startDate, endDate);
     }
 }

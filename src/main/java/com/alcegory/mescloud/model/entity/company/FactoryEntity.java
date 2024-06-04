@@ -20,6 +20,7 @@ public class FactoryEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
+    private String prefix;
     @ManyToOne
     @JoinColumn(name = "company_id")
     private CompanyEntity company;

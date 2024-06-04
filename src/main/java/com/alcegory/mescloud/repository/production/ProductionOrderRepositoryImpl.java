@@ -29,7 +29,8 @@ public class ProductionOrderRepositoryImpl {
 
     private final EntityManager entityManager;
 
-    public List<ProductionOrderEntity> findCompleted(boolean withoutComposed, Filter filter, Timestamp startDate, Timestamp endDate) {
+    public List<ProductionOrderEntity> findCompleted(long sectionId, boolean withoutComposed, Filter filter, Timestamp startDate, Timestamp endDate) {
+        //TODO: ADD SECTION ID FILTER
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Long> idQuery = cb.createQuery(Long.class);
         Root<ProductionOrderEntity> root = idQuery.from(ProductionOrderEntity.class);

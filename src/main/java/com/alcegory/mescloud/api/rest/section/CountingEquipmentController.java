@@ -1,4 +1,4 @@
-package com.alcegory.mescloud.api.rest;
+package com.alcegory.mescloud.api.rest.section;
 
 import com.alcegory.mescloud.exception.*;
 import com.alcegory.mescloud.model.dto.equipment.CountingEquipmentDto;
@@ -107,11 +107,13 @@ public class CountingEquipmentController {
     }
 
     @PutMapping("/{equipmentId}/configuration")
-    public ResponseEntity<CountingEquipmentDto> updateConfiguration(@PathVariable long equipmentId,
+    public ResponseEntity<CountingEquipmentDto> updateConfiguration(@PathVariable String companyPrefix, @PathVariable String sectionPrefix,
+                                                                    @PathVariable long sectionId, @PathVariable long equipmentId,
                                                                     @RequestBody RequestConfigurationDto request,
                                                                     Authentication authentication) {
         try {
-            CountingEquipmentDto countingEquipment = countingEquipmentManagementService.updateConfiguration(equipmentId, request, authentication);
+            CountingEquipmentDto countingEquipment = countingEquipmentManagementService.updateConfiguration(companyPrefix, sectionPrefix,
+                    sectionId, equipmentId, request, authentication);
             return new ResponseEntity<>(countingEquipment, HttpStatus.OK);
         } catch (IncompleteConfigurationException e) {
             return HttpUtil.responseWithHeaders(HttpStatus.BAD_REQUEST, CONFIG_ERROR_CAUSE, e);

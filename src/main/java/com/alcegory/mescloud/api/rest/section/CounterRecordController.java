@@ -1,4 +1,4 @@
-package com.alcegory.mescloud.api.rest;
+package com.alcegory.mescloud.api.rest.section;
 
 import com.alcegory.mescloud.model.dto.pagination.PaginatedCounterRecordsDto;
 import com.alcegory.mescloud.model.filter.Filter;

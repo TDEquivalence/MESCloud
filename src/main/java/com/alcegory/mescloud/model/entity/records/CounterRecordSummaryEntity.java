@@ -27,6 +27,9 @@ public class CounterRecordSummaryEntity implements Serializable {
     @Column(name = "equipment_alias")
     private String equipmentAlias;
 
+    @Column(name = "section_id")
+    private Long sectionId;
+
     @Column(name = "production_order_id")
     private Long productionOrderId;
 

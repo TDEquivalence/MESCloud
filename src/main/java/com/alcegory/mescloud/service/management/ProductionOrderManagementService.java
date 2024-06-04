@@ -8,9 +8,10 @@ import java.util.Optional;
 
 public interface ProductionOrderManagementService {
 
-    Optional<ProductionOrderDto> create(RequestProductionOrderDto productionOrder, Authentication authentication);
+    Optional<ProductionOrderDto> create(String companyPrefix, String sectionPrefix, long sectionId, RequestProductionOrderDto productionOrder,
+                                        Authentication authentication);
 
-    Optional<ProductionOrderDto> complete(long equipmentId, Authentication authentication);
+    Optional<ProductionOrderDto> complete(String companyPrefix, String sectionPrefix, long sectionId, long equipmentId, Authentication authentication);
 
-    ProductionOrderDto editProductionOrder(ProductionOrderDto requestProductionOrder, Authentication authentication);
+    ProductionOrderDto editProductionOrder(ProductionOrderDto requestProductionOrder, Authentication authentication, long sectionId);
 }

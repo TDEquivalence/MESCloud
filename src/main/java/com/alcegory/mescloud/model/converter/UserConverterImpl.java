@@ -57,7 +57,7 @@ public class UserConverterImpl implements UserConverter {
         if (factoryEntity != null) {
             factoryDto.setId(factoryEntity.getId());
             factoryDto.setName(factoryEntity.getName());
-            // Convert sectionList
+            factoryDto.setPrefix(factoryEntity.getPrefix());
             factoryDto.setSectionList(convertToSectionDtoList(factoryEntity.getSectionList()));
         }
         return factoryDto;
@@ -78,7 +78,7 @@ public class UserConverterImpl implements UserConverter {
         if (sectionEntity != null) {
             sectionDto.setId(sectionEntity.getId());
             sectionDto.setName(sectionEntity.getName());
-            // Convert all associated section configs
+            sectionDto.setPrefix(sectionEntity.getPrefix());
             sectionDto.setSectionConfigList(convertToSectionConfigDtoList(sectionEntity.getSectionConfigList()));
         }
         return sectionDto;

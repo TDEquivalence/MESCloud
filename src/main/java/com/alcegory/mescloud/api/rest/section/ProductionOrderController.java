@@ -1,5 +1,6 @@
-package com.alcegory.mescloud.api.rest;
+package com.alcegory.mescloud.api.rest.section;
 
+import com.alcegory.mescloud.api.rest.base.SectionBaseController;
 import com.alcegory.mescloud.exception.ForbiddenAccessException;
 import com.alcegory.mescloud.model.dto.pagination.PaginatedProductionOrderDto;
 import com.alcegory.mescloud.model.dto.production.ProductionOrderDto;
@@ -17,17 +18,20 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
+
 @RestController
-@RequestMapping("/api/production-orders")
 @AllArgsConstructor
-public class ProductionOrderController {
+public class ProductionOrderController extends SectionBaseController {
+
+    private static final String PRODUCTION_ORDERS = "/production-orders";
 
     private final ProductionOrderService service;
     private final ProductionOrderManagementService productionOrderManagementService;
     private final ManagementInfoService managementInfoService;
 
-    @GetMapping("/{id}")
+    @GetMapping(PRODUCTION_ORDERS + "/{id}")
     public ResponseEntity<ProductionOrderDto> getProductionOrderById(@PathVariable Long id) {
+
         try {
             Optional<ProductionOrderDto> productionOrderOpt = service.getProductionOrderById(id);
             if (productionOrderOpt.isPresent()) {
@@ -40,12 +44,14 @@ public class ProductionOrderController {
         }
     }
 
-    @PostMapping
-    public ResponseEntity<ProductionOrderDto> create(@RequestBody RequestProductionOrderDto requestProductionOrder,
+    @PostMapping(PRODUCTION_ORDERS)
+    public ResponseEntity<ProductionOrderDto> create(@PathVariable String companyPrefix, @PathVariable String sectionPrefix,
+                                                     @PathVariable long sectionId, @RequestBody RequestProductionOrderDto requestProductionOrder,
                                                      Authentication authentication) {
 
         try {
-            Optional<ProductionOrderDto> productionOrderOpt = productionOrderManagementService.create(requestProductionOrder, authentication);
+            Optional<ProductionOrderDto> productionOrderOpt = productionOrderManagementService.create(companyPrefix, sectionPrefix,
+                    sectionId, requestProductionOrder, authentication);
             if (productionOrderOpt.isPresent()) {
                 return new ResponseEntity<>(productionOrderOpt.get(), HttpStatus.OK);
             } else {
@@ -56,11 +62,13 @@ public class ProductionOrderController {
         }
     }
 
-    @PutMapping("/edit")
-    public ResponseEntity<ProductionOrderDto> edit(@RequestBody ProductionOrderDto requestProductionOrder,
+    @PutMapping(PRODUCTION_ORDERS + "/edit")
+    public ResponseEntity<ProductionOrderDto> edit(@PathVariable long sectionId, @RequestBody ProductionOrderDto requestProductionOrder,
                                                    Authentication authentication) {
+
         try {
-            ProductionOrderDto editedProductionOrder = productionOrderManagementService.editProductionOrder(requestProductionOrder, authentication);
+            ProductionOrderDto editedProductionOrder = productionOrderManagementService.editProductionOrder(requestProductionOrder,
+                    authentication, sectionId);
 
             if (editedProductionOrder != null) {
                 return ResponseEntity.ok(editedProductionOrder);
@@ -72,11 +80,14 @@ public class ProductionOrderController {
         }
     }
 
-    @PutMapping("{countingEquipmentId}/complete")
-    public ResponseEntity<ProductionOrderDto> complete(@PathVariable long countingEquipmentId, Authentication authentication) {
+    @PutMapping(PRODUCTION_ORDERS + "/{countingEquipmentId}/complete")
+    public ResponseEntity<ProductionOrderDto> complete(@PathVariable String companyPrefix, @PathVariable String sectionPrefix,
+                                                       @PathVariable long sectionId, @PathVariable long countingEquipmentId,
+                                                       Authentication authentication) {
         try {
             Optional<ProductionOrderDto> productionOrderOpt
-                    = productionOrderManagementService.complete(countingEquipmentId, authentication);
+                    = productionOrderManagementService.complete(companyPrefix, sectionPrefix, sectionId,
+                    countingEquipmentId, authentication);
             if (productionOrderOpt.isPresent()) {
                 return ResponseEntity.ok(productionOrderOpt.get());
             } else {
@@ -87,24 +98,25 @@ public class ProductionOrderController {
         }
     }
 
-    @GetMapping("/completed")
-    public ResponseEntity<List<ProductionOrderDto>> getAllCompleted() {
+    @GetMapping(PRODUCTION_ORDERS + "/completed")
+    public ResponseEntity<List<ProductionOrderDto>> getAllCompleted(@PathVariable long sectionId) {
         try {
-            List<ProductionOrderDto> completedOrders = service.getCompletedWithoutComposedFiltered();
+            List<ProductionOrderDto> completedOrders = service.getCompletedWithoutComposedFiltered(sectionId);
             return ResponseEntity.ok(completedOrders);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
-    @PostMapping("/completed/filtered")
-    public ResponseEntity<PaginatedProductionOrderDto> getCompletedFiltered(@RequestBody Filter filter) {
+    @PostMapping(PRODUCTION_ORDERS + "/completed/filtered")
+    public ResponseEntity<PaginatedProductionOrderDto> getCompletedFiltered(@PathVariable long sectionId, @RequestBody Filter filter) {
         try {
             if (filter == null) {
                 return ResponseEntity.badRequest().build();
             }
 
-            PaginatedProductionOrderDto completedOrders = managementInfoService.getCompletedWithoutComposedFiltered(filter);
+            PaginatedProductionOrderDto completedOrders = managementInfoService.getCompletedWithoutComposedFiltered(sectionId,
+                    filter);
             return ResponseEntity.ok(completedOrders);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();

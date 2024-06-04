@@ -8,8 +8,11 @@ import lombok.Setter;
 @Setter
 public class HasReceivedMqttDto extends AbstractMqttDto {
 
-    private String equipmentCode;
     private static final boolean hasReceived = true;
+    private String equipmentCode;
+
+    public HasReceivedMqttDto() {
+    }
 
     public HasReceivedMqttDto(String equipmentCode) {
         this.setJsonType(MqttDTOConstants.HAS_RECEIVED_DTO_NAME);

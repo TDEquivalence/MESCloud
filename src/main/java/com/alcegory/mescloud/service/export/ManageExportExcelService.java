@@ -6,5 +6,6 @@ import java.util.Map;
 
 public interface ManageExportExcelService {
 
-    void exportProductionAndComposedToExcelFiltered(HttpServletResponse response, Map<String, String> requestPayload);
+    void exportProductionAndComposedToExcelFiltered(HttpServletResponse response, Map<String, String> requestPayload,
+                                                    long sectionId);
 }

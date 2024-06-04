@@ -1,4 +1,4 @@
-package com.alcegory.mescloud.api.rest;
+package com.alcegory.mescloud.api.rest.section;
 
 import com.alcegory.mescloud.exception.AlarmNotFoundException;
 import com.alcegory.mescloud.exception.IllegalAlarmStatusException;

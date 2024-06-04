@@ -1,4 +1,4 @@
-package com.alcegory.mescloud.api.rest;
+package com.alcegory.mescloud.api.rest.section;
 
 import com.alcegory.mescloud.exception.ForbiddenAccessException;
 import com.alcegory.mescloud.model.dto.composed.HitDto;

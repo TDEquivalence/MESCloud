@@ -1,4 +1,4 @@
-package com.alcegory.mescloud.api.rest;
+package com.alcegory.mescloud.api.rest.section;
 
 import com.alcegory.mescloud.model.entity.equipment.TemplateEntity;
 import com.alcegory.mescloud.service.production.TemplateService;

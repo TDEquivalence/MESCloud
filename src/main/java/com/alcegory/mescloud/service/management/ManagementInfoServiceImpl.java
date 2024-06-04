@@ -89,12 +89,12 @@ public class ManagementInfoServiceImpl implements ManagementInfoService {
     }
 
     @Override
-    public PaginatedProductionOrderDto getCompletedWithoutComposedFiltered(Filter filter) {
+    public PaginatedProductionOrderDto getCompletedWithoutComposedFiltered(long sectionId, Filter filter) {
         int requestedProductionOrders = filter.getTake();
         filter.setTake(filter.getTake() + 1);
 
-        List<ProductionOrderEntity> persistedProductionOrders = productionOrderService.findCompleted(true, filter,
-                filter.getSearch().getTimestampValue(START_DATE), filter.getSearch().getTimestampValue(END_DATE));
+        List<ProductionOrderEntity> persistedProductionOrders = productionOrderService.findCompleted(sectionId, true,
+                filter, filter.getSearch().getTimestampValue(START_DATE), filter.getSearch().getTimestampValue(END_DATE));
         boolean hasNextPage = persistedProductionOrders.size() > requestedProductionOrders;
 
         if (hasNextPage) {

@@ -38,7 +38,7 @@ public class CountingEquipmentEntity implements Serializable {
     private List<EquipmentStatusRecordEntity> equipmentStatusRecords;
 
     @ManyToOne
-    @JoinColumn(name = "template_id") // This column refers to the template
+    @JoinColumn(name = "template_id")
     private TemplateEntity template;
 
 

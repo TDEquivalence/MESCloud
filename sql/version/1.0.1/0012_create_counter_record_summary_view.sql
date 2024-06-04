@@ -5,6 +5,7 @@ SELECT
     MAX(cr.id) AS id,
     e.id AS equipment_id,
     e.alias AS equipment_alias,
+    e.section_id,
     po.id AS production_order_id,
     po.code AS production_order_code,
     eo.id AS equipment_output_id,
@@ -31,6 +32,7 @@ JOIN
 GROUP BY
     e.id,
     e.alias,
+    e.section_id,
     po.id,
     po.code,
     eo.id,
@@ -40,7 +42,6 @@ GROUP BY
     ims.code,
     po.created_at,
     po.completed_at;
-
 
 INSERT INTO audit_script (run_date, process, version, schema)
 VALUES
