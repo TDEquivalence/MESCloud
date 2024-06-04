@@ -23,13 +23,13 @@ import java.util.Optional;
 @AllArgsConstructor
 public class ProductionOrderController extends SectionBaseController {
 
-    private static final String PRODUCTION_ORDERS = "/production-orders";
+    private static final String PRODUCTION_ORDERS_URL = "/production-orders";
 
     private final ProductionOrderService service;
     private final ProductionOrderManagementService productionOrderManagementService;
     private final ManagementInfoService managementInfoService;
 
-    @GetMapping(PRODUCTION_ORDERS + "/{id}")
+    @GetMapping(PRODUCTION_ORDERS_URL + "/{id}")
     public ResponseEntity<ProductionOrderDto> getProductionOrderById(@PathVariable Long id) {
 
         try {
@@ -44,7 +44,7 @@ public class ProductionOrderController extends SectionBaseController {
         }
     }
 
-    @PostMapping(PRODUCTION_ORDERS)
+    @PostMapping(PRODUCTION_ORDERS_URL)
     public ResponseEntity<ProductionOrderDto> create(@PathVariable String companyPrefix, @PathVariable String sectionPrefix,
                                                      @PathVariable long sectionId, @RequestBody RequestProductionOrderDto requestProductionOrder,
                                                      Authentication authentication) {
@@ -62,7 +62,7 @@ public class ProductionOrderController extends SectionBaseController {
         }
     }
 
-    @PutMapping(PRODUCTION_ORDERS + "/edit")
+    @PutMapping(PRODUCTION_ORDERS_URL + "/edit")
     public ResponseEntity<ProductionOrderDto> edit(@PathVariable long sectionId, @RequestBody ProductionOrderDto requestProductionOrder,
                                                    Authentication authentication) {
 
@@ -80,7 +80,7 @@ public class ProductionOrderController extends SectionBaseController {
         }
     }
 
-    @PutMapping(PRODUCTION_ORDERS + "/{countingEquipmentId}/complete")
+    @PutMapping(PRODUCTION_ORDERS_URL + "/{countingEquipmentId}/complete")
     public ResponseEntity<ProductionOrderDto> complete(@PathVariable String companyPrefix, @PathVariable String sectionPrefix,
                                                        @PathVariable long sectionId, @PathVariable long countingEquipmentId,
                                                        Authentication authentication) {
@@ -98,7 +98,7 @@ public class ProductionOrderController extends SectionBaseController {
         }
     }
 
-    @GetMapping(PRODUCTION_ORDERS + "/completed")
+    @GetMapping(PRODUCTION_ORDERS_URL + "/completed")
     public ResponseEntity<List<ProductionOrderDto>> getAllCompleted(@PathVariable long sectionId) {
         try {
             List<ProductionOrderDto> completedOrders = service.getCompletedWithoutComposedFiltered(sectionId);
@@ -108,7 +108,7 @@ public class ProductionOrderController extends SectionBaseController {
         }
     }
 
-    @PostMapping(PRODUCTION_ORDERS + "/completed/filtered")
+    @PostMapping(PRODUCTION_ORDERS_URL + "/completed/filtered")
     public ResponseEntity<PaginatedProductionOrderDto> getCompletedFiltered(@PathVariable long sectionId, @RequestBody Filter filter) {
         try {
             if (filter == null) {

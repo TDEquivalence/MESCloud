@@ -26,6 +26,7 @@ public class ProductionOrderRepositoryImpl {
     private static final String PROP_ID = "id";
 
     private static final String EQUIPMENT = "equipment";
+    private static final String SECTION = "section";
 
     private final EntityManager entityManager;
 
@@ -34,15 +35,15 @@ public class ProductionOrderRepositoryImpl {
         CriteriaQuery<Long> idQuery = cb.createQuery(Long.class);
         Root<ProductionOrderEntity> root = idQuery.from(ProductionOrderEntity.class);
 
-        Join<ProductionOrderEntity, CountingEquipmentEntity> equipmentJoin = root.join("equipment");
-        
-        Predicate sectionPredicate = cb.equal(equipmentJoin.get("section").get("id"), sectionId);
+        Join<ProductionOrderEntity, CountingEquipmentEntity> equipmentJoin = root.join(EQUIPMENT);
+
+        Predicate sectionPredicate = cb.equal(equipmentJoin.get(SECTION).get(PROP_ID), sectionId);
 
         Predicate[] predicates = buildPredicates(cb, root, withoutComposed, startDate, endDate, filter);
         Predicate finalPredicate = cb.and(sectionPredicate, cb.and(predicates));
 
         idQuery.where(finalPredicate);
-        idQuery.select(root.get("id"));
+        idQuery.select(root.get(PROP_ID));
         TypedQuery<Long> idTypedQuery = entityManager.createQuery(idQuery);
 
         if (filter != null) {

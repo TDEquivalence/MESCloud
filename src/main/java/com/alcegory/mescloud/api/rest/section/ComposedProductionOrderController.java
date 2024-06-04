@@ -1,5 +1,6 @@
 package com.alcegory.mescloud.api.rest.section;
 
+import com.alcegory.mescloud.api.rest.base.SectionBaseController;
 import com.alcegory.mescloud.model.dto.composed.ComposedProductionOrderDto;
 import com.alcegory.mescloud.model.dto.composed.ComposedSummaryDto;
 import com.alcegory.mescloud.model.dto.pagination.PaginatedComposedDto;
@@ -11,19 +12,23 @@ import com.alcegory.mescloud.service.composed.ComposedProductionOrderService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/composed-production-order")
 @AllArgsConstructor
-public class ComposedProductionOrderController {
+public class ComposedProductionOrderController extends SectionBaseController {
+
+    private static final String COMPOSED_PRODUCTION_ORDER_URL = "/composed-production-order";
 
     private final ComposedProductionOrderService composedService;
 
-    @PostMapping
+    @PostMapping(COMPOSED_PRODUCTION_ORDER_URL)
     public ResponseEntity<ComposedProductionOrderDto> create(@RequestBody RequestComposedDto productionOrderIds) {
         try {
             Optional<ComposedProductionOrderDto> composedProductionOpt = composedService.create(productionOrderIds);
@@ -36,7 +41,7 @@ public class ComposedProductionOrderController {
         }
     }
 
-    @GetMapping
+    @GetMapping(COMPOSED_PRODUCTION_ORDER_URL)
     public ResponseEntity<List<ComposedProductionOrderDto>> findAll() {
         try {
             List<ComposedProductionOrderDto> composedDtos = composedService.getAll();
@@ -49,7 +54,7 @@ public class ComposedProductionOrderController {
         }
     }
 
-    @GetMapping("/insert-hits")
+    @GetMapping(COMPOSED_PRODUCTION_ORDER_URL + "/insert-hits")
     public ResponseEntity<PaginatedComposedDto> findAllToInsertHits() {
         try {
             PaginatedComposedDto composedWithoutHits = composedService.findAllSummarizedWithoutHits();
@@ -62,7 +67,7 @@ public class ComposedProductionOrderController {
         }
     }
 
-    @PostMapping("/insert-hits/filtered")
+    @PostMapping(COMPOSED_PRODUCTION_ORDER_URL + "/insert-hits/filtered")
     public ResponseEntity<PaginatedComposedDto> findToInsertHitsFiltered(@RequestBody Filter filter) {
         try {
             PaginatedComposedDto composedWithoutHits = composedService.findSummarizedWithoutHitsFiltered(filter);
@@ -75,7 +80,7 @@ public class ComposedProductionOrderController {
         }
     }
 
-    @GetMapping("/approval")
+    @GetMapping(COMPOSED_PRODUCTION_ORDER_URL + "/approval")
     public ResponseEntity<PaginatedComposedDto> findAllForApproval() {
         try {
             PaginatedComposedDto composedWithHits = composedService.findAllSummarizedWithHits();
@@ -88,7 +93,7 @@ public class ComposedProductionOrderController {
         }
     }
 
-    @PostMapping("/approval/filtered")
+    @PostMapping(COMPOSED_PRODUCTION_ORDER_URL + "/approval/filtered")
     public ResponseEntity<PaginatedComposedDto> findForApprovalFiltered(@RequestBody Filter filter) {
         try {
             PaginatedComposedDto composedWithHits = composedService.findSummarizedWithHitsFiltered(filter);
@@ -101,7 +106,7 @@ public class ComposedProductionOrderController {
         }
     }
 
-    @GetMapping("/completed")
+    @GetMapping(COMPOSED_PRODUCTION_ORDER_URL + "/completed")
     public ResponseEntity<List<ComposedSummaryDto>> findAllCompleted() {
         try {
             List<ComposedSummaryDto> composedCompleted = composedService.findAllCompleted();
@@ -114,7 +119,7 @@ public class ComposedProductionOrderController {
         }
     }
 
-    @PostMapping("/completed/filtered")
+    @PostMapping(COMPOSED_PRODUCTION_ORDER_URL + "/completed/filtered")
     public ResponseEntity<PaginatedComposedDto> findCompletedFiltered(@RequestBody Filter filter) {
         try {
             PaginatedComposedDto composedCompleted = composedService.findCompletedFiltered(filter);
@@ -127,7 +132,7 @@ public class ComposedProductionOrderController {
         }
     }
 
-    @PostMapping("/production-orders")
+    @PostMapping(COMPOSED_PRODUCTION_ORDER_URL + "/production-orders")
     public ResponseEntity<List<ProductionOrderDto>> getProductionOrderSummaryByComposedId(@RequestBody RequestById request) {
         if (request == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

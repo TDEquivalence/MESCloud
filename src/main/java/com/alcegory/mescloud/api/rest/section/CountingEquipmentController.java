@@ -1,5 +1,6 @@
 package com.alcegory.mescloud.api.rest.section;
 
+import com.alcegory.mescloud.api.rest.base.SectionBaseController;
 import com.alcegory.mescloud.exception.*;
 import com.alcegory.mescloud.model.dto.equipment.CountingEquipmentDto;
 import com.alcegory.mescloud.model.dto.equipment.CountingEquipmentInfoDto;
@@ -21,9 +22,10 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/counting-equipments")
 @AllArgsConstructor
-public class CountingEquipmentController {
+public class CountingEquipmentController extends SectionBaseController {
+
+    private static final String COUNTING_EQUIPMENT_URL = "/counting-equipments";
 
     private static final String IMS_ERROR_CAUSE = "IMS";
     private static final String EQUIPMENT_ERROR_CAUSE = "EQUIPMENT";
@@ -34,10 +36,10 @@ public class CountingEquipmentController {
     private final CountingEquipmentManagementService countingEquipmentManagementService;
     private final ManagementInfoService managementInfoService;
 
-    @GetMapping
-    public ResponseEntity<List<CountingEquipmentDto>> findAll() {
+    @GetMapping(COUNTING_EQUIPMENT_URL)
+    public ResponseEntity<List<CountingEquipmentDto>> findAll(@PathVariable long sectionId) {
         try {
-            List<CountingEquipmentDto> countingEquipments = service.findAllWithLastProductionOrder();
+            List<CountingEquipmentDto> countingEquipments = service.findAllWithLastProductionOrder(sectionId);
             if (countingEquipments.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
@@ -47,7 +49,7 @@ public class CountingEquipmentController {
         }
     }
 
-    @GetMapping("/{id}/info")
+    @GetMapping(COUNTING_EQUIPMENT_URL + "/{id}/info")
     public ResponseEntity<CountingEquipmentInfoDto> findCountingInfoById(@PathVariable long id) {
         try {
             Optional<CountingEquipmentInfoDto> countingEquipmentOpt = managementInfoService.findEquipmentWithProductionOrderById(id);
@@ -61,7 +63,7 @@ public class CountingEquipmentController {
         }
     }
 
-    @GetMapping("/{id}")
+    @GetMapping(COUNTING_EQUIPMENT_URL + "/{id}")
     public ResponseEntity<CountingEquipmentDto> findById(@PathVariable long id) {
         try {
             CountingEquipmentDto countingEquipmentOpt = managementInfoService.findEquipmentById(id);
@@ -75,7 +77,7 @@ public class CountingEquipmentController {
         }
     }
 
-    @GetMapping("/{id}/template")
+    @GetMapping(COUNTING_EQUIPMENT_URL + "/{id}/template")
     public ResponseEntity<TemplateDto> findTemplateById(@PathVariable long id) {
         try {
             TemplateDto templateDto = countingEquipmentManagementService.findEquipmentTemplate(id);
@@ -89,7 +91,7 @@ public class CountingEquipmentController {
         }
     }
 
-    @PutMapping("/{equipmentId}/ims")
+    @PutMapping(COUNTING_EQUIPMENT_URL + "/{equipmentId}/ims")
     public ResponseEntity<CountingEquipmentDto> updateIms(@PathVariable long equipmentId, @RequestBody RequestById request,
                                                           Authentication authentication) {
         try {
@@ -106,7 +108,7 @@ public class CountingEquipmentController {
         }
     }
 
-    @PutMapping("/{equipmentId}/configuration")
+    @PutMapping(COUNTING_EQUIPMENT_URL + "/{equipmentId}/configuration")
     public ResponseEntity<CountingEquipmentDto> updateConfiguration(@PathVariable String companyPrefix, @PathVariable String sectionPrefix,
                                                                     @PathVariable long sectionId, @PathVariable long equipmentId,
                                                                     @RequestBody RequestConfigurationDto request,
