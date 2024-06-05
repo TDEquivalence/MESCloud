@@ -133,13 +133,9 @@ public class UserServiceImpl implements UserService {
         for (SectionRoleMapping sectionRoleMapping : sectionRoles) {
             long sectionId = sectionRoleMapping.getSectionId();
 
-            if (sectionRoleMapping.getSectionRole().equals(SectionRole.NONE)) {
-                deleteExistingUserRole(user.getId(), sectionId);
-            } else {
-                SectionRoleEntity sectionRole = findSectionRole(String.valueOf(sectionRoleMapping.getSectionRole()));
-                deleteExistingUserRole(user.getId(), sectionId);
-                createNewUserRole(user.getId(), sectionRole.getId(), sectionId);
-            }
+            SectionRoleEntity sectionRole = findSectionRole(String.valueOf(sectionRoleMapping.getSectionRole()));
+            deleteExistingUserRole(user.getId(), sectionId);
+            createNewUserRole(user.getId(), sectionRole.getId(), sectionId);
         }
     }
 
