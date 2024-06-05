@@ -1,5 +1,6 @@
 package com.alcegory.mescloud.api.rest.section;
 
+import com.alcegory.mescloud.api.rest.base.SectionBaseController;
 import com.alcegory.mescloud.exception.AlarmNotFoundException;
 import com.alcegory.mescloud.exception.IllegalAlarmStatusException;
 import com.alcegory.mescloud.model.dto.alarm.AlarmCountsDto;
@@ -15,23 +16,24 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/alarm")
 @AllArgsConstructor
-public class AlarmController {
+public class AlarmController extends SectionBaseController {
+
+    private static final String ALARM_URL = "/alarm";
 
     private final AlarmService service;
 
-    @PostMapping
-    public ResponseEntity<PaginatedAlarmDto> findByFilter(@RequestBody Filter filter) {
+    @PostMapping(ALARM_URL)
+    public ResponseEntity<PaginatedAlarmDto> findByFilter(@PathVariable long sectionId, @RequestBody Filter filter) {
         try {
-            PaginatedAlarmDto alarms = service.findByFilter(filter);
+            PaginatedAlarmDto alarms = service.findByFilter(sectionId, filter);
             return new ResponseEntity<>(alarms, HttpStatus.OK);
         } catch (AlarmNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
-    @PutMapping("/{alarmId}/recognize")
+    @PutMapping(ALARM_URL + "/{alarmId}/recognize")
     public ResponseEntity<AlarmDto> recognizeAlarmRecord(@PathVariable Long alarmId,
                                                          @RequestBody RequestAlarmRecognitionDto alarmRecognition,
                                                          Authentication authentication) {
@@ -46,7 +48,7 @@ public class AlarmController {
         }
     }
 
-    @PostMapping("/counts")
+    @PostMapping(ALARM_URL + "/counts")
     public ResponseEntity<AlarmCountsDto> getAlarmCounts(@RequestBody Filter filter) {
         try {
             AlarmCountsDto alarmCounts = service.getAlarmCounts(filter);

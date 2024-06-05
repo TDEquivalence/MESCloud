@@ -128,24 +128,27 @@ public class UserServiceImpl implements UserService {
     }
 
     private void updateSectionRole(UserEntity user, UserDto userDto) throws RoleNotFoundException {
+
+        if (user == null || userDto == null) {
+            throw new IllegalArgumentException("User and UserDto must not be null");
+        }
+
+        deleteExistingUserRole(user.getId());
         List<SectionRoleMapping> sectionRoles = Optional.ofNullable(userDto.getSectionRoles()).orElse(Collections.emptyList());
 
         for (SectionRoleMapping sectionRoleMapping : sectionRoles) {
             long sectionId = sectionRoleMapping.getSectionId();
 
             SectionRoleEntity sectionRole = findSectionRole(String.valueOf(sectionRoleMapping.getSectionRole()));
-            deleteExistingUserRole(user.getId(), sectionId);
             createNewUserRole(user.getId(), sectionRole.getId(), sectionId);
         }
     }
 
-    private void deleteExistingUserRole(Long userId, Long sectionId) {
-        UserRoleEntity existingUserRole = userRoleRepository.findByUserIdAndSectionId(userId, sectionId);
-        if (existingUserRole != null) {
-            userRoleRepository.delete(existingUserRole);
-            log.info("User role deleted successfully. User ID: {}, Role ID: {}, Section ID: {}", userId,
-                    existingUserRole.getRoleId(), sectionId);
+    private void deleteExistingUserRole(Long userId) {
+        if (userId == null) {
+            throw new IllegalArgumentException("User ID must not be null");
         }
+        userRoleRepository.deleteByUserId(userId);
     }
 
     private SectionRoleEntity findSectionRole(String roleName) throws RoleNotFoundException {
@@ -154,6 +157,10 @@ public class UserServiceImpl implements UserService {
     }
 
     private void createNewUserRole(Long userId, Long roleId, Long sectionId) {
+        if (userId == null || roleId == null) {
+            throw new IllegalArgumentException("User ID and Role ID must not be null");
+        }
+        
         UserRoleEntity newUserRole = new UserRoleEntity();
         newUserRole.setUserId(userId);
         newUserRole.setRoleId(roleId);

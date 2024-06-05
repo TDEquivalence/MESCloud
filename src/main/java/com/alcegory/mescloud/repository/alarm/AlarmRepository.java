@@ -13,7 +13,7 @@ import java.util.List;
 
 public interface AlarmRepository extends JpaRepository<AlarmEntity, Long> {
 
-    List<AlarmSummaryEntity> findByFilter(Filter filter);
+    List<AlarmSummaryEntity> findByFilter(long sectionId, Filter filter);
 
     List<AlarmEntity> findByEquipmentIdAndStatus(Long equipmentId, AlarmStatus status);
 

@@ -1,5 +1,6 @@
 package com.alcegory.mescloud.api.rest.section;
 
+import com.alcegory.mescloud.api.rest.base.SectionBaseController;
 import com.alcegory.mescloud.exception.ForbiddenAccessException;
 import com.alcegory.mescloud.model.dto.composed.BatchDto;
 import com.alcegory.mescloud.model.dto.production.ProductionOrderDto;
@@ -19,7 +20,7 @@ import java.util.List;
 
 @RestController
 @AllArgsConstructor
-public class BatchController {
+public class BatchController extends SectionBaseController {
 
     private static final String BATCH_URL = "/batch";
 

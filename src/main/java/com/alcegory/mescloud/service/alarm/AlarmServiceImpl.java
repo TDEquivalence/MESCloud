@@ -50,17 +50,13 @@ public class AlarmServiceImpl implements AlarmService {
     private final GenericConverter<ProductionOrderEntity, ProductionOrderDto> productionOrderConverter;
     private final CountingEquipmentService countingEquipmentService;
     private final GenericConverter<CountingEquipmentEntity, CountingEquipmentDto> countingEquipmentConverter;
-
-    public List<AlarmSummaryEntity> find(Filter filter) {
-        return repository.findByFilter(filter);
-    }
-
+    
     @Override
-    public PaginatedAlarmDto findByFilter(Filter filter) {
+    public PaginatedAlarmDto findByFilter(long sectionId, Filter filter) {
         int requestedAlarms = filter.getTake();
         filter.setTake(filter.getTake() + 1);
 
-        List<AlarmSummaryEntity> alarms = repository.findByFilter(filter);
+        List<AlarmSummaryEntity> alarms = repository.findByFilter(sectionId, filter);
         boolean hasNextPage = alarms.size() > requestedAlarms;
 
         if (hasNextPage) {

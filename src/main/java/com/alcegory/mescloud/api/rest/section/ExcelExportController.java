@@ -20,7 +20,7 @@ public class ExcelExportController extends SectionBaseController {
 
     private final ManageExportExcelService exportExcelService;
 
-    @PostMapping(EXPORT_URL + "composed-and-production-orders/completed")
+    @PostMapping(EXPORT_URL + "/composed-and-production-orders/completed")
     public ResponseEntity<Void> exportCompletedComposedAndProductionToExcel(HttpServletResponse response,
                                                                             @RequestBody Map<String, String> requestPayload,
                                                                             @PathVariable long sectionId) {

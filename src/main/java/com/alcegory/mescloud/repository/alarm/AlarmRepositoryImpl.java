@@ -20,6 +20,7 @@ import java.util.List;
 public class AlarmRepositoryImpl extends AbstractFilterRepository<Filter.Property, AlarmEntity> {
 
     private static final String ID_PROP = "id";
+    private static final String SECTION_ID_PROP = "sectionId";
     private static final String CREATED_AT_PROP = "createdAt";
     private static final String STATUS_PROP = "status";
 
@@ -27,12 +28,15 @@ public class AlarmRepositoryImpl extends AbstractFilterRepository<Filter.Propert
         super(entityManager);
     }
 
-    public List<AlarmSummaryEntity> findByFilter(Filter filter) {
+    public List<AlarmSummaryEntity> findByFilter(long sectionId, Filter filter) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<AlarmSummaryEntity> query = criteriaBuilder.createQuery(AlarmSummaryEntity.class);
         Root<AlarmSummaryEntity> root = query.from(AlarmSummaryEntity.class);
 
         List<Predicate> predicates = new ArrayList<>();
+
+        predicates.add(criteriaBuilder.equal(root.get(SECTION_ID_PROP), sectionId));
+
         addPredicates(filter, predicates, criteriaBuilder, root);
 
         List<Order> orders = new ArrayList<>();
