@@ -47,7 +47,6 @@ public class MesMqttSettings {
             }
         } catch (Exception e) {
             log.error("Error initializing MesMqttSettings", e);
-            throw e;
         }
     }
 
