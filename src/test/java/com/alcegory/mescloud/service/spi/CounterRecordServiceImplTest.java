@@ -1,8 +1,5 @@
 package com.alcegory.mescloud.service.spi;
 
-import com.alcegory.mescloud.model.dto.equipment.CountingEquipmentDto;
-import com.alcegory.mescloud.model.dto.equipment.EquipmentOutputAliasDto;
-import com.alcegory.mescloud.model.dto.equipment.EquipmentOutputDto;
 import com.alcegory.mescloud.model.dto.mqqt.CounterMqttDto;
 import com.alcegory.mescloud.model.dto.mqqt.PlcMqttDto;
 import com.alcegory.mescloud.repository.record.CounterRecordRepository;
@@ -11,12 +8,10 @@ import com.alcegory.mescloud.service.equipment.EquipmentOutputServiceImpl;
 import com.alcegory.mescloud.service.record.CounterRecordServiceImpl;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.Mockito.*;

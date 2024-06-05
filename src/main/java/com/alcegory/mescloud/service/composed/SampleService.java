@@ -18,11 +18,11 @@ public interface SampleService {
 
     Optional<SampleEntity> findById(Long id);
 
-    SampleDto create(RequestSampleDto requestSampleDto, Authentication authentication);
+    SampleDto create(long sectionId, RequestSampleDto requestSampleDto, Authentication authentication);
 
     List<SampleDto> getAll();
 
     SampleEntity findByComposedProductionOrderId(Long composedProductionOrderId);
 
-    List<ProductionOrderDto> removeProductionOrderFromComposed(RequestById request, Authentication authentication);
+    List<ProductionOrderDto> removeProductionOrderFromComposed(long sectionId, RequestById request, Authentication authentication);
 }

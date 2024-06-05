@@ -40,9 +40,8 @@ public class BatchServiceImpl implements BatchService {
     private final ProductionOrderConverter productionOrderConverter;
 
     @Override
-    public BatchDto create(RequestBatchDto requestBatch, Authentication authentication) {
-        //TODO: sectionID
-        userRoleService.checkSectionAuthority(authentication, 1L, OPERATOR_CREATE);
+    public BatchDto create(long sectionId, RequestBatchDto requestBatch, Authentication authentication) {
+        userRoleService.checkSectionAuthority(authentication, sectionId, OPERATOR_CREATE);
 
         BatchEntity batch = createBatch(requestBatch);
         BatchEntity savedBatch = saveAndUpdate(batch);
@@ -56,7 +55,7 @@ public class BatchServiceImpl implements BatchService {
         return batch;
     }
 
-    public BatchDto rejectComposed(RequestToRejectBatchDto requestToRejectBatchDto, Authentication authentication) {
+    public BatchDto rejectComposed(long sectionId, RequestToRejectBatchDto requestToRejectBatchDto, Authentication authentication) {
         Optional<ComposedProductionOrderDto> composedProductionOrderDto = composedService.create(requestToRejectBatchDto.getProductionOrderIds());
 
         if (composedProductionOrderDto.isEmpty()) {
@@ -65,13 +64,12 @@ public class BatchServiceImpl implements BatchService {
 
         ComposedProductionOrderDto composed = composedProductionOrderDto.get();
         requestToRejectBatchDto.getRequestBatchDto().setComposedId(composed.getId());
-        return create(requestToRejectBatchDto.getRequestBatchDto(), authentication);
+        return create(sectionId, requestToRejectBatchDto.getRequestBatchDto(), authentication);
     }
 
     @Override
-    public List<ProductionOrderDto> removeBatch(RequestById request, Authentication authentication) {
-        //TODO: sectionID
-        userRoleService.checkSectionAuthority(authentication, 1L, ADMIN_DELETE);
+    public List<ProductionOrderDto> removeBatch(long sectionId, RequestById request, Authentication authentication) {
+        userRoleService.checkSectionAuthority(authentication, sectionId, ADMIN_DELETE);
         Optional<ComposedProductionOrderEntity> composedOpt = composedService.findById(request.getId());
 
         if (composedOpt.isEmpty()) {

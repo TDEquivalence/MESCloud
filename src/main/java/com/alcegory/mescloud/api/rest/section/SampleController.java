@@ -1,10 +1,11 @@
 package com.alcegory.mescloud.api.rest.section;
 
+import com.alcegory.mescloud.api.rest.base.SectionBaseController;
 import com.alcegory.mescloud.api.rest.response.ErrorResponse;
 import com.alcegory.mescloud.exception.ForbiddenAccessException;
 import com.alcegory.mescloud.exception.InconsistentPropertiesException;
-import com.alcegory.mescloud.model.dto.production.ProductionOrderDto;
 import com.alcegory.mescloud.model.dto.composed.SampleDto;
+import com.alcegory.mescloud.model.dto.production.ProductionOrderDto;
 import com.alcegory.mescloud.model.request.RequestById;
 import com.alcegory.mescloud.model.request.RequestSampleDto;
 import com.alcegory.mescloud.service.composed.SampleService;
@@ -19,16 +20,18 @@ import java.util.Collections;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/sample")
 @AllArgsConstructor
-public class SampleController {
+public class SampleController extends SectionBaseController {
+
+    private static final String SAMPLE_URL = "/sample";
 
     private final SampleService sampleService;
 
-    @PostMapping
-    public ResponseEntity<Object> create(@RequestBody RequestSampleDto requestSampleDto, Authentication authentication) {
+    @PostMapping(SAMPLE_URL)
+    public ResponseEntity<Object> create(@PathVariable long sectionId,
+                                         @RequestBody RequestSampleDto requestSampleDto, Authentication authentication) {
         try {
-            SampleDto sampleDto = sampleService.create(requestSampleDto, authentication);
+            SampleDto sampleDto = sampleService.create(sectionId, requestSampleDto, authentication);
             return ResponseEntity.ok(sampleDto);
         } catch (InconsistentPropertiesException ex) {
             ErrorResponse errorResponse = new ErrorResponse("Inconsistent properties: " + ex.getMessage());
@@ -41,7 +44,7 @@ public class SampleController {
         }
     }
 
-    @GetMapping
+    @GetMapping(SAMPLE_URL)
     public ResponseEntity<List<SampleDto>> findAll() {
         try {
             List<SampleDto> sampleDtos = sampleService.getAll();
@@ -51,15 +54,17 @@ public class SampleController {
         }
     }
 
-    @PostMapping("/remove")
-    public ResponseEntity<List<ProductionOrderDto>> removeProductionOrderFromComposed(@RequestBody RequestById request,
+    @PostMapping(SAMPLE_URL + "/remove")
+    public ResponseEntity<List<ProductionOrderDto>> removeProductionOrderFromComposed(@PathVariable long sectionId,
+                                                                                      @RequestBody RequestById request,
                                                                                       Authentication authentication) {
         if (request == null) {
             return ResponseEntity.badRequest().build();
         }
 
         try {
-            List<ProductionOrderDto> productionOrders = sampleService.removeProductionOrderFromComposed(request, authentication);
+            List<ProductionOrderDto> productionOrders = sampleService.removeProductionOrderFromComposed(sectionId, request,
+                    authentication);
             return ResponseEntity.ok(productionOrders);
         } catch (EntityNotFoundException e) {
             return ResponseEntity.notFound().build();

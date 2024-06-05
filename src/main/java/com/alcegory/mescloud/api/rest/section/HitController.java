@@ -1,5 +1,6 @@
 package com.alcegory.mescloud.api.rest.section;
 
+import com.alcegory.mescloud.api.rest.base.SectionBaseController;
 import com.alcegory.mescloud.exception.ForbiddenAccessException;
 import com.alcegory.mescloud.model.dto.composed.HitDto;
 import com.alcegory.mescloud.model.dto.production.ProductionOrderDto;
@@ -17,16 +18,18 @@ import java.util.Collections;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/hit")
 @AllArgsConstructor
-public class HitController {
+public class HitController extends SectionBaseController {
+
+    private static final String HIT_URL = "/hit";
 
     private final HitService hitService;
 
-    @PostMapping
-    public ResponseEntity<List<HitDto>> create(@RequestBody RequestHitDto requestHitDto, Authentication authentication) {
+    @PostMapping(HIT_URL)
+    public ResponseEntity<List<HitDto>> create(@PathVariable long sectionId, @RequestBody RequestHitDto requestHitDto,
+                                               Authentication authentication) {
         try {
-            List<HitDto> createdHits = hitService.create(requestHitDto, authentication);
+            List<HitDto> createdHits = hitService.create(sectionId, requestHitDto, authentication);
 
             if (createdHits.isEmpty()) {
                 return ResponseEntity.notFound().build();
@@ -40,7 +43,7 @@ public class HitController {
         }
     }
 
-    @GetMapping
+    @GetMapping(HIT_URL)
     public ResponseEntity<List<HitDto>> findAll() {
         try {
             List<HitDto> hitDtos = hitService.getAll();
@@ -50,15 +53,15 @@ public class HitController {
         }
     }
 
-    @PostMapping("/remove")
-    public ResponseEntity<List<ProductionOrderDto>> removeHits(@RequestBody RequestById request,
+    @PostMapping(HIT_URL + "/remove")
+    public ResponseEntity<List<ProductionOrderDto>> removeHits(@PathVariable long sectionId, @RequestBody RequestById request,
                                                                Authentication authentication) {
         if (request == null) {
             return ResponseEntity.badRequest().build();
         }
 
         try {
-            List<ProductionOrderDto> productionOrders = hitService.removeHits(request, authentication);
+            List<ProductionOrderDto> productionOrders = hitService.removeHits(sectionId, request, authentication);
             return ResponseEntity.ok(productionOrders);
         } catch (EntityNotFoundException e) {
             return ResponseEntity.notFound().build();

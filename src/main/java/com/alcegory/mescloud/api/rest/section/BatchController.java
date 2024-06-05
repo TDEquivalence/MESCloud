@@ -18,16 +18,18 @@ import java.util.Collections;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/batch")
 @AllArgsConstructor
 public class BatchController {
 
+    private static final String BATCH_URL = "/batch";
+
     private final BatchService batchService;
 
-    @PostMapping
-    public ResponseEntity<BatchDto> create(@RequestBody RequestBatchDto requestBatchDto, Authentication authentication) {
+    @PostMapping(BATCH_URL)
+    public ResponseEntity<BatchDto> create(@PathVariable long sectionId, @RequestBody RequestBatchDto requestBatchDto,
+                                           Authentication authentication) {
         try {
-            BatchDto batchDto = batchService.create(requestBatchDto, authentication);
+            BatchDto batchDto = batchService.create(sectionId, requestBatchDto, authentication);
 
             if (batchDto == null) {
                 return ResponseEntity.notFound().build();
@@ -41,7 +43,7 @@ public class BatchController {
         }
     }
 
-    @GetMapping
+    @GetMapping(BATCH_URL)
     public ResponseEntity<List<BatchDto>> findAll() {
         try {
             List<BatchDto> batchDtos = batchService.getAll();
@@ -54,9 +56,10 @@ public class BatchController {
         }
     }
 
-    @PostMapping("/reject")
-    public ResponseEntity<BatchDto> rejected(@RequestBody RequestToRejectBatchDto requestBatchDto, Authentication authentication) {
-        BatchDto batchDto = batchService.rejectComposed(requestBatchDto, authentication);
+    @PostMapping(BATCH_URL + "/reject")
+    public ResponseEntity<BatchDto> rejected(@PathVariable long sectionId, @RequestBody RequestToRejectBatchDto requestBatchDto,
+                                             Authentication authentication) {
+        BatchDto batchDto = batchService.rejectComposed(sectionId, requestBatchDto, authentication);
         if (batchDto == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -64,14 +67,15 @@ public class BatchController {
         return new ResponseEntity<>(batchDto, HttpStatus.OK);
     }
 
-    @PostMapping("/remove")
-    public ResponseEntity<List<ProductionOrderDto>> removeHits(@RequestBody RequestById request, Authentication authentication) {
+    @PostMapping(BATCH_URL + "/remove")
+    public ResponseEntity<List<ProductionOrderDto>> removeHits(@PathVariable long sectionId, @RequestBody RequestById request,
+                                                               Authentication authentication) {
         if (request == null) {
             return ResponseEntity.badRequest().build();
         }
 
         try {
-            List<ProductionOrderDto> productionOrders = batchService.removeBatch(request, authentication);
+            List<ProductionOrderDto> productionOrders = batchService.removeBatch(sectionId, request, authentication);
             return ResponseEntity.ok(productionOrders);
         } catch (EntityNotFoundException e) {
             return ResponseEntity.notFound().build();
