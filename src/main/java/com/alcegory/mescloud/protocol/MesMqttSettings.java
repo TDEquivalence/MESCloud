@@ -6,6 +6,7 @@ import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -15,6 +16,7 @@ import java.util.Map;
 
 @Getter
 @Setter
+@Slf4j
 @Component
 @AllArgsConstructor
 public class MesMqttSettings {
@@ -28,19 +30,24 @@ public class MesMqttSettings {
     private Map<String, List<String>> companySectionTopicsMap;
 
     @PostConstruct
-    private void initTopics() {
-        List<TopicSummaryEntity> topics = topicService.getAllTopics();
-        backendTopics = new ArrayList<>();
-        companySectionTopicsMap = new HashMap<>();
+    public void initTopics() {
+        try {
+            List<TopicSummaryEntity> topics = topicService.getAllTopics();
+            backendTopics = new ArrayList<>();
+            companySectionTopicsMap = new HashMap<>();
 
-        for (TopicSummaryEntity topic : topics) {
-            if (topic.getBackendTopic().endsWith(BE_DEVICE)) {
-                backendTopics.add(topic.getBackendTopic());
+            for (TopicSummaryEntity topic : topics) {
+                if (topic.getBackendTopic().endsWith(BE_DEVICE)) {
+                    backendTopics.add(topic.getBackendTopic());
+                }
+
+                String companyAndSectionKey = topic.getCompanyPrefix() + DELIMITER + topic.getSectionPrefix();
+                companySectionTopicsMap.computeIfAbsent(companyAndSectionKey, k -> new ArrayList<>()).add(topic.getPlcTopic());
+                companySectionTopicsMap.computeIfAbsent(companyAndSectionKey, k -> new ArrayList<>()).add(topic.getBackendTopic());
             }
-
-            String companyAndSectionKey = topic.getCompanyPrefix() + DELIMITER + topic.getSectionPrefix();
-            companySectionTopicsMap.computeIfAbsent(companyAndSectionKey, k -> new ArrayList<>()).add(topic.getPlcTopic());
-            companySectionTopicsMap.computeIfAbsent(companyAndSectionKey, k -> new ArrayList<>()).add(topic.getBackendTopic());
+        } catch (Exception e) {
+            log.error("Error initializing MesMqttSettings", e);
+            throw e;
         }
     }
 
