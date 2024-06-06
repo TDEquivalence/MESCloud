@@ -11,5 +11,6 @@ public class CompanyDto {
 
     private Long id;
     private String name;
+    private String prefix;
     private List<FactoryDto> factoryList;
 }
