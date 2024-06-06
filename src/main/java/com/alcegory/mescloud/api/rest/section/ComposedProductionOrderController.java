@@ -12,10 +12,7 @@ import com.alcegory.mescloud.service.composed.ComposedProductionOrderService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -55,9 +52,9 @@ public class ComposedProductionOrderController extends SectionBaseController {
     }
 
     @GetMapping(COMPOSED_PRODUCTION_ORDER_URL + "/insert-hits")
-    public ResponseEntity<PaginatedComposedDto> findAllToInsertHits() {
+    public ResponseEntity<PaginatedComposedDto> findAllToInsertHits(@PathVariable long sectionId) {
         try {
-            PaginatedComposedDto composedWithoutHits = composedService.findAllSummarizedWithoutHits();
+            PaginatedComposedDto composedWithoutHits = composedService.findAllSummarizedWithoutHits(sectionId);
             if (composedWithoutHits == null) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
@@ -68,9 +65,10 @@ public class ComposedProductionOrderController extends SectionBaseController {
     }
 
     @PostMapping(COMPOSED_PRODUCTION_ORDER_URL + "/insert-hits/filtered")
-    public ResponseEntity<PaginatedComposedDto> findToInsertHitsFiltered(@RequestBody Filter filter) {
+    public ResponseEntity<PaginatedComposedDto> findToInsertHitsFiltered(@PathVariable long sectionId,
+                                                                         @RequestBody Filter filter) {
         try {
-            PaginatedComposedDto composedWithoutHits = composedService.findSummarizedWithoutHitsFiltered(filter);
+            PaginatedComposedDto composedWithoutHits = composedService.findSummarizedWithoutHitsFiltered(sectionId, filter);
             if (composedWithoutHits == null) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
@@ -81,9 +79,9 @@ public class ComposedProductionOrderController extends SectionBaseController {
     }
 
     @GetMapping(COMPOSED_PRODUCTION_ORDER_URL + "/approval")
-    public ResponseEntity<PaginatedComposedDto> findAllForApproval() {
+    public ResponseEntity<PaginatedComposedDto> findAllForApproval(@PathVariable long sectionId) {
         try {
-            PaginatedComposedDto composedWithHits = composedService.findAllSummarizedWithHits();
+            PaginatedComposedDto composedWithHits = composedService.findAllSummarizedWithHits(sectionId);
             if (composedWithHits == null) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
@@ -94,9 +92,10 @@ public class ComposedProductionOrderController extends SectionBaseController {
     }
 
     @PostMapping(COMPOSED_PRODUCTION_ORDER_URL + "/approval/filtered")
-    public ResponseEntity<PaginatedComposedDto> findForApprovalFiltered(@RequestBody Filter filter) {
+    public ResponseEntity<PaginatedComposedDto> findForApprovalFiltered(@PathVariable long sectionId,
+                                                                        @RequestBody Filter filter) {
         try {
-            PaginatedComposedDto composedWithHits = composedService.findSummarizedWithHitsFiltered(filter);
+            PaginatedComposedDto composedWithHits = composedService.findSummarizedWithHitsFiltered(sectionId, filter);
             if (composedWithHits == null) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
@@ -107,9 +106,9 @@ public class ComposedProductionOrderController extends SectionBaseController {
     }
 
     @GetMapping(COMPOSED_PRODUCTION_ORDER_URL + "/completed")
-    public ResponseEntity<List<ComposedSummaryDto>> findAllCompleted() {
+    public ResponseEntity<List<ComposedSummaryDto>> findAllCompleted(@PathVariable long sectionId) {
         try {
-            List<ComposedSummaryDto> composedCompleted = composedService.findAllCompleted();
+            List<ComposedSummaryDto> composedCompleted = composedService.findAllCompleted(sectionId);
             if (composedCompleted.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
@@ -120,9 +119,10 @@ public class ComposedProductionOrderController extends SectionBaseController {
     }
 
     @PostMapping(COMPOSED_PRODUCTION_ORDER_URL + "/completed/filtered")
-    public ResponseEntity<PaginatedComposedDto> findCompletedFiltered(@RequestBody Filter filter) {
+    public ResponseEntity<PaginatedComposedDto> findCompletedFiltered(@PathVariable long sectionId,
+                                                                      @RequestBody Filter filter) {
         try {
-            PaginatedComposedDto composedCompleted = composedService.findCompletedFiltered(filter);
+            PaginatedComposedDto composedCompleted = composedService.findCompletedFiltered(sectionId, filter);
             if (composedCompleted == null) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }

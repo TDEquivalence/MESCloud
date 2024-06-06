@@ -24,7 +24,7 @@ public interface AlarmService {
     AlarmDto recognizeAlarm(Long alarmId, RequestAlarmRecognitionDto alarmRecognition, Authentication authentication)
             throws AlarmNotFoundException, IllegalAlarmStatusException;
 
-    AlarmCountsDto getAlarmCounts(Filter filter);
+    AlarmCountsDto getAlarmCounts(long sectionId, Filter filter);
 
     void processAlarms(PlcMqttDto plcMqttDto) throws AlarmConfigurationNotFoundException, EquipmentNotFoundException;
 }

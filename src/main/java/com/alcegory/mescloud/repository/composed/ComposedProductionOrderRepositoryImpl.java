@@ -22,7 +22,9 @@ import static com.alcegory.mescloud.model.filter.Filter.Property.START_DATE;
 @Repository
 public class ComposedProductionOrderRepositoryImpl {
 
-    private static final String PROP_ID = "id";
+    private static final String ID_PROP = "id";
+
+    private static final String SECTION_ID_PROP = "sectionId";
     private static final String PROP_SAMPLE = "sample";
     private static final String PROP_COMPOSED_PO = "composedProductionOrder";
     private static final String CREATED_AT = "createdAt";
@@ -31,7 +33,7 @@ public class ComposedProductionOrderRepositoryImpl {
 
     private final EntityManager entityManager;
 
-    public List<ComposedSummaryEntity> findCompleted(Filter filter, Long composedId) {
+    public List<ComposedSummaryEntity> findCompleted(long sectionId, Filter filter, Long composedId) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<ComposedSummaryEntity> query = criteriaBuilder.createQuery(ComposedSummaryEntity.class);
         Root<ComposedSummaryEntity> root = query.from(ComposedSummaryEntity.class);
@@ -41,8 +43,10 @@ public class ComposedProductionOrderRepositoryImpl {
         predicates.add(hasAssociatedBatchPredicate(query, root));
         predicates.addAll(getDatePredicates(criteriaBuilder, root, filter));
 
+        predicates.add(criteriaBuilder.equal(root.get(SECTION_ID_PROP), sectionId));
+
         if (composedId != null) {
-            predicates.add(criteriaBuilder.equal(root.get("id"), composedId));
+            predicates.add(criteriaBuilder.equal(root.get(ID_PROP), composedId));
         }
         // Construct ordering
         List<Order> orders = new ArrayList<>();
@@ -83,12 +87,12 @@ public class ComposedProductionOrderRepositoryImpl {
 
         Subquery<Integer> subquery = rootQuery.subquery(Integer.class);
         Root<BatchEntity> subRoot = subquery.from(BatchEntity.class);
-        subquery.select(subRoot.get(PROP_COMPOSED_PO).get(PROP_ID));
+        subquery.select(subRoot.get(PROP_COMPOSED_PO).get(ID_PROP));
 
-        return root.get(PROP_ID).in(subquery);
+        return root.get(ID_PROP).in(subquery);
     }
 
-    public List<ComposedSummaryEntity> getOpenComposedSummaries(boolean withHits, Filter filter, Long composedId) {
+    public List<ComposedSummaryEntity> getOpenComposedSummaries(long sectionId, boolean withHits, Filter filter, Long composedId) {
 
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<ComposedSummaryEntity> query = criteriaBuilder.createQuery(ComposedSummaryEntity.class);
@@ -99,9 +103,9 @@ public class ComposedProductionOrderRepositoryImpl {
         // Predicate for withHits condition
         Subquery<Integer> subquery = query.subquery(Integer.class);
         Root<HitEntity> subRoot = subquery.from(HitEntity.class);
-        subquery.select(subRoot.get(PROP_SAMPLE).get(PROP_COMPOSED_PO).get(PROP_ID));
+        subquery.select(subRoot.get(PROP_SAMPLE).get(PROP_COMPOSED_PO).get(ID_PROP));
 
-        Predicate hitsPredicate = withHits ? root.get(PROP_ID).in(subquery) : criteriaBuilder.not(root.get(PROP_ID).in(subquery));
+        Predicate hitsPredicate = withHits ? root.get(ID_PROP).in(subquery) : criteriaBuilder.not(root.get(ID_PROP).in(subquery));
         predicates.add(hitsPredicate);
 
         // Handle filter
@@ -124,9 +128,10 @@ public class ComposedProductionOrderRepositoryImpl {
 
         // Add predicate for composedId if it's not null
         if (composedId != null) {
-            predicates.add(criteriaBuilder.equal(root.get(PROP_ID), composedId));
+            predicates.add(criteriaBuilder.equal(root.get(ID_PROP), composedId));
         }
 
+        predicates.add(criteriaBuilder.equal(root.get(SECTION_ID_PROP), sectionId));
         // Constructing the final query
         query.where(predicates.toArray(new Predicate[0]));
 

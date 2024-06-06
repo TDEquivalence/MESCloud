@@ -50,7 +50,7 @@ public class AlarmServiceImpl implements AlarmService {
     private final GenericConverter<ProductionOrderEntity, ProductionOrderDto> productionOrderConverter;
     private final CountingEquipmentService countingEquipmentService;
     private final GenericConverter<CountingEquipmentEntity, CountingEquipmentDto> countingEquipmentConverter;
-    
+
     @Override
     public PaginatedAlarmDto findByFilter(long sectionId, Filter filter) {
         int requestedAlarms = filter.getTake();
@@ -111,8 +111,8 @@ public class AlarmServiceImpl implements AlarmService {
     }
 
     @Override
-    public AlarmCountsDto getAlarmCounts(Filter filter) {
-        return repository.getAlarmCounts(filter);
+    public AlarmCountsDto getAlarmCounts(long sectionId, Filter filter) {
+        return repository.getAlarmCounts(sectionId, filter);
     }
 
     @Override

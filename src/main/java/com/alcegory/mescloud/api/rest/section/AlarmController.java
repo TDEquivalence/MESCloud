@@ -49,9 +49,9 @@ public class AlarmController extends SectionBaseController {
     }
 
     @PostMapping(ALARM_URL + "/counts")
-    public ResponseEntity<AlarmCountsDto> getAlarmCounts(@RequestBody Filter filter) {
+    public ResponseEntity<AlarmCountsDto> getAlarmCounts(@PathVariable long sectionId, @RequestBody Filter filter) {
         try {
-            AlarmCountsDto alarmCounts = service.getAlarmCounts(filter);
+            AlarmCountsDto alarmCounts = service.getAlarmCounts(sectionId, filter);
             return new ResponseEntity<>(alarmCounts, HttpStatus.OK);
         } catch (AlarmNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
