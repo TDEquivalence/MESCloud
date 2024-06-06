@@ -38,7 +38,7 @@ public class UserConverterImpl implements UserConverter {
         if (companyEntity != null) {
             companyDto.setId(companyEntity.getId());
             companyDto.setName(companyEntity.getName());
-            companyDto.setPrefix(companyDto.getPrefix());
+            companyDto.setPrefix(companyEntity.getPrefix());
             // Convert factoryList
             companyDto.setFactoryList(convertToFactoryDtoList(companyEntity.getFactoryList()));
         }
