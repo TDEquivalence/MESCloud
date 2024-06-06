@@ -28,6 +28,7 @@ public class CounterRecordConclusionEntity implements Serializable {
     @JoinColumn(name = "equipment_output_id")
     private EquipmentOutputEntity equipmentOutput;
     private String equipmentOutputAlias;
+    private Long sectionId;
     private int realValue;
     private int computedValue;
     @ManyToOne(fetch = FetchType.LAZY)

@@ -5,7 +5,7 @@ import com.alcegory.mescloud.exception.IncompleteConfigurationException;
 import com.alcegory.mescloud.model.dto.equipment.CountingEquipmentKpiDto;
 import com.alcegory.mescloud.model.dto.equipment.EquipmentKpiAggregatorDto;
 import com.alcegory.mescloud.model.filter.FilterDto;
-import com.alcegory.mescloud.service.kpi.KpiManagementServiceImpl;
+import com.alcegory.mescloud.service.kpi.KpiManagementService;
 import com.alcegory.mescloud.utility.HttpUtil;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -27,16 +27,17 @@ public class KpiController extends SectionBaseController {
     private static final String EQUIPMENT_ERROR_CAUSE = "EQUIPMENT";
     private static final String KPI_ERROR_CAUSE = "KPI";
 
-    private final KpiManagementServiceImpl kpiManagementService;
+    private final KpiManagementService kpiManagementService;
 
     @PostMapping(KPI_URL + "/equipment-counts")
-    public ResponseEntity<CountingEquipmentKpiDto[]> getCountingEquipmentKpi(@RequestBody FilterDto filter) {
+    public ResponseEntity<CountingEquipmentKpiDto[]> getCountingEquipmentKpi(@PathVariable long sectionId,
+                                                                             @RequestBody FilterDto filter) {
         try {
             if (filter == null) {
                 return ResponseEntity.badRequest().build();
             }
 
-            CountingEquipmentKpiDto[] countingEquipmentKpiDto = kpiManagementService.computeEquipmentKpi(filter);
+            CountingEquipmentKpiDto[] countingEquipmentKpiDto = kpiManagementService.computeEquipmentKpi(sectionId, filter);
             return ResponseEntity.ok(countingEquipmentKpiDto);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -44,13 +45,15 @@ public class KpiController extends SectionBaseController {
     }
 
     @PostMapping(KPI_URL + "/equipment-daily-counts")
-    public ResponseEntity<CountingEquipmentKpiDto[]> getEquipmentOutputProductionPerDay(@RequestBody FilterDto filter) {
+    public ResponseEntity<CountingEquipmentKpiDto[]> getEquipmentOutputProductionPerDay(@PathVariable long sectionId,
+                                                                                        @RequestBody FilterDto filter) {
         try {
             if (filter == null) {
                 return ResponseEntity.badRequest().build();
             }
 
-            CountingEquipmentKpiDto[] countingEquipmentKpiDto = kpiManagementService.getEquipmentOutputProductionPerDay(filter);
+            CountingEquipmentKpiDto[] countingEquipmentKpiDto =
+                    kpiManagementService.getEquipmentOutputProductionPerDay(sectionId, filter);
             return ResponseEntity.ok(countingEquipmentKpiDto);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();

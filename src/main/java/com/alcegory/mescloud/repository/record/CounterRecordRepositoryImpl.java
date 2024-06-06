@@ -27,6 +27,8 @@ import static com.alcegory.mescloud.model.filter.Filter.Property.*;
 public class CounterRecordRepositoryImpl extends AbstractFilterRepository<Filter.Property, CounterRecordEntity> {
 
     private static final String ID_PROP = "id";
+    private static final String SECTION_ID_PROP = "sectionId";
+    private static final String SECTION = "section";
     private static final String EQUIPMENT_OUTPUT_PROP = "equipmentOutput";
     private static final String EQUIPMENT_ID_PROP = "equipmentId";
     private static final String PRODUCTION_ORDER_PROP = "productionOrder";
@@ -43,7 +45,7 @@ public class CounterRecordRepositoryImpl extends AbstractFilterRepository<Filter
         super(entityManager);
     }
 
-    public List<CounterRecordSummaryEntity> findLastPerProductionOrderAndEquipmentOutputPerDay(FilterDto filter) {
+    public List<CounterRecordSummaryEntity> findLastPerProductionOrderAndEquipmentOutputPerDay(long sectionId, FilterDto filter) {
         Timestamp startDateFilter = filter.getSearch().getTimestampValue(START_DATE);
         Timestamp endDateFilter = filter.getSearch().getTimestampValue(END_DATE);
         String equipmentAlias = filter.getSearch().getValue(EQUIPMENT_ALIAS);
@@ -57,6 +59,7 @@ public class CounterRecordRepositoryImpl extends AbstractFilterRepository<Filter
         Query query = entityManager.createNativeQuery(queryString, CounterRecordSummaryEntity.class);
         query.setParameter(START_DATE_PROP, startDateFilter);
         query.setParameter(END_DATE_PROP, endDateFilter);
+        query.setParameter(SECTION_ID_PROP, sectionId);
 
         if (equipmentAlias != null && !equipmentAlias.isEmpty()) {
             query.setParameter(EQUIPMENT_ALIAS_PROP, equipmentAlias);
@@ -65,12 +68,17 @@ public class CounterRecordRepositoryImpl extends AbstractFilterRepository<Filter
         return query.getResultList();
     }
 
-    public List<CounterRecordEntity> getFilteredAndPaginated(Filter filterDto) {
+    public List<CounterRecordEntity> getFilteredAndPaginated(long sectionId, Filter filterDto) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<CounterRecordEntity> query = cb.createQuery(CounterRecordEntity.class);
         Root<CounterRecordEntity> root = query.from(CounterRecordEntity.class);
 
         List<Predicate> predicates = new ArrayList<>();
+
+        Join<CounterRecordEntity, EquipmentOutputEntity> equipmentOutputJoin = root.join(EQUIPMENT_OUTPUT_PROP);
+        Join<EquipmentOutputEntity, CountingEquipmentEntity> countingEquipmentJoin = equipmentOutputJoin.join(COUNTING_EQUIPMENT_PROP);
+        predicates.add(cb.equal(countingEquipmentJoin.get(SECTION).get(ID_PROP), sectionId));
+
         addPredicates(filterDto, predicates, cb, root);
 
         List<Order> orders = new ArrayList<>();
@@ -93,13 +101,14 @@ public class CounterRecordRepositoryImpl extends AbstractFilterRepository<Filter
                 .getResultList();
     }
 
-    public List<CounterRecordConclusionEntity> findLastPerProductionOrder(Filter filterDto) {
+    public List<CounterRecordConclusionEntity> findLastPerProductionOrder(long sectionId, Filter filterDto) {
 
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<CounterRecordConclusionEntity> query = criteriaBuilder.createQuery(CounterRecordConclusionEntity.class);
         Root<CounterRecordConclusionEntity> root = query.from(CounterRecordConclusionEntity.class);
 
         List<Predicate> predicates = new ArrayList<>();
+        predicates.add(criteriaBuilder.equal(root.get(SECTION_ID_PROP), sectionId));
         addPredicates(filterDto, predicates, criteriaBuilder, root);
 
         List<Order> orders = new ArrayList<>();
@@ -120,13 +129,14 @@ public class CounterRecordRepositoryImpl extends AbstractFilterRepository<Filter
                 .getResultList();
     }
 
-    public List<CounterRecordConclusionEntity> findLastPerProductionOrder(FilterDto filterDto) {
+    public List<CounterRecordConclusionEntity> findLastPerProductionOrder(long sectionId, FilterDto filterDto) {
 
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<CounterRecordConclusionEntity> query = criteriaBuilder.createQuery(CounterRecordConclusionEntity.class);
         Root<CounterRecordConclusionEntity> root = query.from(CounterRecordConclusionEntity.class);
 
         List<Predicate> predicates = new ArrayList<>();
+        predicates.add(criteriaBuilder.equal(root.get(SECTION_ID_PROP), sectionId));
         addPredicates(filterDto, predicates, criteriaBuilder, root);
 
         List<Order> orders = new ArrayList<>();

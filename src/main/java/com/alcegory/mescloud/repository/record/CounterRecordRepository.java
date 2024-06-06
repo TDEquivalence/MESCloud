@@ -23,13 +23,13 @@ public interface CounterRecordRepository extends CrudRepository<CounterRecordEnt
     @Query(value = "SELECT * FROM counter_record cr WHERE (cr.production_order_id = :productionOrderId) LIMIT 1", nativeQuery = true)
     Optional<CounterRecordEntity> findLastByProductionOrderId(Long productionOrderId);
 
-    List<CounterRecordConclusionEntity> findLastPerProductionOrder(Filter filterDto);
+    List<CounterRecordConclusionEntity> findLastPerProductionOrder(long sectionId, Filter filterDto);
 
-    List<CounterRecordConclusionEntity> findLastPerProductionOrder(FilterDto filterDto);
+    List<CounterRecordConclusionEntity> findLastPerProductionOrder(long sectionId, FilterDto filterDto);
 
-    List<CounterRecordSummaryEntity> findLastPerProductionOrderAndEquipmentOutputPerDay(FilterDto filterDto);
+    List<CounterRecordSummaryEntity> findLastPerProductionOrderAndEquipmentOutputPerDay(long sectionId, FilterDto filterDto);
 
-    List<CounterRecordEntity> getFilteredAndPaginated(Filter filterDto);
+    List<CounterRecordEntity> getFilteredAndPaginated(long sectionId, Filter filterDto);
 
     @Query("SELECT SUM(cr.increment) FROM CounterRecordEntity cr " +
             "WHERE cr.isValidForProduction = true " +

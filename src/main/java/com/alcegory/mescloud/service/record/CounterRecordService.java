@@ -12,13 +12,13 @@ import java.util.List;
 
 public interface CounterRecordService {
 
-    List<CounterRecordSummaryEntity> getEquipmentOutputProductionPerDay(FilterDto filter);
+    List<CounterRecordSummaryEntity> getEquipmentOutputProductionPerDay(long sectionId, FilterDto filter);
 
-    List<CounterRecordDto> filterConclusionRecordsKpi(FilterDto filterDto);
+    List<CounterRecordDto> filterConclusionRecordsKpi(long sectionId, FilterDto filterDto);
 
-    PaginatedCounterRecordsDto filterConclusionRecordsPaginated(Filter filterDto);
+    PaginatedCounterRecordsDto filterConclusionRecordsPaginated(long sectionId, Filter filterDto);
 
-    PaginatedCounterRecordsDto getFilteredAndPaginated(Filter filterDto);
+    PaginatedCounterRecordsDto getFilteredAndPaginated(long sectionId, Filter filterDto);
 
     void processCounterRecord(PlcMqttDto equipmentCountsMqttDTO);
 

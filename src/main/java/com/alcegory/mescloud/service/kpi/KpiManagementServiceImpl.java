@@ -40,15 +40,15 @@ public class KpiManagementServiceImpl implements KpiManagementService {
     private final CounterRecordConverter counterRecordConverter;
 
     @Override
-    public CountingEquipmentKpiDto[] getEquipmentOutputProductionPerDay(FilterDto filter) {
-        List<CounterRecordSummaryEntity> equipmentCounts = counterRecordService.getEquipmentOutputProductionPerDay(filter);
+    public CountingEquipmentKpiDto[] getEquipmentOutputProductionPerDay(long sectionId, FilterDto filter) {
+        List<CounterRecordSummaryEntity> equipmentCounts = counterRecordService.getEquipmentOutputProductionPerDay(sectionId, filter);
         List<CounterRecordDto> counterRecordDto = counterRecordConverter.toDtoList(equipmentCounts);
         return sortPerDay(filter, counterRecordDto);
     }
 
     @Override
-    public CountingEquipmentKpiDto[] computeEquipmentKpi(FilterDto filter) {
-        List<CounterRecordDto> equipmentCounts = counterRecordService.filterConclusionRecordsKpi(filter);
+    public CountingEquipmentKpiDto[] computeEquipmentKpi(long sectionId, FilterDto filter) {
+        List<CounterRecordDto> equipmentCounts = counterRecordService.filterConclusionRecordsKpi(sectionId, filter);
         return sortPerDay(filter, equipmentCounts);
     }
 
@@ -134,7 +134,7 @@ public class KpiManagementServiceImpl implements KpiManagementService {
     }
 
     private List<EquipmentKpiAggregatorDto> computeEquipmentKpiAggregators(Long equipmentId, FilterDto filter) {
-        
+
         Timestamp startDate = filter.getSearch().getTimestampValue(START_DATE);
         Timestamp endDate = filter.getSearch().getTimestampValue(END_DATE);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
