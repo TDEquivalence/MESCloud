@@ -151,7 +151,8 @@ public class AlarmServiceImpl implements AlarmService {
         return alarmsToUpsert;
     }
 
-    private void processAlarmBit(Map<Long, AlarmEntity> activeAlarmByConfigId, List<AlarmEntity> alarmsToUpsert, CountingEquipmentDto equipment, int wordIndex, int bitIndex)
+    private void processAlarmBit(Map<Long, AlarmEntity> activeAlarmByConfigId, List<AlarmEntity> alarmsToUpsert,
+                                 CountingEquipmentDto equipment, int wordIndex, int bitIndex)
             throws AlarmConfigurationNotFoundException {
 
         int binaryBitIndex = BinaryUtil.flipIndex(PLC_BITS_PER_WORD - ZERO_BASED_OFFSET, bitIndex);
