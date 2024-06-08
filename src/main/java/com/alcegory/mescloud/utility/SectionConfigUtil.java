@@ -1,7 +1,7 @@
 package com.alcegory.mescloud.utility;
 
-import com.alcegory.mescloud.model.dto.FactoryDto;
-import com.alcegory.mescloud.model.dto.SectionDto;
+import com.alcegory.mescloud.model.dto.company.FactoryDto;
+import com.alcegory.mescloud.model.dto.company.SectionDto;
 import com.alcegory.mescloud.security.model.SectionRoleEntity;
 import com.alcegory.mescloud.security.model.UserRoleEntity;
 

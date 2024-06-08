@@ -1,13 +1,13 @@
 package com.alcegory.mescloud.api.rest;
 
-import com.alcegory.mescloud.model.dto.ComposedProductionOrderDto;
-import com.alcegory.mescloud.model.dto.ComposedSummaryDto;
-import com.alcegory.mescloud.model.dto.PaginatedComposedDto;
-import com.alcegory.mescloud.model.dto.ProductionOrderSummaryDto;
+import com.alcegory.mescloud.model.dto.composed.ComposedProductionOrderDto;
+import com.alcegory.mescloud.model.dto.composed.ComposedSummaryDto;
+import com.alcegory.mescloud.model.dto.pagination.PaginatedComposedDto;
+import com.alcegory.mescloud.model.dto.production.ProductionOrderDto;
 import com.alcegory.mescloud.model.filter.Filter;
 import com.alcegory.mescloud.model.request.RequestById;
 import com.alcegory.mescloud.model.request.RequestComposedDto;
-import com.alcegory.mescloud.service.ComposedProductionOrderService;
+import com.alcegory.mescloud.service.composed.ComposedProductionOrderService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -53,7 +53,7 @@ public class ComposedProductionOrderController {
     public ResponseEntity<PaginatedComposedDto> findAllToInsertHits() {
         try {
             PaginatedComposedDto composedWithoutHits = composedService.findAllSummarizedWithoutHits();
-            if (composedWithoutHits == null || composedWithoutHits.getComposedProductionOrders().isEmpty()) {
+            if (composedWithoutHits == null) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
             return new ResponseEntity<>(composedWithoutHits, HttpStatus.OK);
@@ -66,7 +66,7 @@ public class ComposedProductionOrderController {
     public ResponseEntity<PaginatedComposedDto> findToInsertHitsFiltered(@RequestBody Filter filter) {
         try {
             PaginatedComposedDto composedWithoutHits = composedService.findSummarizedWithoutHitsFiltered(filter);
-            if (composedWithoutHits == null || composedWithoutHits.getComposedProductionOrders().isEmpty()) {
+            if (composedWithoutHits == null) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
             return new ResponseEntity<>(composedWithoutHits, HttpStatus.OK);
@@ -79,7 +79,7 @@ public class ComposedProductionOrderController {
     public ResponseEntity<PaginatedComposedDto> findAllForApproval() {
         try {
             PaginatedComposedDto composedWithHits = composedService.findAllSummarizedWithHits();
-            if (composedWithHits == null || composedWithHits.getComposedProductionOrders().isEmpty()) {
+            if (composedWithHits == null) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
             return new ResponseEntity<>(composedWithHits, HttpStatus.OK);
@@ -92,7 +92,7 @@ public class ComposedProductionOrderController {
     public ResponseEntity<PaginatedComposedDto> findForApprovalFiltered(@RequestBody Filter filter) {
         try {
             PaginatedComposedDto composedWithHits = composedService.findSummarizedWithHitsFiltered(filter);
-            if (composedWithHits == null || composedWithHits.getComposedProductionOrders().isEmpty()) {
+            if (composedWithHits == null) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
             return new ResponseEntity<>(composedWithHits, HttpStatus.OK);
@@ -118,7 +118,7 @@ public class ComposedProductionOrderController {
     public ResponseEntity<PaginatedComposedDto> findCompletedFiltered(@RequestBody Filter filter) {
         try {
             PaginatedComposedDto composedCompleted = composedService.findCompletedFiltered(filter);
-            if (composedCompleted == null || composedCompleted.getComposedProductionOrders().isEmpty()) {
+            if (composedCompleted == null) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
             return new ResponseEntity<>(composedCompleted, HttpStatus.OK);
@@ -128,13 +128,13 @@ public class ComposedProductionOrderController {
     }
 
     @PostMapping("/production-orders")
-    public ResponseEntity<List<ProductionOrderSummaryDto>> getProductionOrderSummaryByComposedId(@RequestBody RequestById request) {
+    public ResponseEntity<List<ProductionOrderDto>> getProductionOrderSummaryByComposedId(@RequestBody RequestById request) {
         if (request == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
         try {
-            List<ProductionOrderSummaryDto> productionOrderSummary =
+            List<ProductionOrderDto> productionOrderSummary =
                     composedService.getProductionOrderSummaryByComposedId(request.getId());
             return new ResponseEntity<>(productionOrderSummary, HttpStatus.OK);
         } catch (Exception e) {

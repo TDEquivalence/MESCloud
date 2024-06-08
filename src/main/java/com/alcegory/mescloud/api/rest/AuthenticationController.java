@@ -1,7 +1,7 @@
 package com.alcegory.mescloud.api.rest;
 
 import com.alcegory.mescloud.api.rest.response.ErrorResponse;
-import com.alcegory.mescloud.model.dto.UserConfigDto;
+import com.alcegory.mescloud.model.dto.user.UserConfigDto;
 import com.alcegory.mescloud.security.constant.HttpResponseConstant;
 import com.alcegory.mescloud.security.exception.UsernameExistException;
 import com.alcegory.mescloud.security.model.auth.AuthenticateRequest;
