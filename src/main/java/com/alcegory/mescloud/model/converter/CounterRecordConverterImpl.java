@@ -1,18 +1,15 @@
 package com.alcegory.mescloud.model.converter;
 
 import com.alcegory.mescloud.model.dto.CounterRecordDto;
+import com.alcegory.mescloud.model.entity.CounterRecordConclusionEntity;
+import com.alcegory.mescloud.model.entity.CounterRecordEntity;
 import com.alcegory.mescloud.model.entity.ImsEntity;
-import com.alcegory.mescloud.model.entity.production.ProductionOrderEntity;
-import com.alcegory.mescloud.model.entity.records.CounterRecordConclusionEntity;
-import com.alcegory.mescloud.model.entity.records.CounterRecordEntity;
-import com.alcegory.mescloud.model.entity.records.CounterRecordSummaryEntity;
+import com.alcegory.mescloud.model.entity.ProductionOrderEntity;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -26,23 +23,9 @@ public class CounterRecordConverterImpl implements CounterRecordConverter {
     public CounterRecordDto toDto(CounterRecordEntity entity) {
         CounterRecordDto counterRecordDto = mapper.map(entity, CounterRecordDto.class);
         if (entity.getEquipmentOutput() != null && entity.getEquipmentOutput().getCountingEquipment() != null) {
-            counterRecordDto.setEquipmentOutputAlias(entity.getEquipmentOutput().getCountingEquipment().getAlias());
+            counterRecordDto.setEquipmentAlias(entity.getEquipmentOutput().getCountingEquipment().getAlias());
         }
         return counterRecordDto;
-    }
-
-    @Override
-    public CounterRecordDto toDto(CounterRecordSummaryEntity entity) {
-        return mapper.map(entity, CounterRecordDto.class);
-    }
-
-    @Override
-    public List<CounterRecordDto> toDtoList(List<CounterRecordSummaryEntity> entityList) {
-        List<CounterRecordDto> dtoList = new ArrayList<>();
-        for (CounterRecordSummaryEntity entity : entityList) {
-            dtoList.add(toDto(entity));
-        }
-        return dtoList;
     }
 
     @Override
@@ -56,6 +39,26 @@ public class CounterRecordConverterImpl implements CounterRecordConverter {
         dto.setIms(Optional.ofNullable(entity.getProductionOrder())
                 .map(ProductionOrderEntity::getIms)
                 .map(ImsEntity::getCode)
+                .orElse(null));
+
+        dto.setInputBatch(Optional.ofNullable(entity.getProductionOrder())
+                .map(ProductionOrderEntity::getInputBatch)
+                .orElse(null));
+
+        dto.setSource(Optional.ofNullable(entity.getProductionOrder())
+                .map(ProductionOrderEntity::getSource)
+                .orElse(null));
+
+        dto.setGauge(Optional.ofNullable(entity.getProductionOrder())
+                .map(ProductionOrderEntity::getGauge)
+                .orElse(null));
+
+        dto.setCategory(Optional.ofNullable(entity.getProductionOrder())
+                .map(ProductionOrderEntity::getCategory)
+                .orElse(null));
+
+        dto.setWashingProcess(Optional.ofNullable(entity.getProductionOrder())
+                .map(ProductionOrderEntity::getWashingProcess)
                 .orElse(null));
 
         return dto;

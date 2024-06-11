@@ -1,8 +1,8 @@
 package com.alcegory.mescloud.service.spi;
 
-import com.alcegory.mescloud.model.entity.production.ProductionOrderEntity;
-import com.alcegory.mescloud.repository.production.ProductionOrderRepository;
-import com.alcegory.mescloud.service.production.ProductionOrderServiceImpl;
+import com.alcegory.mescloud.repository.ProductionOrderRepository;
+import com.alcegory.mescloud.model.entity.ProductionOrderEntity;
+import com.alcegory.mescloud.service.spi.ProductionOrderServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -10,11 +10,10 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest

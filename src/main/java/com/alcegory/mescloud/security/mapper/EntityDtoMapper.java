@@ -1,6 +1,6 @@
 package com.alcegory.mescloud.security.mapper;
 
-import com.alcegory.mescloud.model.dto.user.UserDto;
+import com.alcegory.mescloud.model.dto.UserDto;
 import com.alcegory.mescloud.model.entity.UserEntity;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;

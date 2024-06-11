@@ -29,7 +29,7 @@ env:
   PENDING_SAS_TOKEN: ${{ secrets.PENDING_SAS_TOKEN }}
   APPROVED_CONTAINER_NAME: ${{ secrets.APPROVED_CONTAINER_NAME }}
   APPROVED_SAS_TOKEN: ${{ secrets.APPROVED_SAS_TOKEN }}
-
+  
 
 jobs:
   codeql-analysis:
@@ -204,17 +204,3 @@ jobs:
           region: eu-west-3
           deployment_package: mescloud-0.0.1-SNAPSHOT.jar
         if: github.ref == 'refs/heads/development'
-
-      - name: Deploy to AWS Beanstalk (Development)
-        uses: einaregilsson/beanstalk-deploy@v13
-        with:
-          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws_session_token: ${{ secrets.AWS_SESSION_TOKEN }}
-          use_existing_version_if_available: true
-          application_name: mescloud
-          environment_name: Mescloud-env
-          version_label: ${{ github.SHA }}
-          region: eu-west-3
-          deployment_package: mescloud-0.0.1-SNAPSHOT.jar
-        if: github.ref == 'refs/heads/test_environment'

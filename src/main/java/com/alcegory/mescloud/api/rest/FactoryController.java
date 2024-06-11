@@ -1,7 +1,7 @@
 package com.alcegory.mescloud.api.rest;
 
-import com.alcegory.mescloud.model.dto.company.CompanyDto;
-import com.alcegory.mescloud.service.company.CompanyService;
+import com.alcegory.mescloud.model.dto.CompanyDto;
+import com.alcegory.mescloud.service.CompanyService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

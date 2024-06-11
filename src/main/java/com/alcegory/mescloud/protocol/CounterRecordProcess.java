@@ -1,12 +1,11 @@
 package com.alcegory.mescloud.protocol;
 
 import com.alcegory.mescloud.constant.MqttDTOConstants;
-import com.alcegory.mescloud.model.dto.mqqt.PlcMqttDto;
-import com.alcegory.mescloud.model.entity.equipment.CountingEquipmentEntity;
-import com.alcegory.mescloud.service.alarm.AlarmService;
-import com.alcegory.mescloud.service.record.CounterRecordService;
-import com.alcegory.mescloud.service.management.CountingEquipmentManagementService;
-import com.alcegory.mescloud.service.equipment.CountingEquipmentService;
+import com.alcegory.mescloud.model.dto.PlcMqttDto;
+import com.alcegory.mescloud.model.entity.CountingEquipmentEntity;
+import com.alcegory.mescloud.service.AlarmService;
+import com.alcegory.mescloud.service.CounterRecordService;
+import com.alcegory.mescloud.service.CountingEquipmentService;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
@@ -19,7 +18,6 @@ public class CounterRecordProcess extends AbstractMesProtocolProcess<PlcMqttDto>
 
     private final CounterRecordService counterRecordService;
     private final CountingEquipmentService equipmentService;
-    private final CountingEquipmentManagementService countingEquipmentManagementService;
     private final AlarmService alarmService;
 
 
@@ -27,7 +25,7 @@ public class CounterRecordProcess extends AbstractMesProtocolProcess<PlcMqttDto>
     public void execute(PlcMqttDto equipmentCounts) {
 
         log.info("Executing Counter Record process");
-        countingEquipmentManagementService.updateEquipmentStatus(equipmentCounts.getEquipmentCode(), equipmentCounts.getEquipmentStatus());
+        equipmentService.updateEquipmentStatus(equipmentCounts.getEquipmentCode(), equipmentCounts.getEquipmentStatus());
         alarmService.processAlarms(equipmentCounts);
 
         if (areInvalidContinuationCounts(equipmentCounts)) {

@@ -1,8 +1,5 @@
 package com.alcegory.mescloud.model.entity;
 
-import com.alcegory.mescloud.model.entity.equipment.CountingEquipmentEntity;
-import com.alcegory.mescloud.model.entity.production.ProductionOrderEntity;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,19 +15,16 @@ public class ImsEntity implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
-
+    
+    @OneToOne(mappedBy = "ims")
+    CountingEquipmentEntity countingEquipment;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @JsonIgnore
-    @OneToOne(mappedBy = "ims", fetch = FetchType.LAZY)
-    private CountingEquipmentEntity countingEquipment;
-
+    private String code;
     @OneToMany(mappedBy = "ims", fetch = FetchType.LAZY)
     private List<ProductionOrderEntity> productionOrders;
 
-    private String code;
 
     public boolean isInUse() {
         return countingEquipment != null;

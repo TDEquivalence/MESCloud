@@ -1,6 +1,6 @@
 package com.alcegory.mescloud.model.request;
 
-import com.alcegory.mescloud.model.dto.composed.HitDto;
+import com.alcegory.mescloud.model.dto.HitDto;
 import lombok.Getter;
 import lombok.Setter;
 

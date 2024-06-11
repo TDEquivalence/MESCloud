@@ -127,8 +127,7 @@ CREATE TABLE counting_equipment (
 
     PRIMARY KEY(id),
     FOREIGN KEY(section_id) REFERENCES section(id),
-    FOREIGN KEY(ims_id) REFERENCES ims(id),
-    FOREIGN KEY (template_id) REFERENCES production_order_template (id)
+    FOREIGN KEY(ims_id) REFERENCES ims(id)
 );
 
 CREATE INDEX idx_counting_equipment_section_id ON counting_equipment (section_id);

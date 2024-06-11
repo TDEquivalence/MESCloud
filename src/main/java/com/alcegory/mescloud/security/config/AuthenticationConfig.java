@@ -1,6 +1,6 @@
 package com.alcegory.mescloud.security.config;
 
-import com.alcegory.mescloud.repository.user.UserRepository;
+import com.alcegory.mescloud.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

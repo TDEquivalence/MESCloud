@@ -1,12 +1,7 @@
 package com.alcegory.mescloud.model.converter;
 
-import com.alcegory.mescloud.model.dto.company.*;
+import com.alcegory.mescloud.model.dto.*;
 import com.alcegory.mescloud.model.entity.*;
-import com.alcegory.mescloud.model.dto.user.UserConfigDto;
-import com.alcegory.mescloud.model.entity.company.CompanyEntity;
-import com.alcegory.mescloud.model.entity.company.FactoryEntity;
-import com.alcegory.mescloud.model.entity.company.SectionConfigEntity;
-import com.alcegory.mescloud.model.entity.company.SectionEntity;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 

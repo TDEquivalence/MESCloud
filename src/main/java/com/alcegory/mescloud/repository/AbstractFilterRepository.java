@@ -19,14 +19,12 @@ import java.util.function.Function;
 public abstract class AbstractFilterRepository<F extends FilterProperty, E> {
 
     public static final String JAKARTA_FETCHGRAPH = "jakarta.persistence.fetchgraph";
-    
+    public static final String SQL_WILDCARD = "%";
+
+    @Autowired
     protected EntityManager entityManager;
     protected Map<String, Function<Root<?>, Path<?>>> pathByJointProperty = new HashMap<>();
 
-    @Autowired
-    protected AbstractFilterRepository(EntityManager entityManager) {
-        this.entityManager = entityManager;
-    }
 
     public List<E> findAllWithFilter(Filter filter, Class<E> entityClass) {
 
