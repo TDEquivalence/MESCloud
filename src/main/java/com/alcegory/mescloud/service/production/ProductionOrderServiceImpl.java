@@ -21,7 +21,6 @@ import java.util.Optional;
 @Service
 @AllArgsConstructor
 @Log
-@Transactional
 public class ProductionOrderServiceImpl implements ProductionOrderService {
 
     private static final String OBO_SECTION_PREFIX = "OBO";
@@ -31,12 +30,10 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
 
     private final ProductionOrderRepository repository;
     private final ProductionOrderConverter converter;
-
     private final CounterRecordRepository counterRecordRepository;
 
     @Override
     public String generateCode() {
-
         Optional<ProductionOrderEntity> productionOrderOpt = repository.findTopByOrderByIdDesc();
         int yearLastTwoDigits = DateUtil.getCurrentYearLastTwoDigits();
         String codePrefix = OBO_SECTION_PREFIX + CODE_PREFIX;
@@ -49,7 +46,6 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     }
 
     private String generateFormattedCodeValue(ProductionOrderEntity productionOrder, String codePrefix) {
-
         if (productionOrder.getCode() == null || productionOrder.getCode().isEmpty()) {
             String message = "Unable to generate new code: last stored Production Order code is null or empty";
             log.warning(message);
@@ -94,11 +90,13 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     }
 
     @Override
+    @Transactional
     public ProductionOrderEntity saveAndUpdate(ProductionOrderEntity productionOrder) {
         return repository.save(productionOrder);
     }
 
     @Override
+    @Transactional
     public List<ProductionOrderEntity> saveAndUpdateAll(List<ProductionOrderEntity> productionOrder) {
         return repository.saveAll(productionOrder);
     }
@@ -109,6 +107,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<ProductionOrderDto> findDtoById(Long id) {
         Optional<ProductionOrderEntity> entity = repository.findById(id);
         if (entity.isEmpty()) {
@@ -127,10 +126,9 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public List<ProductionOrderDto> getCompletedWithoutComposedFiltered(long sectionId) {
-        List<ProductionOrderEntity> persistedProductionOrders = repository.findCompleted(sectionId, true,
-                null, null, null);
+        List<ProductionOrderEntity> persistedProductionOrders = repository.findCompleted(sectionId, true, null, null, null);
         return converter.toDto(persistedProductionOrders);
     }
 
@@ -155,8 +153,8 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     }
 
     @Override
-    public List<ProductionOrderEntity> findByComposedProductionOrderId(Long composedOrderId) {
-        return repository.findByComposedProductionOrderId(composedOrderId);
+    public List<ProductionOrderEntity> findByComposedProductionOrderId(Long composedProductionOrderId) {
+        return repository.findByComposedProductionOrderId(composedProductionOrderId);
     }
 
     @Override
@@ -170,6 +168,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     }
 
     @Override
+    @Transactional
     public void deleteByCode(String productionOrderCode) {
         Optional<ProductionOrderEntity> productionOrder = repository.findByCode(productionOrderCode);
         if (productionOrder.isEmpty()) {
@@ -180,12 +179,13 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     }
 
     @Override
+    @Transactional
     public void delete(ProductionOrderEntity productionOrder) {
         repository.delete(productionOrder);
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public List<ProductionOrderDto> getProductionOrderByComposedId(Long composedId) {
         if (composedId == null) {
             throw new IllegalArgumentException("Composed ID cannot be null");
@@ -207,6 +207,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         return Optional.of(productionOrderDto);
     }
 
+    @Transactional
     public void completeProductionOrder(ProductionOrderEntity productionOrder) {
         String productionOrderCode = productionOrder.getCode();
         log.info(() -> String.format("Setting and saving production order [%s] as completed.", productionOrderCode));
@@ -221,6 +222,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ProductionOrderEntity getProductionOrderByCode(String code) {
         Optional<ProductionOrderEntity> productionOrderEntityOpt = repository.findByCode(code);
         if (productionOrderEntityOpt.isEmpty()) {
@@ -232,6 +234,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<ProductionOrderEntity> findActiveByEquipmentId(long equipmentId) {
         if (equipmentId <= 0) {
             throw new IllegalArgumentException("Equipment ID must be positive");
@@ -240,6 +243,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public boolean hasEquipmentActiveProductionOrder(Long equipmentId) {
         if (equipmentId == null || equipmentId <= 0) {
             throw new IllegalArgumentException("Invalid equipment ID: " + equipmentId);
@@ -248,6 +252,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     }
 
     @Override
+    @Transactional
     public ProductionOrderEntity save(ProductionOrderEntity productionOrder) {
         if (productionOrder == null) {
             throw new IllegalArgumentException("Production order cannot be null");
@@ -262,13 +267,16 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<ProductionOrderEntity> findLastByEquipmentId(long equipmentId) {
         return repository.findLastByEquipmentId(equipmentId);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ProductionOrderEntity> findCompleted(long sectionId, boolean withoutComposed, Filter filter, Timestamp startDate,
                                                      Timestamp endDate) {
         return repository.findCompleted(sectionId, withoutComposed, filter, startDate, endDate);
     }
 }
+
