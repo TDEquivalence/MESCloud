@@ -21,10 +21,8 @@ import org.springframework.stereotype.Service;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 import static com.alcegory.mescloud.model.filter.Filter.Property.END_DATE;
 import static com.alcegory.mescloud.model.filter.Filter.Property.START_DATE;
@@ -121,26 +119,35 @@ public class KpiManagementServiceImpl implements KpiManagementService {
 
         Timestamp startDate = filter.getSearch().getTimestampValue(START_DATE);
         Timestamp endDate = filter.getSearch().getTimestampValue(END_DATE);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+        List<EquipmentKpiAggregatorDto> equipmentKpiAggregators = new ArrayList<>();
 
         LocalDateTime startLocalDateTime = startDate.toLocalDateTime();
         LocalDateTime endLocalDateTime = endDate.toLocalDateTime().plusDays(1).minusNanos(1);
 
         TargetValuesDto targetValues = getTargetValues(equipmentId);
 
-        List<LocalDate> daysInRange =
-                startLocalDateTime.toLocalDate().
-                        datesUntil(endLocalDateTime.toLocalDate().plusDays(1)).toList();
+        for (LocalDate currentDay = startLocalDateTime.toLocalDate();
+             !currentDay.isAfter(endLocalDateTime.toLocalDate());
+             currentDay = currentDay.plusDays(1)) {
 
-        return daysInRange.parallelStream()
-                .map(currentDay -> {
-                    LocalDateTime startOfDay = currentDay.atStartOfDay();
-                    LocalDateTime endOfDay = currentDay.plusDays(1).atStartOfDay().minusNanos(1);
+            LocalDateTime startOfDay = currentDay.atStartOfDay();
+            LocalDateTime endOfDay = currentDay.plusDays(1).atStartOfDay().minusNanos(1);
 
-                    filter.getSearch().setSearchValueByName(START_DATE, startOfDay.toString());
-                    filter.getSearch().setSearchValueByName(END_DATE, endOfDay.toString());
+            String startDateFilter = startOfDay.format(formatter);
+            String endDateTimeFilter = endOfDay.format(formatter);
 
-                    return computeEquipmentKpiAggregator(equipmentId, filter, targetValues);
-                }).toList();
+            filter.getSearch().setSearchValueByName(START_DATE, startDateFilter);
+            filter.getSearch().setSearchValueByName(END_DATE, endDateTimeFilter);
+
+            EquipmentKpiAggregatorDto aggregator = computeEquipmentKpiAggregator(
+                    equipmentId, filter, targetValues);
+
+            equipmentKpiAggregators.add(aggregator);
+        }
+
+        return equipmentKpiAggregators;
     }
 
     @Override
