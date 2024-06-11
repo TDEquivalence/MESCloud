@@ -24,7 +24,6 @@ import static com.alcegory.mescloud.model.filter.Filter.Property.END_DATE;
 import static com.alcegory.mescloud.model.filter.Filter.Property.START_DATE;
 
 @Service
-@Transactional
 @Log
 @AllArgsConstructor
 public class ManagementInfoServiceImpl implements ManagementInfoService {
@@ -34,6 +33,7 @@ public class ManagementInfoServiceImpl implements ManagementInfoService {
     private final CountingEquipmentConverter countingEquipmentConverter;
     private final ProductionOrderConverter productionOrderConverter;
 
+    @Transactional(readOnly = true)
     public Optional<CountingEquipmentInfoDto> findEquipmentWithProductionOrderById(long id) {
         CountingEquipmentDto countingEquipmentOpt = findEquipmentById(id);
         ProductionOrderInfoDto productionOrderDto = findProductionOrderByEquipmentId(id);
@@ -44,6 +44,7 @@ public class ManagementInfoServiceImpl implements ManagementInfoService {
         return Optional.of(infoDto);
     }
 
+    @Transactional(readOnly = true)
     public CountingEquipmentDto findEquipmentById(long id) {
         Optional<CountingEquipmentEntity> countingEquipmentOpt = countingEquipmentService.findByIdWithLastProductionOrder(id);
         if (countingEquipmentOpt.isEmpty()) {
@@ -61,7 +62,6 @@ public class ManagementInfoServiceImpl implements ManagementInfoService {
     }
 
     private CountingEquipmentDto convertToDtoWithActiveProductionOrder(CountingEquipmentEntity entity) {
-
         CountingEquipmentDto dto = countingEquipmentConverter.convertToDto(entity);
 
         if (hasSingleActiveProductionOrder(entity)) {
@@ -72,12 +72,12 @@ public class ManagementInfoServiceImpl implements ManagementInfoService {
     }
 
     private boolean hasSingleActiveProductionOrder(CountingEquipmentEntity entity) {
-
         return entity.getProductionOrders() != null &&
                 entity.getProductionOrders().size() == 1 &&
                 !entity.getProductionOrders().get(0).isCompleted();
     }
 
+    @Transactional(readOnly = true)
     public ProductionOrderInfoDto findProductionOrderByEquipmentId(long equipmentId) {
         Optional<ProductionOrderEntity> productionOrderOpt = productionOrderService.findActiveByEquipmentId(equipmentId);
         if (productionOrderOpt.isEmpty() || productionOrderOpt.get().isCompleted()) {
@@ -89,6 +89,7 @@ public class ManagementInfoServiceImpl implements ManagementInfoService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public PaginatedProductionOrderDto getCompletedWithoutComposedFiltered(long sectionId, Filter filter) {
         int requestedProductionOrders = filter.getTake();
         filter.setTake(filter.getTake() + 1);

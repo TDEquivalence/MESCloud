@@ -30,7 +30,6 @@ import static com.alcegory.mescloud.security.model.SectionAuthority.OPERATOR_CRE
 import static com.alcegory.mescloud.security.model.SectionAuthority.OPERATOR_UPDATE;
 
 @Service
-@Transactional
 @Log
 @AllArgsConstructor
 public class ProductionOrderManagementServiceImpl implements ProductionOrderManagementService {
@@ -45,6 +44,7 @@ public class ProductionOrderManagementServiceImpl implements ProductionOrderMana
     private final ProductionOrderConverter converter;
 
     @Override
+    @Transactional
     public Optional<ProductionOrderDto> create(String companyPrefix, String sectionPrefix, long sectionId,
                                                RequestProductionOrderDto productionOrder, Authentication authentication) {
         userRoleService.checkSectionAuthority(authentication, sectionId, OPERATOR_CREATE);
@@ -106,6 +106,7 @@ public class ProductionOrderManagementServiceImpl implements ProductionOrderMana
     }
 
     @Override
+    @Transactional
     public Optional<ProductionOrderDto> complete(String companyPrefix, String sectionPrefix, long sectionId, long equipmentId,
                                                  Authentication authentication) {
         userRoleService.checkSectionAuthority(authentication, sectionId, OPERATOR_UPDATE);
@@ -161,6 +162,7 @@ public class ProductionOrderManagementServiceImpl implements ProductionOrderMana
     }
 
     @Override
+    @Transactional
     public ProductionOrderDto editProductionOrder(ProductionOrderDto requestProductionOrder, Authentication authentication,
                                                   long sectionId) {
         userRoleService.checkSectionAuthority(authentication, sectionId, OPERATOR_UPDATE);

@@ -35,7 +35,6 @@ import static com.alcegory.mescloud.security.model.SectionRole.ADMIN;
 import static com.alcegory.mescloud.security.utility.AuthorityUtil.checkUserAndSectionRole;
 
 @Service
-@Transactional
 @Log
 @AllArgsConstructor
 public class CountingEquipmentManagementServiceImpl implements CountingEquipmentManagementService {
