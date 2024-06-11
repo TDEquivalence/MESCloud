@@ -49,11 +49,17 @@ public class CounterRecordRepositoryImpl extends AbstractFilterRepository<Filter
         Timestamp startDateFilter = filter.getSearch().getTimestampValue(START_DATE);
         Timestamp endDateFilter = filter.getSearch().getTimestampValue(END_DATE);
         String equipmentAlias = filter.getSearch().getValue(EQUIPMENT_ALIAS);
+        String productionOrderCode = filter.getSearch().getValue(PRODUCTION_ORDER_CODE);
 
-        String queryString = "SELECT * FROM counter_record_summary WHERE section_id = :sectionId AND registered_at BETWEEN :startDate AND :endDate";
+        String queryString = "SELECT * FROM counter_record_summary WHERE section_id = :sectionId AND registered_at " +
+                "BETWEEN :startDate AND :endDate";
 
         if (equipmentAlias != null && !equipmentAlias.isEmpty()) {
             queryString += " AND equipment_alias = :equipmentAlias";
+        }
+
+        if (productionOrderCode != null && !productionOrderCode.isEmpty()) {
+            queryString += " AND production_order_code = :productionOrderCode";
         }
 
         Query query = entityManager.createNativeQuery(queryString, CounterRecordSummaryEntity.class);
@@ -63,6 +69,10 @@ public class CounterRecordRepositoryImpl extends AbstractFilterRepository<Filter
 
         if (equipmentAlias != null && !equipmentAlias.isEmpty()) {
             query.setParameter(EQUIPMENT_ALIAS_PROP, equipmentAlias);
+        }
+
+        if (productionOrderCode != null && !productionOrderCode.isEmpty()) {
+            query.setParameter(PRODUCTION_ORDER_CODE_PROP, productionOrderCode);
         }
 
         return query.getResultList();
