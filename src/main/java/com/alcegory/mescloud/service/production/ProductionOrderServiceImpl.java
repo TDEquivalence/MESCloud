@@ -10,6 +10,7 @@ import com.alcegory.mescloud.repository.record.CounterRecordRepository;
 import com.alcegory.mescloud.utility.DateUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
+import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -239,7 +240,14 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
         if (equipmentId <= 0) {
             throw new IllegalArgumentException("Equipment ID must be positive");
         }
-        return repository.findActiveByEquipmentId(equipmentId);
+
+        Optional<ProductionOrderEntity> productionOrderEntityOpt = repository.findActiveByEquipmentId(equipmentId);
+
+        productionOrderEntityOpt.ifPresent(productionOrder -> {
+            Hibernate.initialize(productionOrder.getProductionInstructions());
+        });
+
+        return productionOrderEntityOpt;
     }
 
     @Override
