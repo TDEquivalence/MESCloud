@@ -1,4 +1,5 @@
 BEGIN;
+DROP VIEW counter_record_summary;
 
 CREATE VIEW counter_record_summary AS
 SELECT
