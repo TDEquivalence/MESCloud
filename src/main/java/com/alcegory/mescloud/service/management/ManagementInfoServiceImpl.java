@@ -15,7 +15,6 @@ import com.alcegory.mescloud.service.production.ProductionOrderService;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -32,8 +31,7 @@ public class ManagementInfoServiceImpl implements ManagementInfoService {
     private final ProductionOrderService productionOrderService;
     private final CountingEquipmentConverter countingEquipmentConverter;
     private final ProductionOrderConverter productionOrderConverter;
-
-    @Transactional(readOnly = true)
+    
     public Optional<CountingEquipmentInfoDto> findEquipmentWithProductionOrderById(long id) {
         CountingEquipmentDto countingEquipmentOpt = findEquipmentById(id);
         ProductionOrderInfoDto productionOrderDto = findProductionOrderByEquipmentId(id);
@@ -44,7 +42,6 @@ public class ManagementInfoServiceImpl implements ManagementInfoService {
         return Optional.of(infoDto);
     }
 
-    @Transactional(readOnly = true)
     public CountingEquipmentDto findEquipmentById(long id) {
         Optional<CountingEquipmentEntity> countingEquipmentOpt = countingEquipmentService.findByIdWithLastProductionOrder(id);
         if (countingEquipmentOpt.isEmpty()) {
@@ -77,7 +74,6 @@ public class ManagementInfoServiceImpl implements ManagementInfoService {
                 !entity.getProductionOrders().get(0).isCompleted();
     }
 
-    @Transactional(readOnly = true)
     public ProductionOrderInfoDto findProductionOrderByEquipmentId(long equipmentId) {
         Optional<ProductionOrderEntity> productionOrderOpt = productionOrderService.findActiveByEquipmentId(equipmentId);
         if (productionOrderOpt.isEmpty() || productionOrderOpt.get().isCompleted()) {
@@ -89,7 +85,6 @@ public class ManagementInfoServiceImpl implements ManagementInfoService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public PaginatedProductionOrderDto getCompletedWithoutComposedFiltered(long sectionId, Filter filter) {
         int requestedProductionOrders = filter.getTake();
         filter.setTake(filter.getTake() + 1);
