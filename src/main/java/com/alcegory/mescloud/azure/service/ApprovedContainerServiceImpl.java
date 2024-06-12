@@ -66,7 +66,7 @@ public class ApprovedContainerServiceImpl implements ApprovedContainerService {
             return convertJsonToImageAnnotation(uploadedData);
         } catch (IOException e) {
             log.error("Error saving to approved container", e);
-            return null;
+            return null; // Or return a default ImageAnnotationDto object as needed
         }
     }
 

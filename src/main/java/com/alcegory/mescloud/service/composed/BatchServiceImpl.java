@@ -40,14 +40,8 @@ public class BatchServiceImpl implements BatchService {
     private final ProductionOrderConverter productionOrderConverter;
 
     @Override
-<<<<<<< HEAD
-    public BatchDto create(RequestBatchDto requestBatch, Authentication authentication) {
-        //TODO: sectionID
-        userRoleService.checkSectionAuthority(authentication, 1L, OPERATOR_CREATE);
-=======
     public BatchDto create(long sectionId, RequestBatchDto requestBatch, Authentication authentication) {
         userRoleService.checkSectionAuthority(authentication, sectionId, OPERATOR_CREATE);
->>>>>>> test_environment
 
         BatchEntity batch = createBatch(requestBatch);
         BatchEntity savedBatch = saveAndUpdate(batch);

@@ -10,10 +10,7 @@ import com.alcegory.mescloud.service.alarm.AlarmService;
 import com.alcegory.mescloud.service.management.CountingEquipmentManagementService;
 import com.alcegory.mescloud.service.production.ProductionOrderService;
 import com.alcegory.mescloud.service.record.CounterRecordService;
-<<<<<<< HEAD
-=======
 import com.amazonaws.services.iot.client.AWSIotMessage;
->>>>>>> test_environment
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
@@ -30,11 +27,7 @@ public class ProductionOrderConclusionProcess extends AbstractMesProtocolProcess
     private final ProductionOrderService productionOrderService;
     private final AlarmService alarmService;
     private final MqttClient mqttClient;
-<<<<<<< HEAD
-    private final MesMqttSettings mqttSettings;
-=======
     private final MesMqttSettings mesMqttSettings;
->>>>>>> test_environment
 
     @Override
     public void execute(PlcMqttDto equipmentCounts, AWSIotMessage message) {

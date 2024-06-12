@@ -1,14 +1,9 @@
 package com.alcegory.mescloud.model.converter;
 
 import com.alcegory.mescloud.model.dto.company.*;
-<<<<<<< HEAD
-import com.alcegory.mescloud.model.entity.*;
-import com.alcegory.mescloud.model.dto.user.UserConfigDto;
-=======
 import com.alcegory.mescloud.model.dto.user.UserConfigDto;
 import com.alcegory.mescloud.model.entity.FeatureEntity;
 import com.alcegory.mescloud.model.entity.UserEntity;
->>>>>>> test_environment
 import com.alcegory.mescloud.model.entity.company.CompanyEntity;
 import com.alcegory.mescloud.model.entity.company.FactoryEntity;
 import com.alcegory.mescloud.model.entity.company.SectionConfigEntity;

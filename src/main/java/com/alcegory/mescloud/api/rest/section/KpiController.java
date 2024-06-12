@@ -5,11 +5,7 @@ import com.alcegory.mescloud.exception.IncompleteConfigurationException;
 import com.alcegory.mescloud.model.dto.equipment.CountingEquipmentKpiDto;
 import com.alcegory.mescloud.model.dto.equipment.EquipmentKpiAggregatorDto;
 import com.alcegory.mescloud.model.filter.FilterDto;
-<<<<<<< HEAD:src/main/java/com/alcegory/mescloud/api/rest/KpiController.java
-import com.alcegory.mescloud.service.kpi.KpiManagementServiceImpl;
-=======
 import com.alcegory.mescloud.service.kpi.KpiManagementService;
->>>>>>> test_environment:src/main/java/com/alcegory/mescloud/api/rest/section/KpiController.java
 import com.alcegory.mescloud.utility.HttpUtil;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -31,11 +27,7 @@ public class KpiController extends SectionBaseController {
     private static final String EQUIPMENT_ERROR_CAUSE = "EQUIPMENT";
     private static final String KPI_ERROR_CAUSE = "KPI";
 
-<<<<<<< HEAD:src/main/java/com/alcegory/mescloud/api/rest/KpiController.java
-    private final KpiManagementServiceImpl kpiManagementService;
-=======
     private final KpiManagementService kpiManagementService;
->>>>>>> test_environment:src/main/java/com/alcegory/mescloud/api/rest/section/KpiController.java
 
     @PostMapping(KPI_URL + "/equipment-counts")
     public ResponseEntity<CountingEquipmentKpiDto[]> getCountingEquipmentKpi(@PathVariable long sectionId,
@@ -45,11 +37,7 @@ public class KpiController extends SectionBaseController {
                 return ResponseEntity.badRequest().build();
             }
 
-<<<<<<< HEAD:src/main/java/com/alcegory/mescloud/api/rest/KpiController.java
-            CountingEquipmentKpiDto[] countingEquipmentKpiDto = kpiManagementService.computeEquipmentKpi(filter);
-=======
             CountingEquipmentKpiDto[] countingEquipmentKpiDto = kpiManagementService.computeEquipmentKpi(sectionId, filter);
->>>>>>> test_environment:src/main/java/com/alcegory/mescloud/api/rest/section/KpiController.java
             return ResponseEntity.ok(countingEquipmentKpiDto);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -64,23 +52,15 @@ public class KpiController extends SectionBaseController {
                 return ResponseEntity.badRequest().build();
             }
 
-<<<<<<< HEAD:src/main/java/com/alcegory/mescloud/api/rest/KpiController.java
-            CountingEquipmentKpiDto[] countingEquipmentKpiDto = kpiManagementService.getEquipmentOutputProductionPerDay(filter);
-=======
             CountingEquipmentKpiDto[] countingEquipmentKpiDto =
                     kpiManagementService.getEquipmentOutputProductionPerDay(sectionId, filter);
->>>>>>> test_environment:src/main/java/com/alcegory/mescloud/api/rest/section/KpiController.java
             return ResponseEntity.ok(countingEquipmentKpiDto);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
-<<<<<<< HEAD:src/main/java/com/alcegory/mescloud/api/rest/KpiController.java
-    @PostMapping("/{equipmentId}/aggregator")
-=======
     @PostMapping(KPI_URL + "/{equipmentId}/aggregator")
->>>>>>> test_environment:src/main/java/com/alcegory/mescloud/api/rest/section/KpiController.java
     public ResponseEntity<EquipmentKpiAggregatorDto> getEquipmentKpiAggregator(@PathVariable long equipmentId,
                                                                                @RequestBody FilterDto filter) {
         try {

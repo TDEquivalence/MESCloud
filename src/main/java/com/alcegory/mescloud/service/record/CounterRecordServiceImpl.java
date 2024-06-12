@@ -50,13 +50,8 @@ public class CounterRecordServiceImpl implements CounterRecordService {
 
 
     @Override
-<<<<<<< HEAD
-    public List<CounterRecordSummaryEntity> getEquipmentOutputProductionPerDay(FilterDto filter) {
-        return repository.findLastPerProductionOrderAndEquipmentOutputPerDay(filter);
-=======
     public List<CounterRecordSummaryEntity> getEquipmentOutputProductionPerDay(long sectionId, FilterDto filter) {
         return repository.findLastPerProductionOrderAndEquipmentOutputPerDay(sectionId, filter);
->>>>>>> test_environment
     }
 
     @Override

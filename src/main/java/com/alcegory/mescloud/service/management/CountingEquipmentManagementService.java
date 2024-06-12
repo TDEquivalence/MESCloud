@@ -15,12 +15,8 @@ public interface CountingEquipmentManagementService {
 
     CountingEquipmentDto updateIms(Long equipmentId, Long imsId, Authentication authentication);
 
-<<<<<<< HEAD
-    CountingEquipmentDto updateConfiguration(long equipmentId, RequestConfigurationDto request, Authentication authentication) throws MesMqttException;
-=======
     CountingEquipmentDto updateConfiguration(String companyPrefix, String sectionPrefix, long sectionId, long equipmentId,
                                              RequestConfigurationDto request, Authentication authentication) throws MesMqttException;
->>>>>>> test_environment
 
     void setOperationStatusByCode(String equipmentCode, CountingEquipmentEntity.OperationStatus status);
 

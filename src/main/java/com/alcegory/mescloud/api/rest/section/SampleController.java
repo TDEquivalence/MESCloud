@@ -4,13 +4,8 @@ import com.alcegory.mescloud.api.rest.base.SectionBaseController;
 import com.alcegory.mescloud.api.rest.response.ErrorResponse;
 import com.alcegory.mescloud.exception.ForbiddenAccessException;
 import com.alcegory.mescloud.exception.InconsistentPropertiesException;
-<<<<<<< HEAD:src/main/java/com/alcegory/mescloud/api/rest/SampleController.java
-import com.alcegory.mescloud.model.dto.production.ProductionOrderDto;
-import com.alcegory.mescloud.model.dto.composed.SampleDto;
-=======
 import com.alcegory.mescloud.model.dto.composed.SampleDto;
 import com.alcegory.mescloud.model.dto.production.ProductionOrderDto;
->>>>>>> test_environment:src/main/java/com/alcegory/mescloud/api/rest/section/SampleController.java
 import com.alcegory.mescloud.model.request.RequestById;
 import com.alcegory.mescloud.model.request.RequestSampleDto;
 import com.alcegory.mescloud.service.composed.SampleService;

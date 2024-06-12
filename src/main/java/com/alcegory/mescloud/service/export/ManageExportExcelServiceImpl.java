@@ -53,12 +53,8 @@ public class ManageExportExcelServiceImpl implements ManageExportExcelService {
 
         setExcelResponseHeaders(response, COMPOSED_PRODUCTION_ORDERS_COMPLETED);
 
-<<<<<<< HEAD
-        List<ProductionOrderEntity> productionOrders = productionOrderRepository.findCompleted(false, null, startDate, endDate);
-=======
         List<ProductionOrderEntity> productionOrders = productionOrderRepository.findCompleted(sectionId, false,
                 null, startDate, endDate);
->>>>>>> test_environment
         List<ComposedSummaryEntity> composedList = composedRepository.findAllComposed(startDate, endDate);
 
         List<ProductionOrderExportInfoDto> productionOrderDtos = productionOrderConverter.toExportDtoList(productionOrders);

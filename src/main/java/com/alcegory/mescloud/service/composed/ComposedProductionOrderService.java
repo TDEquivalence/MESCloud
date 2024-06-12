@@ -25,31 +25,6 @@ public interface ComposedProductionOrderService {
 
     List<ComposedProductionOrderDto> getAll();
 
-<<<<<<< HEAD
-    default PaginatedComposedDto findAllSummarizedWithHits() {
-        return findAllSummarized(true);
-    }
-
-    default PaginatedComposedDto findAllSummarizedWithoutHits() {
-        return findAllSummarized(false);
-    }
-
-    default PaginatedComposedDto findSummarizedWithHitsFiltered(Filter filter) {
-        return findSummarizedFiltered(true, filter);
-    }
-
-    default PaginatedComposedDto findSummarizedWithoutHitsFiltered(Filter filter) {
-        return findSummarizedFiltered(false, filter);
-    }
-
-    PaginatedComposedDto findSummarizedFiltered(boolean withHits, Filter filter);
-
-    PaginatedComposedDto findAllSummarized(boolean withHits);
-
-    List<ComposedSummaryDto> findAllCompleted();
-
-    PaginatedComposedDto findCompletedFiltered(Filter filter);
-=======
     default PaginatedComposedDto findAllSummarizedWithHits(long sectionId) {
         return findAllSummarized(sectionId, true);
     }
@@ -73,7 +48,6 @@ public interface ComposedProductionOrderService {
     List<ComposedSummaryDto> findAllCompleted(long sectionId);
 
     PaginatedComposedDto findCompletedFiltered(long sectionId, Filter filter);
->>>>>>> test_environment
 
     void setProductionOrderApproval(ComposedProductionOrderEntity composed, boolean isApproved);
 

@@ -9,11 +9,7 @@ import java.util.Optional;
 
 public interface CountingEquipmentService {
 
-<<<<<<< HEAD
-    List<CountingEquipmentDto> findAllWithLastProductionOrder();
-=======
     List<CountingEquipmentDto> findAllWithLastProductionOrder(long sectionId);
->>>>>>> test_environment
 
     Optional<CountingEquipmentDto> findById(long id);
 

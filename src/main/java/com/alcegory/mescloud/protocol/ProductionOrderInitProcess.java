@@ -5,10 +5,7 @@ import com.alcegory.mescloud.model.dto.mqqt.PlcMqttDto;
 import com.alcegory.mescloud.service.alarm.AlarmService;
 import com.alcegory.mescloud.service.record.CounterRecordService;
 import com.alcegory.mescloud.service.management.CountingEquipmentManagementService;
-<<<<<<< HEAD
-=======
 import com.amazonaws.services.iot.client.AWSIotMessage;
->>>>>>> test_environment
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;

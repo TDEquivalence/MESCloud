@@ -28,11 +28,7 @@ public class AlarmRepositoryImpl extends AbstractFilterRepository<Filter.Propert
         super(entityManager);
     }
 
-<<<<<<< HEAD
-    public List<AlarmSummaryEntity> findByFilter(Filter filter) {
-=======
     public List<AlarmSummaryEntity> findByFilter(long sectionId, Filter filter) {
->>>>>>> test_environment
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<AlarmSummaryEntity> query = criteriaBuilder.createQuery(AlarmSummaryEntity.class);
         Root<AlarmSummaryEntity> root = query.from(AlarmSummaryEntity.class);

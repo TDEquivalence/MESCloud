@@ -15,10 +15,6 @@ import com.alcegory.mescloud.service.production.ProductionOrderService;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
-<<<<<<< HEAD
-import org.springframework.transaction.annotation.Transactional;
-=======
->>>>>>> test_environment
 
 import java.util.List;
 import java.util.Optional;
@@ -27,10 +23,6 @@ import static com.alcegory.mescloud.model.filter.Filter.Property.END_DATE;
 import static com.alcegory.mescloud.model.filter.Filter.Property.START_DATE;
 
 @Service
-<<<<<<< HEAD
-@Transactional
-=======
->>>>>>> test_environment
 @Log
 @AllArgsConstructor
 public class ManagementInfoServiceImpl implements ManagementInfoService {
@@ -39,11 +31,7 @@ public class ManagementInfoServiceImpl implements ManagementInfoService {
     private final ProductionOrderService productionOrderService;
     private final CountingEquipmentConverter countingEquipmentConverter;
     private final ProductionOrderConverter productionOrderConverter;
-<<<<<<< HEAD
-
-=======
     
->>>>>>> test_environment
     public Optional<CountingEquipmentInfoDto> findEquipmentWithProductionOrderById(long id) {
         CountingEquipmentDto countingEquipmentOpt = findEquipmentById(id);
         ProductionOrderInfoDto productionOrderDto = findProductionOrderByEquipmentId(id);
@@ -71,10 +59,6 @@ public class ManagementInfoServiceImpl implements ManagementInfoService {
     }
 
     private CountingEquipmentDto convertToDtoWithActiveProductionOrder(CountingEquipmentEntity entity) {
-<<<<<<< HEAD
-
-=======
->>>>>>> test_environment
         CountingEquipmentDto dto = countingEquipmentConverter.convertToDto(entity);
 
         if (hasSingleActiveProductionOrder(entity)) {
@@ -85,10 +69,6 @@ public class ManagementInfoServiceImpl implements ManagementInfoService {
     }
 
     private boolean hasSingleActiveProductionOrder(CountingEquipmentEntity entity) {
-<<<<<<< HEAD
-
-=======
->>>>>>> test_environment
         return entity.getProductionOrders() != null &&
                 entity.getProductionOrders().size() == 1 &&
                 !entity.getProductionOrders().get(0).isCompleted();
@@ -105,21 +85,12 @@ public class ManagementInfoServiceImpl implements ManagementInfoService {
     }
 
     @Override
-<<<<<<< HEAD
-    public PaginatedProductionOrderDto getCompletedWithoutComposedFiltered(Filter filter) {
-        int requestedProductionOrders = filter.getTake();
-        filter.setTake(filter.getTake() + 1);
-
-        List<ProductionOrderEntity> persistedProductionOrders = productionOrderService.findCompleted(true, filter,
-                filter.getSearch().getTimestampValue(START_DATE), filter.getSearch().getTimestampValue(END_DATE));
-=======
     public PaginatedProductionOrderDto getCompletedWithoutComposedFiltered(long sectionId, Filter filter) {
         int requestedProductionOrders = filter.getTake();
         filter.setTake(filter.getTake() + 1);
 
         List<ProductionOrderEntity> persistedProductionOrders = productionOrderService.findCompleted(sectionId, true,
                 filter, filter.getSearch().getTimestampValue(START_DATE), filter.getSearch().getTimestampValue(END_DATE));
->>>>>>> test_environment
         boolean hasNextPage = persistedProductionOrders.size() > requestedProductionOrders;
 
         if (hasNextPage) {
@@ -134,8 +105,4 @@ public class ManagementInfoServiceImpl implements ManagementInfoService {
         paginatedProductionOrderDto.setProductionOrders(summaryDtos);
         return paginatedProductionOrderDto;
     }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> test_environment

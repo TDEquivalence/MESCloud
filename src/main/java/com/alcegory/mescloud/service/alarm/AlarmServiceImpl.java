@@ -56,11 +56,7 @@ public class AlarmServiceImpl implements AlarmService {
         int requestedAlarms = filter.getTake();
         filter.setTake(filter.getTake() + 1);
 
-<<<<<<< HEAD
-        List<AlarmSummaryEntity> alarms = repository.findByFilter(filter);
-=======
         List<AlarmSummaryEntity> alarms = repository.findByFilter(sectionId, filter);
->>>>>>> test_environment
         boolean hasNextPage = alarms.size() > requestedAlarms;
 
         if (hasNextPage) {

@@ -11,11 +11,7 @@ public interface ManagementInfoService {
 
     Optional<CountingEquipmentInfoDto> findEquipmentWithProductionOrderById(long id);
 
-<<<<<<< HEAD
-    PaginatedProductionOrderDto getCompletedWithoutComposedFiltered(Filter filter);
-=======
     PaginatedProductionOrderDto getCompletedWithoutComposedFiltered(long sectionId, Filter filter);
->>>>>>> test_environment
 
     CountingEquipmentDto findEquipmentById(long id);
 }

@@ -27,17 +27,10 @@ public interface CounterRecordRepository extends CrudRepository<CounterRecordEnt
 
     List<CounterRecordConclusionEntity> findLastPerProductionOrder(long sectionId, FilterDto filterDto);
 
-<<<<<<< HEAD
-    List<CounterRecordSummaryEntity> findLastPerProductionOrderAndEquipmentOutputPerDay(FilterDto filterDto);
-
-    List<CounterRecordEntity> getFilteredAndPaginated(Filter filterDto);
-
-=======
     List<CounterRecordSummaryEntity> findLastPerProductionOrderAndEquipmentOutputPerDay(long sectionId, FilterDto filterDto);
 
     List<CounterRecordEntity> getFilteredAndPaginated(long sectionId, Filter filterDto);
 
->>>>>>> test_environment
     @Query("SELECT SUM(cr.increment) FROM CounterRecordEntity cr " +
             "WHERE cr.isValidForProduction = true " +
             "AND cr.productionOrder.id = :productionOrderId")

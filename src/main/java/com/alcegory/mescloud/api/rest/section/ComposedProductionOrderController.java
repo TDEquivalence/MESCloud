@@ -1,9 +1,6 @@
 package com.alcegory.mescloud.api.rest.section;
 
-<<<<<<< HEAD:src/main/java/com/alcegory/mescloud/api/rest/ComposedProductionOrderController.java
-=======
 import com.alcegory.mescloud.api.rest.base.SectionBaseController;
->>>>>>> test_environment:src/main/java/com/alcegory/mescloud/api/rest/section/ComposedProductionOrderController.java
 import com.alcegory.mescloud.model.dto.composed.ComposedProductionOrderDto;
 import com.alcegory.mescloud.model.dto.composed.ComposedSummaryDto;
 import com.alcegory.mescloud.model.dto.pagination.PaginatedComposedDto;
@@ -57,11 +54,7 @@ public class ComposedProductionOrderController extends SectionBaseController {
     @GetMapping(COMPOSED_PRODUCTION_ORDER_URL + "/insert-hits")
     public ResponseEntity<PaginatedComposedDto> findAllToInsertHits(@PathVariable long sectionId) {
         try {
-<<<<<<< HEAD:src/main/java/com/alcegory/mescloud/api/rest/ComposedProductionOrderController.java
-            PaginatedComposedDto composedWithoutHits = composedService.findAllSummarizedWithoutHits();
-=======
             PaginatedComposedDto composedWithoutHits = composedService.findAllSummarizedWithoutHits(sectionId);
->>>>>>> test_environment:src/main/java/com/alcegory/mescloud/api/rest/section/ComposedProductionOrderController.java
             if (composedWithoutHits == null) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
@@ -75,11 +68,7 @@ public class ComposedProductionOrderController extends SectionBaseController {
     public ResponseEntity<PaginatedComposedDto> findToInsertHitsFiltered(@PathVariable long sectionId,
                                                                          @RequestBody Filter filter) {
         try {
-<<<<<<< HEAD:src/main/java/com/alcegory/mescloud/api/rest/ComposedProductionOrderController.java
-            PaginatedComposedDto composedWithoutHits = composedService.findSummarizedWithoutHitsFiltered(filter);
-=======
             PaginatedComposedDto composedWithoutHits = composedService.findSummarizedWithoutHitsFiltered(sectionId, filter);
->>>>>>> test_environment:src/main/java/com/alcegory/mescloud/api/rest/section/ComposedProductionOrderController.java
             if (composedWithoutHits == null) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
@@ -92,11 +81,7 @@ public class ComposedProductionOrderController extends SectionBaseController {
     @GetMapping(COMPOSED_PRODUCTION_ORDER_URL + "/approval")
     public ResponseEntity<PaginatedComposedDto> findAllForApproval(@PathVariable long sectionId) {
         try {
-<<<<<<< HEAD:src/main/java/com/alcegory/mescloud/api/rest/ComposedProductionOrderController.java
-            PaginatedComposedDto composedWithHits = composedService.findAllSummarizedWithHits();
-=======
             PaginatedComposedDto composedWithHits = composedService.findAllSummarizedWithHits(sectionId);
->>>>>>> test_environment:src/main/java/com/alcegory/mescloud/api/rest/section/ComposedProductionOrderController.java
             if (composedWithHits == null) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
@@ -110,11 +95,7 @@ public class ComposedProductionOrderController extends SectionBaseController {
     public ResponseEntity<PaginatedComposedDto> findForApprovalFiltered(@PathVariable long sectionId,
                                                                         @RequestBody Filter filter) {
         try {
-<<<<<<< HEAD:src/main/java/com/alcegory/mescloud/api/rest/ComposedProductionOrderController.java
-            PaginatedComposedDto composedWithHits = composedService.findSummarizedWithHitsFiltered(filter);
-=======
             PaginatedComposedDto composedWithHits = composedService.findSummarizedWithHitsFiltered(sectionId, filter);
->>>>>>> test_environment:src/main/java/com/alcegory/mescloud/api/rest/section/ComposedProductionOrderController.java
             if (composedWithHits == null) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
@@ -141,11 +122,7 @@ public class ComposedProductionOrderController extends SectionBaseController {
     public ResponseEntity<PaginatedComposedDto> findCompletedFiltered(@PathVariable long sectionId,
                                                                       @RequestBody Filter filter) {
         try {
-<<<<<<< HEAD:src/main/java/com/alcegory/mescloud/api/rest/ComposedProductionOrderController.java
-            PaginatedComposedDto composedCompleted = composedService.findCompletedFiltered(filter);
-=======
             PaginatedComposedDto composedCompleted = composedService.findCompletedFiltered(sectionId, filter);
->>>>>>> test_environment:src/main/java/com/alcegory/mescloud/api/rest/section/ComposedProductionOrderController.java
             if (composedCompleted == null) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
@@ -155,11 +132,7 @@ public class ComposedProductionOrderController extends SectionBaseController {
         }
     }
 
-<<<<<<< HEAD:src/main/java/com/alcegory/mescloud/api/rest/ComposedProductionOrderController.java
-    @PostMapping("/production-orders")
-=======
     @PostMapping(COMPOSED_PRODUCTION_ORDER_URL + "/production-orders")
->>>>>>> test_environment:src/main/java/com/alcegory/mescloud/api/rest/section/ComposedProductionOrderController.java
     public ResponseEntity<List<ProductionOrderDto>> getProductionOrderSummaryByComposedId(@RequestBody RequestById request) {
         if (request == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

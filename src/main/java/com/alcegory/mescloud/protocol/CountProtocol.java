@@ -8,11 +8,6 @@ import com.amazonaws.services.iot.client.AWSIotMessage;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-<<<<<<< HEAD
-import com.alcegory.mescloud.model.dto.mqqt.HasReceivedMqttDto;
-import com.alcegory.mescloud.model.dto.mqqt.MqttDto;
-=======
->>>>>>> test_environment
 import jakarta.annotation.PostConstruct;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Component;

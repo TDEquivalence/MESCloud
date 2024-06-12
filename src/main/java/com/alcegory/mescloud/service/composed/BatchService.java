@@ -19,15 +19,6 @@ public interface BatchService {
 
     Optional<BatchEntity> findById(Long id);
 
-<<<<<<< HEAD
-    BatchDto create(RequestBatchDto requestBatchDto, Authentication authentication);
-
-    List<BatchDto> getAll();
-
-    BatchDto rejectComposed(RequestToRejectBatchDto requestToRejectBatchDto, Authentication authentication);
-
-    List<ProductionOrderDto> removeBatch(RequestById request, Authentication authentication);
-=======
     BatchDto create(long sectionId, RequestBatchDto requestBatchDto, Authentication authentication);
 
     List<BatchDto> getAll();
@@ -35,5 +26,4 @@ public interface BatchService {
     BatchDto rejectComposed(long sectionId, RequestToRejectBatchDto requestToRejectBatchDto, Authentication authentication);
 
     List<ProductionOrderDto> removeBatch(long sectionId, RequestById request, Authentication authentication);
->>>>>>> test_environment
 }

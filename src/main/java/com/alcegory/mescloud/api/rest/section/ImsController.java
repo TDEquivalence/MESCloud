@@ -17,11 +17,7 @@ import java.util.List;
 @AllArgsConstructor
 public class ImsController {
 
-<<<<<<< HEAD:src/main/java/com/alcegory/mescloud/api/rest/ImsController.java
-    private ImsService imsService;
-=======
     private static final String IMS_URL = "/ims";
->>>>>>> test_environment:src/main/java/com/alcegory/mescloud/api/rest/section/ImsController.java
 
     private ImsService imsService;
 

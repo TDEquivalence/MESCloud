@@ -2,15 +2,9 @@ package com.alcegory.mescloud.service.composed;
 
 import com.alcegory.mescloud.exception.InconsistentPropertiesException;
 import com.alcegory.mescloud.model.converter.GenericConverter;
-<<<<<<< HEAD
-import com.alcegory.mescloud.model.dto.pagination.PaginatedComposedDto;
-import com.alcegory.mescloud.model.dto.composed.ComposedProductionOrderDto;
-import com.alcegory.mescloud.model.dto.composed.ComposedSummaryDto;
-=======
 import com.alcegory.mescloud.model.dto.composed.ComposedProductionOrderDto;
 import com.alcegory.mescloud.model.dto.composed.ComposedSummaryDto;
 import com.alcegory.mescloud.model.dto.pagination.PaginatedComposedDto;
->>>>>>> test_environment
 import com.alcegory.mescloud.model.dto.production.ProductionInstructionDto;
 import com.alcegory.mescloud.model.dto.production.ProductionOrderDto;
 import com.alcegory.mescloud.model.entity.composed.ComposedProductionOrderEntity;

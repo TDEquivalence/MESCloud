@@ -1,9 +1,6 @@
 package com.alcegory.mescloud.api.rest.section;
 
-<<<<<<< HEAD:src/main/java/com/alcegory/mescloud/api/rest/CounterRecordController.java
-=======
 import com.alcegory.mescloud.api.rest.base.SectionBaseController;
->>>>>>> test_environment:src/main/java/com/alcegory/mescloud/api/rest/section/CounterRecordController.java
 import com.alcegory.mescloud.model.dto.pagination.PaginatedCounterRecordsDto;
 import com.alcegory.mescloud.model.filter.Filter;
 import com.alcegory.mescloud.service.record.CounterRecordService;
