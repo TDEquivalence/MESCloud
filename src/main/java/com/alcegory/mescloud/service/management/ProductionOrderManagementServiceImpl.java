@@ -94,7 +94,7 @@ public class ProductionOrderManagementServiceImpl implements ProductionOrderMana
 
     private void updateProductionOrderEntity(ProductionOrderEntity productionOrderEntity, CountingEquipmentEntity countingEquipmentEntity) {
         productionOrderEntity.setEquipment(countingEquipmentEntity);
-        productionOrderEntity.setIms(countingEquipmentEntity.getIms());
+        productionOrderEntity.setEquipmentInstrument(countingEquipmentEntity.getEquipmentInstrument());
         countingEquipmentEntity.setId(productionOrderEntity.getEquipment().getId());
         countingEquipmentService.setOperationStatus(countingEquipmentEntity, CountingEquipmentEntity.OperationStatus.IN_PROGRESS);
     }
@@ -133,6 +133,7 @@ public class ProductionOrderManagementServiceImpl implements ProductionOrderMana
 
         ProductionOrderEntity productionOrder = productionOrderEntityOpt.get();
         ProductionOrderDto productionOrderDto = converter.toDto(productionOrder);
+        productionOrderDto.setCompletedAt(new Date());
         return Optional.of(productionOrderDto);
     }
 
