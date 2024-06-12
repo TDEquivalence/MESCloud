@@ -94,7 +94,7 @@ public class ProductionOrderManagementServiceImpl implements ProductionOrderMana
 
     private void updateProductionOrderEntity(ProductionOrderEntity productionOrderEntity, CountingEquipmentEntity countingEquipmentEntity) {
         productionOrderEntity.setEquipment(countingEquipmentEntity);
-        productionOrderEntity.setEquipmentInstrument(countingEquipmentEntity.getEquipmentInstrument());
+        productionOrderEntity.setIms(countingEquipmentEntity.getIms());
         countingEquipmentEntity.setId(productionOrderEntity.getEquipment().getId());
         countingEquipmentService.setOperationStatus(countingEquipmentEntity, CountingEquipmentEntity.OperationStatus.IN_PROGRESS);
     }
