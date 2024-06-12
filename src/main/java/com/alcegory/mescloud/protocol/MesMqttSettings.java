@@ -55,11 +55,11 @@ public class MesMqttSettings {
     }
 
     public String getPlcTopicByCompanyAndSection(String companyPrefix, String sectionPrefix) {
-        String key = companyPrefix + DELIMITER + sectionPrefix;
+        String key = companyPrefix.toUpperCase() + DELIMITER + sectionPrefix.toUpperCase();
         List<String> topics = companySectionTopicsMap.get(key);
         if (topics != null && !topics.isEmpty()) {
             for (String topic : topics) {
-                if (topic.endsWith(PLC_DEVICE)) {
+                if (topic.endsWith(PLC_DEVICE.toUpperCase())) {
                     return topic;
                 }
             }
