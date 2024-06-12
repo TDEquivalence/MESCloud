@@ -1,9 +1,5 @@
 BEGIN;
 
-<<<<<<< HEAD
-=======
--- create after composed_summary
->>>>>>> test_environment
 DROP VIEW composed_summary;
 DROP VIEW counter_record_production_conclusion;
 
@@ -52,7 +48,6 @@ GROUP BY
     cr.registered_at,
     cr.is_valid_for_production,
     po.code;
-
 
 
 INSERT INTO audit_script (run_date, process, version, schema)

@@ -7,6 +7,7 @@ import com.alcegory.mescloud.repository.equipment.CountingEquipmentRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -172,6 +173,7 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
     }
 
     @Override
+    @Transactional
     public Optional<CountingEquipmentEntity> findEquipmentTemplate(long id) {
         return repository.findEquipmentWithTemplateById(id);
     }
