@@ -253,6 +253,7 @@ public class CountingEquipmentManagementServiceImpl implements CountingEquipment
     }
 
     @Override
+    @Transactional
     public TemplateDto findEquipmentTemplate(long id) {
         CountingEquipmentEntity countingEquipment = countingEquipmentService.findEquipmentTemplate(id)
                 .orElseThrow(() -> new CountingEquipmentException("Error getting counting equipment with id " + id));
