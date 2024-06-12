@@ -41,13 +41,13 @@ public interface CountingEquipmentService {
 
     Optional<CountingEquipmentEntity> findEquipmentTemplate(long id);
 
-    Double getAverageQualityTargetDividedByTotalCount();
+    Double getAverageQualityTargetDividedByTotalCount(Long sectionId);
 
-    Double getAverageAvailabilityTargetDividedByTotalCount();
+    Double getAverageAvailabilityTargetDividedByTotalCount(Long sectionId);
 
-    Double getAveragePerformanceTargetDividedByTotalCount();
+    Double getAveragePerformanceTargetDividedByTotalCount(Long sectionId);
 
-    Double getAverageOverallEquipmentEffectivenessTargetDividedByTotalCount();
+    Double getAverageOverallEquipmentEffectivenessTargetDividedByTotalCount(Long sectionId);
 
-    Double getAverageTheoreticalProduction();
+    Double getAverageTheoreticalProduction(Long sectionId);
 }

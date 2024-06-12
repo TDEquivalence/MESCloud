@@ -5,5 +5,5 @@ import com.alcegory.mescloud.model.filter.FilterDto;
 
 public interface AvailabilityKpiService {
 
-    KpiDto computeAvailability(Long equipmentId, FilterDto filter);
+    KpiDto computeAvailability(Long sectionId, Long equipmentId, FilterDto filter);
 }

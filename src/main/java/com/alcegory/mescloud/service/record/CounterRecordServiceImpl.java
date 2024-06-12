@@ -282,13 +282,13 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     }
 
     @Override
-    public Integer sumValidCounterIncrement(Long countingEquipmentId, FilterDto filter) {
-        return repository.sumIncrementDay(countingEquipmentId, filter, true);
+    public Integer sumValidCounterIncrement(Long sectionId, Long countingEquipmentId, FilterDto filter) {
+        return repository.sumIncrementDay(sectionId, countingEquipmentId, filter, true);
     }
 
     @Override
-    public Integer sumTotalCounterIncrement(Long countingEquipmentId, FilterDto filter) {
-        return repository.sumIncrementDay(countingEquipmentId, filter, false);
+    public Integer sumTotalCounterIncrement(Long sectionId, Long countingEquipmentId, FilterDto filter) {
+        return repository.sumIncrementDay(sectionId, countingEquipmentId, filter, false);
     }
 
     @Override
@@ -329,7 +329,7 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     }
 
     public List<CounterRecordSummaryEntity> findByEquipmentAndPeriod(
-            Long equipmentId, FilterDto filter) {
-        return repository.findByEquipmentAndPeriod(equipmentId, filter);
+            Long sectionId, Long equipmentId, FilterDto filter) {
+        return repository.findBySectionAndEquipmentAndPeriod(sectionId, equipmentId, filter);
     }
 }

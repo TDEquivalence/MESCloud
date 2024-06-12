@@ -26,11 +26,12 @@ public class AvailabilityKpiServiceImpl implements AvailabilityKpiService {
     private final CounterRecordService counterRecordService;
 
     @Override
-    public KpiDto computeAvailability(Long equipmentId, FilterDto filter) {
+    public KpiDto computeAvailability(Long sectionId, Long equipmentId, FilterDto filter) {
         Timestamp startDate = filter.getSearch().getTimestampValue(START_DATE);
         Timestamp endDate = filter.getSearch().getTimestampValue(END_DATE);
 
-        List<CounterRecordSummaryEntity> counterRecords = counterRecordService.findByEquipmentAndPeriod(equipmentId, filter);
+        List<CounterRecordSummaryEntity> counterRecords = counterRecordService.findByEquipmentAndPeriod(sectionId,
+                equipmentId, filter);
 
         long totalScheduledTime = 0L;
         long totalActiveTime = 0L;

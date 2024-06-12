@@ -1,18 +1,13 @@
 BEGIN;
-<<<<<<< HEAD
-=======
+
 DROP VIEW counter_record_summary;
->>>>>>> test_environment
 
 CREATE VIEW counter_record_summary AS
 SELECT
     MAX(cr.id) AS id,
     e.id AS equipment_id,
     e.alias AS equipment_alias,
-<<<<<<< HEAD
-=======
     e.section_id,
->>>>>>> test_environment
     po.id AS production_order_id,
     po.code AS production_order_code,
     eo.id AS equipment_output_id,
@@ -39,10 +34,7 @@ JOIN
 GROUP BY
     e.id,
     e.alias,
-<<<<<<< HEAD
-=======
     e.section_id,
->>>>>>> test_environment
     po.id,
     po.code,
     eo.id,
@@ -53,10 +45,6 @@ GROUP BY
     po.created_at,
     po.completed_at;
 
-<<<<<<< HEAD
-
-=======
->>>>>>> test_environment
 INSERT INTO audit_script (run_date, process, version, schema)
 VALUES
     (CURRENT_DATE, '0012_create_counter_record_summary_view.sql', '1.0.1', '1.0.1_0012');

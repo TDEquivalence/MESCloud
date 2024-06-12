@@ -14,12 +14,12 @@ public interface KpiManagementService {
 
     CountingEquipmentKpiDto[] computeEquipmentKpi(long sectionId, FilterDto filter);
 
-    EquipmentKpiAggregatorDto computeEquipmentKpiAggregatorById(Long equipmentId, FilterDto filter)
+    EquipmentKpiAggregatorDto computeEquipmentKpiAggregatorById(Long sectionId, Long equipmentId, FilterDto filter)
             throws NoSuchElementException, IncompleteConfigurationException, ArithmeticException;
 
-    List<EquipmentKpiAggregatorDto> computeEquipmentKpiAggregatorPerDay(FilterDto filter);
+    List<EquipmentKpiAggregatorDto> computeEquipmentKpiAggregatorPerDay(Long sectionId, FilterDto filter);
 
-    List<EquipmentKpiAggregatorDto> computeEquipmentKpiAggregatorPerDayById(Long equipmentId, FilterDto filter);
+    List<EquipmentKpiAggregatorDto> computeEquipmentKpiAggregatorPerDayById(Long sectionId, Long equipmentId, FilterDto filter);
 
-    EquipmentKpiAggregatorDto computeAllEquipmentKpiAggregator(FilterDto filter);
+    EquipmentKpiAggregatorDto computeAllEquipmentKpiAggregator(Long sectionId, FilterDto filter);
 }

@@ -26,9 +26,9 @@ public interface CounterRecordService {
 
     boolean areValidContinuationCounts(String productionOrderCode);
 
-    Integer sumValidCounterIncrement(Long countingEquipmentId, FilterDto filter);
+    Integer sumValidCounterIncrement(Long sectionId, Long countingEquipmentId, FilterDto filter);
 
-    Integer sumTotalCounterIncrement(Long countingEquipmentId, FilterDto filter);
+    Integer sumTotalCounterIncrement(Long sectionId, Long countingEquipmentId, FilterDto filter);
 
     Timestamp getLastRegisteredAtByProductionOrderId(Long productionOrderId);
 
@@ -36,6 +36,6 @@ public interface CounterRecordService {
 
     Long sumActiveTimeDayByProductionOrderId(Long productionOrderId, Long equipmentId, Timestamp startDate, Timestamp endDate);
 
-    List<CounterRecordSummaryEntity> findByEquipmentAndPeriod(
-            Long equipmentId, FilterDto filter);
+    List<CounterRecordSummaryEntity> findByEquipmentAndPeriod(Long sectionId,
+                                                              Long equipmentId, FilterDto filter);
 }

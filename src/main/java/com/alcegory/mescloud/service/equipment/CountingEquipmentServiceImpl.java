@@ -7,7 +7,6 @@ import com.alcegory.mescloud.repository.equipment.CountingEquipmentRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -173,32 +172,31 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
     }
 
     @Override
-    @Transactional
     public Optional<CountingEquipmentEntity> findEquipmentTemplate(long id) {
         return repository.findEquipmentWithTemplateById(id);
     }
 
     @Override
-    public Double getAverageQualityTargetDividedByTotalCount() {
-        return repository.findSumQualityTargetDividedByTotalCount();
+    public Double getAverageQualityTargetDividedByTotalCount(Long sectionId) {
+        return repository.findSumQualityTargetDividedByTotalCount(sectionId);
     }
 
     @Override
-    public Double getAverageAvailabilityTargetDividedByTotalCount() {
-        return repository.findSumAvailabilityTargetDividedByTotalCount();
+    public Double getAverageAvailabilityTargetDividedByTotalCount(Long sectionId) {
+        return repository.findSumAvailabilityTargetDividedByTotalCount(sectionId);
     }
 
     @Override
-    public Double getAveragePerformanceTargetDividedByTotalCount() {
-        return repository.findSumPerformanceTargetDividedByTotalCount();
+    public Double getAveragePerformanceTargetDividedByTotalCount(Long sectionId) {
+        return repository.findSumPerformanceTargetDividedByTotalCount(sectionId);
     }
 
     @Override
-    public Double getAverageOverallEquipmentEffectivenessTargetDividedByTotalCount() {
-        return repository.findSumOverallEquipmentEffectivenessTargetDividedByTotalCount();
+    public Double getAverageOverallEquipmentEffectivenessTargetDividedByTotalCount(Long sectionId) {
+        return repository.findSumOverallEquipmentEffectivenessTargetDividedByTotalCount(sectionId);
     }
 
-    public Double getAverageTheoreticalProduction() {
-        return repository.findSumTheoreticalProductionDividedByTotalCount();
+    public Double getAverageTheoreticalProduction(Long sectionId) {
+        return repository.findSumTheoreticalProductionDividedByTotalCount(sectionId);
     }
 }

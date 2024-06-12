@@ -61,10 +61,12 @@ public class KpiController extends SectionBaseController {
     }
 
     @PostMapping(KPI_URL + "/{equipmentId}/aggregator")
-    public ResponseEntity<EquipmentKpiAggregatorDto> getEquipmentKpiAggregator(@PathVariable long equipmentId,
+    public ResponseEntity<EquipmentKpiAggregatorDto> getEquipmentKpiAggregator(@PathVariable long sectionId,
+                                                                               @PathVariable long equipmentId,
                                                                                @RequestBody FilterDto filter) {
         try {
-            EquipmentKpiAggregatorDto kpiAggregatorDto = kpiManagementService.computeEquipmentKpiAggregatorById(equipmentId, filter);
+            EquipmentKpiAggregatorDto kpiAggregatorDto = kpiManagementService.computeEquipmentKpiAggregatorById(sectionId,
+                    equipmentId, filter);
             return new ResponseEntity<>(kpiAggregatorDto, HttpStatus.OK);
         } catch (NoSuchElementException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -76,9 +78,11 @@ public class KpiController extends SectionBaseController {
     }
 
     @PostMapping(KPI_URL + "/aggregator")
-    public ResponseEntity<EquipmentKpiAggregatorDto> getEquipmentKpiAggregator(@RequestBody FilterDto filter) {
+    public ResponseEntity<EquipmentKpiAggregatorDto> getEquipmentKpiAggregator(@PathVariable long sectionId,
+                                                                               @RequestBody FilterDto filter) {
         try {
-            EquipmentKpiAggregatorDto kpiAggregatorDto = kpiManagementService.computeAllEquipmentKpiAggregator(filter);
+            EquipmentKpiAggregatorDto kpiAggregatorDto = kpiManagementService.computeAllEquipmentKpiAggregator(sectionId,
+                    filter);
             return new ResponseEntity<>(kpiAggregatorDto, HttpStatus.OK);
         } catch (NoSuchElementException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -90,10 +94,12 @@ public class KpiController extends SectionBaseController {
     }
 
     @PostMapping(KPI_URL + "/{equipmentId}/daily-aggregator")
-    public ResponseEntity<List<EquipmentKpiAggregatorDto>> getEquipmentKpiAggregatorPerDayById(@PathVariable long equipmentId,
+    public ResponseEntity<List<EquipmentKpiAggregatorDto>> getEquipmentKpiAggregatorPerDayById(@PathVariable long sectionId,
+                                                                                               @PathVariable long equipmentId,
                                                                                                @RequestBody FilterDto filter) {
         try {
-            List<EquipmentKpiAggregatorDto> kpiAggregatorsDto = kpiManagementService.computeEquipmentKpiAggregatorPerDayById(equipmentId, filter);
+            List<EquipmentKpiAggregatorDto> kpiAggregatorsDto =
+                    kpiManagementService.computeEquipmentKpiAggregatorPerDayById(sectionId, equipmentId, filter);
             return new ResponseEntity<>(kpiAggregatorsDto, HttpStatus.OK);
         } catch (NoSuchElementException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -101,9 +107,11 @@ public class KpiController extends SectionBaseController {
     }
 
     @PostMapping(KPI_URL + "/daily-aggregator")
-    public ResponseEntity<List<EquipmentKpiAggregatorDto>> getEquipmentKpiAggregatorPerDay(@RequestBody FilterDto filter) {
+    public ResponseEntity<List<EquipmentKpiAggregatorDto>> getEquipmentKpiAggregatorPerDay(@PathVariable long sectionId,
+                                                                                           @RequestBody FilterDto filter) {
         try {
-            List<EquipmentKpiAggregatorDto> kpiAggregatorsDto = kpiManagementService.computeEquipmentKpiAggregatorPerDay(filter);
+            List<EquipmentKpiAggregatorDto> kpiAggregatorsDto =
+                    kpiManagementService.computeEquipmentKpiAggregatorPerDay(sectionId, filter);
             return new ResponseEntity<>(kpiAggregatorsDto, HttpStatus.OK);
         } catch (NoSuchElementException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

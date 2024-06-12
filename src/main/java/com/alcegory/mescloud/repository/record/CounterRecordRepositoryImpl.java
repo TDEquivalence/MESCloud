@@ -183,7 +183,7 @@ public class CounterRecordRepositoryImpl extends AbstractFilterRepository<Filter
     }
 
     //KPI QUALITY WITH COUNTER_RECORD_SUMMARY_VIEW//
-    public Integer sumIncrementDay(Long equipmentId, FilterDto filter, boolean filterByValidProduction) {
+    public Integer sumIncrementDay(Long sectionId, Long equipmentId, FilterDto filter, boolean filterByValidProduction) {
         Timestamp startDateFilter = filter.getSearch().getTimestampValue(START_DATE);
         Timestamp endDateFilter = filter.getSearch().getTimestampValue(END_DATE);
         String productionOrderCode = filter.getSearch().getValue(PRODUCTION_ORDER_CODE);
@@ -209,6 +209,10 @@ public class CounterRecordRepositoryImpl extends AbstractFilterRepository<Filter
             conditions.add("c.equipment_alias = :equipmentAlias");
         }
 
+        if (sectionId != null) {
+            conditions.add("c.section_id = :sectionId");
+        }
+
         conditions.add("c.registered_at BETWEEN :startDate AND :endDate");
 
         nativeQuery.append(String.join(" AND ", conditions));
@@ -229,12 +233,16 @@ public class CounterRecordRepositoryImpl extends AbstractFilterRepository<Filter
             query.setParameter(EQUIPMENT_ALIAS_PROP, equipmentAlias);
         }
 
+        if (sectionId != null) {
+            query.setParameter(SECTION_ID_PROP, sectionId);
+        }
+
         Object result = query.getSingleResult();
         return result != null ? ((Number) result).intValue() : 0;
     }
 
     //KPI AVAILABILITY WITH COUNTER_RECORD_SUMMARY_VIEW//
-    public List<CounterRecordSummaryEntity> findByEquipmentAndPeriod(Long equipmentId, FilterDto filter) {
+    public List<CounterRecordSummaryEntity> findBySectionAndEquipmentAndPeriod(Long sectionId, Long equipmentId, FilterDto filter) {
         Timestamp startDate = filter.getSearch().getTimestampValue(START_DATE);
         Timestamp endDate = filter.getSearch().getTimestampValue(END_DATE);
         String productionOrderCode = filter.getSearch().getValue(PRODUCTION_ORDER_CODE);
@@ -244,6 +252,10 @@ public class CounterRecordRepositoryImpl extends AbstractFilterRepository<Filter
         CriteriaQuery<CounterRecordSummaryEntity> criteriaQuery = criteriaBuilder.createQuery(CounterRecordSummaryEntity.class);
         Root<CounterRecordSummaryEntity> root = criteriaQuery.from(CounterRecordSummaryEntity.class);
         List<Predicate> predicates = new ArrayList<>();
+
+        if (sectionId != null) {
+            predicates.add(criteriaBuilder.equal(root.get(SECTION_ID_PROP), sectionId));
+        }
 
         if (equipmentId != null) {
             predicates.add(criteriaBuilder.equal(root.get(EQUIPMENT_ID_PROP), equipmentId));
@@ -263,4 +275,5 @@ public class CounterRecordRepositoryImpl extends AbstractFilterRepository<Filter
 
         return entityManager.createQuery(criteriaQuery).getResultList();
     }
+
 }

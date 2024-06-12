@@ -10,20 +10,26 @@ import java.util.Optional;
 
 public interface CountingEquipmentRepository extends CrudRepository<CountingEquipmentEntity, Long> {
 
-    @Query(value = "SELECT SUM(ce.quality_target) / COUNT(ce) FROM counting_equipment ce", nativeQuery = true)
-    Double findSumQualityTargetDividedByTotalCount();
+    @Query(value = "SELECT SUM(ce.quality_target) / COUNT(ce) FROM counting_equipment ce WHERE ce.section_id = :sectionId",
+            nativeQuery = true)
+    Double findSumQualityTargetDividedByTotalCount(@Param("sectionId") Long sectionId);
 
-    @Query(value = "SELECT SUM(ce.availability_target) / COUNT(ce) FROM counting_equipment ce", nativeQuery = true)
-    Double findSumAvailabilityTargetDividedByTotalCount();
+    @Query(value = "SELECT SUM(ce.availability_target) / COUNT(ce) FROM counting_equipment ce WHERE ce.section_id = :sectionId",
+            nativeQuery = true)
+    Double findSumAvailabilityTargetDividedByTotalCount(@Param("sectionId") Long sectionId);
 
-    @Query(value = "SELECT SUM(ce.performance_target) / COUNT(ce) FROM counting_equipment ce", nativeQuery = true)
-    Double findSumPerformanceTargetDividedByTotalCount();
+    @Query(value = "SELECT SUM(ce.performance_target) / COUNT(ce) FROM counting_equipment ce WHERE ce.section_id = :sectionId",
+            nativeQuery = true)
+    Double findSumPerformanceTargetDividedByTotalCount(@Param("sectionId") Long sectionId);
 
-    @Query(value = "SELECT SUM(ce.overall_equipment_effectiveness_target) / COUNT(ce) FROM counting_equipment ce", nativeQuery = true)
-    Double findSumOverallEquipmentEffectivenessTargetDividedByTotalCount();
+    @Query(value = "SELECT SUM(ce.overall_equipment_effectiveness_target) / COUNT(ce) FROM counting_equipment ce WHERE ce.section_id = :sectionId",
+            nativeQuery = true)
+    Double findSumOverallEquipmentEffectivenessTargetDividedByTotalCount(@Param("sectionId") Long sectionId);
 
-    @Query(value = "SELECT SUM(ce.theoretical_production) / COUNT(ce) FROM counting_equipment ce", nativeQuery = true)
-    Double findSumTheoreticalProductionDividedByTotalCount();
+    @Query(value = "SELECT SUM(ce.theoretical_production) / COUNT(ce) FROM counting_equipment ce WHERE ce.section_id = :sectionId",
+            nativeQuery = true)
+    Double findSumTheoreticalProductionDividedByTotalCount(@Param("sectionId") Long sectionId);
+
 
     Optional<CountingEquipmentEntity> findByCode(String code);
 

@@ -5,5 +5,5 @@ import com.alcegory.mescloud.model.filter.FilterDto;
 
 public interface QualityKpiService {
 
-    KpiDto computeQuality(Long equipmentId, FilterDto filter);
+    KpiDto computeQuality(Long sectionId, Long equipmentId, FilterDto filter);
 }

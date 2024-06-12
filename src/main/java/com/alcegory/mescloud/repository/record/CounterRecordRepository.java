@@ -82,7 +82,7 @@ public interface CounterRecordRepository extends CrudRepository<CounterRecordEnt
             "AND (cr.increment IS NOT NULL AND cr.increment > 0)", nativeQuery = true)
     boolean hasIncrementByProductionOrderCode(String productionOrderCode);
 
-    Integer sumIncrementDay(Long countingEquipmentId, FilterDto filter, boolean filterByValidProduction);
+    Integer sumIncrementDay(Long sectionId, Long countingEquipmentId, FilterDto filter, boolean filterByValidProduction);
 
     @Query(value = "SELECT SUM(DISTINCT cr.active_time_day) " +
             "FROM counter_record_summary cr " +
@@ -95,5 +95,5 @@ public interface CounterRecordRepository extends CrudRepository<CounterRecordEnt
             @Param("startDate") Timestamp startDate,
             @Param("endDate") Timestamp endDate);
 
-    List<CounterRecordSummaryEntity> findByEquipmentAndPeriod(Long equipmentId, FilterDto filter);
+    List<CounterRecordSummaryEntity> findBySectionAndEquipmentAndPeriod(Long sectionId, Long equipmentId, FilterDto filter);
 }
