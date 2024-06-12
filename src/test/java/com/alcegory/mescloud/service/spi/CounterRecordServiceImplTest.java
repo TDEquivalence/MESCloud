@@ -1,11 +1,5 @@
 package com.alcegory.mescloud.service.spi;
 
-<<<<<<< HEAD
-import com.alcegory.mescloud.model.dto.equipment.CountingEquipmentDto;
-import com.alcegory.mescloud.model.dto.equipment.EquipmentOutputAliasDto;
-import com.alcegory.mescloud.model.dto.equipment.EquipmentOutputDto;
-=======
->>>>>>> test_environment
 import com.alcegory.mescloud.model.dto.mqqt.CounterMqttDto;
 import com.alcegory.mescloud.model.dto.mqqt.PlcMqttDto;
 import com.alcegory.mescloud.repository.record.CounterRecordRepository;
