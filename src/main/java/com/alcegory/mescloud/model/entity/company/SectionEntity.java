@@ -21,6 +21,7 @@ public class SectionEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
+    private String prefix;
     @OneToMany(mappedBy = "section", fetch = FetchType.EAGER)
     private List<CountingEquipmentEntity> countingEquipments;
     @ManyToOne

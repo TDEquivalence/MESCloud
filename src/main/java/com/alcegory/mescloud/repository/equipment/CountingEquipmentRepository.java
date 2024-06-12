@@ -40,9 +40,10 @@ public interface CountingEquipmentRepository extends CrudRepository<CountingEqui
 
     @Query("SELECT ce FROM counting_equipment ce " +
             "LEFT JOIN FETCH ce.productionOrders po " +
-            "WHERE po IS NULL OR po.id = (SELECT MAX(p.id) FROM production_order p WHERE p.equipment = ce)" +
+            "WHERE (po IS NULL OR po.id = (SELECT MAX(p.id) FROM production_order p WHERE p.equipment = ce)) " +
+            "AND ce.section.id = :sectionId " +
             "ORDER BY ce.id")
-    List<CountingEquipmentEntity> findAllWithLastProductionOrder();
+    List<CountingEquipmentEntity> findAllWithLastProductionOrder(@Param("sectionId") long sectionId);
 
     @Query("SELECT ce.id FROM counting_equipment ce")
     List<Long> findAllIds();

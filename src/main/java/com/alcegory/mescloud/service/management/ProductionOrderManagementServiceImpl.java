@@ -30,7 +30,10 @@ import static com.alcegory.mescloud.security.model.SectionAuthority.OPERATOR_CRE
 import static com.alcegory.mescloud.security.model.SectionAuthority.OPERATOR_UPDATE;
 
 @Service
+<<<<<<< HEAD
 @Transactional
+=======
+>>>>>>> test_environment
 @Log
 @AllArgsConstructor
 public class ProductionOrderManagementServiceImpl implements ProductionOrderManagementService {
@@ -44,6 +47,7 @@ public class ProductionOrderManagementServiceImpl implements ProductionOrderMana
 
     private final ProductionOrderConverter converter;
 
+<<<<<<< HEAD
 
     @Override
     public Optional<ProductionOrderDto> create(RequestProductionOrderDto productionOrder, Authentication authentication) {
@@ -53,6 +57,18 @@ public class ProductionOrderManagementServiceImpl implements ProductionOrderMana
     }
 
     private Optional<ProductionOrderDto> create(RequestProductionOrderDto productionOrder) {
+=======
+    @Override
+    @Transactional
+    public Optional<ProductionOrderDto> create(String companyPrefix, String sectionPrefix, long sectionId,
+                                               RequestProductionOrderDto productionOrder, Authentication authentication) {
+        userRoleService.checkSectionAuthority(authentication, sectionId, OPERATOR_CREATE);
+        return create(companyPrefix, sectionPrefix, productionOrder);
+    }
+
+    private Optional<ProductionOrderDto> create(String companyPrefix, String sectionPrefix,
+                                                RequestProductionOrderDto productionOrder) {
+>>>>>>> test_environment
         Optional<CountingEquipmentEntity> countingEquipmentOpt = countingEquipmentService.findEntityById(productionOrder.getEquipmentId());
 
         if (countingEquipmentOpt.isEmpty()) {
@@ -72,7 +88,11 @@ public class ProductionOrderManagementServiceImpl implements ProductionOrderMana
         updateProductionOrderEntity(productionOrderEntity, countingEquipmentEntity);
 
         try {
+<<<<<<< HEAD
             publishToPlc(productionOrderEntity);
+=======
+            publishToPlc(companyPrefix, sectionPrefix, productionOrderEntity);
+>>>>>>> test_environment
         } catch (MesMqttException e) {
             log.severe("Unable to publish Production Order over MQTT.");
             return Optional.empty();
@@ -99,6 +119,7 @@ public class ProductionOrderManagementServiceImpl implements ProductionOrderMana
         countingEquipmentService.setOperationStatus(countingEquipmentEntity, CountingEquipmentEntity.OperationStatus.IN_PROGRESS);
     }
 
+<<<<<<< HEAD
     private void publishToPlc(ProductionOrderEntity productionOrderEntity) throws MesMqttException {
         ProductionOrderMqttDto productionOrderMqttDto = converter.toMqttDto(productionOrderEntity, true);
         mqttClient.publish(mqttSettings.getProtCountPlcTopic(), productionOrderMqttDto);
@@ -108,6 +129,19 @@ public class ProductionOrderManagementServiceImpl implements ProductionOrderMana
     public Optional<ProductionOrderDto> complete(long equipmentId, Authentication authentication) {
         //TODO: sectionId
         userRoleService.checkSectionAuthority(authentication, 1L, OPERATOR_UPDATE);
+=======
+    private void publishToPlc(String companyPrefix, String sectionPrefix, ProductionOrderEntity productionOrderEntity) throws MesMqttException {
+        ProductionOrderMqttDto productionOrderMqttDto = converter.toMqttDto(productionOrderEntity, true);
+        String topic = mqttSettings.getPlcTopicByCompanyAndSection(companyPrefix, sectionPrefix);
+        mqttClient.publish(topic, productionOrderMqttDto);
+    }
+
+    @Override
+    @Transactional
+    public Optional<ProductionOrderDto> complete(String companyPrefix, String sectionPrefix, long sectionId, long equipmentId,
+                                                 Authentication authentication) {
+        userRoleService.checkSectionAuthority(authentication, sectionId, OPERATOR_UPDATE);
+>>>>>>> test_environment
         log.info(() -> String.format("Complete process Production Order started for equipmentId [%s]:", equipmentId));
 
         Optional<CountingEquipmentEntity> countingEquipmentOpt = countingEquipmentService.findEntityById(equipmentId);
@@ -126,7 +160,11 @@ public class ProductionOrderManagementServiceImpl implements ProductionOrderMana
             return Optional.empty();
         }
 
+<<<<<<< HEAD
         publishProductionOrderCompletion(countingEquipmentOpt.get(), productionOrderEntityOpt.get());
+=======
+        publishProductionOrderCompletion(companyPrefix, sectionPrefix, countingEquipmentOpt.get(), productionOrderEntityOpt.get());
+>>>>>>> test_environment
         log.info(() -> String.format("Production Order Conclusion already publish for equipmentId [%s]:", equipmentId));
 
         ProductionOrderEntity productionOrder = productionOrderEntityOpt.get();
@@ -134,16 +172,28 @@ public class ProductionOrderManagementServiceImpl implements ProductionOrderMana
         return Optional.of(productionOrderDto);
     }
 
+<<<<<<< HEAD
     public void publishProductionOrderCompletion(CountingEquipmentEntity countingEquipment, ProductionOrderEntity productionOrder) {
         try {
             publishProductionOrderCompletionToPLC(countingEquipment, productionOrder);
+=======
+    public void publishProductionOrderCompletion(String companyPrefix, String sectionPrefix,
+                                                 CountingEquipmentEntity countingEquipment, ProductionOrderEntity productionOrder) {
+        try {
+            publishProductionOrderCompletionToPLC(companyPrefix, sectionPrefix, countingEquipment, productionOrder);
+>>>>>>> test_environment
         } catch (MesMqttException e) {
             log.severe(() -> String.format("Unable to publish Order Completion to PLC for equipment [%s]",
                     countingEquipment.getCode()));
         }
     }
 
+<<<<<<< HEAD
     private void publishProductionOrderCompletionToPLC(CountingEquipmentEntity countingEquipment, ProductionOrderEntity productionOrder)
+=======
+    private void publishProductionOrderCompletionToPLC(String companyPrefix, String sectionPrefix,
+                                                       CountingEquipmentEntity countingEquipment, ProductionOrderEntity productionOrder)
+>>>>>>> test_environment
             throws MesMqttException {
 
         ProductionOrderMqttDto productionOrderMqttDto = new ProductionOrderMqttDto();
@@ -152,6 +202,7 @@ public class ProductionOrderManagementServiceImpl implements ProductionOrderMana
         productionOrderMqttDto.setProductionOrderCode(productionOrder.getCode());
         productionOrderMqttDto.setTargetAmount(0);
         productionOrderMqttDto.setEquipmentCode(countingEquipment.getCode());
+<<<<<<< HEAD
         mqttClient.publish(mqttSettings.getProtCountPlcTopic(), productionOrderMqttDto);
     }
 
@@ -159,6 +210,18 @@ public class ProductionOrderManagementServiceImpl implements ProductionOrderMana
     public ProductionOrderDto editProductionOrder(ProductionOrderDto requestProductionOrder, Authentication authentication) {
         //TODO: section ID
         userRoleService.checkSectionAuthority(authentication, 1L, OPERATOR_UPDATE);
+=======
+
+        String topic = mqttSettings.getPlcTopicByCompanyAndSection(companyPrefix, sectionPrefix);
+        mqttClient.publish(topic, productionOrderMqttDto);
+    }
+
+    @Override
+    @Transactional
+    public ProductionOrderDto editProductionOrder(ProductionOrderDto requestProductionOrder, Authentication authentication,
+                                                  long sectionId) {
+        userRoleService.checkSectionAuthority(authentication, sectionId, OPERATOR_UPDATE);
+>>>>>>> test_environment
 
         if (requestProductionOrder == null) {
             log.warning("Null request Production Order received for editing production order.");

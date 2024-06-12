@@ -10,6 +10,7 @@ import java.util.Map;
 @Getter
 @Setter
 public class CounterRecordDto {
+    
     private long id;
     private String equipmentAlias;
     private String productionOrderCode;

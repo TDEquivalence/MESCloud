@@ -35,7 +35,10 @@ import static com.alcegory.mescloud.security.model.SectionRole.ADMIN;
 import static com.alcegory.mescloud.security.utility.AuthorityUtil.checkUserAndSectionRole;
 
 @Service
+<<<<<<< HEAD
 @Transactional
+=======
+>>>>>>> test_environment
 @Log
 @AllArgsConstructor
 public class CountingEquipmentManagementServiceImpl implements CountingEquipmentManagementService {
@@ -124,10 +127,15 @@ public class CountingEquipmentManagementServiceImpl implements CountingEquipment
     }
 
     @Override
-    public CountingEquipmentDto updateConfiguration(long equipmentId, RequestConfigurationDto request, Authentication authentication)
+    public CountingEquipmentDto updateConfiguration(String companyPrefix, String sectionPrefix,
+                                                    long sectionId, long equipmentId, RequestConfigurationDto request, Authentication authentication)
             throws IncompleteConfigurationException, EmptyResultDataAccessException, ActiveProductionOrderException, MesMqttException {
+<<<<<<< HEAD
         //TODO: sectionID
         userRoleService.checkSectionAuthority(authentication, 1L, SectionAuthority.ADMIN_UPDATE);
+=======
+        userRoleService.checkSectionAuthority(authentication, sectionId, SectionAuthority.ADMIN_UPDATE);
+>>>>>>> test_environment
 
         if (containsNullProperty(request)) {
             throw new IncompleteConfigurationException("Counting equipment configuration is incomplete: properties alias and outputs must be specified.");
@@ -148,7 +156,11 @@ public class CountingEquipmentManagementServiceImpl implements CountingEquipment
         }
 
         updateEquipmentConfiguration(countingEquipment, request);
+<<<<<<< HEAD
         publishToPlc(countingEquipment);
+=======
+        publishToPlc(countingEquipment, companyPrefix, sectionPrefix);
+>>>>>>> test_environment
         countingEquipmentService.save(countingEquipment);
 
         return converter.convertToDto(countingEquipment);
@@ -158,6 +170,7 @@ public class CountingEquipmentManagementServiceImpl implements CountingEquipment
     public void setOperationStatusByCode(String equipmentCode, CountingEquipmentEntity.OperationStatus status) {
         Optional<CountingEquipmentEntity> countingEquipmentEntityOptional = countingEquipmentService.findEntityByCode(equipmentCode);
         countingEquipmentEntityOptional.ifPresent(countingEquipmentEntity -> countingEquipmentService.setOperationStatus(countingEquipmentEntity, status));
+<<<<<<< HEAD
 
         if (countingEquipmentEntityOptional.isEmpty()) {
             log.info(() -> String.format("Equipment with code [%s] not found", equipmentCode));
@@ -174,10 +187,32 @@ public class CountingEquipmentManagementServiceImpl implements CountingEquipment
         int pTimerCommunicationCycleInSeconds = equipmentConfig.getPTimerCommunicationCycle() * 60;
         int finalPTimerCommunicationCycleInSeconds = Math.max(MIN_P_TIMER_IN_SECONDS, pTimerCommunicationCycleInSeconds);
         equipmentConfig.setPTimerCommunicationCycle(finalPTimerCommunicationCycleInSeconds);
+=======
+>>>>>>> test_environment
 
-        mqttClient.publish(mqttSettings.getProtCountPlcTopic(), equipmentConfig);
+        if (countingEquipmentEntityOptional.isEmpty()) {
+            log.info(() -> String.format("Equipment with code [%s] not found", equipmentCode));
+        }
     }
 
+<<<<<<< HEAD
+=======
+    private boolean containsNullProperty(RequestConfigurationDto countingEquipmentDto) {
+        return countingEquipmentDto.getAlias() == null ||
+                countingEquipmentDto.getOutputs() == null;
+    }
+
+    private void publishToPlc(CountingEquipmentEntity countingEquipment, String companyPrefix, String sectionPrefix) throws MesMqttException {
+        EquipmentConfigMqttDto equipmentConfig = plcConverter.toMqttDto(countingEquipment);
+        int pTimerCommunicationCycleInSeconds = equipmentConfig.getPTimerCommunicationCycle() * 60;
+        int finalPTimerCommunicationCycleInSeconds = Math.max(MIN_P_TIMER_IN_SECONDS, pTimerCommunicationCycleInSeconds);
+        equipmentConfig.setPTimerCommunicationCycle(finalPTimerCommunicationCycleInSeconds);
+
+        String topic = mqttSettings.getPlcTopicByCompanyAndSection(companyPrefix, sectionPrefix);
+        mqttClient.publish(topic, equipmentConfig);
+    }
+
+>>>>>>> test_environment
     private void updateEquipmentConfiguration(CountingEquipmentEntity persistedEquipment, RequestConfigurationDto request) {
         CountingEquipmentEntity countingEquipmentConfig = converter.convertToEntity(request);
         ensureMinimumPTimer(countingEquipmentConfig);

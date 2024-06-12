@@ -10,6 +10,10 @@ import com.alcegory.mescloud.service.alarm.AlarmService;
 import com.alcegory.mescloud.service.management.CountingEquipmentManagementService;
 import com.alcegory.mescloud.service.production.ProductionOrderService;
 import com.alcegory.mescloud.service.record.CounterRecordService;
+<<<<<<< HEAD
+=======
+import com.amazonaws.services.iot.client.AWSIotMessage;
+>>>>>>> test_environment
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
@@ -26,10 +30,14 @@ public class ProductionOrderConclusionProcess extends AbstractMesProtocolProcess
     private final ProductionOrderService productionOrderService;
     private final AlarmService alarmService;
     private final MqttClient mqttClient;
+<<<<<<< HEAD
     private final MesMqttSettings mqttSettings;
+=======
+    private final MesMqttSettings mesMqttSettings;
+>>>>>>> test_environment
 
     @Override
-    public void execute(PlcMqttDto equipmentCounts) {
+    public void execute(PlcMqttDto equipmentCounts, AWSIotMessage message) {
 
         log.info("Executing Production Order conclusion process");
         if (equipmentCounts.getProductionOrderCode() == null && equipmentCounts.getEquipmentCode() == null) {
@@ -44,10 +52,12 @@ public class ProductionOrderConclusionProcess extends AbstractMesProtocolProcess
 
         ProductionOrderEntity productionOrder = getProductionOrderByCode(equipmentCounts.getProductionOrderCode());
         if (productionOrder == null) {
-            throw new IllegalStateException("Production order code: " + equipmentCounts.getProductionOrderCode() + "not found for equipment code: " + equipmentCounts.getEquipmentCode());
+            throw new IllegalStateException("Production order code: " + equipmentCounts.getProductionOrderCode()
+                    + "not found for equipment code: " + equipmentCounts.getEquipmentCode());
         }
 
-        executeProductionOrderConclusion(productionOrder, equipmentCounts.getEquipmentCode());
+        executeProductionOrderConclusion(mesMqttSettings.getOppositeTopic(message.getTopic()),
+                productionOrder, equipmentCounts.getEquipmentCode());
     }
 
     @Override
@@ -55,7 +65,7 @@ public class ProductionOrderConclusionProcess extends AbstractMesProtocolProcess
         return MqttDTOConstants.PRODUCTION_ORDER_CONCLUSION_RESPONSE_DTO_NAME;
     }
 
-    public void executeProductionOrderConclusion(ProductionOrderEntity productionOrder, String equipmentCode) {
+    public void executeProductionOrderConclusion(String topic, ProductionOrderEntity productionOrder, String equipmentCode) {
 
         if (productionOrder == null) {
             log.warning(() -> String.format("No Production Order found for Equipment with code [%s]", equipmentCode));
@@ -66,7 +76,7 @@ public class ProductionOrderConclusionProcess extends AbstractMesProtocolProcess
             try {
                 Thread.sleep(THREAD_SLEEP_DURATION);
                 ProductionOrderMqttDto productionOrderMqttDto = createProductionOrderMqttDto(equipmentCode);
-                mqttClient.publish(mqttSettings.getProtCountPlcTopic(), productionOrderMqttDto);
+                mqttClient.publish(topic, productionOrderMqttDto);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 log.severe(() -> String.format("Unable to publish Order Completion to PLC for equipment with code [%s]", equipmentCode));

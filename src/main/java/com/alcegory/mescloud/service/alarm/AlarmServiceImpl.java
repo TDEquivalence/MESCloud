@@ -51,16 +51,16 @@ public class AlarmServiceImpl implements AlarmService {
     private final CountingEquipmentService countingEquipmentService;
     private final GenericConverter<CountingEquipmentEntity, CountingEquipmentDto> countingEquipmentConverter;
 
-    public List<AlarmSummaryEntity> find(Filter filter) {
-        return repository.findByFilter(filter);
-    }
-
     @Override
-    public PaginatedAlarmDto findByFilter(Filter filter) {
+    public PaginatedAlarmDto findByFilter(long sectionId, Filter filter) {
         int requestedAlarms = filter.getTake();
         filter.setTake(filter.getTake() + 1);
 
+<<<<<<< HEAD
         List<AlarmSummaryEntity> alarms = repository.findByFilter(filter);
+=======
+        List<AlarmSummaryEntity> alarms = repository.findByFilter(sectionId, filter);
+>>>>>>> test_environment
         boolean hasNextPage = alarms.size() > requestedAlarms;
 
         if (hasNextPage) {
@@ -115,8 +115,8 @@ public class AlarmServiceImpl implements AlarmService {
     }
 
     @Override
-    public AlarmCountsDto getAlarmCounts(Filter filter) {
-        return repository.getAlarmCounts(filter);
+    public AlarmCountsDto getAlarmCounts(long sectionId, Filter filter) {
+        return repository.getAlarmCounts(sectionId, filter);
     }
 
     @Override
@@ -155,7 +155,8 @@ public class AlarmServiceImpl implements AlarmService {
         return alarmsToUpsert;
     }
 
-    private void processAlarmBit(Map<Long, AlarmEntity> activeAlarmByConfigId, List<AlarmEntity> alarmsToUpsert, CountingEquipmentDto equipment, int wordIndex, int bitIndex)
+    private void processAlarmBit(Map<Long, AlarmEntity> activeAlarmByConfigId, List<AlarmEntity> alarmsToUpsert,
+                                 CountingEquipmentDto equipment, int wordIndex, int bitIndex)
             throws AlarmConfigurationNotFoundException {
 
         int binaryBitIndex = BinaryUtil.flipIndex(PLC_BITS_PER_WORD - ZERO_BASED_OFFSET, bitIndex);

@@ -24,8 +24,13 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
     private final CountingEquipmentConverter converter;
 
     @Override
+<<<<<<< HEAD
     public List<CountingEquipmentDto> findAllWithLastProductionOrder() {
         List<CountingEquipmentEntity> persistedCountingEquipments = repository.findAllWithLastProductionOrder();
+=======
+    public List<CountingEquipmentDto> findAllWithLastProductionOrder(long sectionId) {
+        List<CountingEquipmentEntity> persistedCountingEquipments = repository.findAllWithLastProductionOrder(sectionId);
+>>>>>>> test_environment
         return convertToDtoWithActiveProductionOrder(persistedCountingEquipments);
     }
 

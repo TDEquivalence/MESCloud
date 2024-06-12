@@ -12,7 +12,7 @@ import java.util.Optional;
 
 public interface HitService {
 
-    List<HitDto> create(RequestHitDto requestHitDto, Authentication authentication);
+    List<HitDto> create(long sectionId, RequestHitDto requestHitDto, Authentication authentication);
 
     HitEntity saveAndUpdate(HitEntity hitEntity);
 
@@ -24,5 +24,5 @@ public interface HitService {
 
     List<HitDto> getAll();
 
-    List<ProductionOrderDto> removeHits(RequestById request, Authentication authentication);
+    List<ProductionOrderDto> removeHits(long sectionId, RequestById request, Authentication authentication);
 }

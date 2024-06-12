@@ -3,11 +3,19 @@ package com.alcegory.mescloud.service.composed;
 import com.alcegory.mescloud.model.converter.GenericConverter;
 import com.alcegory.mescloud.model.converter.ProductionOrderConverter;
 import com.alcegory.mescloud.model.dto.composed.ComposedProductionOrderDto;
+<<<<<<< HEAD
 import com.alcegory.mescloud.model.dto.production.ProductionOrderDto;
 import com.alcegory.mescloud.model.dto.composed.SampleDto;
 import com.alcegory.mescloud.model.entity.composed.ComposedProductionOrderEntity;
 import com.alcegory.mescloud.model.entity.production.ProductionOrderEntity;
 import com.alcegory.mescloud.model.entity.composed.SampleEntity;
+=======
+import com.alcegory.mescloud.model.dto.composed.SampleDto;
+import com.alcegory.mescloud.model.dto.production.ProductionOrderDto;
+import com.alcegory.mescloud.model.entity.composed.ComposedProductionOrderEntity;
+import com.alcegory.mescloud.model.entity.composed.SampleEntity;
+import com.alcegory.mescloud.model.entity.production.ProductionOrderEntity;
+>>>>>>> test_environment
 import com.alcegory.mescloud.model.request.RequestById;
 import com.alcegory.mescloud.model.request.RequestSampleDto;
 import com.alcegory.mescloud.repository.composed.SampleRepository;
@@ -42,9 +50,8 @@ public class SampleServiceImpl implements SampleService {
     private final UserRoleService userRoleService;
 
     @Override
-    public SampleDto create(RequestSampleDto requestSampleDto, Authentication authentication) {
-        //TODO: sectionID
-        userRoleService.checkSectionAuthority(authentication, 1L, OPERATOR_CREATE);
+    public SampleDto create(long sectionId, RequestSampleDto requestSampleDto, Authentication authentication) {
+        userRoleService.checkSectionAuthority(authentication, sectionId, OPERATOR_CREATE);
         ComposedProductionOrderEntity composedEntity = createComposed(requestSampleDto);
         return createSample(requestSampleDto, composedEntity);
     }
@@ -90,9 +97,8 @@ public class SampleServiceImpl implements SampleService {
     }
 
     @Override
-    public List<ProductionOrderDto> removeProductionOrderFromComposed(RequestById request, Authentication authentication) {
-        //TODO: sectionID
-        userRoleService.checkSectionAuthority(authentication, 1L, ADMIN_DELETE);
+    public List<ProductionOrderDto> removeProductionOrderFromComposed(long sectionId, RequestById request, Authentication authentication) {
+        userRoleService.checkSectionAuthority(authentication, sectionId, ADMIN_DELETE);
 
         Optional<ProductionOrderEntity> productionOrderOpt = productionOrderService.findById(request.getId());
 

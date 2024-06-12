@@ -20,6 +20,7 @@ import java.util.List;
 public class AlarmRepositoryImpl extends AbstractFilterRepository<Filter.Property, AlarmEntity> {
 
     private static final String ID_PROP = "id";
+    private static final String SECTION_ID_PROP = "sectionId";
     private static final String CREATED_AT_PROP = "createdAt";
     private static final String STATUS_PROP = "status";
 
@@ -27,12 +28,19 @@ public class AlarmRepositoryImpl extends AbstractFilterRepository<Filter.Propert
         super(entityManager);
     }
 
+<<<<<<< HEAD
     public List<AlarmSummaryEntity> findByFilter(Filter filter) {
+=======
+    public List<AlarmSummaryEntity> findByFilter(long sectionId, Filter filter) {
+>>>>>>> test_environment
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<AlarmSummaryEntity> query = criteriaBuilder.createQuery(AlarmSummaryEntity.class);
         Root<AlarmSummaryEntity> root = query.from(AlarmSummaryEntity.class);
 
         List<Predicate> predicates = new ArrayList<>();
+
+        predicates.add(criteriaBuilder.equal(root.get(SECTION_ID_PROP), sectionId));
+
         addPredicates(filter, predicates, criteriaBuilder, root);
 
         List<Order> orders = new ArrayList<>();
@@ -50,15 +58,18 @@ public class AlarmRepositoryImpl extends AbstractFilterRepository<Filter.Propert
                 .getResultList();
     }
 
-    public AlarmCountsDto getAlarmCounts(Filter filter) {
+    public AlarmCountsDto getAlarmCounts(long sectionId, Filter filter) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<AlarmCountsDto> query = criteriaBuilder.createQuery(AlarmCountsDto.class);
-        Root<AlarmEntity> root = query.from(AlarmEntity.class);
+        Root<AlarmSummaryEntity> root = query.from(AlarmSummaryEntity.class);
 
         Expression<Long> totalAlarmsExpression = getTotalAlarmsExpression(criteriaBuilder, root);
         Expression<Long> totalActiveAlarmsExpression = getTotalActiveAlarmsExpression(criteriaBuilder, root);
 
         List<Predicate> predicates = buildPredicates(criteriaBuilder, root, filter);
+
+        Predicate sectionIdPredicate = criteriaBuilder.equal(root.get(SECTION_ID_PROP), sectionId);
+        predicates.add(sectionIdPredicate);
 
         query.select(criteriaBuilder.construct(AlarmCountsDto.class, totalAlarmsExpression, totalActiveAlarmsExpression))
                 .where(criteriaBuilder.and(predicates.toArray(new Predicate[0])));
@@ -66,11 +77,11 @@ public class AlarmRepositoryImpl extends AbstractFilterRepository<Filter.Propert
         return entityManager.createQuery(query).getSingleResult();
     }
 
-    private Expression<Long> getTotalAlarmsExpression(CriteriaBuilder criteriaBuilder, Root<AlarmEntity> root) {
+    private Expression<Long> getTotalAlarmsExpression(CriteriaBuilder criteriaBuilder, Root<AlarmSummaryEntity> root) {
         return criteriaBuilder.coalesce(criteriaBuilder.count(root), 0L);
     }
 
-    private Expression<Long> getTotalActiveAlarmsExpression(CriteriaBuilder criteriaBuilder, Root<AlarmEntity> root) {
+    private Expression<Long> getTotalActiveAlarmsExpression(CriteriaBuilder criteriaBuilder, Root<AlarmSummaryEntity> root) {
         return criteriaBuilder.coalesce(
                 criteriaBuilder.sum(criteriaBuilder.<Long>selectCase()
                         .when(criteriaBuilder.equal(root.get(STATUS_PROP), AlarmStatus.ACTIVE), 1L)

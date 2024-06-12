@@ -12,6 +12,7 @@ import java.util.List;
 
 public interface CounterRecordService {
 
+<<<<<<< HEAD
     List<CounterRecordSummaryEntity> getEquipmentOutputProductionPerDay(FilterDto filter);
 
     List<CounterRecordDto> filterConclusionRecordsKpi(FilterDto filterDto);
@@ -19,6 +20,15 @@ public interface CounterRecordService {
     PaginatedCounterRecordsDto filterConclusionRecordsPaginated(Filter filterDto);
 
     PaginatedCounterRecordsDto getFilteredAndPaginated(Filter filterDto);
+=======
+    List<CounterRecordSummaryEntity> getEquipmentOutputProductionPerDay(long sectionId, FilterDto filter);
+
+    List<CounterRecordDto> filterConclusionRecordsKpi(long sectionId, FilterDto filterDto);
+
+    PaginatedCounterRecordsDto filterConclusionRecordsPaginated(long sectionId, Filter filterDto);
+
+    PaginatedCounterRecordsDto getFilteredAndPaginated(long sectionId, Filter filterDto);
+>>>>>>> test_environment
 
     void processCounterRecord(PlcMqttDto equipmentCountsMqttDTO);
 

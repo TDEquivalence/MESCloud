@@ -2,9 +2,15 @@ package com.alcegory.mescloud.service.composed;
 
 import com.alcegory.mescloud.exception.InconsistentPropertiesException;
 import com.alcegory.mescloud.model.converter.GenericConverter;
+<<<<<<< HEAD
 import com.alcegory.mescloud.model.dto.pagination.PaginatedComposedDto;
 import com.alcegory.mescloud.model.dto.composed.ComposedProductionOrderDto;
 import com.alcegory.mescloud.model.dto.composed.ComposedSummaryDto;
+=======
+import com.alcegory.mescloud.model.dto.composed.ComposedProductionOrderDto;
+import com.alcegory.mescloud.model.dto.composed.ComposedSummaryDto;
+import com.alcegory.mescloud.model.dto.pagination.PaginatedComposedDto;
+>>>>>>> test_environment
 import com.alcegory.mescloud.model.dto.production.ProductionInstructionDto;
 import com.alcegory.mescloud.model.dto.production.ProductionOrderDto;
 import com.alcegory.mescloud.model.entity.composed.ComposedProductionOrderEntity;
@@ -180,21 +186,22 @@ public class ComposedProductionOrderServiceImpl implements ComposedProductionOrd
     }
 
     @Override
-    public PaginatedComposedDto findAllSummarized(boolean withHits) {
-        return getOpenComposedSummaries(withHits, null);
+    public PaginatedComposedDto findAllSummarized(long sectionId, boolean withHits) {
+        return getOpenComposedSummaries(sectionId, withHits, null);
     }
 
     @Override
-    public PaginatedComposedDto findSummarizedFiltered(boolean withHits, Filter filter) {
-        return getOpenComposedSummaries(withHits, filter);
+    public PaginatedComposedDto findSummarizedFiltered(long sectionId, boolean withHits, Filter filter) {
+        return getOpenComposedSummaries(sectionId, withHits, filter);
     }
 
-    private PaginatedComposedDto getOpenComposedSummaries(boolean withHits, Filter filter) {
+    private PaginatedComposedDto getOpenComposedSummaries(long sectionId, boolean withHits, Filter filter) {
         int requestedComposed = filter.getTake();
         filter.setTake(filter.getTake() + 1);
 
         Long composedId = getComposedIdFromFilter(filter);
-        List<ComposedSummaryEntity> composedWithoutHits = repository.getOpenComposedSummaries(withHits, filter, composedId);
+        List<ComposedSummaryEntity> composedWithoutHits = repository.getOpenComposedSummaries(sectionId, withHits,
+                filter, composedId);
 
         boolean hasNextPage = composedWithoutHits.size() > requestedComposed;
 
@@ -221,18 +228,18 @@ public class ComposedProductionOrderServiceImpl implements ComposedProductionOrd
     }
 
     @Override
-    public List<ComposedSummaryDto> findAllCompleted() {
-        List<ComposedSummaryEntity> composedCompleted = repository.findCompleted(null, null);
+    public List<ComposedSummaryDto> findAllCompleted(long sectionId) {
+        List<ComposedSummaryEntity> composedCompleted = repository.findCompleted(sectionId, null, null);
         return summaryConverter.toDto(composedCompleted, ComposedSummaryDto.class);
     }
 
     @Override
-    public PaginatedComposedDto findCompletedFiltered(Filter filter) {
+    public PaginatedComposedDto findCompletedFiltered(long sectionId, Filter filter) {
         int requestedComposed = filter.getTake();
         filter.setTake(filter.getTake() + 1);
         Long composedId = getComposedIdFromFilter(filter);
 
-        List<ComposedSummaryEntity> composedCompleted = repository.findCompleted(filter, composedId);
+        List<ComposedSummaryEntity> composedCompleted = repository.findCompleted(sectionId, filter, composedId);
 
         boolean hasNextPage = composedCompleted.size() > requestedComposed;
 

@@ -47,13 +47,18 @@ public class ManageExportExcelServiceImpl implements ManageExportExcelService {
     }
 
     @Override
-    public void exportProductionAndComposedToExcelFiltered(HttpServletResponse response, Map<String, String> requestPayload) {
+    public void exportProductionAndComposedToExcelFiltered(HttpServletResponse response, Map<String, String> requestPayload, long sectionId) {
         Timestamp startDate = stringToTimestamp(requestPayload.get(START_DATE));
         Timestamp endDate = stringToTimestamp(requestPayload.get(END_DATE));
 
         setExcelResponseHeaders(response, COMPOSED_PRODUCTION_ORDERS_COMPLETED);
 
+<<<<<<< HEAD
         List<ProductionOrderEntity> productionOrders = productionOrderRepository.findCompleted(false, null, startDate, endDate);
+=======
+        List<ProductionOrderEntity> productionOrders = productionOrderRepository.findCompleted(sectionId, false,
+                null, startDate, endDate);
+>>>>>>> test_environment
         List<ComposedSummaryEntity> composedList = composedRepository.findAllComposed(startDate, endDate);
 
         List<ProductionOrderExportInfoDto> productionOrderDtos = productionOrderConverter.toExportDtoList(productionOrders);

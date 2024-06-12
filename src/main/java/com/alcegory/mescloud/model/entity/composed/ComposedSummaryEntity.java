@@ -33,7 +33,12 @@ public class ComposedSummaryEntity implements Serializable {
     private String batchCode;
     private Integer amountOfHits;
     private Integer validAmount;
+<<<<<<< HEAD
     
+=======
+    private Long sectionId;
+
+>>>>>>> test_environment
     @Convert(converter = InstructionsConverter.class)
     private List<Map<String, Object>> instructions;
 }

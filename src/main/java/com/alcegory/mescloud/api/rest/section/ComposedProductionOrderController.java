@@ -1,5 +1,9 @@
-package com.alcegory.mescloud.api.rest;
+package com.alcegory.mescloud.api.rest.section;
 
+<<<<<<< HEAD:src/main/java/com/alcegory/mescloud/api/rest/ComposedProductionOrderController.java
+=======
+import com.alcegory.mescloud.api.rest.base.SectionBaseController;
+>>>>>>> test_environment:src/main/java/com/alcegory/mescloud/api/rest/section/ComposedProductionOrderController.java
 import com.alcegory.mescloud.model.dto.composed.ComposedProductionOrderDto;
 import com.alcegory.mescloud.model.dto.composed.ComposedSummaryDto;
 import com.alcegory.mescloud.model.dto.pagination.PaginatedComposedDto;
@@ -17,13 +21,14 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/composed-production-order")
 @AllArgsConstructor
-public class ComposedProductionOrderController {
+public class ComposedProductionOrderController extends SectionBaseController {
+
+    private static final String COMPOSED_PRODUCTION_ORDER_URL = "/composed-production-order";
 
     private final ComposedProductionOrderService composedService;
 
-    @PostMapping
+    @PostMapping(COMPOSED_PRODUCTION_ORDER_URL)
     public ResponseEntity<ComposedProductionOrderDto> create(@RequestBody RequestComposedDto productionOrderIds) {
         try {
             Optional<ComposedProductionOrderDto> composedProductionOpt = composedService.create(productionOrderIds);
@@ -36,7 +41,7 @@ public class ComposedProductionOrderController {
         }
     }
 
-    @GetMapping
+    @GetMapping(COMPOSED_PRODUCTION_ORDER_URL)
     public ResponseEntity<List<ComposedProductionOrderDto>> findAll() {
         try {
             List<ComposedProductionOrderDto> composedDtos = composedService.getAll();
@@ -49,10 +54,14 @@ public class ComposedProductionOrderController {
         }
     }
 
-    @GetMapping("/insert-hits")
-    public ResponseEntity<PaginatedComposedDto> findAllToInsertHits() {
+    @GetMapping(COMPOSED_PRODUCTION_ORDER_URL + "/insert-hits")
+    public ResponseEntity<PaginatedComposedDto> findAllToInsertHits(@PathVariable long sectionId) {
         try {
+<<<<<<< HEAD:src/main/java/com/alcegory/mescloud/api/rest/ComposedProductionOrderController.java
             PaginatedComposedDto composedWithoutHits = composedService.findAllSummarizedWithoutHits();
+=======
+            PaginatedComposedDto composedWithoutHits = composedService.findAllSummarizedWithoutHits(sectionId);
+>>>>>>> test_environment:src/main/java/com/alcegory/mescloud/api/rest/section/ComposedProductionOrderController.java
             if (composedWithoutHits == null) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
@@ -62,10 +71,15 @@ public class ComposedProductionOrderController {
         }
     }
 
-    @PostMapping("/insert-hits/filtered")
-    public ResponseEntity<PaginatedComposedDto> findToInsertHitsFiltered(@RequestBody Filter filter) {
+    @PostMapping(COMPOSED_PRODUCTION_ORDER_URL + "/insert-hits/filtered")
+    public ResponseEntity<PaginatedComposedDto> findToInsertHitsFiltered(@PathVariable long sectionId,
+                                                                         @RequestBody Filter filter) {
         try {
+<<<<<<< HEAD:src/main/java/com/alcegory/mescloud/api/rest/ComposedProductionOrderController.java
             PaginatedComposedDto composedWithoutHits = composedService.findSummarizedWithoutHitsFiltered(filter);
+=======
+            PaginatedComposedDto composedWithoutHits = composedService.findSummarizedWithoutHitsFiltered(sectionId, filter);
+>>>>>>> test_environment:src/main/java/com/alcegory/mescloud/api/rest/section/ComposedProductionOrderController.java
             if (composedWithoutHits == null) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
@@ -75,10 +89,14 @@ public class ComposedProductionOrderController {
         }
     }
 
-    @GetMapping("/approval")
-    public ResponseEntity<PaginatedComposedDto> findAllForApproval() {
+    @GetMapping(COMPOSED_PRODUCTION_ORDER_URL + "/approval")
+    public ResponseEntity<PaginatedComposedDto> findAllForApproval(@PathVariable long sectionId) {
         try {
+<<<<<<< HEAD:src/main/java/com/alcegory/mescloud/api/rest/ComposedProductionOrderController.java
             PaginatedComposedDto composedWithHits = composedService.findAllSummarizedWithHits();
+=======
+            PaginatedComposedDto composedWithHits = composedService.findAllSummarizedWithHits(sectionId);
+>>>>>>> test_environment:src/main/java/com/alcegory/mescloud/api/rest/section/ComposedProductionOrderController.java
             if (composedWithHits == null) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
@@ -88,10 +106,15 @@ public class ComposedProductionOrderController {
         }
     }
 
-    @PostMapping("/approval/filtered")
-    public ResponseEntity<PaginatedComposedDto> findForApprovalFiltered(@RequestBody Filter filter) {
+    @PostMapping(COMPOSED_PRODUCTION_ORDER_URL + "/approval/filtered")
+    public ResponseEntity<PaginatedComposedDto> findForApprovalFiltered(@PathVariable long sectionId,
+                                                                        @RequestBody Filter filter) {
         try {
+<<<<<<< HEAD:src/main/java/com/alcegory/mescloud/api/rest/ComposedProductionOrderController.java
             PaginatedComposedDto composedWithHits = composedService.findSummarizedWithHitsFiltered(filter);
+=======
+            PaginatedComposedDto composedWithHits = composedService.findSummarizedWithHitsFiltered(sectionId, filter);
+>>>>>>> test_environment:src/main/java/com/alcegory/mescloud/api/rest/section/ComposedProductionOrderController.java
             if (composedWithHits == null) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
@@ -101,10 +124,10 @@ public class ComposedProductionOrderController {
         }
     }
 
-    @GetMapping("/completed")
-    public ResponseEntity<List<ComposedSummaryDto>> findAllCompleted() {
+    @GetMapping(COMPOSED_PRODUCTION_ORDER_URL + "/completed")
+    public ResponseEntity<List<ComposedSummaryDto>> findAllCompleted(@PathVariable long sectionId) {
         try {
-            List<ComposedSummaryDto> composedCompleted = composedService.findAllCompleted();
+            List<ComposedSummaryDto> composedCompleted = composedService.findAllCompleted(sectionId);
             if (composedCompleted.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
@@ -114,10 +137,15 @@ public class ComposedProductionOrderController {
         }
     }
 
-    @PostMapping("/completed/filtered")
-    public ResponseEntity<PaginatedComposedDto> findCompletedFiltered(@RequestBody Filter filter) {
+    @PostMapping(COMPOSED_PRODUCTION_ORDER_URL + "/completed/filtered")
+    public ResponseEntity<PaginatedComposedDto> findCompletedFiltered(@PathVariable long sectionId,
+                                                                      @RequestBody Filter filter) {
         try {
+<<<<<<< HEAD:src/main/java/com/alcegory/mescloud/api/rest/ComposedProductionOrderController.java
             PaginatedComposedDto composedCompleted = composedService.findCompletedFiltered(filter);
+=======
+            PaginatedComposedDto composedCompleted = composedService.findCompletedFiltered(sectionId, filter);
+>>>>>>> test_environment:src/main/java/com/alcegory/mescloud/api/rest/section/ComposedProductionOrderController.java
             if (composedCompleted == null) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
@@ -127,7 +155,11 @@ public class ComposedProductionOrderController {
         }
     }
 
+<<<<<<< HEAD:src/main/java/com/alcegory/mescloud/api/rest/ComposedProductionOrderController.java
     @PostMapping("/production-orders")
+=======
+    @PostMapping(COMPOSED_PRODUCTION_ORDER_URL + "/production-orders")
+>>>>>>> test_environment:src/main/java/com/alcegory/mescloud/api/rest/section/ComposedProductionOrderController.java
     public ResponseEntity<List<ProductionOrderDto>> getProductionOrderSummaryByComposedId(@RequestBody RequestById request) {
         if (request == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

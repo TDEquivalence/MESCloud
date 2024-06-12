@@ -13,11 +13,11 @@ import java.util.List;
 
 public interface AlarmRepository extends JpaRepository<AlarmEntity, Long> {
 
-    List<AlarmSummaryEntity> findByFilter(Filter filter);
+    List<AlarmSummaryEntity> findByFilter(long sectionId, Filter filter);
 
     List<AlarmEntity> findByEquipmentIdAndStatus(Long equipmentId, AlarmStatus status);
 
-    AlarmCountsDto getAlarmCounts(Filter filter);
+    AlarmCountsDto getAlarmCounts(long sectionId, Filter filter);
 
     @Query("SELECT CASE WHEN COUNT(a) > 0 THEN true ELSE false END FROM alarm a " +
             "WHERE a.alarmConfiguration.id = :alarmConfigurationId " +

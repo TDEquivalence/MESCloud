@@ -1,5 +1,6 @@
-package com.alcegory.mescloud.api.rest;
+package com.alcegory.mescloud.api.rest.section;
 
+import com.alcegory.mescloud.api.rest.base.SectionBaseController;
 import com.alcegory.mescloud.exception.*;
 import com.alcegory.mescloud.model.dto.equipment.CountingEquipmentDto;
 import com.alcegory.mescloud.model.dto.equipment.CountingEquipmentInfoDto;
@@ -21,9 +22,10 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/counting-equipments")
 @AllArgsConstructor
-public class CountingEquipmentController {
+public class CountingEquipmentController extends SectionBaseController {
+
+    private static final String COUNTING_EQUIPMENT_URL = "/counting-equipments";
 
     private static final String IMS_ERROR_CAUSE = "IMS";
     private static final String EQUIPMENT_ERROR_CAUSE = "EQUIPMENT";
@@ -34,10 +36,10 @@ public class CountingEquipmentController {
     private final CountingEquipmentManagementService countingEquipmentManagementService;
     private final ManagementInfoService managementInfoService;
 
-    @GetMapping
-    public ResponseEntity<List<CountingEquipmentDto>> findAll() {
+    @GetMapping(COUNTING_EQUIPMENT_URL)
+    public ResponseEntity<List<CountingEquipmentDto>> findAll(@PathVariable long sectionId) {
         try {
-            List<CountingEquipmentDto> countingEquipments = service.findAllWithLastProductionOrder();
+            List<CountingEquipmentDto> countingEquipments = service.findAllWithLastProductionOrder(sectionId);
             if (countingEquipments.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
@@ -47,7 +49,11 @@ public class CountingEquipmentController {
         }
     }
 
+<<<<<<< HEAD:src/main/java/com/alcegory/mescloud/api/rest/CountingEquipmentController.java
     @GetMapping("/{id}/info")
+=======
+    @GetMapping(COUNTING_EQUIPMENT_URL + "/{id}/info")
+>>>>>>> test_environment:src/main/java/com/alcegory/mescloud/api/rest/section/CountingEquipmentController.java
     public ResponseEntity<CountingEquipmentInfoDto> findCountingInfoById(@PathVariable long id) {
         try {
             Optional<CountingEquipmentInfoDto> countingEquipmentOpt = managementInfoService.findEquipmentWithProductionOrderById(id);
@@ -61,7 +67,11 @@ public class CountingEquipmentController {
         }
     }
 
+<<<<<<< HEAD:src/main/java/com/alcegory/mescloud/api/rest/CountingEquipmentController.java
     @GetMapping("/{id}")
+=======
+    @GetMapping(COUNTING_EQUIPMENT_URL + "/{id}")
+>>>>>>> test_environment:src/main/java/com/alcegory/mescloud/api/rest/section/CountingEquipmentController.java
     public ResponseEntity<CountingEquipmentDto> findById(@PathVariable long id) {
         try {
             CountingEquipmentDto countingEquipmentOpt = managementInfoService.findEquipmentById(id);
@@ -75,7 +85,11 @@ public class CountingEquipmentController {
         }
     }
 
+<<<<<<< HEAD:src/main/java/com/alcegory/mescloud/api/rest/CountingEquipmentController.java
     @GetMapping("/{id}/template")
+=======
+    @GetMapping(COUNTING_EQUIPMENT_URL + "/{id}/template")
+>>>>>>> test_environment:src/main/java/com/alcegory/mescloud/api/rest/section/CountingEquipmentController.java
     public ResponseEntity<TemplateDto> findTemplateById(@PathVariable long id) {
         try {
             TemplateDto templateDto = countingEquipmentManagementService.findEquipmentTemplate(id);
@@ -89,7 +103,11 @@ public class CountingEquipmentController {
         }
     }
 
+<<<<<<< HEAD:src/main/java/com/alcegory/mescloud/api/rest/CountingEquipmentController.java
     @PutMapping("/{equipmentId}/ims")
+=======
+    @PutMapping(COUNTING_EQUIPMENT_URL + "/{equipmentId}/ims")
+>>>>>>> test_environment:src/main/java/com/alcegory/mescloud/api/rest/section/CountingEquipmentController.java
     public ResponseEntity<CountingEquipmentDto> updateIms(@PathVariable long equipmentId, @RequestBody RequestById request,
                                                           Authentication authentication) {
         try {
@@ -106,12 +124,18 @@ public class CountingEquipmentController {
         }
     }
 
-    @PutMapping("/{equipmentId}/configuration")
-    public ResponseEntity<CountingEquipmentDto> updateConfiguration(@PathVariable long equipmentId,
+    @PutMapping(COUNTING_EQUIPMENT_URL + "/{equipmentId}/configuration")
+    public ResponseEntity<CountingEquipmentDto> updateConfiguration(@PathVariable String companyPrefix, @PathVariable String sectionPrefix,
+                                                                    @PathVariable long sectionId, @PathVariable long equipmentId,
                                                                     @RequestBody RequestConfigurationDto request,
                                                                     Authentication authentication) {
         try {
+<<<<<<< HEAD:src/main/java/com/alcegory/mescloud/api/rest/CountingEquipmentController.java
             CountingEquipmentDto countingEquipment = countingEquipmentManagementService.updateConfiguration(equipmentId, request, authentication);
+=======
+            CountingEquipmentDto countingEquipment = countingEquipmentManagementService.updateConfiguration(companyPrefix, sectionPrefix,
+                    sectionId, equipmentId, request, authentication);
+>>>>>>> test_environment:src/main/java/com/alcegory/mescloud/api/rest/section/CountingEquipmentController.java
             return new ResponseEntity<>(countingEquipment, HttpStatus.OK);
         } catch (IncompleteConfigurationException e) {
             return HttpUtil.responseWithHeaders(HttpStatus.BAD_REQUEST, CONFIG_ERROR_CAUSE, e);

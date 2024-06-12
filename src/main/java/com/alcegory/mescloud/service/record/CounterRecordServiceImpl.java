@@ -50,22 +50,29 @@ public class CounterRecordServiceImpl implements CounterRecordService {
 
 
     @Override
+<<<<<<< HEAD
     public List<CounterRecordSummaryEntity> getEquipmentOutputProductionPerDay(FilterDto filter) {
         return repository.findLastPerProductionOrderAndEquipmentOutputPerDay(filter);
+=======
+    public List<CounterRecordSummaryEntity> getEquipmentOutputProductionPerDay(long sectionId, FilterDto filter) {
+        return repository.findLastPerProductionOrderAndEquipmentOutputPerDay(sectionId, filter);
+>>>>>>> test_environment
     }
 
     @Override
-    public List<CounterRecordDto> filterConclusionRecordsKpi(FilterDto filter) {
-        List<CounterRecordConclusionEntity> counterRecordConclusionEntities = repository.findLastPerProductionOrder(filter);
+    public List<CounterRecordDto> filterConclusionRecordsKpi(long sectionId, FilterDto filter) {
+        List<CounterRecordConclusionEntity> counterRecordConclusionEntities =
+                repository.findLastPerProductionOrder(sectionId, filter);
         return converter.conclusionViewToDto(counterRecordConclusionEntities);
     }
 
     @Override
-    public PaginatedCounterRecordsDto filterConclusionRecordsPaginated(Filter filter) {
+    public PaginatedCounterRecordsDto filterConclusionRecordsPaginated(long sectionId, Filter filter) {
         int requestedRecords = filter.getTake();
         filter.setTake(filter.getTake() + 1);
 
-        List<CounterRecordConclusionEntity> counterRecordConclusionEntities = repository.findLastPerProductionOrder(filter);
+        List<CounterRecordConclusionEntity> counterRecordConclusionEntities =
+                repository.findLastPerProductionOrder(sectionId, filter);
         boolean hasNextPage = counterRecordConclusionEntities.size() > requestedRecords;
 
         if (hasNextPage) {
@@ -82,11 +89,11 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     }
 
     @Override
-    public PaginatedCounterRecordsDto getFilteredAndPaginated(Filter filterDto) {
+    public PaginatedCounterRecordsDto getFilteredAndPaginated(long sectionId, Filter filterDto) {
         int requestedRecords = filterDto.getTake();
         filterDto.setTake(filterDto.getTake() + 1);
 
-        List<CounterRecordEntity> counterRecordEntities = repository.getFilteredAndPaginated(filterDto);
+        List<CounterRecordEntity> counterRecordEntities = repository.getFilteredAndPaginated(sectionId, filterDto);
         boolean hasNextPage = counterRecordEntities.size() > requestedRecords;
 
         if (hasNextPage) {
