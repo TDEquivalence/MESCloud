@@ -23,9 +23,6 @@ aws:
     awsSecretAccessKey: ${AWS_SECRET_ACCESS_KEY}
 
 mes:
-  mqtt:
-    protCountBackendTopic: ${PROT_COUNT_BACKEND_TOPIC}
-    protCountPlcTopic: ${PROT_COUNT_PLC_TOPIC}
   security:
     allowedOrigin: ${CORS_ALLOWED_ORIGIN}
 

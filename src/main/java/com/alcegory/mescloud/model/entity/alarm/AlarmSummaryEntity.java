@@ -23,6 +23,7 @@ public class AlarmSummaryEntity implements Serializable {
     private String configurationCode;
     private String configurationDescription;
     private String equipmentAlias;
+    private Long sectionId;
     private String productionOrderCode;
     @Enumerated(EnumType.STRING)
     private AlarmStatus status;

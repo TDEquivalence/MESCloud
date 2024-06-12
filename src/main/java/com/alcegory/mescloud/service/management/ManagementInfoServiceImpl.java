@@ -15,7 +15,6 @@ import com.alcegory.mescloud.service.production.ProductionOrderService;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -24,7 +23,6 @@ import static com.alcegory.mescloud.model.filter.Filter.Property.END_DATE;
 import static com.alcegory.mescloud.model.filter.Filter.Property.START_DATE;
 
 @Service
-@Transactional
 @Log
 @AllArgsConstructor
 public class ManagementInfoServiceImpl implements ManagementInfoService {
@@ -33,7 +31,7 @@ public class ManagementInfoServiceImpl implements ManagementInfoService {
     private final ProductionOrderService productionOrderService;
     private final CountingEquipmentConverter countingEquipmentConverter;
     private final ProductionOrderConverter productionOrderConverter;
-
+    
     public Optional<CountingEquipmentInfoDto> findEquipmentWithProductionOrderById(long id) {
         CountingEquipmentDto countingEquipmentOpt = findEquipmentById(id);
         ProductionOrderInfoDto productionOrderDto = findProductionOrderByEquipmentId(id);
@@ -61,7 +59,6 @@ public class ManagementInfoServiceImpl implements ManagementInfoService {
     }
 
     private CountingEquipmentDto convertToDtoWithActiveProductionOrder(CountingEquipmentEntity entity) {
-
         CountingEquipmentDto dto = countingEquipmentConverter.convertToDto(entity);
 
         if (hasSingleActiveProductionOrder(entity)) {
@@ -72,7 +69,6 @@ public class ManagementInfoServiceImpl implements ManagementInfoService {
     }
 
     private boolean hasSingleActiveProductionOrder(CountingEquipmentEntity entity) {
-
         return entity.getProductionOrders() != null &&
                 entity.getProductionOrders().size() == 1 &&
                 !entity.getProductionOrders().get(0).isCompleted();
@@ -89,12 +85,12 @@ public class ManagementInfoServiceImpl implements ManagementInfoService {
     }
 
     @Override
-    public PaginatedProductionOrderDto getCompletedWithoutComposedFiltered(Filter filter) {
+    public PaginatedProductionOrderDto getCompletedWithoutComposedFiltered(long sectionId, Filter filter) {
         int requestedProductionOrders = filter.getTake();
         filter.setTake(filter.getTake() + 1);
 
-        List<ProductionOrderEntity> persistedProductionOrders = productionOrderService.findCompleted(true, filter,
-                filter.getSearch().getTimestampValue(START_DATE), filter.getSearch().getTimestampValue(END_DATE));
+        List<ProductionOrderEntity> persistedProductionOrders = productionOrderService.findCompleted(sectionId, true,
+                filter, filter.getSearch().getTimestampValue(START_DATE), filter.getSearch().getTimestampValue(END_DATE));
         boolean hasNextPage = persistedProductionOrders.size() > requestedProductionOrders;
 
         if (hasNextPage) {

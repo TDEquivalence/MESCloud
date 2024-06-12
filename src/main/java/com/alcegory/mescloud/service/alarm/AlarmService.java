@@ -17,14 +17,14 @@ import java.util.List;
 
 public interface AlarmService {
 
-    PaginatedAlarmDto findByFilter(Filter filter);
+    PaginatedAlarmDto findByFilter(long sectionId, Filter filter);
 
     List<AlarmDto> findByEquipmentIdAndStatus(Long equipmentId, AlarmStatus status);
 
     AlarmDto recognizeAlarm(Long alarmId, RequestAlarmRecognitionDto alarmRecognition, Authentication authentication)
             throws AlarmNotFoundException, IllegalAlarmStatusException;
 
-    AlarmCountsDto getAlarmCounts(Filter filter);
+    AlarmCountsDto getAlarmCounts(long sectionId, Filter filter);
 
     void processAlarms(PlcMqttDto plcMqttDto) throws AlarmConfigurationNotFoundException, EquipmentNotFoundException;
 }

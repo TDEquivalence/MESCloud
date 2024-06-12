@@ -26,18 +26,23 @@ public class ProductionOrderRepositoryImpl {
     private static final String PROP_ID = "id";
 
     private static final String EQUIPMENT = "equipment";
+    private static final String SECTION = "section";
 
     private final EntityManager entityManager;
 
-    public List<ProductionOrderEntity> findCompleted(boolean withoutComposed, Filter filter, Timestamp startDate, Timestamp endDate) {
+    public List<ProductionOrderEntity> findCompleted(long sectionId, boolean withoutComposed, Filter filter, Timestamp startDate, Timestamp endDate) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Long> idQuery = cb.createQuery(Long.class);
         Root<ProductionOrderEntity> root = idQuery.from(ProductionOrderEntity.class);
 
+        Join<ProductionOrderEntity, CountingEquipmentEntity> equipmentJoin = root.join(EQUIPMENT);
+
+        Predicate sectionPredicate = cb.equal(equipmentJoin.get(SECTION).get(PROP_ID), sectionId);
+
         Predicate[] predicates = buildPredicates(cb, root, withoutComposed, startDate, endDate, filter);
-        idQuery.where(predicates);
+        Predicate finalPredicate = cb.and(sectionPredicate, cb.and(predicates));
 
-
+        idQuery.where(finalPredicate);
         idQuery.select(root.get(PROP_ID));
         TypedQuery<Long> idTypedQuery = entityManager.createQuery(idQuery);
 
@@ -52,8 +57,8 @@ public class ProductionOrderRepositoryImpl {
 
         CriteriaQuery<ProductionOrderEntity> mainQuery = cb.createQuery(ProductionOrderEntity.class);
         Root<ProductionOrderEntity> mainRoot = mainQuery.from(ProductionOrderEntity.class);
-        mainQuery.where(mainRoot.get(PROP_ID).in(ids));
-        mainQuery.orderBy(cb.desc(mainRoot.get(PROP_ID)));
+        mainQuery.where(mainRoot.get("id").in(ids));
+        mainQuery.orderBy(cb.desc(mainRoot.get("id")));
 
         TypedQuery<ProductionOrderEntity> typedQuery = entityManager.createQuery(mainQuery);
 

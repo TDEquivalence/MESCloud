@@ -6,8 +6,8 @@ import com.alcegory.mescloud.model.dto.composed.HitDto;
 import com.alcegory.mescloud.model.dto.production.ProductionOrderDto;
 import com.alcegory.mescloud.model.entity.composed.ComposedProductionOrderEntity;
 import com.alcegory.mescloud.model.entity.composed.HitEntity;
-import com.alcegory.mescloud.model.entity.production.ProductionOrderEntity;
 import com.alcegory.mescloud.model.entity.composed.SampleEntity;
+import com.alcegory.mescloud.model.entity.production.ProductionOrderEntity;
 import com.alcegory.mescloud.model.request.RequestById;
 import com.alcegory.mescloud.model.request.RequestHitDto;
 import com.alcegory.mescloud.repository.composed.HitRepository;
@@ -45,9 +45,8 @@ public class HitServiceImpl implements HitService {
     private final ProductionOrderConverter productionOrderConverter;
 
     @Override
-    public List<HitDto> create(RequestHitDto requestHitDto, Authentication authentication) {
-        //TODO: sectionID
-        userRoleService.checkSectionAuthority(authentication, 1L, OPERATOR_CREATE);
+    public List<HitDto> create(long sectionId, RequestHitDto requestHitDto, Authentication authentication) {
+        userRoleService.checkSectionAuthority(authentication, sectionId, OPERATOR_CREATE);
 
         if (requestHitDto.getHits() == null || requestHitDto.getHits().isEmpty()) {
             throw new IllegalArgumentException("Hits list are not valid");
@@ -143,9 +142,8 @@ public class HitServiceImpl implements HitService {
     }
 
     @Override
-    public List<ProductionOrderDto> removeHits(RequestById request, Authentication authentication) {
-        //TODO: sectionID
-        userRoleService.checkSectionAuthority(authentication, 1L, ADMIN_DELETE);
+    public List<ProductionOrderDto> removeHits(long sectionId, RequestById request, Authentication authentication) {
+        userRoleService.checkSectionAuthority(authentication, sectionId, ADMIN_DELETE);
         Optional<ComposedProductionOrderEntity> composedOpt = composedService.findById(request.getId());
 
         if (composedOpt.isEmpty()) {

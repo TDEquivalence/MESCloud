@@ -25,29 +25,29 @@ public interface ComposedProductionOrderService {
 
     List<ComposedProductionOrderDto> getAll();
 
-    default PaginatedComposedDto findAllSummarizedWithHits() {
-        return findAllSummarized(true);
+    default PaginatedComposedDto findAllSummarizedWithHits(long sectionId) {
+        return findAllSummarized(sectionId, true);
     }
 
-    default PaginatedComposedDto findAllSummarizedWithoutHits() {
-        return findAllSummarized(false);
+    default PaginatedComposedDto findAllSummarizedWithoutHits(long sectionId) {
+        return findAllSummarized(sectionId, false);
     }
 
-    default PaginatedComposedDto findSummarizedWithHitsFiltered(Filter filter) {
-        return findSummarizedFiltered(true, filter);
+    default PaginatedComposedDto findSummarizedWithHitsFiltered(long sectionId, Filter filter) {
+        return findSummarizedFiltered(sectionId, true, filter);
     }
 
-    default PaginatedComposedDto findSummarizedWithoutHitsFiltered(Filter filter) {
-        return findSummarizedFiltered(false, filter);
+    default PaginatedComposedDto findSummarizedWithoutHitsFiltered(long sectionId, Filter filter) {
+        return findSummarizedFiltered(sectionId, false, filter);
     }
 
-    PaginatedComposedDto findSummarizedFiltered(boolean withHits, Filter filter);
+    PaginatedComposedDto findSummarizedFiltered(long sectionId, boolean withHits, Filter filter);
 
-    PaginatedComposedDto findAllSummarized(boolean withHits);
+    PaginatedComposedDto findAllSummarized(long sectionId, boolean withHits);
 
-    List<ComposedSummaryDto> findAllCompleted();
+    List<ComposedSummaryDto> findAllCompleted(long sectionId);
 
-    PaginatedComposedDto findCompletedFiltered(Filter filter);
+    PaginatedComposedDto findCompletedFiltered(long sectionId, Filter filter);
 
     void setProductionOrderApproval(ComposedProductionOrderEntity composed, boolean isApproved);
 

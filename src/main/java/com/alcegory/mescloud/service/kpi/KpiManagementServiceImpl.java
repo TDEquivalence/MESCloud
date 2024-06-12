@@ -40,15 +40,15 @@ public class KpiManagementServiceImpl implements KpiManagementService {
     private final CounterRecordConverter counterRecordConverter;
 
     @Override
-    public CountingEquipmentKpiDto[] getEquipmentOutputProductionPerDay(FilterDto filter) {
-        List<CounterRecordSummaryEntity> equipmentCounts = counterRecordService.getEquipmentOutputProductionPerDay(filter);
+    public CountingEquipmentKpiDto[] getEquipmentOutputProductionPerDay(long sectionId, FilterDto filter) {
+        List<CounterRecordSummaryEntity> equipmentCounts = counterRecordService.getEquipmentOutputProductionPerDay(sectionId, filter);
         List<CounterRecordDto> counterRecordDto = counterRecordConverter.toDtoList(equipmentCounts);
         return sortPerDay(filter, counterRecordDto);
     }
 
     @Override
-    public CountingEquipmentKpiDto[] computeEquipmentKpi(FilterDto filter) {
-        List<CounterRecordDto> equipmentCounts = counterRecordService.filterConclusionRecordsKpi(filter);
+    public CountingEquipmentKpiDto[] computeEquipmentKpi(long sectionId, FilterDto filter) {
+        List<CounterRecordDto> equipmentCounts = counterRecordService.filterConclusionRecordsKpi(sectionId, filter);
         return sortPerDay(filter, equipmentCounts);
     }
 
@@ -82,38 +82,30 @@ public class KpiManagementServiceImpl implements KpiManagementService {
             throws NoSuchElementException, IncompleteConfigurationException, ArithmeticException {
 
         TargetValuesDto targetValuesDto = getTargetValues(null);
-        return computeEquipmentKpiAggregator(null, filter, targetValuesDto.getAvailabilityTarget(),
-                targetValuesDto.getAvailabilityTarget(), targetValuesDto.getPerformanceTarget(),
-                targetValuesDto.getOverallEffectivePerformanceTarget(), targetValuesDto.getTheoreticalProduction());
+        return computeEquipmentKpiAggregator(null, filter, targetValuesDto);
     }
 
     @Override
     public EquipmentKpiAggregatorDto computeEquipmentKpiAggregatorById(Long equipmentId, FilterDto filter)
             throws NoSuchElementException, IncompleteConfigurationException, ArithmeticException {
 
-        TargetValuesDto targetValuesDto = getTargetValues(null);
-        return computeEquipmentKpiAggregator(equipmentId, filter, targetValuesDto.getAvailabilityTarget(),
-                targetValuesDto.getAvailabilityTarget(), targetValuesDto.getPerformanceTarget(),
-                targetValuesDto.getOverallEffectivePerformanceTarget(), targetValuesDto.getTheoreticalProduction());
+        TargetValuesDto targetValuesDto = getTargetValues(equipmentId);
+        return computeEquipmentKpiAggregator(equipmentId, filter, targetValuesDto);
     }
 
-    private EquipmentKpiAggregatorDto computeEquipmentKpiAggregator(Long equipmentId, FilterDto filter,
-                                                                    Double qualityTarget, Double availabilityTarget,
-                                                                    Double performanceTarget, Double overallEffectivePerformanceTarget,
-                                                                    Double theoreticalProduction) {
+    private EquipmentKpiAggregatorDto computeEquipmentKpiAggregator(Long equipmentId, FilterDto filter, TargetValuesDto targetValues) {
 
         KpiDto qualityKpi = qualityKpiService.computeQuality(equipmentId, filter);
-        EquipmentKpiDto quality = new EquipmentKpiDto(qualityTarget, qualityKpi);
+        EquipmentKpiDto quality = new EquipmentKpiDto(targetValues.getQualityTarget(), qualityKpi);
 
         KpiDto availabilityKpi = availabilityKpiService.computeAvailability(equipmentId, filter);
-        EquipmentKpiDto availability = new EquipmentKpiDto(availabilityTarget, availabilityKpi);
+        EquipmentKpiDto availability = new EquipmentKpiDto(targetValues.getAvailabilityTarget(), availabilityKpi);
 
-        KpiDto performanceKpi = performanceKpiService.computePerformance(qualityKpi, availabilityKpi, theoreticalProduction);
-        EquipmentKpiDto performance = new EquipmentKpiDto(performanceTarget, performanceKpi);
+        KpiDto performanceKpi = performanceKpiService.computePerformance(qualityKpi, availabilityKpi, targetValues.getTheoreticalProduction());
+        EquipmentKpiDto performance = new EquipmentKpiDto(targetValues.getPerformanceTarget(), performanceKpi);
 
         Double overallEffectivePerformance = computeOverallEffectivePerformance(qualityKpi, availabilityKpi, performanceKpi);
-        EquipmentKpiDto overallEquipmentEffectiveness =
-                new EquipmentKpiDto(overallEffectivePerformanceTarget, overallEffectivePerformance);
+        EquipmentKpiDto overallEquipmentEffectiveness = new EquipmentKpiDto(targetValues.getOverallEffectivePerformanceTarget(), overallEffectivePerformance);
 
         return EquipmentKpiAggregatorDto.builder()
                 .qualityKpi(quality)
@@ -123,18 +115,8 @@ public class KpiManagementServiceImpl implements KpiManagementService {
                 .build();
     }
 
-    @Override
-    public List<EquipmentKpiAggregatorDto> computeEquipmentKpiAggregatorPerDay(FilterDto filter) {
-        return computeEquipmentKpiAggregators(null, filter);
-    }
-
-    @Override
-    public List<EquipmentKpiAggregatorDto> computeEquipmentKpiAggregatorPerDayById(Long equipmentId, FilterDto filter) {
-        return computeEquipmentKpiAggregators(equipmentId, filter);
-    }
-
     private List<EquipmentKpiAggregatorDto> computeEquipmentKpiAggregators(Long equipmentId, FilterDto filter) {
-        
+
         Timestamp startDate = filter.getSearch().getTimestampValue(START_DATE);
         Timestamp endDate = filter.getSearch().getTimestampValue(END_DATE);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -144,11 +126,7 @@ public class KpiManagementServiceImpl implements KpiManagementService {
         LocalDateTime startLocalDateTime = startDate.toLocalDateTime();
         LocalDateTime endLocalDateTime = endDate.toLocalDateTime().plusDays(1).minusNanos(1);
 
-        CountingEquipmentDto countingEquipment = (equipmentId != null)
-                ? countingEquipmentService.findById(equipmentId).orElse(null)
-                : null;
-
-        TargetValuesDto targetValues = getTargetValues(countingEquipment);
+        TargetValuesDto targetValues = getTargetValues(equipmentId);
 
         for (LocalDate currentDay = startLocalDateTime.toLocalDate();
              !currentDay.isAfter(endLocalDateTime.toLocalDate());
@@ -164,14 +142,22 @@ public class KpiManagementServiceImpl implements KpiManagementService {
             filter.getSearch().setSearchValueByName(END_DATE, endDateTimeFilter);
 
             EquipmentKpiAggregatorDto aggregator = computeEquipmentKpiAggregator(
-                    equipmentId, filter, targetValues.getQualityTarget(), targetValues.getAvailabilityTarget(),
-                    targetValues.getPerformanceTarget(), targetValues.getOverallEffectivePerformanceTarget(),
-                    targetValues.getTheoreticalProduction());
+                    equipmentId, filter, targetValues);
 
             equipmentKpiAggregators.add(aggregator);
         }
 
         return equipmentKpiAggregators;
+    }
+
+    @Override
+    public List<EquipmentKpiAggregatorDto> computeEquipmentKpiAggregatorPerDay(FilterDto filter) {
+        return computeEquipmentKpiAggregators(null, filter);
+    }
+
+    @Override
+    public List<EquipmentKpiAggregatorDto> computeEquipmentKpiAggregatorPerDayById(Long equipmentId, FilterDto filter) {
+        return computeEquipmentKpiAggregators(equipmentId, filter);
     }
 
     private Double computeOverallEffectivePerformance(KpiDto quality, KpiDto availability, KpiDto performance) {
@@ -185,7 +171,11 @@ public class KpiManagementServiceImpl implements KpiManagementService {
         return kpiDto == null || kpiDto.getValue() == null || kpiDto.getValue() == 0;
     }
 
-    private TargetValuesDto getTargetValues(CountingEquipmentDto countingEquipment) {
+    private TargetValuesDto getTargetValues(Long equipmentId) {
+        CountingEquipmentDto countingEquipment = (equipmentId != null)
+                ? countingEquipmentService.findById(equipmentId).orElse(null)
+                : null;
+
         if (countingEquipment == null) {
             return new TargetValuesDto(
                     countingEquipmentService.getAverageQualityTargetDividedByTotalCount(),

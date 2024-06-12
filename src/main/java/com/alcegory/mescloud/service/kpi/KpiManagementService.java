@@ -10,9 +10,9 @@ import java.util.NoSuchElementException;
 
 public interface KpiManagementService {
 
-    CountingEquipmentKpiDto[] getEquipmentOutputProductionPerDay(FilterDto filter);
+    CountingEquipmentKpiDto[] getEquipmentOutputProductionPerDay(long sectionId, FilterDto filter);
 
-    CountingEquipmentKpiDto[] computeEquipmentKpi(FilterDto filter);
+    CountingEquipmentKpiDto[] computeEquipmentKpi(long sectionId, FilterDto filter);
 
     EquipmentKpiAggregatorDto computeEquipmentKpiAggregatorById(Long equipmentId, FilterDto filter)
             throws NoSuchElementException, IncompleteConfigurationException, ArithmeticException;

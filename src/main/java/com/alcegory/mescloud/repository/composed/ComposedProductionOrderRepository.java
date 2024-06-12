@@ -20,9 +20,9 @@ public interface ComposedProductionOrderRepository extends JpaRepository<Compose
 
     Optional<ComposedProductionOrderEntity> findTopByOrderByIdDesc();
 
-    List<ComposedSummaryEntity> getOpenComposedSummaries(boolean withHits, Filter filter, Long composedId);
+    List<ComposedSummaryEntity> getOpenComposedSummaries(long sectionId, boolean withHits, Filter filter, Long composedId);
 
-    List<ComposedSummaryEntity> findCompleted(Filter filter, Long composedId);
+    List<ComposedSummaryEntity> findCompleted(long sectionId, Filter filter, Long composedId);
 
     List<ComposedSummaryEntity> findAllComposed(Timestamp startDate, Timestamp endDate);
 

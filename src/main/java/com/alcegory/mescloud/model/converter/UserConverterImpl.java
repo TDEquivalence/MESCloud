@@ -1,8 +1,9 @@
 package com.alcegory.mescloud.model.converter;
 
 import com.alcegory.mescloud.model.dto.company.*;
-import com.alcegory.mescloud.model.entity.*;
 import com.alcegory.mescloud.model.dto.user.UserConfigDto;
+import com.alcegory.mescloud.model.entity.FeatureEntity;
+import com.alcegory.mescloud.model.entity.UserEntity;
 import com.alcegory.mescloud.model.entity.company.CompanyEntity;
 import com.alcegory.mescloud.model.entity.company.FactoryEntity;
 import com.alcegory.mescloud.model.entity.company.SectionConfigEntity;
@@ -37,6 +38,7 @@ public class UserConverterImpl implements UserConverter {
         if (companyEntity != null) {
             companyDto.setId(companyEntity.getId());
             companyDto.setName(companyEntity.getName());
+            companyDto.setPrefix(companyEntity.getPrefix());
             // Convert factoryList
             companyDto.setFactoryList(convertToFactoryDtoList(companyEntity.getFactoryList()));
         }
@@ -57,7 +59,7 @@ public class UserConverterImpl implements UserConverter {
         if (factoryEntity != null) {
             factoryDto.setId(factoryEntity.getId());
             factoryDto.setName(factoryEntity.getName());
-            // Convert sectionList
+            factoryDto.setPrefix(factoryEntity.getPrefix());
             factoryDto.setSectionList(convertToSectionDtoList(factoryEntity.getSectionList()));
         }
         return factoryDto;
@@ -78,7 +80,7 @@ public class UserConverterImpl implements UserConverter {
         if (sectionEntity != null) {
             sectionDto.setId(sectionEntity.getId());
             sectionDto.setName(sectionEntity.getName());
-            // Convert all associated section configs
+            sectionDto.setPrefix(sectionEntity.getPrefix());
             sectionDto.setSectionConfigList(convertToSectionConfigDtoList(sectionEntity.getSectionConfigList()));
         }
         return sectionDto;

@@ -12,6 +12,7 @@ public class SectionDto {
 
     private Long id;
     private String name;
+    private String prefix;
     private SectionRole sectionRole;
     private List<SectionConfigDto> sectionConfigList;
 }

@@ -1,5 +1,9 @@
 BEGIN;
 
+<<<<<<< HEAD
+=======
+-- create after composed_summary
+>>>>>>> test_environment
 DROP VIEW composed_summary;
 DROP VIEW counter_record_production_conclusion;
 

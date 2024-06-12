@@ -1,23 +1,27 @@
-package com.alcegory.mescloud.api.rest;
+package com.alcegory.mescloud.api.rest.section;
 
 import com.alcegory.mescloud.model.dto.ImsDto;
 import com.alcegory.mescloud.service.equipment.ImsService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
 
 @RestController
-@RequestMapping("/api/ims")
 @AllArgsConstructor
 public class ImsController {
 
+    private static final String IMS_URL = "/ims";
+
     private ImsService imsService;
 
-    @PostMapping()
+    @PostMapping(IMS_URL)
     public ResponseEntity<ImsDto> create(@RequestBody ImsDto imsDto) {
         try {
             if (imsDto == null) {
@@ -31,7 +35,7 @@ public class ImsController {
         }
     }
 
-    @GetMapping
+    @GetMapping(IMS_URL)
     public ResponseEntity<List<ImsDto>> findAll() {
         try {
             List<ImsDto> imsDtos = imsService.getAll();
