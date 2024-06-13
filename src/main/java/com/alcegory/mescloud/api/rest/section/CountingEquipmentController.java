@@ -81,10 +81,6 @@ public class CountingEquipmentController extends SectionBaseController {
     public ResponseEntity<TemplateDto> findTemplateById(@PathVariable long id) {
         try {
             TemplateDto templateDto = countingEquipmentManagementService.findEquipmentTemplate(id);
-            if (templateDto == null) {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
-
             return new ResponseEntity<>(templateDto, HttpStatus.OK);
         } catch (EquipmentNotFoundException e) {
             return HttpUtil.responseWithHeaders(HttpStatus.NOT_FOUND, EQUIPMENT_ERROR_CAUSE, e);

@@ -19,6 +19,7 @@ import com.alcegory.mescloud.protocol.MesMqttSettings;
 import com.alcegory.mescloud.security.model.SectionAuthority;
 import com.alcegory.mescloud.security.service.UserRoleService;
 import com.alcegory.mescloud.service.equipment.*;
+import com.alcegory.mescloud.service.production.TemplateService;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -49,6 +50,7 @@ public class CountingEquipmentManagementServiceImpl implements CountingEquipment
     private final EquipmentOutputService outputService;
     private final UserRoleService userRoleService;
     private final ImsService imsService;
+    private final TemplateService templateService;
 
     private final MqttClient mqttClient;
     private final MesMqttSettings mqttSettings;
@@ -255,11 +257,8 @@ public class CountingEquipmentManagementServiceImpl implements CountingEquipment
     @Override
     @Transactional
     public TemplateDto findEquipmentTemplate(long id) {
-        CountingEquipmentEntity countingEquipment = countingEquipmentService.findEquipmentTemplate(id)
-                .orElseThrow(() -> new CountingEquipmentException("Error getting counting equipment with id " + id));
+        Optional<TemplateDto> templateDtoOpt = templateService.findTemplateByCountingEquipmentId(id);
 
-        TemplateEntity template = countingEquipment.getTemplate();
-
-        return templateConverter.toDto(template, TemplateDto.class);
+        return templateDtoOpt.orElseGet(TemplateDto::new);
     }
 }
