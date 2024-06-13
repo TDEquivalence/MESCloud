@@ -2,7 +2,8 @@ BEGIN;
 
 INSERT INTO section_config (section_id, label, "order") VALUES
 (2, 'dashboard', 1),
-(2, 'machine-center', 2);
+(2, 'machine-center', 2),
+(2, 'production-management', 3);
 
 INSERT INTO audit_script (run_date, process, version, schema)
 VALUES
