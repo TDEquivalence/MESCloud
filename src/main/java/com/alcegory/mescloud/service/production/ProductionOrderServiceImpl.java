@@ -65,6 +65,7 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     }
 
     @Override
+    @Transactional
     public Optional<ProductionOrderDto> findDtoByCode(String code) {
         Optional<ProductionOrderEntity> persistedProductionOrderOpt = repository.findByCode(code);
         if (persistedProductionOrderOpt.isEmpty()) {

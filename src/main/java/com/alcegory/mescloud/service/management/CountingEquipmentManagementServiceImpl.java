@@ -61,6 +61,7 @@ public class CountingEquipmentManagementServiceImpl implements CountingEquipment
     private final GenericConverter<TemplateEntity, TemplateDto> templateConverter;
 
     @Override
+    @Transactional
     public Optional<CountingEquipmentDto> updateEquipmentStatus(String equipmentCode, int equipmentStatus) {
         Optional<CountingEquipmentEntity> countingEquipmentOpt = countingEquipmentService.findByCodeWithLastStatusRecord(equipmentCode);
         if (countingEquipmentOpt.isEmpty()) {
