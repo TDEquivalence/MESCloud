@@ -242,9 +242,8 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
 
         Optional<ProductionOrderEntity> productionOrderEntityOpt = repository.findActiveByEquipmentId(equipmentId);
 
-        productionOrderEntityOpt.ifPresent(productionOrder -> {
-            Hibernate.initialize(productionOrder.getProductionInstructions());
-        });
+        productionOrderEntityOpt.ifPresent(productionOrder ->
+                Hibernate.initialize(productionOrder.getProductionInstructions()));
 
         return productionOrderEntityOpt;
     }
