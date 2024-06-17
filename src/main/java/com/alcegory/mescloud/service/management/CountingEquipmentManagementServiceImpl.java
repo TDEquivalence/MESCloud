@@ -126,6 +126,7 @@ public class CountingEquipmentManagementServiceImpl implements CountingEquipment
     }
 
     @Override
+    @Transactional
     public CountingEquipmentDto updateConfiguration(String companyPrefix, String sectionPrefix,
                                                     long sectionId, long equipmentId, RequestConfigurationDto request, Authentication authentication)
             throws IncompleteConfigurationException, EmptyResultDataAccessException, ActiveProductionOrderException, MesMqttException {
