@@ -92,13 +92,11 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     }
 
     @Override
-    @Transactional
     public ProductionOrderEntity saveAndUpdate(ProductionOrderEntity productionOrder) {
         return repository.save(productionOrder);
     }
 
     @Override
-    @Transactional
     public List<ProductionOrderEntity> saveAndUpdateAll(List<ProductionOrderEntity> productionOrder) {
         return repository.saveAll(productionOrder);
     }
