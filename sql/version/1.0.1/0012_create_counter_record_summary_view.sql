@@ -27,7 +27,7 @@ JOIN
     counting_equipment e ON eo.counting_equipment_id = e.id
 JOIN
     production_order po ON cr.production_order_id = po.id
-JOIN
+LEFT JOIN
     ims ON po.ims_id = ims.id
 JOIN
     equipment_output_alias eo_alias ON eo.equipment_output_alias_id = eo_alias.id

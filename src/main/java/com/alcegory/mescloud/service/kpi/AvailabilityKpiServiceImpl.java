@@ -47,7 +47,12 @@ public class AvailabilityKpiServiceImpl implements AvailabilityKpiService {
             }
 
             for (CounterRecordSummaryEntity counterRecord : records) {
-                totalActiveTime += counterRecord.getActiveTimeDay() - ACTIVE_TIME_THRESHOLD_SECONDS;
+                long activeTime = counterRecord.getActiveTimeDay();
+                if (activeTime > ACTIVE_TIME_THRESHOLD_SECONDS) {
+                    totalActiveTime += activeTime - ACTIVE_TIME_THRESHOLD_SECONDS;
+                } else {
+                    totalActiveTime += activeTime;
+                }
             }
 
             Timestamp adjustedStartDate = calculateAdjustedStartDate(records.get(0), startDate);
