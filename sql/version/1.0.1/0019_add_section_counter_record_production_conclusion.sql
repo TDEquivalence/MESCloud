@@ -14,7 +14,7 @@ SELECT
     cr.is_valid_for_production,
     po.code AS production_order_code,
     ce.section_id,
-    jsonb_agg(DISTINCT jsonb_build_object('name', pi.name, 'value', pi.value)) AS instructions
+    COALESCE(jsonb_agg(DISTINCT jsonb_build_object('name', pi.name, 'value', pi.value)) FILTER (WHERE pi.id IS NOT NULL), '[]'::jsonb) AS instructions
 FROM (
     SELECT
         eo.id AS equipment_output_id,
@@ -39,7 +39,7 @@ JOIN
     counter_record cr ON last_counter.max_counter_record_id = cr.id
 JOIN
     production_order po ON cr.production_order_id = po.id
-JOIN
+LEFT JOIN
     production_instruction pi ON pi.production_order_id = po.id
 JOIN
     counting_equipment ce ON po.equipment_id = ce.id
@@ -54,6 +54,7 @@ GROUP BY
     cr.is_valid_for_production,
     po.code,
     ce.section_id;
+
 
 INSERT INTO audit_script (run_date, process, version, schema)
 VALUES

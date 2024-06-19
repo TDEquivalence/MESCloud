@@ -24,6 +24,7 @@ import com.alcegory.mescloud.service.production.ProductionOrderService;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -62,6 +63,7 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     }
 
     @Override
+    @Transactional
     public PaginatedCounterRecordsDto filterConclusionRecordsPaginated(long sectionId, Filter filter) {
         int requestedRecords = filter.getTake();
         filter.setTake(filter.getTake() + 1);
