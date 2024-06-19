@@ -1,6 +1,7 @@
 package com.alcegory.mescloud.api.rest.section;
 
 import com.alcegory.mescloud.api.rest.base.SectionBaseController;
+import com.alcegory.mescloud.exception.ActiveProductionOrderException;
 import com.alcegory.mescloud.exception.ForbiddenAccessException;
 import com.alcegory.mescloud.model.dto.pagination.PaginatedProductionOrderDto;
 import com.alcegory.mescloud.model.dto.production.ProductionOrderDto;
@@ -59,6 +60,8 @@ public class ProductionOrderController extends SectionBaseController {
             }
         } catch (ForbiddenAccessException e) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        } catch (ActiveProductionOrderException e) {
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
     }
 

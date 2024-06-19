@@ -2,6 +2,7 @@ package com.alcegory.mescloud.service.management;
 
 import com.alcegory.mescloud.api.mqtt.MqttClient;
 import com.alcegory.mescloud.constant.MqttDTOConstants;
+import com.alcegory.mescloud.exception.ActiveProductionOrderException;
 import com.alcegory.mescloud.exception.MesMqttException;
 import com.alcegory.mescloud.model.converter.ProductionOrderConverter;
 import com.alcegory.mescloud.model.dto.equipment.CountingEquipmentDto;
@@ -62,9 +63,9 @@ public class ProductionOrderManagementServiceImpl implements ProductionOrderMana
         }
 
         if (productionOrderService.hasEquipmentActiveProductionOrder(productionOrder.getEquipmentId())) {
-            log.warning(() -> String.format("Unable to create Production Order - Equipment with id [%s] still has an " +
+            throw new ActiveProductionOrderException(String.format("Unable to create Production Order - " +
+                    "Equipment with id [%s] still has an " +
                     "uncompleted production order", productionOrder.getEquipmentId()));
-            return Optional.empty();
         }
 
         ProductionOrderEntity productionOrderEntity = createProductionOrderEntity(productionOrder);
