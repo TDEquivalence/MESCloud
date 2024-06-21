@@ -21,7 +21,8 @@ public class AlarmRepositoryImpl extends AbstractFilterRepository<Filter.Propert
 
     private static final String ID_PROP = "id";
     private static final String SECTION_ID_PROP = "sectionId";
-    private static final String CREATED_AT_PROP = "createdAt";
+
+    private static final String REGISTERED_AT_PROP = "registeredAt";
     private static final String STATUS_PROP = "status";
 
     protected AlarmRepositoryImpl(EntityManager entityManager) {
@@ -92,7 +93,7 @@ public class AlarmRepositoryImpl extends AbstractFilterRepository<Filter.Propert
         Timestamp startDate = filter.getSearch().getTimestampValue(Filter.Property.START_DATE);
         Timestamp endDate = filter.getSearch().getTimestampValue(Filter.Property.END_DATE);
 
-        predicates.add(criteriaBuilder.between(root.get(CREATED_AT_PROP), startDate, endDate));
+        predicates.add(criteriaBuilder.between(root.get(REGISTERED_AT_PROP), startDate, endDate));
 
         String statusString = filter.getSearch().getValue(Filter.Property.STATUS);
         if (statusString != null && !statusString.isEmpty()) {
