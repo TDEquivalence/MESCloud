@@ -1,5 +1,6 @@
 package com.alcegory.mescloud.api.rest.section;
 
+import com.alcegory.mescloud.api.rest.base.SectionBaseController;
 import com.alcegory.mescloud.model.dto.ImsDto;
 import com.alcegory.mescloud.service.equipment.ImsService;
 import lombok.AllArgsConstructor;
@@ -15,7 +16,7 @@ import java.util.List;
 
 @RestController
 @AllArgsConstructor
-public class ImsController {
+public class ImsController extends SectionBaseController {
 
     private static final String IMS_URL = "/ims";
 
