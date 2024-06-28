@@ -86,7 +86,9 @@ public class ProductionOrderManagementServiceImpl implements ProductionOrderMana
         ProductionOrderEntity productionOrderEntity = converter.toEntity(productionOrder);
         productionOrderEntity.setCreatedAt(new Date());
         productionOrderEntity.setCompleted(false);
-        productionOrderEntity.setCode(productionOrderService.generateCode(sectionPrefix));
+
+        String sectionPrefixUpper = sectionPrefix.toUpperCase();
+        productionOrderEntity.setCode(productionOrderService.generateCode(sectionPrefixUpper));
 
         List<ProductionInstructionEntity> instructions = converter.toEntityList(productionOrder.getInstructions());
         productionOrderEntity.setProductionInstructions(instructions);
