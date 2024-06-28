@@ -20,7 +20,8 @@ public interface ProductionOrderRepository extends JpaRepository<ProductionOrder
 
     Optional<ProductionOrderEntity> findTopByOrderByIdDesc();
 
-    @Query(value = "SELECT po FROM production_order po WHERE po.code LIKE CONCAT(:sectionPrefix, :codePrefix, '%') ORDER BY po.id DESC")
+    @Query(value = "SELECT * FROM production_order po WHERE po.code LIKE CONCAT(:sectionPrefix, :codePrefix, '%') " +
+            "ORDER BY po.id DESC LIMIT 1", nativeQuery = true)
     Optional<ProductionOrderEntity> findTopBySectionPrefixAndCodePrefixOrderByIdDesc(@Param("sectionPrefix") String sectionPrefix,
                                                                                      @Param("codePrefix") String codePrefix);
 
