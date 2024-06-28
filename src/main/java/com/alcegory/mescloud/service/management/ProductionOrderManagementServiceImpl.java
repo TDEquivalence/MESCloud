@@ -68,7 +68,7 @@ public class ProductionOrderManagementServiceImpl implements ProductionOrderMana
                     "uncompleted production order", productionOrder.getEquipmentId()));
         }
 
-        ProductionOrderEntity productionOrderEntity = createProductionOrderEntity(productionOrder);
+        ProductionOrderEntity productionOrderEntity = createProductionOrderEntity(productionOrder, sectionPrefix);
         CountingEquipmentEntity countingEquipmentEntity = countingEquipmentOpt.get();
         updateProductionOrderEntity(productionOrderEntity, countingEquipmentEntity);
 
@@ -82,11 +82,11 @@ public class ProductionOrderManagementServiceImpl implements ProductionOrderMana
         return Optional.of(converter.toDto(productionOrderService.save(productionOrderEntity)));
     }
 
-    private ProductionOrderEntity createProductionOrderEntity(RequestProductionOrderDto productionOrder) {
+    private ProductionOrderEntity createProductionOrderEntity(RequestProductionOrderDto productionOrder, String sectionPrefix) {
         ProductionOrderEntity productionOrderEntity = converter.toEntity(productionOrder);
         productionOrderEntity.setCreatedAt(new Date());
         productionOrderEntity.setCompleted(false);
-        productionOrderEntity.setCode(productionOrderService.generateCode());
+        productionOrderEntity.setCode(productionOrderService.generateCode(sectionPrefix));
 
         List<ProductionInstructionEntity> instructions = converter.toEntityList(productionOrder.getInstructions());
         productionOrderEntity.setProductionInstructions(instructions);

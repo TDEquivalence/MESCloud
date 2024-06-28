@@ -15,7 +15,7 @@ public interface ProductionOrderService {
 
     Optional<ProductionOrderEntity> findByCode(String code);
 
-    String generateCode();
+    String generateCode(String sectionPrefix);
 
     boolean hasActiveProductionOrderByEquipmentId(long countingEquipmentId);
 

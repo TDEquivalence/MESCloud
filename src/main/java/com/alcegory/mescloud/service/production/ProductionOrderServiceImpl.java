@@ -24,7 +24,6 @@ import java.util.Optional;
 @Log
 public class ProductionOrderServiceImpl implements ProductionOrderService {
 
-    private static final String OBO_SECTION_PREFIX = "OBO";
     private static final String CODE_PREFIX = "PO";
     private static final String FIVE_DIGIT_NUMBER_FORMAT = "%05d";
     private static final int FIRST_CODE_VALUE = 1;
@@ -34,10 +33,12 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     private final CounterRecordRepository counterRecordRepository;
 
     @Override
-    public String generateCode() {
-        Optional<ProductionOrderEntity> productionOrderOpt = repository.findTopByOrderByIdDesc();
+    public String generateCode(String sectionPrefix) {
+        Optional<ProductionOrderEntity> productionOrderOpt =
+                repository.findTopBySectionPrefixOrderByIdDesc(sectionPrefix, CODE_PREFIX);
+        
         int yearLastTwoDigits = DateUtil.getCurrentYearLastTwoDigits();
-        String codePrefix = OBO_SECTION_PREFIX + CODE_PREFIX;
+        String codePrefix = sectionPrefix + CODE_PREFIX;
         String codeWithYear = codePrefix + yearLastTwoDigits;
 
         return productionOrderOpt.isEmpty() ||
