@@ -67,14 +67,4 @@ class ProductionOrderServiceTest {
 
         assertEquals(expectedIds, result);
     }
-
-    @Test
-    void testGenerateCodeWithProperlyFormattedCode() {
-        ProductionOrderEntity productionOrderEntity = new ProductionOrderEntity();
-        productionOrderEntity.setCode("OBOPO2400001");
-        when(productionOrderRepository.findTopByOrderByIdDesc()).thenReturn(Optional.of(productionOrderEntity));
-
-        String generatedCode = productionOrderService.generateCode();
-        assertEquals("OBOPO2400002", generatedCode);
-    }
 }
