@@ -35,8 +35,8 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     @Override
     public String generateCode(String sectionPrefix) {
         Optional<ProductionOrderEntity> productionOrderOpt =
-                repository.findTopBySectionPrefixOrderByIdDesc(sectionPrefix, CODE_PREFIX);
-        
+                repository.findTopBySectionPrefixAndCodePrefixOrderByIdDesc(sectionPrefix, CODE_PREFIX);
+
         int yearLastTwoDigits = DateUtil.getCurrentYearLastTwoDigits();
         String codePrefix = sectionPrefix + CODE_PREFIX;
         String codeWithYear = codePrefix + yearLastTwoDigits;
