@@ -2,7 +2,7 @@ BEGIN;
 
 DROP VIEW counter_record_summary;
 
-CREATE VIEW counter_record_summary AS
+CREATE VIEW counter_record_daily_summary AS
 SELECT
     MAX(cr.id) AS id,
     e.id AS equipment_id,
@@ -47,6 +47,6 @@ GROUP BY
 
 INSERT INTO audit_script (run_date, process, version, schema)
 VALUES
-    (CURRENT_DATE, '0012_create_counter_record_summary_view.sql', '1.0.1', '1.0.1_0012');
+    (CURRENT_DATE, '0012_create_counter_record_daily_summary_view.sql', '1.0.1', '1.0.1_0012');
 
 COMMIT;

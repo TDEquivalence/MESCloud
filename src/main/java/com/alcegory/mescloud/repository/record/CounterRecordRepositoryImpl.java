@@ -4,12 +4,12 @@ import com.alcegory.mescloud.model.entity.equipment.CountingEquipmentEntity;
 import com.alcegory.mescloud.model.entity.equipment.EquipmentOutputEntity;
 import com.alcegory.mescloud.model.entity.production.ProductionOrderEntity;
 import com.alcegory.mescloud.model.entity.records.CounterRecordConclusionEntity;
+import com.alcegory.mescloud.model.entity.records.CounterRecordDailySummaryEntity;
+import com.alcegory.mescloud.model.entity.records.CounterRecordDetailedSummaryEntity;
 import com.alcegory.mescloud.model.entity.records.CounterRecordEntity;
-import com.alcegory.mescloud.model.entity.records.CounterRecordSummaryEntity;
 import com.alcegory.mescloud.model.filter.Filter;
 import com.alcegory.mescloud.model.filter.FilterDto;
 import com.alcegory.mescloud.repository.AbstractFilterRepository;
-import jakarta.persistence.EntityGraph;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import jakarta.persistence.criteria.*;
@@ -45,13 +45,13 @@ public class CounterRecordRepositoryImpl extends AbstractFilterRepository<Filter
         super(entityManager);
     }
 
-    public List<CounterRecordSummaryEntity> findLastPerProductionOrderAndEquipmentOutputPerDay(long sectionId, FilterDto filter) {
+    public List<CounterRecordDailySummaryEntity> findLastPerProductionOrderAndEquipmentOutputPerDay(long sectionId, FilterDto filter) {
         Timestamp startDateFilter = filter.getSearch().getTimestampValue(START_DATE);
         Timestamp endDateFilter = filter.getSearch().getTimestampValue(END_DATE);
         String equipmentAlias = filter.getSearch().getValue(EQUIPMENT_ALIAS);
         String productionOrderCode = filter.getSearch().getValue(PRODUCTION_ORDER_CODE);
 
-        String queryString = "SELECT * FROM counter_record_summary WHERE section_id = :sectionId AND registered_at " +
+        String queryString = "SELECT * FROM counter_record_daily_summary WHERE section_id = :sectionId AND registered_at " +
                 "BETWEEN :startDate AND :endDate";
 
         if (equipmentAlias != null && !equipmentAlias.isEmpty()) {
@@ -62,7 +62,7 @@ public class CounterRecordRepositoryImpl extends AbstractFilterRepository<Filter
             queryString += " AND production_order_code = :productionOrderCode";
         }
 
-        Query query = entityManager.createNativeQuery(queryString, CounterRecordSummaryEntity.class);
+        Query query = entityManager.createNativeQuery(queryString, CounterRecordDailySummaryEntity.class);
         query.setParameter(SECTION_ID_PROP, sectionId);
         query.setParameter(START_DATE_PROP, startDateFilter);
         query.setParameter(END_DATE_PROP, endDateFilter);
@@ -78,34 +78,28 @@ public class CounterRecordRepositoryImpl extends AbstractFilterRepository<Filter
         return query.getResultList();
     }
 
-    public List<CounterRecordEntity> getFilteredAndPaginated(long sectionId, Filter filterDto) {
+    public List<CounterRecordDetailedSummaryEntity> getFilteredAndPaginated(long sectionId, Filter filterDto) {
+        Timestamp startDateFilter = filterDto.getSearch().getTimestampValue(START_DATE);
+        Timestamp endDateFilter = filterDto.getSearch().getTimestampValue(END_DATE);
+
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-        CriteriaQuery<CounterRecordEntity> query = cb.createQuery(CounterRecordEntity.class);
-        Root<CounterRecordEntity> root = query.from(CounterRecordEntity.class);
+        CriteriaQuery<CounterRecordDetailedSummaryEntity> query = cb.createQuery(CounterRecordDetailedSummaryEntity.class);
+        Root<CounterRecordDetailedSummaryEntity> root = query.from(CounterRecordDetailedSummaryEntity.class);
 
         List<Predicate> predicates = new ArrayList<>();
+        predicates.add(cb.equal(root.get(SECTION_ID_PROP), sectionId));
 
-        Join<CounterRecordEntity, EquipmentOutputEntity> equipmentOutputJoin = root.join(EQUIPMENT_OUTPUT_PROP);
-        Join<EquipmentOutputEntity, CountingEquipmentEntity> countingEquipmentJoin = equipmentOutputJoin.join(COUNTING_EQUIPMENT_PROP);
-        predicates.add(cb.equal(countingEquipmentJoin.get(SECTION).get(ID_PROP), sectionId));
+        if (startDateFilter != null && endDateFilter != null) {
+            predicates.add(cb.between(root.get(REGISTERED_AT_PROP), startDateFilter, endDateFilter));
+        } else if (startDateFilter != null) {
+            predicates.add(cb.greaterThanOrEqualTo(root.get(REGISTERED_AT_PROP), startDateFilter));
+        } else if (endDateFilter != null) {
+            predicates.add(cb.lessThanOrEqualTo(root.get(REGISTERED_AT_PROP), endDateFilter));
+        }
 
-        addPredicates(filterDto, predicates, cb, root);
-
-        List<Order> orders = new ArrayList<>();
-        addSortOrders(filterDto, orders, cb, root);
-        Order newestOrder = cb.desc(root.get(ID_PROP));
-        orders.add(newestOrder);
-
-        EntityGraph<CounterRecordEntity> entityGraph = entityManager.createEntityGraph(CounterRecordEntity.class);
-        entityGraph.addSubgraph(PRODUCTION_ORDER_PROP);
-        entityGraph.addSubgraph(EQUIPMENT_OUTPUT_PROP).addSubgraph(COUNTING_EQUIPMENT_PROP);
-
-        query.select(root)
-                .where(cb.and(predicates.toArray(new Predicate[0])))
-                .orderBy(orders);
+        query.where(cb.and(predicates.toArray(new Predicate[0])));
 
         return entityManager.createQuery(query)
-                .setHint(JAKARTA_FETCHGRAPH, entityGraph)
                 .setFirstResult(filterDto.getSkip())
                 .setMaxResults(filterDto.getTake())
                 .getResultList();
@@ -189,7 +183,7 @@ public class CounterRecordRepositoryImpl extends AbstractFilterRepository<Filter
         String productionOrderCode = filter.getSearch().getValue(PRODUCTION_ORDER_CODE);
         String equipmentAlias = filter.getSearch().getValue(EQUIPMENT_ALIAS);
 
-        StringBuilder nativeQuery = new StringBuilder("SELECT SUM(increment_day) FROM counter_record_summary c WHERE ");
+        StringBuilder nativeQuery = new StringBuilder("SELECT SUM(increment_day) FROM counter_record_daily_summary c WHERE ");
 
         List<String> conditions = new ArrayList<>();
 
@@ -242,15 +236,15 @@ public class CounterRecordRepositoryImpl extends AbstractFilterRepository<Filter
     }
 
     //KPI AVAILABILITY WITH COUNTER_RECORD_SUMMARY_VIEW//
-    public List<CounterRecordSummaryEntity> findBySectionAndEquipmentAndPeriod(Long sectionId, Long equipmentId, FilterDto filter) {
+    public List<CounterRecordDailySummaryEntity> findBySectionAndEquipmentAndPeriod(Long sectionId, Long equipmentId, FilterDto filter) {
         Timestamp startDate = filter.getSearch().getTimestampValue(START_DATE);
         Timestamp endDate = filter.getSearch().getTimestampValue(END_DATE);
         String productionOrderCode = filter.getSearch().getValue(PRODUCTION_ORDER_CODE);
         String equipmentAlias = filter.getSearch().getValue(EQUIPMENT_ALIAS);
 
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<CounterRecordSummaryEntity> criteriaQuery = criteriaBuilder.createQuery(CounterRecordSummaryEntity.class);
-        Root<CounterRecordSummaryEntity> root = criteriaQuery.from(CounterRecordSummaryEntity.class);
+        CriteriaQuery<CounterRecordDailySummaryEntity> criteriaQuery = criteriaBuilder.createQuery(CounterRecordDailySummaryEntity.class);
+        Root<CounterRecordDailySummaryEntity> root = criteriaQuery.from(CounterRecordDailySummaryEntity.class);
         List<Predicate> predicates = new ArrayList<>();
 
         if (sectionId != null) {

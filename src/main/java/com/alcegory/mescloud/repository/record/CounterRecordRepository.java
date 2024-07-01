@@ -1,8 +1,9 @@
 package com.alcegory.mescloud.repository.record;
 
 import com.alcegory.mescloud.model.entity.records.CounterRecordConclusionEntity;
+import com.alcegory.mescloud.model.entity.records.CounterRecordDailySummaryEntity;
+import com.alcegory.mescloud.model.entity.records.CounterRecordDetailedSummaryEntity;
 import com.alcegory.mescloud.model.entity.records.CounterRecordEntity;
-import com.alcegory.mescloud.model.entity.records.CounterRecordSummaryEntity;
 import com.alcegory.mescloud.model.filter.Filter;
 import com.alcegory.mescloud.model.filter.FilterDto;
 import jakarta.transaction.Transactional;
@@ -27,9 +28,9 @@ public interface CounterRecordRepository extends CrudRepository<CounterRecordEnt
 
     List<CounterRecordConclusionEntity> findLastPerProductionOrder(long sectionId, FilterDto filterDto);
 
-    List<CounterRecordSummaryEntity> findLastPerProductionOrderAndEquipmentOutputPerDay(long sectionId, FilterDto filterDto);
+    List<CounterRecordDailySummaryEntity> findLastPerProductionOrderAndEquipmentOutputPerDay(long sectionId, FilterDto filterDto);
 
-    List<CounterRecordEntity> getFilteredAndPaginated(long sectionId, Filter filterDto);
+    List<CounterRecordDetailedSummaryEntity> getFilteredAndPaginated(long sectionId, Filter filterDto);
 
     @Query("SELECT SUM(cr.increment) FROM CounterRecordEntity cr " +
             "WHERE cr.isValidForProduction = true " +
@@ -95,5 +96,5 @@ public interface CounterRecordRepository extends CrudRepository<CounterRecordEnt
             @Param("startDate") Timestamp startDate,
             @Param("endDate") Timestamp endDate);
 
-    List<CounterRecordSummaryEntity> findBySectionAndEquipmentAndPeriod(Long sectionId, Long equipmentId, FilterDto filter);
+    List<CounterRecordDailySummaryEntity> findBySectionAndEquipmentAndPeriod(Long sectionId, Long equipmentId, FilterDto filter);
 }

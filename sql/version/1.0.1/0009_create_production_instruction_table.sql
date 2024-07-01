@@ -19,7 +19,7 @@ INSERT INTO production_instruction (name, value, production_order_id)
 SELECT 'Calibre', gauge, id FROM production_order;
 
 INSERT INTO production_instruction (name, value, production_order_id)
-SELECT 'Categoria', category, id FROM production_order;
+SELECT 'Classe', category, id FROM production_order;
 
 INSERT INTO production_instruction (name, value, production_order_id)
 SELECT 'Lavação', washing_process, id FROM production_order;

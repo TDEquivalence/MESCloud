@@ -4,8 +4,9 @@ import com.alcegory.mescloud.model.dto.CounterRecordDto;
 import com.alcegory.mescloud.model.entity.ImsEntity;
 import com.alcegory.mescloud.model.entity.production.ProductionOrderEntity;
 import com.alcegory.mescloud.model.entity.records.CounterRecordConclusionEntity;
+import com.alcegory.mescloud.model.entity.records.CounterRecordDailySummaryEntity;
+import com.alcegory.mescloud.model.entity.records.CounterRecordDetailedSummaryEntity;
 import com.alcegory.mescloud.model.entity.records.CounterRecordEntity;
-import com.alcegory.mescloud.model.entity.records.CounterRecordSummaryEntity;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.modelmapper.ModelMapper;
@@ -32,14 +33,28 @@ public class CounterRecordConverterImpl implements CounterRecordConverter {
     }
 
     @Override
-    public CounterRecordDto toDto(CounterRecordSummaryEntity entity) {
+    public CounterRecordDto toDto(CounterRecordDailySummaryEntity entity) {
         return mapper.map(entity, CounterRecordDto.class);
     }
 
     @Override
-    public List<CounterRecordDto> toDtoList(List<CounterRecordSummaryEntity> entityList) {
+    public CounterRecordDto toDto(CounterRecordDetailedSummaryEntity entity) {
+        return mapper.map(entity, CounterRecordDto.class);
+    }
+
+    @Override
+    public List<CounterRecordDto> toDtoList(List<CounterRecordDailySummaryEntity> entityList) {
         List<CounterRecordDto> dtoList = new ArrayList<>();
-        for (CounterRecordSummaryEntity entity : entityList) {
+        for (CounterRecordDailySummaryEntity entity : entityList) {
+            dtoList.add(toDto(entity));
+        }
+        return dtoList;
+    }
+
+    @Override
+    public List<CounterRecordDto> toDtoDetailedList(List<CounterRecordDetailedSummaryEntity> entityList) {
+        List<CounterRecordDto> dtoList = new ArrayList<>();
+        for (CounterRecordDetailedSummaryEntity entity : entityList) {
             dtoList.add(toDto(entity));
         }
         return dtoList;

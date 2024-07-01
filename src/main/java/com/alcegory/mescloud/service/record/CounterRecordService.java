@@ -3,7 +3,7 @@ package com.alcegory.mescloud.service.record;
 import com.alcegory.mescloud.model.dto.CounterRecordDto;
 import com.alcegory.mescloud.model.dto.mqqt.PlcMqttDto;
 import com.alcegory.mescloud.model.dto.pagination.PaginatedCounterRecordsDto;
-import com.alcegory.mescloud.model.entity.records.CounterRecordSummaryEntity;
+import com.alcegory.mescloud.model.entity.records.CounterRecordDailySummaryEntity;
 import com.alcegory.mescloud.model.filter.Filter;
 import com.alcegory.mescloud.model.filter.FilterDto;
 
@@ -12,7 +12,7 @@ import java.util.List;
 
 public interface CounterRecordService {
 
-    List<CounterRecordSummaryEntity> getEquipmentOutputProductionPerDay(long sectionId, FilterDto filter);
+    List<CounterRecordDailySummaryEntity> getEquipmentOutputProductionPerDay(long sectionId, FilterDto filter);
 
     List<CounterRecordDto> filterConclusionRecordsKpi(long sectionId, FilterDto filterDto);
 
@@ -36,6 +36,6 @@ public interface CounterRecordService {
 
     Long sumActiveTimeDayByProductionOrderId(Long productionOrderId, Long equipmentId, Timestamp startDate, Timestamp endDate);
 
-    List<CounterRecordSummaryEntity> findByEquipmentAndPeriod(Long sectionId,
-                                                              Long equipmentId, FilterDto filter);
+    List<CounterRecordDailySummaryEntity> findByEquipmentAndPeriod(Long sectionId,
+                                                                   Long equipmentId, FilterDto filter);
 }

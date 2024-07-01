@@ -1,7 +1,7 @@
 package com.alcegory.mescloud.service.kpi;
 
 import com.alcegory.mescloud.model.dto.kpi.KpiDto;
-import com.alcegory.mescloud.model.entity.records.CounterRecordSummaryEntity;
+import com.alcegory.mescloud.model.entity.records.CounterRecordDailySummaryEntity;
 import com.alcegory.mescloud.model.filter.FilterDto;
 import com.alcegory.mescloud.service.record.CounterRecordService;
 import com.alcegory.mescloud.utility.DateUtil;
@@ -30,23 +30,23 @@ public class AvailabilityKpiServiceImpl implements AvailabilityKpiService {
         Timestamp startDate = filter.getSearch().getTimestampValue(START_DATE);
         Timestamp endDate = filter.getSearch().getTimestampValue(END_DATE);
 
-        List<CounterRecordSummaryEntity> counterRecords = counterRecordService.findByEquipmentAndPeriod(sectionId,
+        List<CounterRecordDailySummaryEntity> counterRecords = counterRecordService.findByEquipmentAndPeriod(sectionId,
                 equipmentId, filter);
 
         long totalScheduledTime = 0L;
         long totalActiveTime = 0L;
 
-        Map<String, List<CounterRecordSummaryEntity>> recordsByProductionOrder = counterRecords.stream()
-                .collect(Collectors.groupingBy(CounterRecordSummaryEntity::getProductionOrderCode));
+        Map<String, List<CounterRecordDailySummaryEntity>> recordsByProductionOrder = counterRecords.stream()
+                .collect(Collectors.groupingBy(CounterRecordDailySummaryEntity::getProductionOrderCode));
 
-        for (Map.Entry<String, List<CounterRecordSummaryEntity>> entry : recordsByProductionOrder.entrySet()) {
-            List<CounterRecordSummaryEntity> records = entry.getValue();
+        for (Map.Entry<String, List<CounterRecordDailySummaryEntity>> entry : recordsByProductionOrder.entrySet()) {
+            List<CounterRecordDailySummaryEntity> records = entry.getValue();
 
             if (records.isEmpty()) {
                 continue;
             }
 
-            for (CounterRecordSummaryEntity counterRecord : records) {
+            for (CounterRecordDailySummaryEntity counterRecord : records) {
                 long activeTime = counterRecord.getActiveTimeDay();
                 if (activeTime > ACTIVE_TIME_THRESHOLD_SECONDS) {
                     totalActiveTime += activeTime - ACTIVE_TIME_THRESHOLD_SECONDS;
@@ -66,13 +66,13 @@ public class AvailabilityKpiServiceImpl implements AvailabilityKpiService {
         return kpi;
     }
 
-    private Timestamp calculateAdjustedStartDate(CounterRecordSummaryEntity counterRecord, Timestamp startDate) {
+    private Timestamp calculateAdjustedStartDate(CounterRecordDailySummaryEntity counterRecord, Timestamp startDate) {
         Instant createdAt = counterRecord.getCreatedAt().toInstant();
         Instant adjustedStartDate = createdAt.isAfter(startDate.toInstant()) ? createdAt : startDate.toInstant();
         return Timestamp.from(adjustedStartDate);
     }
 
-    private Timestamp calculateAdjustedEndDate(CounterRecordSummaryEntity counterRecord, Timestamp endDate) {
+    private Timestamp calculateAdjustedEndDate(CounterRecordDailySummaryEntity counterRecord, Timestamp endDate) {
         Instant completedAtInstant;
 
         if (counterRecord.getCompletedAt() != null) {

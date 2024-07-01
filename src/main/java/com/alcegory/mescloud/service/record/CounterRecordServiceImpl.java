@@ -11,8 +11,9 @@ import com.alcegory.mescloud.model.dto.production.ProductionOrderDto;
 import com.alcegory.mescloud.model.entity.equipment.EquipmentOutputEntity;
 import com.alcegory.mescloud.model.entity.production.ProductionOrderEntity;
 import com.alcegory.mescloud.model.entity.records.CounterRecordConclusionEntity;
+import com.alcegory.mescloud.model.entity.records.CounterRecordDailySummaryEntity;
+import com.alcegory.mescloud.model.entity.records.CounterRecordDetailedSummaryEntity;
 import com.alcegory.mescloud.model.entity.records.CounterRecordEntity;
-import com.alcegory.mescloud.model.entity.records.CounterRecordSummaryEntity;
 import com.alcegory.mescloud.model.filter.Filter;
 import com.alcegory.mescloud.model.filter.FilterDto;
 import com.alcegory.mescloud.repository.production.ProductionOrderRepository;
@@ -51,7 +52,7 @@ public class CounterRecordServiceImpl implements CounterRecordService {
 
 
     @Override
-    public List<CounterRecordSummaryEntity> getEquipmentOutputProductionPerDay(long sectionId, FilterDto filter) {
+    public List<CounterRecordDailySummaryEntity> getEquipmentOutputProductionPerDay(long sectionId, FilterDto filter) {
         return repository.findLastPerProductionOrderAndEquipmentOutputPerDay(sectionId, filter);
     }
 
@@ -90,14 +91,14 @@ public class CounterRecordServiceImpl implements CounterRecordService {
         int requestedRecords = filterDto.getTake();
         filterDto.setTake(filterDto.getTake() + 1);
 
-        List<CounterRecordEntity> counterRecordEntities = repository.getFilteredAndPaginated(sectionId, filterDto);
+        List<CounterRecordDetailedSummaryEntity> counterRecordEntities = repository.getFilteredAndPaginated(sectionId, filterDto);
         boolean hasNextPage = counterRecordEntities.size() > requestedRecords;
 
         if (hasNextPage) {
             counterRecordEntities.remove(counterRecordEntities.size() - 1);
         }
 
-        List<CounterRecordDto> counterRecords = converter.toDto(counterRecordEntities);
+        List<CounterRecordDto> counterRecords = converter.toDtoDetailedList(counterRecordEntities);
 
         PaginatedCounterRecordsDto paginatedCounterRecords = new PaginatedCounterRecordsDto();
         paginatedCounterRecords.setHasNextPage(hasNextPage);
@@ -330,7 +331,7 @@ public class CounterRecordServiceImpl implements CounterRecordService {
         return repository.sumActiveTimeDayByProductionOrderId(productionOrderId, equipmentId, startDate, endDate);
     }
 
-    public List<CounterRecordSummaryEntity> findByEquipmentAndPeriod(
+    public List<CounterRecordDailySummaryEntity> findByEquipmentAndPeriod(
             Long sectionId, Long equipmentId, FilterDto filter) {
         return repository.findBySectionAndEquipmentAndPeriod(sectionId, equipmentId, filter);
     }

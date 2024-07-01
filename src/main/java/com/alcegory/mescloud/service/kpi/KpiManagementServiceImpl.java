@@ -9,7 +9,7 @@ import com.alcegory.mescloud.model.dto.equipment.EquipmentKpiAggregatorDto;
 import com.alcegory.mescloud.model.dto.equipment.EquipmentKpiDto;
 import com.alcegory.mescloud.model.dto.kpi.KpiDto;
 import com.alcegory.mescloud.model.dto.kpi.TargetValuesDto;
-import com.alcegory.mescloud.model.entity.records.CounterRecordSummaryEntity;
+import com.alcegory.mescloud.model.entity.records.CounterRecordDailySummaryEntity;
 import com.alcegory.mescloud.model.filter.FilterDto;
 import com.alcegory.mescloud.service.equipment.CountingEquipmentService;
 import com.alcegory.mescloud.service.record.CounterRecordService;
@@ -41,7 +41,7 @@ public class KpiManagementServiceImpl implements KpiManagementService {
 
     @Override
     public CountingEquipmentKpiDto[] getEquipmentOutputProductionPerDay(long sectionId, FilterDto filter) {
-        List<CounterRecordSummaryEntity> equipmentCounts = counterRecordService.getEquipmentOutputProductionPerDay(sectionId, filter);
+        List<CounterRecordDailySummaryEntity> equipmentCounts = counterRecordService.getEquipmentOutputProductionPerDay(sectionId, filter);
         List<CounterRecordDto> counterRecordDto = counterRecordConverter.toDtoList(equipmentCounts);
         return sortPerDay(filter, counterRecordDto);
     }
