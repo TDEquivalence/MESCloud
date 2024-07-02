@@ -69,6 +69,7 @@ class AbstractExcelExportTest {
 
         @Override
         public void setWriteListener(WriteListener writeListener) {
+            // Do nothing, we are not testing this method
         }
     }
 }

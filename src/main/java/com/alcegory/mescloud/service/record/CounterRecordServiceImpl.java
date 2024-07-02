@@ -16,7 +16,6 @@ import com.alcegory.mescloud.model.entity.records.CounterRecordDetailedSummaryEn
 import com.alcegory.mescloud.model.entity.records.CounterRecordEntity;
 import com.alcegory.mescloud.model.filter.Filter;
 import com.alcegory.mescloud.model.filter.FilterDto;
-import com.alcegory.mescloud.repository.production.ProductionOrderRepository;
 import com.alcegory.mescloud.repository.record.CounterRecordRepository;
 import com.alcegory.mescloud.service.company.CompanyService;
 import com.alcegory.mescloud.service.equipment.CountingEquipmentService;
@@ -46,7 +45,6 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     private final CounterRecordRepository repository;
     private final EquipmentOutputService equipmentOutputService;
     private final ProductionOrderService productionOrderService;
-    private final ProductionOrderRepository productionOrderRepository;
     private final CountingEquipmentService countingEquipmentService;
     private final CompanyService companyService;
 
@@ -273,13 +271,13 @@ public class CounterRecordServiceImpl implements CounterRecordService {
     }
 
     public boolean areValidInitialCounts(String productionOrderCode) {
-        Optional<ProductionOrderEntity> productionOrderOpt = productionOrderRepository.findByCode(productionOrderCode);
+        Optional<ProductionOrderEntity> productionOrderOpt = productionOrderService.findByCode(productionOrderCode);
         return productionOrderOpt.isPresent() &&
                 repository.findLastByProductionOrderId(productionOrderOpt.get().getId()).isEmpty();
     }
 
     public boolean areValidContinuationCounts(String productionOrderCode) {
-        Optional<ProductionOrderEntity> productionOrderOpt = productionOrderRepository.findByCode(productionOrderCode);
+        Optional<ProductionOrderEntity> productionOrderOpt = productionOrderService.findByCode(productionOrderCode);
         return productionOrderOpt.isPresent() &&
                 repository.findLastByProductionOrderId(productionOrderOpt.get().getId()).isPresent();
     }
@@ -309,7 +307,7 @@ public class CounterRecordServiceImpl implements CounterRecordService {
                 productionOrderService.hasActiveProductionOrderByEquipmentCode(equipmentCode)) {
 
             log.info("Production Order is empty or null, but Equipment has Active PO");
-            Optional<ProductionOrderEntity> productionOrderOpt = productionOrderRepository.findActiveByEquipmentCode(equipmentCode);
+            Optional<ProductionOrderEntity> productionOrderOpt = productionOrderService.findActiveByEquipmentCode(equipmentCode);
 
             log.info("Production Order was find in Equipment by findActiveByEquipmentCode method");
             productionOrderOpt.ifPresent(productionOrder -> {
@@ -321,7 +319,7 @@ public class CounterRecordServiceImpl implements CounterRecordService {
                         repository.deleteByProductionOrderId(productionOrder.getId());
                     }
 
-                    productionOrderRepository.delete(productionOrder);
+                    productionOrderService.delete(productionOrder);
                 }
             });
         }

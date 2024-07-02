@@ -14,4 +14,6 @@ public interface ProductionOrderManagementService {
     Optional<ProductionOrderDto> complete(String companyPrefix, String sectionPrefix, long sectionId, long equipmentId, Authentication authentication);
 
     ProductionOrderDto editProductionOrder(ProductionOrderDto requestProductionOrder, Authentication authentication, long sectionId);
+
+    String createAutomaticProductionOrder(String equipmentCode);
 }

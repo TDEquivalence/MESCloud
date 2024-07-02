@@ -3,12 +3,16 @@ package com.alcegory.mescloud.service.management;
 import com.alcegory.mescloud.api.mqtt.MqttClient;
 import com.alcegory.mescloud.constant.MqttDTOConstants;
 import com.alcegory.mescloud.exception.ActiveProductionOrderException;
+import com.alcegory.mescloud.exception.EquipmentNotFoundException;
 import com.alcegory.mescloud.exception.MesMqttException;
 import com.alcegory.mescloud.model.converter.ProductionOrderConverter;
 import com.alcegory.mescloud.model.dto.equipment.CountingEquipmentDto;
 import com.alcegory.mescloud.model.dto.production.ProductionInstructionDto;
 import com.alcegory.mescloud.model.dto.production.ProductionOrderDto;
 import com.alcegory.mescloud.model.dto.production.ProductionOrderMqttDto;
+import com.alcegory.mescloud.model.entity.company.CompanyEntity;
+import com.alcegory.mescloud.model.entity.company.FactoryEntity;
+import com.alcegory.mescloud.model.entity.company.SectionEntity;
 import com.alcegory.mescloud.model.entity.equipment.CountingEquipmentEntity;
 import com.alcegory.mescloud.model.entity.production.ProductionInstructionEntity;
 import com.alcegory.mescloud.model.entity.production.ProductionOrderEntity;
@@ -23,6 +27,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -68,9 +73,9 @@ public class ProductionOrderManagementServiceImpl implements ProductionOrderMana
                     "uncompleted production order", productionOrder.getEquipmentId()));
         }
 
-        ProductionOrderEntity productionOrderEntity = createProductionOrderEntity(productionOrder, sectionPrefix);
+        ProductionOrderEntity productionOrderEntity = createProductionOrder(productionOrder, sectionPrefix, false);
         CountingEquipmentEntity countingEquipmentEntity = countingEquipmentOpt.get();
-        updateProductionOrderEntity(productionOrderEntity, countingEquipmentEntity);
+        updateProductionOrder(productionOrderEntity, countingEquipmentEntity);
 
         try {
             publishToPlc(companyPrefix, sectionPrefix, productionOrderEntity);
@@ -82,24 +87,56 @@ public class ProductionOrderManagementServiceImpl implements ProductionOrderMana
         return Optional.of(converter.toDto(productionOrderService.save(productionOrderEntity)));
     }
 
-    private ProductionOrderEntity createProductionOrderEntity(RequestProductionOrderDto productionOrder, String sectionPrefix) {
+    private ProductionOrderEntity createProductionOrder(RequestProductionOrderDto productionOrder, String sectionPrefix,
+                                                        boolean isSystemGenerated) {
         ProductionOrderEntity productionOrderEntity = converter.toEntity(productionOrder);
         productionOrderEntity.setCreatedAt(new Date());
         productionOrderEntity.setCompleted(false);
 
         String sectionPrefixUpper = sectionPrefix.toUpperCase();
-        productionOrderEntity.setCode(productionOrderService.generateCode(sectionPrefixUpper));
+        productionOrderEntity.setCode(productionOrderService.generateCode(sectionPrefixUpper, isSystemGenerated));
 
-        List<ProductionInstructionEntity> instructions = converter.toEntityList(productionOrder.getInstructions());
-        productionOrderEntity.setProductionInstructions(instructions);
+        if (productionOrder.getInstructions() != null && !productionOrder.getInstructions().isEmpty()) {
+            List<ProductionInstructionEntity> instructions = converter.toEntityList(productionOrder.getInstructions());
+            productionOrderEntity.setProductionInstructions(instructions);
+        }
+
         return productionOrderEntity;
     }
 
-    private void updateProductionOrderEntity(ProductionOrderEntity productionOrderEntity, CountingEquipmentEntity countingEquipmentEntity) {
+    private void updateProductionOrder(ProductionOrderEntity productionOrderEntity, CountingEquipmentEntity countingEquipmentEntity) {
         productionOrderEntity.setEquipment(countingEquipmentEntity);
         productionOrderEntity.setIms(countingEquipmentEntity.getIms());
         countingEquipmentEntity.setId(productionOrderEntity.getEquipment().getId());
         countingEquipmentService.setOperationStatus(countingEquipmentEntity, CountingEquipmentEntity.OperationStatus.IN_PROGRESS);
+    }
+
+    @Override
+    public String createAutomaticProductionOrder(String equipmentCode) {
+        Optional<CountingEquipmentEntity> countingEquipmentOpt = countingEquipmentService.findEntityByCode(equipmentCode);
+        if (countingEquipmentOpt.isEmpty()) {
+            throw new EquipmentNotFoundException(String.format("Counting equipment with code %s not found.", equipmentCode));
+        }
+
+        CountingEquipmentEntity countingEquipment = countingEquipmentOpt.get();
+        SectionEntity section = countingEquipment.getSection();
+        FactoryEntity factory = section.getFactory();
+        CompanyEntity company = factory.getCompany();
+
+        RequestProductionOrderDto requestProductionOrder = new RequestProductionOrderDto();
+        requestProductionOrder.setInstructions(Collections.emptyList());
+
+        ProductionOrderEntity productionOrder = createProductionOrder(requestProductionOrder, section.getPrefix(), true);
+        updateProductionOrder(productionOrder, countingEquipment);
+        productionOrderService.save(productionOrder);
+
+        try {
+            publishToPlc(company.getPrefix(), section.getPrefix(), productionOrder);
+        } catch (MesMqttException e) {
+            log.severe("Unable to publish Production Order over MQTT.");
+        }
+
+        return productionOrder.getCode();
     }
 
     private void publishToPlc(String companyPrefix, String sectionPrefix, ProductionOrderEntity productionOrderEntity) throws MesMqttException {

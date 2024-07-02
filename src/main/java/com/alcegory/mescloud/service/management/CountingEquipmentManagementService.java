@@ -7,11 +7,9 @@ import com.alcegory.mescloud.model.entity.equipment.CountingEquipmentEntity;
 import com.alcegory.mescloud.model.request.RequestConfigurationDto;
 import org.springframework.security.core.Authentication;
 
-import java.util.Optional;
-
 public interface CountingEquipmentManagementService {
 
-    Optional<CountingEquipmentDto> updateEquipmentStatus(String equipmentCode, int equipmentStatus);
+    int updateEquipmentStatus(String equipmentCode, int equipmentStatus);
 
     CountingEquipmentDto updateIms(Long equipmentId, Long imsId, Authentication authentication);
 
