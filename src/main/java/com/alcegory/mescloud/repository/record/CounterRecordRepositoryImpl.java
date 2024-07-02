@@ -80,6 +80,7 @@ public class CounterRecordRepositoryImpl extends AbstractFilterRepository<Filter
     public List<CounterRecordDetailedSummaryEntity> getFilteredAndPaginated(long sectionId, Filter filterDto) {
         Timestamp startDateFilter = filterDto.getSearch().getTimestampValue(START_DATE);
         Timestamp endDateFilter = filterDto.getSearch().getTimestampValue(END_DATE);
+        String equipmentAlias = filterDto.getSearch().getValue(Filter.Property.valueOf(EQUIPMENT_ALIAS_PROP));
 
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<CounterRecordDetailedSummaryEntity> query = cb.createQuery(CounterRecordDetailedSummaryEntity.class);
@@ -94,6 +95,10 @@ public class CounterRecordRepositoryImpl extends AbstractFilterRepository<Filter
             predicates.add(cb.greaterThanOrEqualTo(root.get(REGISTERED_AT_PROP), startDateFilter));
         } else if (endDateFilter != null) {
             predicates.add(cb.lessThanOrEqualTo(root.get(REGISTERED_AT_PROP), endDateFilter));
+        }
+
+        if (equipmentAlias != null && !equipmentAlias.isEmpty()) {
+            predicates.add(cb.equal(root.get(EQUIPMENT_ALIAS_PROP), equipmentAlias));
         }
 
         query.where(cb.and(predicates.toArray(new Predicate[0])));
