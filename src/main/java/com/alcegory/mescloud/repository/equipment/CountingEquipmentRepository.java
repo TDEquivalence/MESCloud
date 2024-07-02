@@ -1,6 +1,7 @@
 package com.alcegory.mescloud.repository.equipment;
 
 import com.alcegory.mescloud.model.entity.equipment.CountingEquipmentEntity;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -32,6 +33,10 @@ public interface CountingEquipmentRepository extends CrudRepository<CountingEqui
 
 
     Optional<CountingEquipmentEntity> findByCode(String code);
+
+    @Modifying
+    @Query(value = "UPDATE counting_equipment SET operation_status = :status WHERE code = :code", nativeQuery = true)
+    int updateOperationStatusByCode(@Param("code") String code, @Param("status") String status);
 
     @Query("SELECT ce FROM counting_equipment ce LEFT JOIN FETCH ce.equipmentStatusRecords esr " +
             "WHERE ce.code = :code " +

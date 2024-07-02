@@ -15,7 +15,7 @@ public interface ProductionOrderService {
 
     Optional<ProductionOrderEntity> findByCode(String code);
 
-    String generateCode(String sectionPrefix);
+    String generateCode(String sectionPrefix, boolean isSystemGenerated);
 
     boolean hasActiveProductionOrderByEquipmentId(long countingEquipmentId);
 
@@ -63,4 +63,6 @@ public interface ProductionOrderService {
 
     List<ProductionOrderEntity> findCompleted(long sectionId, boolean withoutComposed, Filter filter,
                                               Timestamp startDate, Timestamp endDate);
+
+    Optional<ProductionOrderEntity> findActiveByEquipmentCode(String equipmentCode);
 }

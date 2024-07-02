@@ -13,7 +13,6 @@ import com.alcegory.mescloud.model.entity.ImsEntity;
 import com.alcegory.mescloud.model.entity.equipment.CountingEquipmentEntity;
 import com.alcegory.mescloud.model.entity.equipment.EquipmentOutputAliasEntity;
 import com.alcegory.mescloud.model.entity.equipment.EquipmentOutputEntity;
-import com.alcegory.mescloud.model.entity.equipment.TemplateEntity;
 import com.alcegory.mescloud.model.request.RequestConfigurationDto;
 import com.alcegory.mescloud.protocol.MesMqttSettings;
 import com.alcegory.mescloud.security.model.SectionAuthority;
@@ -35,13 +34,14 @@ import java.util.Optional;
 import static com.alcegory.mescloud.security.model.SectionRole.ADMIN;
 import static com.alcegory.mescloud.security.utility.AuthorityUtil.checkUserAndSectionRole;
 
-@Service
 @Log
+@Service
 @AllArgsConstructor
 public class CountingEquipmentManagementServiceImpl implements CountingEquipmentManagementService {
 
     private static final int MIN_P_TIMER_IN_MINUTES = 1;
     private static final int MIN_P_TIMER_IN_SECONDS = MIN_P_TIMER_IN_MINUTES * 60;
+    private static final int EQUIPMENT_NOT_FOUND = 0;
     private static final String COUNTING_EQUIPMENT_CODE_NOT_FOUND = "No Counting Equipment found for code: [%s]";
     private final EquipmentOutputAliasService aliasService;
 
@@ -58,27 +58,25 @@ public class CountingEquipmentManagementServiceImpl implements CountingEquipment
     private final CountingEquipmentConverter converter;
     private final PlcMqttConverter plcConverter;
     private final GenericConverter<ImsEntity, ImsDto> imsConverter;
-    private final GenericConverter<TemplateEntity, TemplateDto> templateConverter;
 
     @Override
     @Transactional
-    public Optional<CountingEquipmentDto> updateEquipmentStatus(String equipmentCode, int equipmentStatus) {
+    public int updateEquipmentStatus(String equipmentCode, int equipmentStatus) {
         Optional<CountingEquipmentEntity> countingEquipmentOpt = countingEquipmentService.findByCodeWithLastStatusRecord(equipmentCode);
         if (countingEquipmentOpt.isEmpty()) {
             log.warning(() -> String.format(COUNTING_EQUIPMENT_CODE_NOT_FOUND, equipmentCode));
-            return Optional.empty();
+            return EQUIPMENT_NOT_FOUND;
         }
 
         CountingEquipmentEntity countingEquipment = countingEquipmentOpt.get();
         countingEquipment.setEquipmentStatus(equipmentStatus);
-        CountingEquipmentEntity updatedCountingEquipment = countingEquipmentService.save(countingEquipment);
+        countingEquipmentService.save(countingEquipment);
 
         if (hasStatusChanged(countingEquipment, equipmentStatus)) {
             statusRecordService.save(countingEquipment.getId(), equipmentStatus);
         }
 
-        CountingEquipmentDto updatedCountingEquipmentDto = converter.convertToDto(updatedCountingEquipment);
-        return Optional.of(updatedCountingEquipmentDto);
+        return equipmentStatus;
     }
 
     private boolean hasStatusChanged(CountingEquipmentEntity countingEquipment, int equipmentStatus) {

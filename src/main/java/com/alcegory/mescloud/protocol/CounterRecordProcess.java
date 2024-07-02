@@ -6,6 +6,7 @@ import com.alcegory.mescloud.model.entity.equipment.CountingEquipmentEntity;
 import com.alcegory.mescloud.service.alarm.AlarmService;
 import com.alcegory.mescloud.service.equipment.CountingEquipmentService;
 import com.alcegory.mescloud.service.management.CountingEquipmentManagementService;
+import com.alcegory.mescloud.service.management.ProductionOrderManagementService;
 import com.alcegory.mescloud.service.record.CounterRecordService;
 import com.amazonaws.services.iot.client.AWSIotMessage;
 import lombok.AllArgsConstructor;
@@ -17,7 +18,9 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class CounterRecordProcess extends AbstractMesProtocolProcess<PlcMqttDto> {
 
+    private static final int EQUIPMENT_IDLE_STATUS = 0;
 
+    private final ProductionOrderManagementService productionOrderService;
     private final CounterRecordService counterRecordService;
     private final CountingEquipmentService equipmentService;
     private final CountingEquipmentManagementService countingEquipmentManagementService;
@@ -26,9 +29,9 @@ public class CounterRecordProcess extends AbstractMesProtocolProcess<PlcMqttDto>
 
     @Override
     public void execute(PlcMqttDto equipmentCounts, AWSIotMessage message) {
-
         log.info("Executing Counter Record process");
-        countingEquipmentManagementService.updateEquipmentStatus(equipmentCounts.getEquipmentCode(), equipmentCounts.getEquipmentStatus());
+
+        processEquipmentUpdate(equipmentCounts);
         alarmService.processAlarms(equipmentCounts);
 
         if (areInvalidContinuationCounts(equipmentCounts)) {
@@ -36,9 +39,24 @@ public class CounterRecordProcess extends AbstractMesProtocolProcess<PlcMqttDto>
                     equipmentCounts.getProductionOrderCode()));
         }
 
-        validateProductionOrder(equipmentCounts.getEquipmentCode(), equipmentCounts.getProductionOrderCode());
-        setOperationStatus(equipmentCounts);
+        validateProductionOrder(equipmentCounts.getEquipmentCode(),
+                equipmentCounts.getProductionOrderCode());
         counterRecordService.processCounterRecord(equipmentCounts);
+    }
+
+    public void processEquipmentUpdate(PlcMqttDto equipmentCounts) {
+        int equipmentStatus = countingEquipmentManagementService.updateEquipmentStatus(equipmentCounts.getEquipmentCode(),
+                equipmentCounts.getEquipmentStatus());
+
+        setOperationStatus(equipmentCounts);
+        initiateProductionOrderIfRequired(equipmentCounts, equipmentStatus);
+    }
+
+    private void initiateProductionOrderIfRequired(PlcMqttDto equipmentCounts, int equipmentStatus) {
+        if (equipmentStatus > EQUIPMENT_IDLE_STATUS && equipmentCounts.getProductionOrderCode().isEmpty()) {
+            String productionOrderCode = productionOrderService.createAutomaticProductionOrder(equipmentCounts.getEquipmentCode());
+            equipmentCounts.setProductionOrderCode(productionOrderCode);
+        }
     }
 
     private boolean areInvalidContinuationCounts(PlcMqttDto equipmentCountsMqttDTO) {

@@ -24,6 +24,7 @@ import java.util.Optional;
 @Log
 public class ProductionOrderServiceImpl implements ProductionOrderService {
 
+    private static final String SYS_CODE_PREFIX = "SYS";
     private static final String CODE_PREFIX = "PO";
     private static final String FIVE_DIGIT_NUMBER_FORMAT = "%05d";
     private static final int FIRST_CODE_VALUE = 1;
@@ -33,28 +34,35 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     private final CounterRecordRepository counterRecordRepository;
 
     @Override
-    public String generateCode(String sectionPrefix) {
-        Optional<ProductionOrderEntity> productionOrderOpt =
-                repository.findTopBySectionPrefixAndCodePrefixOrderByIdDesc(sectionPrefix, CODE_PREFIX);
+    public String generateCode(String sectionPrefix, boolean isSystemGenerated) {
+        Optional<String> lastCodeOpt;
+        String codePrefix;
+
+        if (isSystemGenerated) {
+            lastCodeOpt = repository.findTopCodeBySysPrefixSectionPrefixOrderByIdDesc(SYS_CODE_PREFIX,
+                    sectionPrefix);
+            codePrefix = SYS_CODE_PREFIX + sectionPrefix;
+        } else {
+            lastCodeOpt = repository.findTopCodeBySectionPrefixAndCodePrefixOrderByIdDesc(sectionPrefix, CODE_PREFIX);
+            codePrefix = sectionPrefix + CODE_PREFIX;
+        }
 
         int yearLastTwoDigits = DateUtil.getCurrentYearLastTwoDigits();
-        String codePrefix = sectionPrefix + CODE_PREFIX;
         String codeWithYear = codePrefix + yearLastTwoDigits;
 
-        return productionOrderOpt.isEmpty() ||
-                hasYearChanged(productionOrderOpt.get().getCode(), yearLastTwoDigits, codePrefix) ?
+        return lastCodeOpt.isEmpty() || hasYearChanged(lastCodeOpt.get(), yearLastTwoDigits, codePrefix) ?
                 codeWithYear + String.format(FIVE_DIGIT_NUMBER_FORMAT, FIRST_CODE_VALUE) :
-                codeWithYear + generateFormattedCodeValue(productionOrderOpt.get(), codeWithYear);
+                codeWithYear + generateFormattedCodeValue(lastCodeOpt.get(), codeWithYear);
     }
 
-    private String generateFormattedCodeValue(ProductionOrderEntity productionOrder, String codePrefix) {
-        if (productionOrder.getCode() == null || productionOrder.getCode().isEmpty()) {
+    private String generateFormattedCodeValue(String productionOrderCode, String codePrefix) {
+        if (productionOrderCode == null || productionOrderCode.isEmpty()) {
             String message = "Unable to generate new code: last stored Production Order code is null or empty";
-            log.warning(message);
+            log.info(message);
             throw new IllegalStateException(message);
         }
 
-        String lastCodeValueAsString = productionOrder.getCode().substring(codePrefix.length());
+        String lastCodeValueAsString = productionOrderCode.substring(codePrefix.length());
         int lastCodeValue = Integer.parseInt(lastCodeValueAsString);
 
         return String.format(FIVE_DIGIT_NUMBER_FORMAT, ++lastCodeValue);
@@ -284,6 +292,11 @@ public class ProductionOrderServiceImpl implements ProductionOrderService {
     public List<ProductionOrderEntity> findCompleted(long sectionId, boolean withoutComposed, Filter filter, Timestamp startDate,
                                                      Timestamp endDate) {
         return repository.findCompleted(sectionId, withoutComposed, filter, startDate, endDate);
+    }
+
+    @Override
+    public Optional<ProductionOrderEntity> findActiveByEquipmentCode(String equipmentCode) {
+        return repository.findActiveByEquipmentCode(equipmentCode);
     }
 }
 

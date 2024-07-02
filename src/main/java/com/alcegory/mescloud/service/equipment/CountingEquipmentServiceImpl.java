@@ -6,7 +6,9 @@ import com.alcegory.mescloud.model.entity.equipment.CountingEquipmentEntity;
 import com.alcegory.mescloud.repository.equipment.CountingEquipmentRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -134,11 +136,13 @@ public class CountingEquipmentServiceImpl implements CountingEquipmentService {
     }
 
     @Override
+    @Transactional
+    @Modifying
     public void setOperationStatusByCode(String equipmentCode, CountingEquipmentEntity.OperationStatus status) {
-        Optional<CountingEquipmentEntity> countingEquipmentEntityOptional = repository.findByCode(equipmentCode);
-        countingEquipmentEntityOptional.ifPresent(countingEquipmentEntity -> setOperationStatus(countingEquipmentEntity, status));
-
-        if (countingEquipmentEntityOptional.isEmpty()) {
+        int updatedRows = repository.updateOperationStatusByCode(equipmentCode, status.toString());
+        if (updatedRows > 0) {
+            log.info(() -> String.format("Updated operation status for equipment with code [%s]", equipmentCode));
+        } else {
             log.info(() -> String.format("Equipment with code [%s] not found", equipmentCode));
         }
     }
