@@ -28,7 +28,6 @@ public class CounterRecordRepositoryImpl extends AbstractFilterRepository<Filter
 
     private static final String ID_PROP = "id";
     private static final String SECTION_ID_PROP = "sectionId";
-    private static final String SECTION = "section";
     private static final String EQUIPMENT_OUTPUT_PROP = "equipmentOutput";
     private static final String EQUIPMENT_ID_PROP = "equipmentId";
     private static final String PRODUCTION_ORDER_PROP = "productionOrder";
