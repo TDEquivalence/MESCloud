@@ -62,7 +62,7 @@ public class ProductionOrderRepositoryImpl {
         mainRoot.fetch(EQUIPMENT, JoinType.LEFT);
 
         mainQuery.where(mainRoot.get(ID_PROP).in(ids));
-        mainQuery.orderBy(cb.desc(mainRoot.get(ID_PROP)));
+        mainQuery.orderBy(cb.desc(mainRoot.get(COMPLETED_AT)), cb.desc(mainRoot.get(ID_PROP)));
 
         TypedQuery<ProductionOrderEntity> typedQuery = entityManager.createQuery(mainQuery);
 
